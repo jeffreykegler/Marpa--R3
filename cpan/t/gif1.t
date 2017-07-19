@@ -265,12 +265,12 @@ GL2 Rule 0: sequence ::= item +
       GL4 Rule 6: pair ::= item item
         Symbol #0 item has 2 symches
           Symch #0.0.0
-          GL5 Rule 2: item ::= Hesperus
-            GL6 Rule 4: Hesperus ::= 'a'
+          GL5 Rule 3: item ::= Phosphorus
+            GL6 Rule 5: Phosphorus ::= 'a'
               GL7 Symbol 'a': "a"
           Symch #0.0.1
-          GL5 Rule 3: item ::= Phosphorus
-            GL8 Rule 5: Phosphorus ::= 'a'
+          GL5 Rule 2: item ::= Hesperus
+            GL8 Rule 4: Hesperus ::= 'a'
               GL9 Symbol 'a': "a"
         Symbol #1 item has 2 symches
           Symch #0.1.0

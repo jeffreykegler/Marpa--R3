@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use English qw( -no_match_vars );
 use Fatal qw( open close );
@@ -69,6 +69,40 @@ D ~ [\d\D]
 END_OF_DSL
 
 my @terminals = qw/A B C D/;
+
+{
+    # This grammar tests multiple uses of the same character class,
+    # so we look at the symbols and productions.
+    my $this_dsl = $dsl;
+    $this_dsl =~ s/DOIT/main::no_bail/xms;
+    my $grammar   = Marpa::R3::Scanless::G->new(
+        {   source => \$this_dsl }
+    );
+    Marpa::R3::Test::is( $grammar->symbols_show(),
+    <<'EO_TEXT', 'Symbols');
+S1 A
+S2 B
+S3 C
+S4 D
+S5 S
+S6 [:lex_start:]
+S7 [:start:]
+S8 [\d\D]
+EO_TEXT
+    Marpa::R3::Test::is( $grammar->productions_show(),
+    <<'EO_TEXT', 'Productions');
+R1 S ::= A B C D
+R2 [:start:] ::= S
+R3 [:lex_start:] ~ A
+R4 [:lex_start:] ~ B
+R5 [:lex_start:] ~ C
+R6 [:lex_start:] ~ D
+R7 A ~ [\d\D]
+R8 B ~ [\d\D]
+R9 C ~ [\d\D]
+R10 D ~ [\d\D]
+EO_TEXT
+}
 
 sub do_parse {
     my ($action) = @_;

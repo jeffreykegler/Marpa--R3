@@ -1388,7 +1388,26 @@ one for each subgrammar.
                 if start_a ~= start_b then return start_a < start_b end
                 local subkey_a = hash_xpr_data[a].subkey
                 local subkey_b = hash_xpr_data[b].subkey
-                return subkey_a < subkey_b
+                if subkey_a ~= subkey_b then return subkey_a < subkey_b end
+                local lhs_a = hash_xpr_data[a].lhs
+                local lhs_b = hash_xpr_data[b].lhs
+                if lhs_a ~= lhs_b then return lhs_a < lhs_b end
+
+                -- rules as of this writing are (I think) unique by start/subkey/LHS
+                --    so that the logic from here on is probably not tested
+
+                -- we only want an arbitrary order, and it is convenient to
+                -- test on length first
+                local rhs_a = hash_xpr_data[a].rhs
+                local rhs_b = hash_xpr_data[b].rhs
+                if #rhs_a ~= #rhs_b then return #rhs_a < #rhs_b end
+                -- we now know that both RHS lengths are the same
+                for ix = 1, #rhs_a do
+                    local sym_a = hash_xpr_data[a].rhs[ix]
+                    local sym_b = hash_xpr_data[b].rhs[ix]
+                    if sym_a ~= sym_b then return sym_a < sym_b end
+                end
+                return false
            end
         )
         for ix = 1, #xpr_names do
@@ -1417,10 +1436,6 @@ one for each subgrammar.
             local from_rhs = xpr_source.rhs
             for ix = 1, #from_rhs do
                 local rh_sym = xpr_source.rhs[ix]
-
-                print('xpr_source', inspect(xpr_source))
-                print('hash_symbols[rh_sym]', inspect(hash_symbols[rh_sym]))
-
                 to_rhs[ix] = xsys[rh_sym] or
                     xsys[hash_symbols[rh_sym].xsy]
             end

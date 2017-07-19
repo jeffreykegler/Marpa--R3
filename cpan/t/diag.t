@@ -179,9 +179,9 @@ Registering character U+0031 "1" as symbol 10: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{
 Registering character U+0032 "2" as symbol 7: [\d]
 Registering character U+0032 "2" as symbol 10: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Registering character U+0033 "3" as symbol 7: [\d]
-Registering character U+0033 "3" as symbol 6: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0033 "3" as symbol 10: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Registering character U+0034 "4" as symbol 7: [\d]
-Registering character U+0034 "4" as symbol 6: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Registering character U+0034 "4" as symbol 10: [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 Restarted recognizer at B1L1c1
 Expected lexeme Number at B1L1c1; assertion ID = 0
 Expected lexeme 'say' at B1L1c1; assertion ID = 1

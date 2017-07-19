@@ -670,7 +670,7 @@ my $start_id;
 
 # Marpa::R3::Display::End
 
-    Test::More::is( $start_id, 3, q{Test of $grammar->start_symbol_id()} );
+    Test::More::is( $start_id, 4, q{Test of $grammar->start_symbol_id()} );
 
 # Marpa::R3::Display
 # name: $grammar->g1_start_symbol_id() example
@@ -688,7 +688,7 @@ my $start_id;
 
 # Marpa::R3::Display::End
 
-    Test::More::is( $start_id, 4, q{Test of $grammar->l0_start_symbol_id()} );
+    Test::More::is( $start_id, 2, q{Test of $grammar->l0_start_symbol_id()} );
 
     my @production_names = ();
 
@@ -703,7 +703,13 @@ my $start_id;
     my $production_names = join q{:}, @production_names;
     Test::More::is(
         $production_names,
-        '[:start:]:start1:start2:first start rule:second start rule:X:Y',
+        (
+            join ':',
+            qw([:start:] start1 start2),
+            'first start rule',
+            'second start rule',
+            qw([:lex_start:] [:lex_start:] X Y)
+        ),
         q{Test of $grammar->production_name()}
     );
 
