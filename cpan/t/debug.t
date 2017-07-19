@@ -518,21 +518,32 @@ R17 <numeric expression> ::= number; prec=2
 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
 R19 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 R20 statement ::= assignment
-R21 whitespace ~ [\s] +
-R22 'set' ~ [s] [e] [t]
-R23 'to' ~ [t] [o]
-R24 '=' ~ [\=]
-R25 'string' ~ [s] [t] [r] [i] [n] [g]
-R26 '(' ~ [\(]
-R27 ')' ~ [\)]
-R28 '+' ~ [\+]
-R29 '*' ~ [\*]
-R30 '+' ~ [\+]
-R31 variable ~ [\w] +
-R32 number ~ [\d] +
-R33 string ~ ['] <string contents> [']
-R34 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-R35 [:discard:] ~ whitespace
+R21 [:lex_start:] ~ '*'
+R22 [:lex_start:] ~ number
+R23 [:lex_start:] ~ string
+R24 [:lex_start:] ~ variable
+R25 [:lex_start:] ~ [:discard:]
+R26 [:lex_start:] ~ 'set'
+R27 [:lex_start:] ~ 'to'
+R28 [:lex_start:] ~ '='
+R29 [:lex_start:] ~ 'string'
+R30 [:lex_start:] ~ '('
+R31 [:lex_start:] ~ ')'
+R32 [:lex_start:] ~ '+'
+R33 whitespace ~ [\s] +
+R34 'set' ~ [s] [e] [t]
+R35 'to' ~ [t] [o]
+R36 '=' ~ [\=]
+R37 'string' ~ [s] [t] [r] [i] [n] [g]
+R38 '(' ~ [\(]
+R39 ')' ~ [\)]
+R40 '+' ~ [\+]
+R41 '*' ~ [\*]
+R42 variable ~ [\w] +
+R43 number ~ [\d] +
+R44 string ~ ['] <string contents> [']
+R45 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R46 [:discard:] ~ whitespace
 END_OF_OUTPUT
 
 # Marpa::R3::Display::End
@@ -554,64 +565,64 @@ $rules_show_output = $grammar->g1_rules_show( { verbose => 3 } );
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show()' );
 R0 statements ::= statement *
-  Symbol IDs: <22> ::= <21>
+  Symbol IDs: <21> ::= <20>
   Canonical symbols: statements ::= statement
 R1 statement ::= assignment
-  Symbol IDs: <21> ::= <10>
+  Symbol IDs: <20> ::= <9>
   Canonical symbols: statement ::= assignment
 R2 statement ::= <numeric assignment>
-  Symbol IDs: <21> ::= <16>
+  Symbol IDs: <20> ::= <15>
   Canonical symbols: statement ::= <numeric assignment>
 R3 assignment ::= 'set' variable 'to' expression
-  Symbol IDs: <10> ::= <1> <24> <2> <11>
+  Symbol IDs: <9> ::= <1> <23> <2> <10>
   Canonical symbols: assignment ::= [Lex-0] variable [Lex-1] expression
 R4 <numeric assignment> ::= variable '=' <numeric expression>
-  Symbol IDs: <16> ::= <24> <3> <17>
+  Symbol IDs: <15> ::= <23> <3> <16>
   Canonical symbols: <numeric assignment> ::= variable [Lex-2] <numeric expression>
 R5 expression ::= expression
-  Symbol IDs: <11> ::= <12>
+  Symbol IDs: <10> ::= <11>
   Canonical symbols: expression ::= <expression[0]>
 R6 expression ::= expression
-  Symbol IDs: <12> ::= <13>
+  Symbol IDs: <11> ::= <12>
   Canonical symbols: <expression[0]> ::= <expression[1]>
 R7 expression ::= expression
-  Symbol IDs: <13> ::= <14>
+  Symbol IDs: <12> ::= <13>
   Canonical symbols: <expression[1]> ::= <expression[2]>
 R8 expression ::= variable
-  Symbol IDs: <14> ::= <24>
+  Symbol IDs: <13> ::= <23>
   Canonical symbols: <expression[2]> ::= variable
 R9 expression ::= string
-  Symbol IDs: <14> ::= <23>
+  Symbol IDs: <13> ::= <22>
   Canonical symbols: <expression[2]> ::= string
 R10 expression ::= 'string' '(' <numeric expression> ')'
-  Symbol IDs: <13> ::= <4> <5> <17> <6>
+  Symbol IDs: <12> ::= <4> <5> <16> <6>
   Canonical symbols: <expression[1]> ::= [Lex-3] [Lex-4] <numeric expression> [Lex-5]
 R11 expression ::= expression '+' expression
-  Symbol IDs: <12> ::= <12> <7> <13>
+  Symbol IDs: <11> ::= <11> <7> <12>
   Canonical symbols: <expression[0]> ::= <expression[0]> [Lex-6] <expression[1]>
 R12 <numeric expression> ::= <numeric expression>
-  Symbol IDs: <17> ::= <18>
+  Symbol IDs: <16> ::= <17>
   Canonical symbols: <numeric expression> ::= <numeric expression[0]>
 R13 <numeric expression> ::= <numeric expression>
-  Symbol IDs: <18> ::= <19>
+  Symbol IDs: <17> ::= <18>
   Canonical symbols: <numeric expression[0]> ::= <numeric expression[1]>
 R14 <numeric expression> ::= <numeric expression>
-  Symbol IDs: <19> ::= <20>
+  Symbol IDs: <18> ::= <19>
   Canonical symbols: <numeric expression[1]> ::= <numeric expression[2]>
 R15 <numeric expression> ::= variable
-  Symbol IDs: <20> ::= <24>
+  Symbol IDs: <19> ::= <23>
   Canonical symbols: <numeric expression[2]> ::= variable
 R16 <numeric expression> ::= number
-  Symbol IDs: <20> ::= <15>
+  Symbol IDs: <19> ::= <14>
   Canonical symbols: <numeric expression[2]> ::= number
 R17 <numeric expression> ::= <numeric expression> '*' <numeric expression>
-  Symbol IDs: <19> ::= <19> <8> <20>
+  Symbol IDs: <18> ::= <18> <8> <19>
   Canonical symbols: <numeric expression[1]> ::= <numeric expression[1]> [Lex-7] <numeric expression[2]>
 R18 <numeric expression> ::= <numeric expression> '+' <numeric expression>
-  Symbol IDs: <18> ::= <18> <9> <19>
-  Canonical symbols: <numeric expression[0]> ::= <numeric expression[0]> [Lex-8] <numeric expression[1]>
+  Symbol IDs: <17> ::= <17> <7> <18>
+  Canonical symbols: <numeric expression[0]> ::= <numeric expression[0]> [Lex-6] <numeric expression[1]>
 R19 [:start:] ::= statements
-  Symbol IDs: <0> ::= <22>
+  Symbol IDs: <0> ::= <21>
   Canonical symbols: [:start:] ::= statements
 END_OF_SHOW_RULES_OUTPUT
 
@@ -632,88 +643,82 @@ $rules_show_output = $grammar->l0_rules_show( { verbose => 3 });
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show()' );
 R0 'set' ~ [s] [e] [t]
-  Symbol IDs: <1> ::= <26> <20> <27>
+  Symbol IDs: <2> ::= <26> <20> <27>
   Canonical symbols: [Lex-0] ::= [[s]] [[e]] [[t]]
 R1 'to' ~ [t] [o]
-  Symbol IDs: <2> ::= <27> <24>
+  Symbol IDs: <3> ::= <27> <24>
   Canonical symbols: [Lex-1] ::= [[t]] [[o]]
 R2 '=' ~ [\=]
-  Symbol IDs: <3> ::= <15>
+  Symbol IDs: <4> ::= <15>
   Canonical symbols: [Lex-2] ::= [[\=]]
 R3 'string' ~ [s] [t] [r] [i] [n] [g]
-  Symbol IDs: <4> ::= <26> <27> <25> <22> <23> <21>
+  Symbol IDs: <5> ::= <26> <27> <25> <22> <23> <21>
   Canonical symbols: [Lex-3] ::= [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
 R4 '(' ~ [\(]
-  Symbol IDs: <5> ::= <11>
+  Symbol IDs: <6> ::= <11>
   Canonical symbols: [Lex-4] ::= [[\(]]
 R5 ')' ~ [\)]
-  Symbol IDs: <6> ::= <12>
+  Symbol IDs: <7> ::= <12>
   Canonical symbols: [Lex-5] ::= [[\)]]
 R6 '+' ~ [\+]
-  Symbol IDs: <7> ::= <14>
+  Symbol IDs: <8> ::= <14>
   Canonical symbols: [Lex-6] ::= [[\+]]
 R7 '*' ~ [\*]
-  Symbol IDs: <8> ::= <13>
+  Symbol IDs: <9> ::= <13>
   Canonical symbols: [Lex-7] ::= [[\*]]
-R8 '+' ~ [\+]
-  Symbol IDs: <9> ::= <14>
-  Canonical symbols: [Lex-8] ::= [[\+]]
-R9 variable ~ [\w] +
+R8 variable ~ [\w] +
   Symbol IDs: <31> ::= <18>
   Canonical symbols: variable ::= [[\w]]
-R10 number ~ [\d] +
+R9 number ~ [\d] +
   Symbol IDs: <28> ::= <16>
   Canonical symbols: number ::= [[\d]]
-R11 string ~ ['] <string contents> [']
+R10 string ~ ['] <string contents> [']
   Symbol IDs: <29> ::= <10> <30> <10>
   Canonical symbols: string ::= [[']] <string contents> [[']]
-R12 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R11 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
   Symbol IDs: <30> ::= <19>
   Canonical symbols: <string contents> ::= [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
-R13 [:discard:] ~ whitespace
+R12 [:discard:] ~ whitespace
   Symbol IDs: <0> ::= <32>
   Canonical symbols: [:discard:] ::= whitespace
-R14 whitespace ~ [\s] +
+R13 whitespace ~ [\s] +
   Symbol IDs: <32> ::= <17>
   Canonical symbols: whitespace ::= [[\s]]
-R15 [:lex_start:] ~ [:discard:]
-  Symbol IDs: <33> ::= <0>
+R14 [:lex_start:] ~ [:discard:]
+  Symbol IDs: <1> ::= <0>
   Canonical symbols: [:lex_start:] ::= [:discard:]
-R16 [:lex_start:] ~ 'set'
-  Symbol IDs: <33> ::= <1>
+R15 [:lex_start:] ~ 'set'
+  Symbol IDs: <1> ::= <2>
   Canonical symbols: [:lex_start:] ::= [Lex-0]
-R17 [:lex_start:] ~ 'to'
-  Symbol IDs: <33> ::= <2>
+R16 [:lex_start:] ~ 'to'
+  Symbol IDs: <1> ::= <3>
   Canonical symbols: [:lex_start:] ::= [Lex-1]
-R18 [:lex_start:] ~ '='
-  Symbol IDs: <33> ::= <3>
+R17 [:lex_start:] ~ '='
+  Symbol IDs: <1> ::= <4>
   Canonical symbols: [:lex_start:] ::= [Lex-2]
-R19 [:lex_start:] ~ 'string'
-  Symbol IDs: <33> ::= <4>
+R18 [:lex_start:] ~ 'string'
+  Symbol IDs: <1> ::= <5>
   Canonical symbols: [:lex_start:] ::= [Lex-3]
-R20 [:lex_start:] ~ '('
-  Symbol IDs: <33> ::= <5>
+R19 [:lex_start:] ~ '('
+  Symbol IDs: <1> ::= <6>
   Canonical symbols: [:lex_start:] ::= [Lex-4]
-R21 [:lex_start:] ~ ')'
-  Symbol IDs: <33> ::= <6>
+R20 [:lex_start:] ~ ')'
+  Symbol IDs: <1> ::= <7>
   Canonical symbols: [:lex_start:] ::= [Lex-5]
-R22 [:lex_start:] ~ '+'
-  Symbol IDs: <33> ::= <7>
+R21 [:lex_start:] ~ '+'
+  Symbol IDs: <1> ::= <8>
   Canonical symbols: [:lex_start:] ::= [Lex-6]
-R23 [:lex_start:] ~ '*'
-  Symbol IDs: <33> ::= <8>
+R22 [:lex_start:] ~ '*'
+  Symbol IDs: <1> ::= <9>
   Canonical symbols: [:lex_start:] ::= [Lex-7]
-R24 [:lex_start:] ~ '+'
-  Symbol IDs: <33> ::= <9>
-  Canonical symbols: [:lex_start:] ::= [Lex-8]
-R25 [:lex_start:] ~ number
-  Symbol IDs: <33> ::= <28>
+R23 [:lex_start:] ~ number
+  Symbol IDs: <1> ::= <28>
   Canonical symbols: [:lex_start:] ::= number
-R26 [:lex_start:] ~ string
-  Symbol IDs: <33> ::= <29>
+R24 [:lex_start:] ~ string
+  Symbol IDs: <1> ::= <29>
   Canonical symbols: [:lex_start:] ::= string
-R27 [:lex_start:] ~ variable
-  Symbol IDs: <33> ::= <31>
+R25 [:lex_start:] ~ variable
+  Symbol IDs: <1> ::= <31>
   Canonical symbols: [:lex_start:] ::= variable
 END_OF_SHOW_RULES_OUTPUT
 
@@ -746,23 +751,34 @@ R15 <numeric expression> ::= <numeric expression>; prec=1
 R16 <numeric expression> ::= variable; prec=2
 R17 <numeric expression> ::= number; prec=2
 R18 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
-R19 <numeric expression> ::= <numeric expression> [Lex-8] <numeric expression>; prec=0
+R19 <numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 R20 statement ::= assignment
-R21 whitespace ~ [[\s]] +
-R22 [Lex-0] ~ [[s]] [[e]] [[t]]
-R23 [Lex-1] ~ [[t]] [[o]]
-R24 [Lex-2] ~ [[\=]]
-R25 [Lex-3] ~ [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
-R26 [Lex-4] ~ [[\(]]
-R27 [Lex-5] ~ [[\)]]
-R28 [Lex-6] ~ [[\+]]
-R29 [Lex-7] ~ [[\*]]
-R30 [Lex-8] ~ [[\+]]
-R31 variable ~ [[\w]] +
-R32 number ~ [[\d]] +
-R33 string ~ [[']] <string contents> [[']]
-R34 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
-R35 [:discard:] ~ whitespace
+R21 [:lex_start:] ~ [Lex-7]
+R22 [:lex_start:] ~ number
+R23 [:lex_start:] ~ string
+R24 [:lex_start:] ~ variable
+R25 [:lex_start:] ~ [:discard:]
+R26 [:lex_start:] ~ [Lex-0]
+R27 [:lex_start:] ~ [Lex-1]
+R28 [:lex_start:] ~ [Lex-2]
+R29 [:lex_start:] ~ [Lex-3]
+R30 [:lex_start:] ~ [Lex-4]
+R31 [:lex_start:] ~ [Lex-5]
+R32 [:lex_start:] ~ [Lex-6]
+R33 whitespace ~ [[\s]] +
+R34 [Lex-0] ~ [[s]] [[e]] [[t]]
+R35 [Lex-1] ~ [[t]] [[o]]
+R36 [Lex-2] ~ [[\=]]
+R37 [Lex-3] ~ [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
+R38 [Lex-4] ~ [[\(]]
+R39 [Lex-5] ~ [[\)]]
+R40 [Lex-6] ~ [[\+]]
+R41 [Lex-7] ~ [[\*]]
+R42 variable ~ [[\w]] +
+R43 number ~ [[\d]] +
+R44 string ~ [[']] <string contents> [[']]
+R45 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
+R46 [:discard:] ~ whitespace
 END_OF_OUTPUT
 
 my $rules_diag_output;
@@ -777,64 +793,64 @@ $rules_diag_output = $grammar->g1_rules_show( { verbose => 3, diag => 1 } );
 Marpa::R3::Test::is( $rules_diag_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show() diag form' );
 R0 statements ::= statement *
-  Symbol IDs: <22> ::= <21>
+  Symbol IDs: <21> ::= <20>
   Canonical symbols: statements ::= statement
 R1 statement ::= assignment
-  Symbol IDs: <21> ::= <10>
+  Symbol IDs: <20> ::= <9>
   Canonical symbols: statement ::= assignment
 R2 statement ::= <numeric assignment>
-  Symbol IDs: <21> ::= <16>
+  Symbol IDs: <20> ::= <15>
   Canonical symbols: statement ::= <numeric assignment>
 R3 assignment ::= [Lex-0] variable [Lex-1] expression
-  Symbol IDs: <10> ::= <1> <24> <2> <11>
+  Symbol IDs: <9> ::= <1> <23> <2> <10>
   Canonical symbols: assignment ::= [Lex-0] variable [Lex-1] expression
 R4 <numeric assignment> ::= variable [Lex-2] <numeric expression>
-  Symbol IDs: <16> ::= <24> <3> <17>
+  Symbol IDs: <15> ::= <23> <3> <16>
   Canonical symbols: <numeric assignment> ::= variable [Lex-2] <numeric expression>
 R5 expression ::= <expression[0]>
-  Symbol IDs: <11> ::= <12>
+  Symbol IDs: <10> ::= <11>
   Canonical symbols: expression ::= <expression[0]>
 R6 <expression[0]> ::= <expression[1]>
-  Symbol IDs: <12> ::= <13>
+  Symbol IDs: <11> ::= <12>
   Canonical symbols: <expression[0]> ::= <expression[1]>
 R7 <expression[1]> ::= <expression[2]>
-  Symbol IDs: <13> ::= <14>
+  Symbol IDs: <12> ::= <13>
   Canonical symbols: <expression[1]> ::= <expression[2]>
 R8 <expression[2]> ::= variable
-  Symbol IDs: <14> ::= <24>
+  Symbol IDs: <13> ::= <23>
   Canonical symbols: <expression[2]> ::= variable
 R9 <expression[2]> ::= string
-  Symbol IDs: <14> ::= <23>
+  Symbol IDs: <13> ::= <22>
   Canonical symbols: <expression[2]> ::= string
 R10 <expression[1]> ::= [Lex-3] [Lex-4] <numeric expression> [Lex-5]
-  Symbol IDs: <13> ::= <4> <5> <17> <6>
+  Symbol IDs: <12> ::= <4> <5> <16> <6>
   Canonical symbols: <expression[1]> ::= [Lex-3] [Lex-4] <numeric expression> [Lex-5]
 R11 <expression[0]> ::= <expression[0]> [Lex-6] <expression[1]>
-  Symbol IDs: <12> ::= <12> <7> <13>
+  Symbol IDs: <11> ::= <11> <7> <12>
   Canonical symbols: <expression[0]> ::= <expression[0]> [Lex-6] <expression[1]>
 R12 <numeric expression> ::= <numeric expression[0]>
-  Symbol IDs: <17> ::= <18>
+  Symbol IDs: <16> ::= <17>
   Canonical symbols: <numeric expression> ::= <numeric expression[0]>
 R13 <numeric expression[0]> ::= <numeric expression[1]>
-  Symbol IDs: <18> ::= <19>
+  Symbol IDs: <17> ::= <18>
   Canonical symbols: <numeric expression[0]> ::= <numeric expression[1]>
 R14 <numeric expression[1]> ::= <numeric expression[2]>
-  Symbol IDs: <19> ::= <20>
+  Symbol IDs: <18> ::= <19>
   Canonical symbols: <numeric expression[1]> ::= <numeric expression[2]>
 R15 <numeric expression[2]> ::= variable
-  Symbol IDs: <20> ::= <24>
+  Symbol IDs: <19> ::= <23>
   Canonical symbols: <numeric expression[2]> ::= variable
 R16 <numeric expression[2]> ::= number
-  Symbol IDs: <20> ::= <15>
+  Symbol IDs: <19> ::= <14>
   Canonical symbols: <numeric expression[2]> ::= number
 R17 <numeric expression[1]> ::= <numeric expression[1]> [Lex-7] <numeric expression[2]>
-  Symbol IDs: <19> ::= <19> <8> <20>
+  Symbol IDs: <18> ::= <18> <8> <19>
   Canonical symbols: <numeric expression[1]> ::= <numeric expression[1]> [Lex-7] <numeric expression[2]>
-R18 <numeric expression[0]> ::= <numeric expression[0]> [Lex-8] <numeric expression[1]>
-  Symbol IDs: <18> ::= <18> <9> <19>
-  Canonical symbols: <numeric expression[0]> ::= <numeric expression[0]> [Lex-8] <numeric expression[1]>
+R18 <numeric expression[0]> ::= <numeric expression[0]> [Lex-6] <numeric expression[1]>
+  Symbol IDs: <17> ::= <17> <7> <18>
+  Canonical symbols: <numeric expression[0]> ::= <numeric expression[0]> [Lex-6] <numeric expression[1]>
 R19 [:start:] ::= statements
-  Symbol IDs: <0> ::= <22>
+  Symbol IDs: <0> ::= <21>
   Canonical symbols: [:start:] ::= statements
 END_OF_SHOW_RULES_OUTPUT
 
@@ -848,88 +864,82 @@ $rules_diag_output = $grammar->l0_rules_show( { verbose => 3, diag => 1 } );
 Marpa::R3::Test::is( $rules_diag_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show() diag form' );
 R0 [Lex-0] ~ [[s]] [[e]] [[t]]
-  Symbol IDs: <1> ::= <26> <20> <27>
+  Symbol IDs: <2> ::= <26> <20> <27>
   Canonical symbols: [Lex-0] ::= [[s]] [[e]] [[t]]
 R1 [Lex-1] ~ [[t]] [[o]]
-  Symbol IDs: <2> ::= <27> <24>
+  Symbol IDs: <3> ::= <27> <24>
   Canonical symbols: [Lex-1] ::= [[t]] [[o]]
 R2 [Lex-2] ~ [[\=]]
-  Symbol IDs: <3> ::= <15>
+  Symbol IDs: <4> ::= <15>
   Canonical symbols: [Lex-2] ::= [[\=]]
 R3 [Lex-3] ~ [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
-  Symbol IDs: <4> ::= <26> <27> <25> <22> <23> <21>
+  Symbol IDs: <5> ::= <26> <27> <25> <22> <23> <21>
   Canonical symbols: [Lex-3] ::= [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
 R4 [Lex-4] ~ [[\(]]
-  Symbol IDs: <5> ::= <11>
+  Symbol IDs: <6> ::= <11>
   Canonical symbols: [Lex-4] ::= [[\(]]
 R5 [Lex-5] ~ [[\)]]
-  Symbol IDs: <6> ::= <12>
+  Symbol IDs: <7> ::= <12>
   Canonical symbols: [Lex-5] ::= [[\)]]
 R6 [Lex-6] ~ [[\+]]
-  Symbol IDs: <7> ::= <14>
+  Symbol IDs: <8> ::= <14>
   Canonical symbols: [Lex-6] ::= [[\+]]
 R7 [Lex-7] ~ [[\*]]
-  Symbol IDs: <8> ::= <13>
+  Symbol IDs: <9> ::= <13>
   Canonical symbols: [Lex-7] ::= [[\*]]
-R8 [Lex-8] ~ [[\+]]
-  Symbol IDs: <9> ::= <14>
-  Canonical symbols: [Lex-8] ::= [[\+]]
-R9 variable ~ [[\w]] +
+R8 variable ~ [[\w]] +
   Symbol IDs: <31> ::= <18>
   Canonical symbols: variable ::= [[\w]]
-R10 number ~ [[\d]] +
+R9 number ~ [[\d]] +
   Symbol IDs: <28> ::= <16>
   Canonical symbols: number ::= [[\d]]
-R11 string ~ [[']] <string contents> [[']]
+R10 string ~ [[']] <string contents> [[']]
   Symbol IDs: <29> ::= <10> <30> <10>
   Canonical symbols: string ::= [[']] <string contents> [[']]
-R12 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
+R11 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
   Symbol IDs: <30> ::= <19>
   Canonical symbols: <string contents> ::= [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
-R13 [:discard:] ~ whitespace
+R12 [:discard:] ~ whitespace
   Symbol IDs: <0> ::= <32>
   Canonical symbols: [:discard:] ::= whitespace
-R14 whitespace ~ [[\s]] +
+R13 whitespace ~ [[\s]] +
   Symbol IDs: <32> ::= <17>
   Canonical symbols: whitespace ::= [[\s]]
-R15 [:lex_start:] ~ [:discard:]
-  Symbol IDs: <33> ::= <0>
+R14 [:lex_start:] ~ [:discard:]
+  Symbol IDs: <1> ::= <0>
   Canonical symbols: [:lex_start:] ::= [:discard:]
-R16 [:lex_start:] ~ [Lex-0]
-  Symbol IDs: <33> ::= <1>
+R15 [:lex_start:] ~ [Lex-0]
+  Symbol IDs: <1> ::= <2>
   Canonical symbols: [:lex_start:] ::= [Lex-0]
-R17 [:lex_start:] ~ [Lex-1]
-  Symbol IDs: <33> ::= <2>
+R16 [:lex_start:] ~ [Lex-1]
+  Symbol IDs: <1> ::= <3>
   Canonical symbols: [:lex_start:] ::= [Lex-1]
-R18 [:lex_start:] ~ [Lex-2]
-  Symbol IDs: <33> ::= <3>
+R17 [:lex_start:] ~ [Lex-2]
+  Symbol IDs: <1> ::= <4>
   Canonical symbols: [:lex_start:] ::= [Lex-2]
-R19 [:lex_start:] ~ [Lex-3]
-  Symbol IDs: <33> ::= <4>
+R18 [:lex_start:] ~ [Lex-3]
+  Symbol IDs: <1> ::= <5>
   Canonical symbols: [:lex_start:] ::= [Lex-3]
-R20 [:lex_start:] ~ [Lex-4]
-  Symbol IDs: <33> ::= <5>
+R19 [:lex_start:] ~ [Lex-4]
+  Symbol IDs: <1> ::= <6>
   Canonical symbols: [:lex_start:] ::= [Lex-4]
-R21 [:lex_start:] ~ [Lex-5]
-  Symbol IDs: <33> ::= <6>
+R20 [:lex_start:] ~ [Lex-5]
+  Symbol IDs: <1> ::= <7>
   Canonical symbols: [:lex_start:] ::= [Lex-5]
-R22 [:lex_start:] ~ [Lex-6]
-  Symbol IDs: <33> ::= <7>
+R21 [:lex_start:] ~ [Lex-6]
+  Symbol IDs: <1> ::= <8>
   Canonical symbols: [:lex_start:] ::= [Lex-6]
-R23 [:lex_start:] ~ [Lex-7]
-  Symbol IDs: <33> ::= <8>
+R22 [:lex_start:] ~ [Lex-7]
+  Symbol IDs: <1> ::= <9>
   Canonical symbols: [:lex_start:] ::= [Lex-7]
-R24 [:lex_start:] ~ [Lex-8]
-  Symbol IDs: <33> ::= <9>
-  Canonical symbols: [:lex_start:] ::= [Lex-8]
-R25 [:lex_start:] ~ number
-  Symbol IDs: <33> ::= <28>
+R23 [:lex_start:] ~ number
+  Symbol IDs: <1> ::= <28>
   Canonical symbols: [:lex_start:] ::= number
-R26 [:lex_start:] ~ string
-  Symbol IDs: <33> ::= <29>
+R24 [:lex_start:] ~ string
+  Symbol IDs: <1> ::= <29>
   Canonical symbols: [:lex_start:] ::= string
-R27 [:lex_start:] ~ variable
-  Symbol IDs: <33> ::= <31>
+R25 [:lex_start:] ~ variable
+  Symbol IDs: <1> ::= <31>
   Canonical symbols: [:lex_start:] ::= variable
 END_OF_SHOW_RULES_OUTPUT
 
@@ -952,36 +962,36 @@ Marpa::R3::Test::is( $symbols_show_output,
 S1 [:discard:]
   Canonical name: [:discard:]
   DSL name: [:discard:]
-S2 [:start:]
+S2 [:lex_start:]
+  Canonical name: [:lex_start:]
+  DSL name: [:lex_start:]
+S3 [:start:]
   Canonical name: [:start:]
   DSL name: [:start:]
-S3 'set'
+S4 'set'
   Canonical name: [Lex-0]
   DSL name: 'set'
-S4 'to'
+S5 'to'
   Canonical name: [Lex-1]
   DSL name: 'to'
-S5 '='
+S6 '='
   Canonical name: [Lex-2]
   DSL name: '='
-S6 'string'
+S7 'string'
   Canonical name: [Lex-3]
   DSL name: 'string'
-S7 '('
+S8 '('
   Canonical name: [Lex-4]
   DSL name: '('
-S8 ')'
+S9 ')'
   Canonical name: [Lex-5]
   DSL name: ')'
-S9 '+'
+S10 '+'
   Canonical name: [Lex-6]
   DSL name: '+'
-S10 '*'
+S11 '*'
   Canonical name: [Lex-7]
   DSL name: '*'
-S11 '+'
-  Canonical name: [Lex-8]
-  DSL name: '+'
 S12 [']
   Canonical name: [[']]
   DSL name: [']
@@ -1124,55 +1134,51 @@ g1 S8 '*'
   /* terminal */
   Canonical name: [Lex-7]
   DSL name: '*'
-g1 S9 '+'
-  /* terminal */
-  Canonical name: [Lex-8]
-  DSL name: '+'
-g1 S10 assignment
+g1 S9 assignment
   Canonical name: assignment
   DSL name: assignment
-g1 S11 expression
+g1 S10 expression
   Canonical name: expression
   DSL name: expression
-g1 S12 expression
+g1 S11 expression
   Canonical name: <expression[0]>
   DSL name: expression
-g1 S13 expression
+g1 S12 expression
   Canonical name: <expression[1]>
   DSL name: expression
-g1 S14 expression
+g1 S13 expression
   Canonical name: <expression[2]>
   DSL name: expression
-g1 S15 number
+g1 S14 number
   /* terminal */
   Canonical name: number
   DSL name: number
-g1 S16 <numeric assignment>
+g1 S15 <numeric assignment>
   Canonical name: <numeric assignment>
   DSL name: numeric assignment
-g1 S17 <numeric expression>
+g1 S16 <numeric expression>
   Canonical name: <numeric expression>
   DSL name: numeric expression
-g1 S18 <numeric expression>
+g1 S17 <numeric expression>
   Canonical name: <numeric expression[0]>
   DSL name: numeric expression
-g1 S19 <numeric expression>
+g1 S18 <numeric expression>
   Canonical name: <numeric expression[1]>
   DSL name: numeric expression
-g1 S20 <numeric expression>
+g1 S19 <numeric expression>
   Canonical name: <numeric expression[2]>
   DSL name: numeric expression
-g1 S21 statement
+g1 S20 statement
   Canonical name: statement
   DSL name: statement
-g1 S22 statements
+g1 S21 statements
   Canonical name: statements
   DSL name: statements
-g1 S23 string
+g1 S22 string
   /* terminal */
   Canonical name: string
   DSL name: string
-g1 S24 variable
+g1 S23 variable
   /* terminal */
   Canonical name: variable
   DSL name: variable
@@ -1198,33 +1204,34 @@ Marpa::R3::Test::is( $symbols_show_output,
 L0 Symbols:
 l0 S0 [:discard:]
   Canonical name: [:discard:]
-l0 S1 'set'
+  DSL name: [:discard:]
+l0 S1 [:lex_start:]
+  Canonical name: [:lex_start:]
+  DSL name: [:lex_start:]
+l0 S2 'set'
   Canonical name: [Lex-0]
   DSL name: 'set'
-l0 S2 'to'
+l0 S3 'to'
   Canonical name: [Lex-1]
   DSL name: 'to'
-l0 S3 '='
+l0 S4 '='
   Canonical name: [Lex-2]
   DSL name: '='
-l0 S4 'string'
+l0 S5 'string'
   Canonical name: [Lex-3]
   DSL name: 'string'
-l0 S5 '('
+l0 S6 '('
   Canonical name: [Lex-4]
   DSL name: '('
-l0 S6 ')'
+l0 S7 ')'
   Canonical name: [Lex-5]
   DSL name: ')'
-l0 S7 '+'
+l0 S8 '+'
   Canonical name: [Lex-6]
   DSL name: '+'
-l0 S8 '*'
+l0 S9 '*'
   Canonical name: [Lex-7]
   DSL name: '*'
-l0 S9 '+'
-  Canonical name: [Lex-8]
-  DSL name: '+'
 l0 S10 [']
   /* terminal */
   Canonical name: [[']]
@@ -1312,8 +1319,6 @@ l0 S31 variable
 l0 S32 whitespace
   Canonical name: whitespace
   DSL name: whitespace
-l0 S33 [:lex_start:]
-  Canonical name: [:lex_start:]
 END_OF_SHOW_SYMBOLS_OUTPUT
 
 # Marpa::R3::Display::End
@@ -1359,7 +1364,7 @@ for (
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY ),
-    ( join "\n", 0 .. 24 ),
+    ( join "\n", 0 .. 23 ),
     'G1 symbol ids'
 );
 
@@ -1380,7 +1385,7 @@ for (
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY ),
-    ( join "\n", 0 .. 33 ),
+    ( join "\n", 0 .. 32 ),
     'L0 symbol ids'
 );
 
@@ -1425,123 +1430,126 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'Symbol names and description');
 symbol number: 1; name: [:discard:]
 symbol number: 1; name in display form: [:discard:]
 symbol number: 1; DSL form: [:discard:]
-symbol number: 2; name: [:start:]
-symbol number: 2; name in display form: [:start:]
-symbol number: 2; DSL form: [:start:]
-symbol number: 3; name: [Lex-0]
-symbol number: 3; name in display form: 'set'
-symbol number: 3; DSL form: 'set'
-symbol number: 4; name: [Lex-1]
-symbol number: 4; name in display form: 'to'
-symbol number: 4; DSL form: 'to'
-symbol number: 5; name: [Lex-2]
-symbol number: 5; name in display form: '='
-symbol number: 5; DSL form: '='
-symbol number: 6; name: [Lex-3]
-symbol number: 6; name in display form: 'string'
-symbol number: 6; DSL form: 'string'
-symbol number: 7; name: [Lex-4]
-symbol number: 7; name in display form: '('
-symbol number: 7; DSL form: '('
-symbol number: 8; name: [Lex-5]
-symbol number: 8; name in display form: ')'
-symbol number: 8; DSL form: ')'
-symbol number: 9; name: [Lex-6]
-symbol number: 9; name in display form: '+'
-symbol number: 9; DSL form: '+'
-symbol number: 10; name: [Lex-7]
-symbol number: 10; name in display form: '*'
-symbol number: 10; DSL form: '*'
-symbol number: 11; name: [Lex-8]
-symbol number: 11; name in display form: '+'
-symbol number: 11; DSL form: '+'
-symbol number: 12; name: [[']]
-symbol number: 12; name in display form: [']
-symbol number: 12; DSL form: [']
-symbol number: 13; name: [[\(]]
-symbol number: 13; name in display form: [\(]
-symbol number: 13; DSL form: [\(]
-symbol number: 14; name: [[\)]]
-symbol number: 14; name in display form: [\)]
-symbol number: 14; DSL form: [\)]
-symbol number: 15; name: [[\*]]
-symbol number: 15; name in display form: [\*]
-symbol number: 15; DSL form: [\*]
-symbol number: 16; name: [[\+]]
-symbol number: 16; name in display form: [\+]
-symbol number: 16; DSL form: [\+]
-symbol number: 17; name: [[\=]]
-symbol number: 17; name in display form: [\=]
-symbol number: 17; DSL form: [\=]
-symbol number: 18; name: [[\d]]
-symbol number: 18; name in display form: [\d]
-symbol number: 18; DSL form: [\d]
-symbol number: 19; name: [[\s]]
-symbol number: 19; name in display form: [\s]
-symbol number: 19; DSL form: [\s]
-symbol number: 20; name: [[\w]]
-symbol number: 20; name in display form: [\w]
-symbol number: 20; DSL form: [\w]
-symbol number: 21; name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
-symbol number: 21; name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-symbol number: 21; DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-symbol number: 22; name: [[e]]
-symbol number: 22; name in display form: [e]
-symbol number: 22; DSL form: [e]
-symbol number: 23; name: [[g]]
-symbol number: 23; name in display form: [g]
-symbol number: 23; DSL form: [g]
-symbol number: 24; name: [[i]]
-symbol number: 24; name in display form: [i]
-symbol number: 24; DSL form: [i]
-symbol number: 25; name: [[n]]
-symbol number: 25; name in display form: [n]
-symbol number: 25; DSL form: [n]
-symbol number: 26; name: [[o]]
-symbol number: 26; name in display form: [o]
-symbol number: 26; DSL form: [o]
-symbol number: 27; name: [[r]]
-symbol number: 27; name in display form: [r]
-symbol number: 27; DSL form: [r]
-symbol number: 28; name: [[s]]
-symbol number: 28; name in display form: [s]
-symbol number: 28; DSL form: [s]
-symbol number: 29; name: [[t]]
-symbol number: 29; name in display form: [t]
-symbol number: 29; DSL form: [t]
-symbol number: 30; name: assignment
-symbol number: 30; name in display form: assignment
-symbol number: 30; DSL form: assignment
-symbol number: 31; name: expression
-symbol number: 31; name in display form: expression
-symbol number: 31; DSL form: expression
-symbol number: 32; name: number
-symbol number: 32; name in display form: number
-symbol number: 32; DSL form: number
-symbol number: 33; name: numeric assignment
-symbol number: 33; name in display form: <numeric assignment>
-symbol number: 33; DSL form: numeric assignment
-symbol number: 34; name: numeric expression
-symbol number: 34; name in display form: <numeric expression>
-symbol number: 34; DSL form: numeric expression
-symbol number: 35; name: statement
-symbol number: 35; name in display form: statement
-symbol number: 35; DSL form: statement
-symbol number: 36; name: statements
-symbol number: 36; name in display form: statements
-symbol number: 36; DSL form: statements
-symbol number: 37; name: string
-symbol number: 37; name in display form: string
-symbol number: 37; DSL form: string
-symbol number: 38; name: string contents
-symbol number: 38; name in display form: <string contents>
-symbol number: 38; DSL form: string contents
-symbol number: 39; name: variable
-symbol number: 39; name in display form: variable
-symbol number: 39; DSL form: variable
-symbol number: 40; name: whitespace
-symbol number: 40; name in display form: whitespace
-symbol number: 40; DSL form: whitespace
+symbol number: 2; name: [:lex_start:]
+symbol number: 2; name in display form: [:lex_start:]
+symbol number: 2; DSL form: [:lex_start:]
+symbol number: 3; name: [:start:]
+symbol number: 3; name in display form: [:start:]
+symbol number: 3; DSL form: [:start:]
+symbol number: 4; name: [Lex-0]
+symbol number: 4; name in display form: 'set'
+symbol number: 4; DSL form: 'set'
+symbol number: 5; name: [Lex-1]
+symbol number: 5; name in display form: 'to'
+symbol number: 5; DSL form: 'to'
+symbol number: 6; name: [Lex-2]
+symbol number: 6; name in display form: '='
+symbol number: 6; DSL form: '='
+symbol number: 7; name: [Lex-3]
+symbol number: 7; name in display form: 'string'
+symbol number: 7; DSL form: 'string'
+symbol number: 8; name: [Lex-4]
+symbol number: 8; name in display form: '('
+symbol number: 8; DSL form: '('
+symbol number: 9; name: [Lex-5]
+symbol number: 9; name in display form: ')'
+symbol number: 9; DSL form: ')'
+symbol number: 10; name: [Lex-6]
+symbol number: 10; name in display form: '+'
+symbol number: 10; DSL form: '+'
+symbol number: 11; name: [Lex-7]
+symbol number: 11; name in display form: '*'
+symbol number: 11; DSL form: '*'
+symbol number: 12; name: [Lex-8]
+symbol number: 12; name in display form: '+'
+symbol number: 12; DSL form: '+'
+symbol number: 13; name: [[']]
+symbol number: 13; name in display form: [']
+symbol number: 13; DSL form: [']
+symbol number: 14; name: [[\(]]
+symbol number: 14; name in display form: [\(]
+symbol number: 14; DSL form: [\(]
+symbol number: 15; name: [[\)]]
+symbol number: 15; name in display form: [\)]
+symbol number: 15; DSL form: [\)]
+symbol number: 16; name: [[\*]]
+symbol number: 16; name in display form: [\*]
+symbol number: 16; DSL form: [\*]
+symbol number: 17; name: [[\+]]
+symbol number: 17; name in display form: [\+]
+symbol number: 17; DSL form: [\+]
+symbol number: 18; name: [[\=]]
+symbol number: 18; name in display form: [\=]
+symbol number: 18; DSL form: [\=]
+symbol number: 19; name: [[\d]]
+symbol number: 19; name in display form: [\d]
+symbol number: 19; DSL form: [\d]
+symbol number: 20; name: [[\s]]
+symbol number: 20; name in display form: [\s]
+symbol number: 20; DSL form: [\s]
+symbol number: 21; name: [[\w]]
+symbol number: 21; name in display form: [\w]
+symbol number: 21; DSL form: [\w]
+symbol number: 22; name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
+symbol number: 22; name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+symbol number: 22; DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+symbol number: 23; name: [[e]]
+symbol number: 23; name in display form: [e]
+symbol number: 23; DSL form: [e]
+symbol number: 24; name: [[g]]
+symbol number: 24; name in display form: [g]
+symbol number: 24; DSL form: [g]
+symbol number: 25; name: [[i]]
+symbol number: 25; name in display form: [i]
+symbol number: 25; DSL form: [i]
+symbol number: 26; name: [[n]]
+symbol number: 26; name in display form: [n]
+symbol number: 26; DSL form: [n]
+symbol number: 27; name: [[o]]
+symbol number: 27; name in display form: [o]
+symbol number: 27; DSL form: [o]
+symbol number: 28; name: [[r]]
+symbol number: 28; name in display form: [r]
+symbol number: 28; DSL form: [r]
+symbol number: 29; name: [[s]]
+symbol number: 29; name in display form: [s]
+symbol number: 29; DSL form: [s]
+symbol number: 30; name: [[t]]
+symbol number: 30; name in display form: [t]
+symbol number: 30; DSL form: [t]
+symbol number: 31; name: assignment
+symbol number: 31; name in display form: assignment
+symbol number: 31; DSL form: assignment
+symbol number: 32; name: expression
+symbol number: 32; name in display form: expression
+symbol number: 32; DSL form: expression
+symbol number: 33; name: number
+symbol number: 33; name in display form: number
+symbol number: 33; DSL form: number
+symbol number: 34; name: numeric assignment
+symbol number: 34; name in display form: <numeric assignment>
+symbol number: 34; DSL form: numeric assignment
+symbol number: 35; name: numeric expression
+symbol number: 35; name in display form: <numeric expression>
+symbol number: 35; DSL form: numeric expression
+symbol number: 36; name: statement
+symbol number: 36; name in display form: statement
+symbol number: 36; DSL form: statement
+symbol number: 37; name: statements
+symbol number: 37; name in display form: statements
+symbol number: 37; DSL form: statements
+symbol number: 38; name: string
+symbol number: 38; name in display form: string
+symbol number: 38; DSL form: string
+symbol number: 39; name: string contents
+symbol number: 39; name in display form: <string contents>
+symbol number: 39; DSL form: string contents
+symbol number: 40; name: variable
+symbol number: 40; name in display form: variable
+symbol number: 40; DSL form: variable
+symbol number: 41; name: whitespace
+symbol number: 41; name in display form: whitespace
+symbol number: 41; DSL form: whitespace
 END_OF_TEXT
 
 $text = q{};

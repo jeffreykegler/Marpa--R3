@@ -1306,13 +1306,9 @@ sub Marpa::R3::Internal::MetaAST_Nodes::discard_rule::evaluate {
         dsl_form    => $discard_lhs,
         name_source => 'internal',
     };
-    $parse->xsy_create( $discard_lhs, $symbol_data );
-    $parse->symbol_names_set(
-        $discard_lhs,
-        'l0',
-        {   # description  => qq{Internal LHS for lexer discard}
-        }
-    );
+    $parse->xsy_assign( $discard_lhs, $symbol_data );
+    $parse->symbol_names_set( $discard_lhs, 'l0', { xsy => $discard_lhs } );
+
     my $rhs         = $symbol->names($parse);
     my $discard_symbol = $rhs->[0];
     my $rhs_as_event         = $symbol->event_name($parse);
