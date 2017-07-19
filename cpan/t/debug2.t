@@ -185,12 +185,12 @@ Marpa::R3::Test::is( Data::Dumper::Dumper($latest_report),
 Marpa::R3::Test::is( $trace_output, <<'END_TRACE_OUTPUT', 'trace output' );
 Setting trace_terminals option
 Expecting "Number" at earleme 0
-Registering character U+0034 "4" as symbol 5: [\d]
-Registering character U+0032 "2" as symbol 5: [\d]
-Registering character U+002a "*" as symbol 3: [*]
-Registering character U+0031 "1" as symbol 5: [\d]
-Registering character U+002b "+" as symbol 4: [+]
-Registering character U+0037 "7" as symbol 5: [\d]
+Registering character U+0034 "4" as symbol 6: [\d]
+Registering character U+0032 "2" as symbol 6: [\d]
+Registering character U+002a "*" as symbol 4: [*]
+Registering character U+0031 "1" as symbol 6: [\d]
+Registering character U+002b "+" as symbol 5: [+]
+Registering character U+0037 "7" as symbol 6: [\d]
 END_TRACE_OUTPUT
 
 # vim: expandtab shiftwidth=4:
