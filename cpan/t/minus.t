@@ -112,8 +112,10 @@ R4 E ::= Number
 R5 MinusMinus ::= Minus Minus
 R6 E ::= E Minus E
 R7 E ::= E MinusMinus
-R8 Minus ~ [\-]
-R9 Number ~ [\d] +
+R8 [:lex_start:] ~ Minus
+R9 [:lex_start:] ~ Number
+R10 Minus ~ [\-]
+R11 Number ~ [\d] +
 END_RULES
 
 Marpa::R3::Test::is( $grammar->ahms_show(),

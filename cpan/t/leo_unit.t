@@ -54,11 +54,12 @@ Marpa::R3::Test::is( $grammar->symbols_show(),
 S1 A
 S2 B
 S3 C
-S4 [:start:]
-S5 [a]
-S6 [c]
-S7 a
-S8 c
+S4 [:lex_start:]
+S5 [:start:]
+S6 [a]
+S7 [c]
+S8 a
+S9 c
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->productions_show(),
@@ -68,8 +69,10 @@ R2 A ::= a B
 R3 B ::= C
 R4 C ::= c A
 R5 C ::= c
-R6 a ~ [a]
-R7 c ~ [c]
+R6 [:lex_start:] ~ a
+R7 [:lex_start:] ~ c
+R8 a ~ [a]
+R9 c ~ [c]
 END_OF_STRING
 
 
