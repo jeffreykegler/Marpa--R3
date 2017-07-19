@@ -58,8 +58,10 @@ R3 A ::= 'a'
 R4 B ::= 'a'
 R5 B ::=
 R6 C ::=
-R7 'a' ~ [a]
-R8 'a' ~ [a]
+R7 [:lex_start:] ~ 'a'
+R8 [:lex_start:] ~ 'a'
+R9 'a' ~ [a]
+R10 'a' ~ [a]
 EOS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

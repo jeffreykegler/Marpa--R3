@@ -1719,18 +1719,22 @@ sub Marpa::R3::Internal::MetaAST_Nodes::single_quoted_string::evaluate {
     } ## end for my $char_class ( map { '[' . ( quotemeta $_ ) . ']'...})
     my $list = Marpa::R3::Internal::MetaAST::Symbol_List->combine(@symbols);
     return $list if $Marpa::R3::Internal::SUBGRAMMAR ne 'g1';
-    my $lexical_lhs       = $parse->internal_lexeme($string);
-    my $lexical_rhs       = $list->names($parse);
-    my %lexical_rule      = (
-        start => $start,
-        length => $length,
-        lhs  => $lexical_lhs,
-        rhs  => $lexical_rhs,
-        # description => "Internal rule for single-quoted string $string",
-        mask => [ map { ; 1 } @{$lexical_rhs} ],
-    );
-    my $wrl = $parse->xpr_create( \%lexical_rule, 'l0' );
-    push @{ $parse->{rules}->{$lexical_grammar} }, $wrl;
+    my $lexical_lhs = $parse->{lexeme_for_string}->{$string};
+    if (not defined $lexical_lhs) {
+        $lexical_lhs       = $parse->internal_lexeme($string);
+        $parse->{lexeme_for_string}->{$string}= $lexical_lhs;
+        my $lexical_rhs       = $list->names($parse);
+        my %lexical_rule      = (
+            start => $start,
+            length => $length,
+            lhs  => $lexical_lhs,
+            rhs  => $lexical_rhs,
+            # description => "Internal rule for single-quoted string $string",
+            mask => [ map { ; 1 } @{$lexical_rhs} ],
+        );
+        my $wrl = $parse->xpr_create( \%lexical_rule, 'l0' );
+        push @{ $parse->{rules}->{$lexical_grammar} }, $wrl;
+    }
     my $g1_symbol =
         Marpa::R3::Internal::MetaAST::Symbol_List->new($lexical_lhs);
     return $g1_symbol;
