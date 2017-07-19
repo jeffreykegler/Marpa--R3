@@ -118,7 +118,7 @@ R5 Statement ::= Expression
 R6 Expression ::= Variable
 R7 Lvalue ::= Variable
 R8 Expression ::= Lvalue AssignOp Expression
-R9 [:lex_start:] ~ AddAssignOP
+R9 [:lex_start:] ~ AddAssignOp
 R10 [:lex_start:] ~ AssignOp
 R11 [:lex_start:] ~ MinusAssignOp
 R12 [:lex_start:] ~ MultiplyAssignOp

@@ -110,35 +110,36 @@ S22 WHERE
 S23 WITH
 S24 WithPf
 S25 [:discard:]
-S26 [:start:]
-S27 [1]
-S28 [A]
-S29 [B]
-S30 [C]
-S31 [F]
-S32 [M]
-S33 [P]
-S34 [S]
-S35 [T]
-S36 [W]
-S37 [\\]
-S38 [\s]
-S39 [a]
-S40 [c]
-S41 [e]
-S42 [f]
-S43 [h]
-S44 [i]
-S45 [l]
-S46 [m]
-S47 [n]
-S48 [o]
-S49 [r]
-S50 [s]
-S51 [t]
-S52 [u]
-S53 [y]
-S54 whitespace
+S26 [:lexstart:]
+S27 [:start:]
+S28 [1]
+S29 [A]
+S30 [B]
+S31 [C]
+S32 [F]
+S33 [M]
+S34 [P]
+S35 [S]
+S36 [T]
+S37 [W]
+S38 [\\]
+S39 [\s]
+S40 [a]
+S41 [c]
+S42 [e]
+S43 [f]
+S44 [h]
+S45 [i]
+S46 [l]
+S47 [m]
+S48 [n]
+S49 [o]
+S50 [r]
+S51 [s]
+S52 [t]
+S53 [u]
+S54 [y]
+S55 whitespace
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->productions_show(),
@@ -159,7 +160,22 @@ R13 FilterExpr ::= FALSE
 R14 WithPf ::=
 R15 WithPf ::= WITH PF
 R16 Statement ::= CREATE TypeDef
-R17 TRUE ~ [T] [r] [u] [e]
+R17 [:lex_start:] ~ PF
+R18 [:lex_start:] ~ SELECT
+R19 [:lex_start:] ~ SEPARATOR
+R20 [:lex_start:] ~ TRUE
+R21 [:lex_start:] ~ WHERE
+R22 [:lex_start:] ~ WITH
+R23 [:lex_start:] ~ [:discard:]
+R24 [:lex_start:] ~ AS
+R25 [:lex_start:] ~ BY
+R26 [:lex_start:] ~ CREATE
+R27 [:lex_start:] ~ FALSE
+R28 [:lex_start:] ~ FOR
+R29 [:lex_start:] ~ ID_METRIC
+R30 [:lex_start:] ~ METRIC
+R31 [:lex_start:] ~ NUMBER
+R32 TRUE ~ [T] [r] [u] [e]
 R18 BY ~ [B] [y]
 R19 FALSE ~ [F] [a] [l] [s] [e]
 R20 SEPARATOR ~ [\\] [n]

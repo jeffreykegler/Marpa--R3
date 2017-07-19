@@ -46,7 +46,7 @@ Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
 S1 a
 S2 [a]
-S4 [:lex_start:]
+S3 [:lex_start:]
 S4 S
 S5 [:start:]
 END_OF_STRING
@@ -55,7 +55,7 @@ Marpa::R3::Test::is( $grammar->productions_show(), <<'END_OF_STRING', 'Leo166 Pr
 R1 [:start:] ::= S
 R2 S ::= a S
 R3 S ::=
-R4 [:lex_start:] ::= a
+R4 [:lex_start:] ~ a
 R5 a ~ [a]
 END_OF_STRING
 
