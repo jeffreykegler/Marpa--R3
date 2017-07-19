@@ -75,6 +75,7 @@ sub Marpa::R3::Internal::MetaAST::Parse::symbol_assign_ordinary {
 
 sub ast_to_hash {
     my ($ast, $p_dsl) = @_;
+    my $xpr_ordinal = 0;
     my $hashed_ast = {};
 
     $hashed_ast->{meta_recce} = $ast->{meta_recce};
@@ -126,6 +127,7 @@ sub ast_to_hash {
             length => 0,
             lhs    => $augment_lhs,
             rhs    => [$start_lhs],
+            subkey => ++$xpr_ordinal,
             action => '::first'
         };
         $hashed_ast->symbol_assign_ordinary($start_lhs, 'g1');
@@ -162,7 +164,8 @@ sub ast_to_hash {
             length          => 0,
             lhs             => $discard_lhs,
             rhs             => [$unicorn],
-            symbol_as_event => $unicorn
+            symbol_as_event => $unicorn,
+            subkey => ++$xpr_ordinal,
 
               # 'description' => 'Discard rule for <[[^\\d\\D]]>'
         };
@@ -241,7 +244,8 @@ sub ast_to_hash {
                 start  => 0,
                 length => 0,
                 lhs    => $lex_start_lhs,
-                rhs    => [$lexeme]
+                rhs    => [$lexeme],
+                subkey => ++$xpr_ordinal,
             };
             $hashed_ast->symbol_assign_ordinary( $lex_start_lhs, 'l0' );
             my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );

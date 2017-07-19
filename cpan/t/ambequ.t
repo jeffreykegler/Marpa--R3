@@ -109,9 +109,10 @@ Marpa::R3::Test::is( ${$actual_ref},
 S1 E
 S2 Number
 S3 Op
-S4 [:start:]
-S5 [-+*]
-S6 [\d]
+S4 [:lex_start:]
+S5 [:start:]
+S6 [-+*]
+S7 [\d]
 END_SYMBOLS
 
 $actual_ref = save_stdout();
@@ -126,8 +127,10 @@ Marpa::R3::Test::is( ${$actual_ref},
 R1 [:start:] ::= E
 R2 E ::= E Op E
 R3 E ::= Number
-R4 Number ~ [\d] +
-R5 Op ~ [-+*]
+R4 [:lex_start:] ~ Number
+R5 [:lex_start:] ~ Op
+R6 Number ~ [\d] +
+R7 Op ~ [-+*]
 END_RULES
 
 $actual_ref = save_stdout();
