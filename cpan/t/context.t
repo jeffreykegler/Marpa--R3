@@ -91,8 +91,8 @@ S8 [\d\D]
 EO_TEXT
     Marpa::R3::Test::is( $grammar->productions_show(),
     <<'EO_TEXT', 'Productions');
-R1 S ::= A B C D
-R2 [:start:] ::= S
+R1 [:start:] ::= S
+R2 S ::= A B C D
 R3 [:lex_start:] ~ A
 R4 [:lex_start:] ~ B
 R5 [:lex_start:] ~ C
@@ -132,7 +132,7 @@ VALUE_TEST: {
             qq{Parse value ref type is "$ref_type"; it needs to be "HASH"});
         last VALUE_TEST;
     } ## end if ( ref $value ne 'HASH' )
-    my $expected_text = qq{rule 1: S ::= A B C D\nlocations: 0-4\n};
+    my $expected_text = qq{rule 2: S ::= A B C D\nlocations: 0-4\n};
     Test::More::is( $value->{text}, $expected_text, 'Parse ok?' );
 } ## end VALUE_TEST:
 

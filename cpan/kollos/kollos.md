@@ -484,6 +484,7 @@ perhaps because it is buggy.
 
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg kollos_funcs[] = {
+      { "memcmp", lca_memcmp },
       { "from_vlq", lca_from_vlq },
       { "to_vlq", lca_to_vlq },
       { "registry_get", lca_registry_get },
@@ -1391,8 +1392,8 @@ one for each subgrammar.
                 if subkey_a ~= subkey_b then return subkey_a < subkey_b end
                 local lhs_a = hash_xpr_data[a].lhs
                 local lhs_b = hash_xpr_data[b].lhs
-                if lhs_a ~= lhs_b then return lhs_a < lhs_b end
-
+                local cmp = _M.memcmp(lhs_a, lhs_b)
+                if cmp ~= nil then return cmp end
                 -- rules as of this writing are (I think) unique by start/subkey/LHS
                 --    so that the logic from here on is probably not tested
 
@@ -1403,9 +1404,10 @@ one for each subgrammar.
                 if #rhs_a ~= #rhs_b then return #rhs_a < #rhs_b end
                 -- we now know that both RHS lengths are the same
                 for ix = 1, #rhs_a do
-                    local sym_a = hash_xpr_data[a].rhs[ix]
-                    local sym_b = hash_xpr_data[b].rhs[ix]
-                    if sym_a ~= sym_b then return sym_a < sym_b end
+                    local sym_a = rhs_a[ix]
+                    local sym_b = rhs_b[ix]
+                    local cmp = _M.memcmp(sym_a, sym_b)
+                    if cmp ~= nil then return cmp end
                 end
                 return false
            end
@@ -8836,6 +8838,61 @@ into integer sequences.
 
 ```
 
+Kollos static function: a memcmp equivalent.
+This avoids the use of locales.
+
+If both arguments are not strings, it falls back
+to the standard Lua compare.
+Takes args `a` and `b`
+Returns `true` if `a < b` for convenience with
+`table.sort`.
+Returns `nil` if `a == b`, and `false` if `a > b`.
+
+```
+    -- miranda: section+ kollos table methods
+    static int
+    lca_memcmp (lua_State * L)
+    {
+        int cmp;
+        if (marpa_lua_type (L, 1) != LUA_TSTRING
+            || marpa_lua_type (L, 2) != LUA_TSTRING) {
+            if (marpa_lua_compare (L, 1, 2, LUA_OPLT)) {
+                cmp = -1;
+            } else if (marpa_lua_compare (L, 1, 2, LUA_OPEQ)) {
+                cmp = 0;
+            } else {
+                cmp = 1;
+            }
+        } else {
+            /* Both arguments are strings */
+            size_t len;
+            size_t len_b;
+            const unsigned char *str_a
+                = (unsigned char *) marpa_luaL_tolstring (L, 1, &len);
+            const unsigned char *str_b
+                = (unsigned char *) marpa_luaL_tolstring (L, 2, &len_b);
+            if (len_b < len) {
+                len = len_b;
+            }
+            cmp = memcmp (str_a, str_b, len);
+            if (!cmp) {
+                if (len < len_b) cmp = -1;
+                else if (len > len_b) cmp = 1;
+            }
+        }
+        if (cmp < 0) {
+            marpa_lua_pushboolean (L, 1);
+        } else if (cmp == 0) {
+            marpa_lua_pushnil (L);
+        } else {
+            marpa_lua_pushboolean (L, 0);
+        }
+        return 1;
+    }
+
+```
+
+vim: expandtab shiftwidth=4:
 <!--
 vim: expandtab shiftwidth=4:
 -->

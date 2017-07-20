@@ -518,18 +518,18 @@ R17 <numeric expression> ::= number; prec=2
 R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
 R19 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 R20 statement ::= assignment
-R21 [:lex_start:] ~ '*'
-R22 [:lex_start:] ~ number
-R23 [:lex_start:] ~ string
-R24 [:lex_start:] ~ variable
-R25 [:lex_start:] ~ [:discard:]
-R26 [:lex_start:] ~ 'set'
-R27 [:lex_start:] ~ 'to'
-R28 [:lex_start:] ~ '='
-R29 [:lex_start:] ~ 'string'
-R30 [:lex_start:] ~ '('
-R31 [:lex_start:] ~ ')'
-R32 [:lex_start:] ~ '+'
+R21 [:lex_start:] ~ [:discard:]
+R22 [:lex_start:] ~ 'set'
+R23 [:lex_start:] ~ 'to'
+R24 [:lex_start:] ~ '='
+R25 [:lex_start:] ~ 'string'
+R26 [:lex_start:] ~ '('
+R27 [:lex_start:] ~ ')'
+R28 [:lex_start:] ~ '+'
+R29 [:lex_start:] ~ '*'
+R30 [:lex_start:] ~ number
+R31 [:lex_start:] ~ string
+R32 [:lex_start:] ~ variable
 R33 whitespace ~ [\s] +
 R34 'set' ~ [s] [e] [t]
 R35 'to' ~ [t] [o]
@@ -753,10 +753,6 @@ R17 <numeric expression> ::= number; prec=2
 R18 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
 R19 <numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 R20 statement ::= assignment
-R21 [:lex_start:] ~ [Lex-7]
-R22 [:lex_start:] ~ number
-R23 [:lex_start:] ~ string
-R24 [:lex_start:] ~ variable
 R25 [:lex_start:] ~ [:discard:]
 R26 [:lex_start:] ~ [Lex-0]
 R27 [:lex_start:] ~ [Lex-1]
@@ -765,6 +761,10 @@ R29 [:lex_start:] ~ [Lex-3]
 R30 [:lex_start:] ~ [Lex-4]
 R31 [:lex_start:] ~ [Lex-5]
 R32 [:lex_start:] ~ [Lex-6]
+R21 [:lex_start:] ~ [Lex-7]
+R22 [:lex_start:] ~ number
+R23 [:lex_start:] ~ string
+R24 [:lex_start:] ~ variable
 R33 whitespace ~ [[\s]] +
 R34 [Lex-0] ~ [[s]] [[e]] [[t]]
 R35 [Lex-1] ~ [[t]] [[o]]
@@ -1460,96 +1460,93 @@ symbol number: 10; DSL form: '+'
 symbol number: 11; name: [Lex-7]
 symbol number: 11; name in display form: '*'
 symbol number: 11; DSL form: '*'
-symbol number: 12; name: [Lex-8]
-symbol number: 12; name in display form: '+'
-symbol number: 12; DSL form: '+'
-symbol number: 13; name: [[']]
-symbol number: 13; name in display form: [']
-symbol number: 13; DSL form: [']
-symbol number: 14; name: [[\(]]
-symbol number: 14; name in display form: [\(]
-symbol number: 14; DSL form: [\(]
-symbol number: 15; name: [[\)]]
-symbol number: 15; name in display form: [\)]
-symbol number: 15; DSL form: [\)]
-symbol number: 16; name: [[\*]]
-symbol number: 16; name in display form: [\*]
-symbol number: 16; DSL form: [\*]
-symbol number: 17; name: [[\+]]
-symbol number: 17; name in display form: [\+]
-symbol number: 17; DSL form: [\+]
-symbol number: 18; name: [[\=]]
-symbol number: 18; name in display form: [\=]
-symbol number: 18; DSL form: [\=]
-symbol number: 19; name: [[\d]]
-symbol number: 19; name in display form: [\d]
-symbol number: 19; DSL form: [\d]
-symbol number: 20; name: [[\s]]
-symbol number: 20; name in display form: [\s]
-symbol number: 20; DSL form: [\s]
-symbol number: 21; name: [[\w]]
-symbol number: 21; name in display form: [\w]
-symbol number: 21; DSL form: [\w]
-symbol number: 22; name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
-symbol number: 22; name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-symbol number: 22; DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-symbol number: 23; name: [[e]]
-symbol number: 23; name in display form: [e]
-symbol number: 23; DSL form: [e]
-symbol number: 24; name: [[g]]
-symbol number: 24; name in display form: [g]
-symbol number: 24; DSL form: [g]
-symbol number: 25; name: [[i]]
-symbol number: 25; name in display form: [i]
-symbol number: 25; DSL form: [i]
-symbol number: 26; name: [[n]]
-symbol number: 26; name in display form: [n]
-symbol number: 26; DSL form: [n]
-symbol number: 27; name: [[o]]
-symbol number: 27; name in display form: [o]
-symbol number: 27; DSL form: [o]
-symbol number: 28; name: [[r]]
-symbol number: 28; name in display form: [r]
-symbol number: 28; DSL form: [r]
-symbol number: 29; name: [[s]]
-symbol number: 29; name in display form: [s]
-symbol number: 29; DSL form: [s]
-symbol number: 30; name: [[t]]
-symbol number: 30; name in display form: [t]
-symbol number: 30; DSL form: [t]
-symbol number: 31; name: assignment
-symbol number: 31; name in display form: assignment
-symbol number: 31; DSL form: assignment
-symbol number: 32; name: expression
-symbol number: 32; name in display form: expression
-symbol number: 32; DSL form: expression
-symbol number: 33; name: number
-symbol number: 33; name in display form: number
-symbol number: 33; DSL form: number
-symbol number: 34; name: numeric assignment
-symbol number: 34; name in display form: <numeric assignment>
-symbol number: 34; DSL form: numeric assignment
-symbol number: 35; name: numeric expression
-symbol number: 35; name in display form: <numeric expression>
-symbol number: 35; DSL form: numeric expression
-symbol number: 36; name: statement
-symbol number: 36; name in display form: statement
-symbol number: 36; DSL form: statement
-symbol number: 37; name: statements
-symbol number: 37; name in display form: statements
-symbol number: 37; DSL form: statements
-symbol number: 38; name: string
-symbol number: 38; name in display form: string
-symbol number: 38; DSL form: string
-symbol number: 39; name: string contents
-symbol number: 39; name in display form: <string contents>
-symbol number: 39; DSL form: string contents
-symbol number: 40; name: variable
-symbol number: 40; name in display form: variable
-symbol number: 40; DSL form: variable
-symbol number: 41; name: whitespace
-symbol number: 41; name in display form: whitespace
-symbol number: 41; DSL form: whitespace
+symbol number: 12; name: [[']]
+symbol number: 12; name in display form: [']
+symbol number: 12; DSL form: [']
+symbol number: 13; name: [[\(]]
+symbol number: 13; name in display form: [\(]
+symbol number: 13; DSL form: [\(]
+symbol number: 14; name: [[\)]]
+symbol number: 14; name in display form: [\)]
+symbol number: 14; DSL form: [\)]
+symbol number: 15; name: [[\*]]
+symbol number: 15; name in display form: [\*]
+symbol number: 15; DSL form: [\*]
+symbol number: 16; name: [[\+]]
+symbol number: 16; name in display form: [\+]
+symbol number: 16; DSL form: [\+]
+symbol number: 17; name: [[\=]]
+symbol number: 17; name in display form: [\=]
+symbol number: 17; DSL form: [\=]
+symbol number: 18; name: [[\d]]
+symbol number: 18; name in display form: [\d]
+symbol number: 18; DSL form: [\d]
+symbol number: 19; name: [[\s]]
+symbol number: 19; name in display form: [\s]
+symbol number: 19; DSL form: [\s]
+symbol number: 20; name: [[\w]]
+symbol number: 20; name in display form: [\w]
+symbol number: 20; DSL form: [\w]
+symbol number: 21; name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
+symbol number: 21; name in display form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+symbol number: 21; DSL form: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+symbol number: 22; name: [[e]]
+symbol number: 22; name in display form: [e]
+symbol number: 22; DSL form: [e]
+symbol number: 23; name: [[g]]
+symbol number: 23; name in display form: [g]
+symbol number: 23; DSL form: [g]
+symbol number: 24; name: [[i]]
+symbol number: 24; name in display form: [i]
+symbol number: 24; DSL form: [i]
+symbol number: 25; name: [[n]]
+symbol number: 25; name in display form: [n]
+symbol number: 25; DSL form: [n]
+symbol number: 26; name: [[o]]
+symbol number: 26; name in display form: [o]
+symbol number: 26; DSL form: [o]
+symbol number: 27; name: [[r]]
+symbol number: 27; name in display form: [r]
+symbol number: 27; DSL form: [r]
+symbol number: 28; name: [[s]]
+symbol number: 28; name in display form: [s]
+symbol number: 28; DSL form: [s]
+symbol number: 29; name: [[t]]
+symbol number: 29; name in display form: [t]
+symbol number: 29; DSL form: [t]
+symbol number: 30; name: assignment
+symbol number: 30; name in display form: assignment
+symbol number: 30; DSL form: assignment
+symbol number: 31; name: expression
+symbol number: 31; name in display form: expression
+symbol number: 31; DSL form: expression
+symbol number: 32; name: number
+symbol number: 32; name in display form: number
+symbol number: 32; DSL form: number
+symbol number: 33; name: numeric assignment
+symbol number: 33; name in display form: <numeric assignment>
+symbol number: 33; DSL form: numeric assignment
+symbol number: 34; name: numeric expression
+symbol number: 34; name in display form: <numeric expression>
+symbol number: 34; DSL form: numeric expression
+symbol number: 35; name: statement
+symbol number: 35; name in display form: statement
+symbol number: 35; DSL form: statement
+symbol number: 36; name: statements
+symbol number: 36; name in display form: statements
+symbol number: 36; DSL form: statements
+symbol number: 37; name: string
+symbol number: 37; name in display form: string
+symbol number: 37; DSL form: string
+symbol number: 38; name: string contents
+symbol number: 38; name in display form: <string contents>
+symbol number: 38; DSL form: string contents
+symbol number: 39; name: variable
+symbol number: 39; name in display form: variable
+symbol number: 39; DSL form: variable
+symbol number: 40; name: whitespace
+symbol number: 40; name in display form: whitespace
+symbol number: 40; DSL form: whitespace
 END_OF_TEXT
 
 $text = q{};
@@ -1616,54 +1613,51 @@ symbol number: 7  DSL form: '+'
 symbol number: 8  name: [Lex-7]
 symbol number: 8  name in display form: '*'
 symbol number: 8  DSL form: '*'
-symbol number: 9  name: [Lex-8]
-symbol number: 9  name in display form: '+'
-symbol number: 9  DSL form: '+'
-symbol number: 10  name: assignment
-symbol number: 10  name in display form: assignment
-symbol number: 10  DSL form: assignment
-symbol number: 11  name: expression
+symbol number: 9  name: assignment
+symbol number: 9  name in display form: assignment
+symbol number: 9  DSL form: assignment
+symbol number: 10  name: expression
+symbol number: 10  name in display form: expression
+symbol number: 10  DSL form: expression
+symbol number: 11  name: expression[0]
 symbol number: 11  name in display form: expression
 symbol number: 11  DSL form: expression
-symbol number: 12  name: expression[0]
+symbol number: 12  name: expression[1]
 symbol number: 12  name in display form: expression
 symbol number: 12  DSL form: expression
-symbol number: 13  name: expression[1]
+symbol number: 13  name: expression[2]
 symbol number: 13  name in display form: expression
 symbol number: 13  DSL form: expression
-symbol number: 14  name: expression[2]
-symbol number: 14  name in display form: expression
-symbol number: 14  DSL form: expression
-symbol number: 15  name: number
-symbol number: 15  name in display form: number
-symbol number: 15  DSL form: number
-symbol number: 16  name: numeric assignment
-symbol number: 16  name in display form: <numeric assignment>
-symbol number: 16  DSL form: numeric assignment
-symbol number: 17  name: numeric expression
+symbol number: 14  name: number
+symbol number: 14  name in display form: number
+symbol number: 14  DSL form: number
+symbol number: 15  name: numeric assignment
+symbol number: 15  name in display form: <numeric assignment>
+symbol number: 15  DSL form: numeric assignment
+symbol number: 16  name: numeric expression
+symbol number: 16  name in display form: <numeric expression>
+symbol number: 16  DSL form: numeric expression
+symbol number: 17  name: numeric expression[0]
 symbol number: 17  name in display form: <numeric expression>
 symbol number: 17  DSL form: numeric expression
-symbol number: 18  name: numeric expression[0]
+symbol number: 18  name: numeric expression[1]
 symbol number: 18  name in display form: <numeric expression>
 symbol number: 18  DSL form: numeric expression
-symbol number: 19  name: numeric expression[1]
+symbol number: 19  name: numeric expression[2]
 symbol number: 19  name in display form: <numeric expression>
 symbol number: 19  DSL form: numeric expression
-symbol number: 20  name: numeric expression[2]
-symbol number: 20  name in display form: <numeric expression>
-symbol number: 20  DSL form: numeric expression
-symbol number: 21  name: statement
-symbol number: 21  name in display form: statement
-symbol number: 21  DSL form: statement
-symbol number: 22  name: statements
-symbol number: 22  name in display form: statements
-symbol number: 22  DSL form: statements
-symbol number: 23  name: string
-symbol number: 23  name in display form: string
-symbol number: 23  DSL form: string
-symbol number: 24  name: variable
-symbol number: 24  name in display form: variable
-symbol number: 24  DSL form: variable
+symbol number: 20  name: statement
+symbol number: 20  name in display form: statement
+symbol number: 20  DSL form: statement
+symbol number: 21  name: statements
+symbol number: 21  name in display form: statements
+symbol number: 21  DSL form: statements
+symbol number: 22  name: string
+symbol number: 22  name in display form: string
+symbol number: 22  DSL form: string
+symbol number: 23  name: variable
+symbol number: 23  name in display form: variable
+symbol number: 23  DSL form: variable
 END_OF_TEXT
 
 $text = '';
@@ -1705,34 +1699,34 @@ for (
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol names and description');
 l0 symbol number: 0  name: [:discard:]
 l0 symbol number: 0  name in display form: [:discard:]
-l0 symbol number: 0  DSL form: [No name in DSL form]
-l0 symbol number: 1  name: [Lex-0]
-l0 symbol number: 1  name in display form: 'set'
-l0 symbol number: 1  DSL form: 'set'
-l0 symbol number: 2  name: [Lex-1]
-l0 symbol number: 2  name in display form: 'to'
-l0 symbol number: 2  DSL form: 'to'
-l0 symbol number: 3  name: [Lex-2]
-l0 symbol number: 3  name in display form: '='
-l0 symbol number: 3  DSL form: '='
-l0 symbol number: 4  name: [Lex-3]
-l0 symbol number: 4  name in display form: 'string'
-l0 symbol number: 4  DSL form: 'string'
-l0 symbol number: 5  name: [Lex-4]
-l0 symbol number: 5  name in display form: '('
-l0 symbol number: 5  DSL form: '('
-l0 symbol number: 6  name: [Lex-5]
-l0 symbol number: 6  name in display form: ')'
-l0 symbol number: 6  DSL form: ')'
-l0 symbol number: 7  name: [Lex-6]
-l0 symbol number: 7  name in display form: '+'
-l0 symbol number: 7  DSL form: '+'
-l0 symbol number: 8  name: [Lex-7]
-l0 symbol number: 8  name in display form: '*'
-l0 symbol number: 8  DSL form: '*'
-l0 symbol number: 9  name: [Lex-8]
-l0 symbol number: 9  name in display form: '+'
-l0 symbol number: 9  DSL form: '+'
+l0 symbol number: 0  DSL form: [:discard:]
+l0 symbol number: 1  name: [:lex_start:]
+l0 symbol number: 1  name in display form: [:lex_start:]
+l0 symbol number: 1  DSL form: [:lex_start:]
+l0 symbol number: 2  name: [Lex-0]
+l0 symbol number: 2  name in display form: 'set'
+l0 symbol number: 2  DSL form: 'set'
+l0 symbol number: 3  name: [Lex-1]
+l0 symbol number: 3  name in display form: 'to'
+l0 symbol number: 3  DSL form: 'to'
+l0 symbol number: 4  name: [Lex-2]
+l0 symbol number: 4  name in display form: '='
+l0 symbol number: 4  DSL form: '='
+l0 symbol number: 5  name: [Lex-3]
+l0 symbol number: 5  name in display form: 'string'
+l0 symbol number: 5  DSL form: 'string'
+l0 symbol number: 6  name: [Lex-4]
+l0 symbol number: 6  name in display form: '('
+l0 symbol number: 6  DSL form: '('
+l0 symbol number: 7  name: [Lex-5]
+l0 symbol number: 7  name in display form: ')'
+l0 symbol number: 7  DSL form: ')'
+l0 symbol number: 8  name: [Lex-6]
+l0 symbol number: 8  name in display form: '+'
+l0 symbol number: 8  DSL form: '+'
+l0 symbol number: 9  name: [Lex-7]
+l0 symbol number: 9  name in display form: '*'
+l0 symbol number: 9  DSL form: '*'
 l0 symbol number: 10  name: [[']]
 l0 symbol number: 10  name in display form: [']
 l0 symbol number: 10  DSL form: [']
@@ -1802,9 +1796,6 @@ l0 symbol number: 31  DSL form: variable
 l0 symbol number: 32  name: whitespace
 l0 symbol number: 32  name in display form: whitespace
 l0 symbol number: 32  DSL form: whitespace
-l0 symbol number: 33  name: [:lex_start:]
-l0 symbol number: 33  name in display form: [:lex_start:]
-l0 symbol number: 33  DSL form: [No name in DSL form]
 END_OF_TEXT
 
 $text = q{};
@@ -1851,6 +1842,18 @@ statements ::= statement *
 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 statement ::= assignment
+[:lex_start:] ~ '*'
+[:lex_start:] ~ number
+[:lex_start:] ~ string
+[:lex_start:] ~ variable
+[:lex_start:] ~ [:discard:]
+[:lex_start:] ~ 'set'
+[:lex_start:] ~ 'to'
+[:lex_start:] ~ '='
+[:lex_start:] ~ 'string'
+[:lex_start:] ~ '('
+[:lex_start:] ~ ')'
+[:lex_start:] ~ '+'
 whitespace ~ [\s] +
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
@@ -1860,7 +1863,6 @@ whitespace ~ [\s] +
 ')' ~ [\)]
 '+' ~ [\+]
 '*' ~ [\*]
-'+' ~ [\+]
 variable ~ [\w] +
 number ~ [\d] +
 string ~ ['] <string contents> [']
@@ -1946,7 +1948,6 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() by rule id');
 ')' ~ [\)]
 '+' ~ [\+]
 '*' ~ [\*]
-'+' ~ [\+]
 variable ~ [\w] +
 number ~ [\d] +
 string ~ ['] <string contents> [']
@@ -1962,7 +1963,6 @@ whitespace ~ [\s] +
 [:lex_start:] ~ ')'
 [:lex_start:] ~ '+'
 [:lex_start:] ~ '*'
-[:lex_start:] ~ '+'
 [:lex_start:] ~ number
 [:lex_start:] ~ string
 [:lex_start:] ~ variable
@@ -2011,7 +2011,7 @@ statements ::= statement *
 <numeric expression> ::= variable; prec=2
 <numeric expression> ::= number; prec=2
 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
-<numeric expression> ::= <numeric expression> [Lex-8] <numeric expression>; prec=0
+<numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 statement ::= assignment
 whitespace ~ [[\s]] +
 [Lex-0] ~ [[s]] [[e]] [[t]]

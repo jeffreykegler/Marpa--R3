@@ -78,16 +78,16 @@ R10 Expression ::= Expression '/' Expression; prec=1
 R11 Expression ::= Expression '+' Expression; prec=0
 R12 Expression ::= Expression '-' Expression; prec=0
 R13 Script ::= Expression +
-R14 [:lex_start:] ~ '-'
-R15 [:lex_start:] ~ comma
-R16 [:lex_start:] ~ Number
-R17 [:lex_start:] ~ [:discard:]
-R18 [:lex_start:] ~ '('
-R19 [:lex_start:] ~ ')'
-R20 [:lex_start:] ~ '**'
-R21 [:lex_start:] ~ '*'
-R22 [:lex_start:] ~ '/'
-R23 [:lex_start:] ~ '+'
+R14 [:lex_start:] ~ Number
+R15 [:lex_start:] ~ [:discard:]
+R16 [:lex_start:] ~ '('
+R17 [:lex_start:] ~ ')'
+R18 [:lex_start:] ~ '**'
+R19 [:lex_start:] ~ '*'
+R20 [:lex_start:] ~ '/'
+R21 [:lex_start:] ~ '+'
+R22 [:lex_start:] ~ '-'
+R23 [:lex_start:] ~ comma
 R24 comma ~ [,]
 R25 '(' ~ [\(]
 R26 ')' ~ [\)]
