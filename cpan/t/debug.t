@@ -753,18 +753,18 @@ R17 <numeric expression> ::= number; prec=2
 R18 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
 R19 <numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 R20 statement ::= assignment
-R25 [:lex_start:] ~ [:discard:]
-R26 [:lex_start:] ~ [Lex-0]
-R27 [:lex_start:] ~ [Lex-1]
-R28 [:lex_start:] ~ [Lex-2]
-R29 [:lex_start:] ~ [Lex-3]
-R30 [:lex_start:] ~ [Lex-4]
-R31 [:lex_start:] ~ [Lex-5]
-R32 [:lex_start:] ~ [Lex-6]
-R21 [:lex_start:] ~ [Lex-7]
-R22 [:lex_start:] ~ number
-R23 [:lex_start:] ~ string
-R24 [:lex_start:] ~ variable
+R21 [:lex_start:] ~ [:discard:]
+R22 [:lex_start:] ~ [Lex-0]
+R23 [:lex_start:] ~ [Lex-1]
+R24 [:lex_start:] ~ [Lex-2]
+R25 [:lex_start:] ~ [Lex-3]
+R26 [:lex_start:] ~ [Lex-4]
+R27 [:lex_start:] ~ [Lex-5]
+R28 [:lex_start:] ~ [Lex-6]
+R29 [:lex_start:] ~ [Lex-7]
+R30 [:lex_start:] ~ number
+R31 [:lex_start:] ~ string
+R32 [:lex_start:] ~ variable
 R33 whitespace ~ [[\s]] +
 R34 [Lex-0] ~ [[s]] [[e]] [[t]]
 R35 [Lex-1] ~ [[t]] [[o]]
@@ -1842,10 +1842,6 @@ statements ::= statement *
 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 statement ::= assignment
-[:lex_start:] ~ '*'
-[:lex_start:] ~ number
-[:lex_start:] ~ string
-[:lex_start:] ~ variable
 [:lex_start:] ~ [:discard:]
 [:lex_start:] ~ 'set'
 [:lex_start:] ~ 'to'
@@ -1854,6 +1850,10 @@ statement ::= assignment
 [:lex_start:] ~ '('
 [:lex_start:] ~ ')'
 [:lex_start:] ~ '+'
+[:lex_start:] ~ '*'
+[:lex_start:] ~ number
+[:lex_start:] ~ string
+[:lex_start:] ~ variable
 whitespace ~ [\s] +
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
@@ -2013,6 +2013,18 @@ statements ::= statement *
 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
 <numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 statement ::= assignment
+[:lex_start:] ~ [:discard:]
+[:lex_start:] ~ [Lex-0]
+[:lex_start:] ~ [Lex-1]
+[:lex_start:] ~ [Lex-2]
+[:lex_start:] ~ [Lex-3]
+[:lex_start:] ~ [Lex-4]
+[:lex_start:] ~ [Lex-5]
+[:lex_start:] ~ [Lex-6]
+[:lex_start:] ~ [Lex-7]
+[:lex_start:] ~ number
+[:lex_start:] ~ string
+[:lex_start:] ~ variable
 whitespace ~ [[\s]] +
 [Lex-0] ~ [[s]] [[e]] [[t]]
 [Lex-1] ~ [[t]] [[o]]
@@ -2022,7 +2034,6 @@ whitespace ~ [[\s]] +
 [Lex-5] ~ [[\)]]
 [Lex-6] ~ [[\+]]
 [Lex-7] ~ [[\*]]
-[Lex-8] ~ [[\+]]
 variable ~ [[\w]] +
 number ~ [[\d]] +
 string ~ [[']] <string contents> [[']]
@@ -2072,7 +2083,7 @@ expression ::= <expression[0]>
 <numeric expression[2]> ::= variable
 <numeric expression[2]> ::= number
 <numeric expression[1]> ::= <numeric expression[1]> [Lex-7] <numeric expression[2]>
-<numeric expression[0]> ::= <numeric expression[0]> [Lex-8] <numeric expression[1]>
+<numeric expression[0]> ::= <numeric expression[0]> [Lex-6] <numeric expression[1]>
 [:start:] ::= statements
 END_OF_TEXT
 
@@ -2108,7 +2119,6 @@ Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 rule_show() diag form by rule i
 [Lex-5] ~ [[\)]]
 [Lex-6] ~ [[\+]]
 [Lex-7] ~ [[\*]]
-[Lex-8] ~ [[\+]]
 variable ~ [[\w]] +
 number ~ [[\d]] +
 string ~ [[']] <string contents> [[']]
@@ -2124,7 +2134,6 @@ whitespace ~ [[\s]] +
 [:lex_start:] ~ [Lex-5]
 [:lex_start:] ~ [Lex-6]
 [:lex_start:] ~ [Lex-7]
-[:lex_start:] ~ [Lex-8]
 [:lex_start:] ~ number
 [:lex_start:] ~ string
 [:lex_start:] ~ variable
@@ -2147,7 +2156,7 @@ for (
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY, '' ),
-    ( join "\n", 1 .. 35, '' ),
+    ( join "\n", 1 .. 46, '' ),
     'production ids'
 );
 
@@ -2189,7 +2198,7 @@ for (
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY, ''),
-    ( join "\n", 0 .. 27, '' ),
+    ( join "\n", 0 .. 25, '' ),
     'L0 rule ids'
 );
 
@@ -2212,41 +2221,52 @@ for (
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'symbol ids by production id');
-Production #1: 2 ::= 36
+Production #1: 3 ::= 36
 Production #2: 35 ::= 33
-Production #3: 30 ::= 3 39 4 31
-Production #4: 33 ::= 39 5 34
+Production #3: 30 ::= 4 39 5 31
+Production #4: 33 ::= 39 6 34
 Production #5: 31 ::= 31
 Production #6: 31 ::= 31
 Production #7: 31 ::= 31
 Production #8: 31 ::= 39
 Production #9: 31 ::= 37
-Production #10: 31 ::= 6 7 34 8
-Production #11: 31 ::= 31 9 31
+Production #10: 31 ::= 7 8 34 9
+Production #11: 31 ::= 31 10 31
 Production #12: 36 ::= 35
 Production #13: 34 ::= 34
 Production #14: 34 ::= 34
 Production #15: 34 ::= 34
 Production #16: 34 ::= 39
 Production #17: 34 ::= 32
-Production #18: 34 ::= 34 10 34
-Production #19: 34 ::= 34 11 34
+Production #18: 34 ::= 34 11 34
+Production #19: 34 ::= 34 10 34
 Production #20: 35 ::= 30
-Production #21: 40 ::= 19
-Production #22: 3 ::= 28 22 29
-Production #23: 4 ::= 29 26
-Production #24: 5 ::= 17
-Production #25: 6 ::= 28 29 27 24 25 23
-Production #26: 7 ::= 13
-Production #27: 8 ::= 14
-Production #28: 9 ::= 16
-Production #29: 10 ::= 15
-Production #30: 11 ::= 16
-Production #31: 39 ::= 20
-Production #32: 32 ::= 18
-Production #33: 37 ::= 12 38 12
-Production #34: 38 ::= 21
-Production #35: 1 ::= 40
+Production #21: 2 ::= 1
+Production #22: 2 ::= 4
+Production #23: 2 ::= 5
+Production #24: 2 ::= 6
+Production #25: 2 ::= 7
+Production #26: 2 ::= 8
+Production #27: 2 ::= 9
+Production #28: 2 ::= 10
+Production #29: 2 ::= 11
+Production #30: 2 ::= 32
+Production #31: 2 ::= 37
+Production #32: 2 ::= 39
+Production #33: 40 ::= 19
+Production #34: 4 ::= 28 22 29
+Production #35: 5 ::= 29 26
+Production #36: 6 ::= 17
+Production #37: 7 ::= 28 29 27 24 25 23
+Production #38: 8 ::= 13
+Production #39: 9 ::= 14
+Production #40: 10 ::= 16
+Production #41: 11 ::= 15
+Production #42: 39 ::= 20
+Production #43: 32 ::= 18
+Production #44: 37 ::= 12 38 12
+Production #45: 38 ::= 21
+Production #46: 1 ::= 40
 END_OF_TEXT
 
 $text = q{};
@@ -2268,26 +2288,26 @@ for (
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'G1 symbol ids by rule id');
-Rule #0: 22 ::= 21
-Rule #1: 21 ::= 10
-Rule #2: 21 ::= 16
-Rule #3: 10 ::= 1 24 2 11
-Rule #4: 16 ::= 24 3 17
-Rule #5: 11 ::= 12
-Rule #6: 12 ::= 13
-Rule #7: 13 ::= 14
-Rule #8: 14 ::= 24
-Rule #9: 14 ::= 23
-Rule #10: 13 ::= 4 5 17 6
-Rule #11: 12 ::= 12 7 13
-Rule #12: 17 ::= 18
-Rule #13: 18 ::= 19
-Rule #14: 19 ::= 20
-Rule #15: 20 ::= 24
-Rule #16: 20 ::= 15
-Rule #17: 19 ::= 19 8 20
-Rule #18: 18 ::= 18 9 19
-Rule #19: 0 ::= 22
+Rule #0: 21 ::= 20
+Rule #1: 20 ::= 9
+Rule #2: 20 ::= 15
+Rule #3: 9 ::= 1 23 2 10
+Rule #4: 15 ::= 23 3 16
+Rule #5: 10 ::= 11
+Rule #6: 11 ::= 12
+Rule #7: 12 ::= 13
+Rule #8: 13 ::= 23
+Rule #9: 13 ::= 22
+Rule #10: 12 ::= 4 5 16 6
+Rule #11: 11 ::= 11 7 12
+Rule #12: 16 ::= 17
+Rule #13: 17 ::= 18
+Rule #14: 18 ::= 19
+Rule #15: 19 ::= 23
+Rule #16: 19 ::= 14
+Rule #17: 18 ::= 18 8 19
+Rule #18: 17 ::= 17 7 18
+Rule #19: 0 ::= 21
 END_OF_TEXT
 
 $text = q{};
@@ -2309,34 +2329,32 @@ for (
 }
 
 Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'L0 symbol ids by rule id');
-l0 Rule #0: 1 ::= 26 20 27
-l0 Rule #1: 2 ::= 27 24
-l0 Rule #2: 3 ::= 15
-l0 Rule #3: 4 ::= 26 27 25 22 23 21
-l0 Rule #4: 5 ::= 11
-l0 Rule #5: 6 ::= 12
-l0 Rule #6: 7 ::= 14
-l0 Rule #7: 8 ::= 13
-l0 Rule #8: 9 ::= 14
-l0 Rule #9: 31 ::= 18
-l0 Rule #10: 28 ::= 16
-l0 Rule #11: 29 ::= 10 30 10
-l0 Rule #12: 30 ::= 19
-l0 Rule #13: 0 ::= 32
-l0 Rule #14: 32 ::= 17
-l0 Rule #15: 33 ::= 0
-l0 Rule #16: 33 ::= 1
-l0 Rule #17: 33 ::= 2
-l0 Rule #18: 33 ::= 3
-l0 Rule #19: 33 ::= 4
-l0 Rule #20: 33 ::= 5
-l0 Rule #21: 33 ::= 6
-l0 Rule #22: 33 ::= 7
-l0 Rule #23: 33 ::= 8
-l0 Rule #24: 33 ::= 9
-l0 Rule #25: 33 ::= 28
-l0 Rule #26: 33 ::= 29
-l0 Rule #27: 33 ::= 31
+l0 Rule #0: 2 ::= 26 20 27
+l0 Rule #1: 3 ::= 27 24
+l0 Rule #2: 4 ::= 15
+l0 Rule #3: 5 ::= 26 27 25 22 23 21
+l0 Rule #4: 6 ::= 11
+l0 Rule #5: 7 ::= 12
+l0 Rule #6: 8 ::= 14
+l0 Rule #7: 9 ::= 13
+l0 Rule #8: 31 ::= 18
+l0 Rule #9: 28 ::= 16
+l0 Rule #10: 29 ::= 10 30 10
+l0 Rule #11: 30 ::= 19
+l0 Rule #12: 0 ::= 32
+l0 Rule #13: 32 ::= 17
+l0 Rule #14: 1 ::= 0
+l0 Rule #15: 1 ::= 2
+l0 Rule #16: 1 ::= 3
+l0 Rule #17: 1 ::= 4
+l0 Rule #18: 1 ::= 5
+l0 Rule #19: 1 ::= 6
+l0 Rule #20: 1 ::= 7
+l0 Rule #21: 1 ::= 8
+l0 Rule #22: 1 ::= 9
+l0 Rule #23: 1 ::= 28
+l0 Rule #24: 1 ::= 29
+l0 Rule #25: 1 ::= 31
 END_OF_TEXT
 
 # vim: expandtab shiftwidth=4:

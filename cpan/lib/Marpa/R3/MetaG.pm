@@ -321,37 +321,9 @@ $hashed_metag = {
                                              '[Lex-45]' => {},
                                              '[Lex-46]' => {},
                                              '[Lex-47]' => {},
-                                             '[Lex-48]' => {},
-                                             '[Lex-49]' => {},
                                              '[Lex-4]' => {},
-                                             '[Lex-50]' => {},
-                                             '[Lex-51]' => {},
-                                             '[Lex-52]' => {},
-                                             '[Lex-53]' => {},
-                                             '[Lex-54]' => {},
-                                             '[Lex-55]' => {},
-                                             '[Lex-56]' => {},
-                                             '[Lex-57]' => {},
-                                             '[Lex-58]' => {},
-                                             '[Lex-59]' => {},
                                              '[Lex-5]' => {},
-                                             '[Lex-60]' => {},
-                                             '[Lex-61]' => {},
-                                             '[Lex-62]' => {},
-                                             '[Lex-63]' => {},
-                                             '[Lex-64]' => {},
-                                             '[Lex-65]' => {},
-                                             '[Lex-66]' => {},
-                                             '[Lex-67]' => {},
-                                             '[Lex-68]' => {},
-                                             '[Lex-69]' => {},
                                              '[Lex-6]' => {},
-                                             '[Lex-70]' => {},
-                                             '[Lex-71]' => {},
-                                             '[Lex-72]' => {},
-                                             '[Lex-73]' => {},
-                                             '[Lex-74]' => {},
-                                             '[Lex-75]' => {},
                                              '[Lex-7]' => {},
                                              '[Lex-8]' => {},
                                              '[Lex-9]' => {},
@@ -398,8 +370,8 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'action',
                                            'rhs' => [
-                                                      '[Lex-33]',
-                                                      '[Lex-34]',
+                                                      '[Lex-24]',
+                                                      '[Lex-25]',
                                                       'action name'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -410,7 +382,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,action,[Lex-33],[Lex-34],action name'
+                                           'xprid' => 'g1,action,[Lex-24],[Lex-25],action name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -758,8 +730,8 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'blessing',
                                            'rhs' => [
-                                                      '[Lex-68]',
-                                                      '[Lex-69]',
+                                                      '[Lex-42]',
+                                                      '[Lex-25]',
                                                       'blessing name'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -770,7 +742,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,blessing,[Lex-68],[Lex-69],blessing name'
+                                           'xprid' => 'g1,blessing,[Lex-42],[Lex-25],blessing name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -804,10 +776,10 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'completion event declaration',
                                            'rhs' => [
-                                                      '[Lex-16]',
+                                                      '[Lex-14]',
                                                       'event initialization',
-                                                      '[Lex-17]',
-                                                      '[Lex-18]',
+                                                      '[Lex-10]',
+                                                      '[Lex-15]',
                                                       'symbol name'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -820,7 +792,7 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name'
+                                           'xprid' => 'g1,completion event declaration,[Lex-14],event initialization,[Lex-10],[Lex-15],symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -845,8 +817,8 @@ $hashed_metag = {
                                            'lhs' => 'discard default statement',
                                            'rhs' => [
                                                       '[Lex-11]',
-                                                      '[Lex-12]',
-                                                      '[Lex-13]',
+                                                      '[Lex-9]',
+                                                      '[Lex-10]',
                                                       'adverb list'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -858,13 +830,13 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,discard default statement,[Lex-11],[Lex-12],[Lex-13],adverb list'
+                                           'xprid' => 'g1,discard default statement,[Lex-11],[Lex-9],[Lex-10],adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'discard rule',
                                            'rhs' => [
-                                                      '[Lex-14]',
+                                                      '[Lex-12]',
                                                       'op declare match',
                                                       'single symbol',
                                                       'adverb list'
@@ -878,14 +850,14 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,discard rule,[Lex-14],op declare match,single symbol,adverb list'
+                                           'xprid' => 'g1,discard rule,[Lex-12],op declare match,single symbol,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'eager specification',
                                            'rhs' => [
-                                                      '[Lex-48]',
-                                                      '[Lex-49]',
+                                                      '[Lex-32]',
+                                                      '[Lex-25]',
                                                       'boolean'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -896,7 +868,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,eager specification,[Lex-48],[Lex-49],boolean'
+                                           'xprid' => 'g1,eager specification,[Lex-32],[Lex-25],boolean'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -947,7 +919,7 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'event initializer',
                                            'rhs' => [
-                                                      '[Lex-65]',
+                                                      '[Lex-10]',
                                                       'on or off'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -957,7 +929,7 @@ $hashed_metag = {
                                                           2
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,event initializer,[Lex-65],on or off'
+                                           'xprid' => 'g1,event initializer,[Lex-10],on or off'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1005,8 +977,8 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'event specification',
                                            'rhs' => [
-                                                      '[Lex-63]',
-                                                      '[Lex-64]',
+                                                      '[Lex-14]',
+                                                      '[Lex-25]',
                                                       'event initialization'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1017,15 +989,15 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,event specification,[Lex-63],[Lex-64],event initialization'
+                                           'xprid' => 'g1,event specification,[Lex-14],[Lex-25],event initialization'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'group association',
                                            'rhs' => [
-                                                      '[Lex-41]',
-                                                      '[Lex-42]',
-                                                      '[Lex-43]'
+                                                      '[Lex-26]',
+                                                      '[Lex-25]',
+                                                      '[Lex-29]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1035,17 +1007,17 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,group association,[Lex-41],[Lex-42],[Lex-43]'
+                                           'xprid' => 'g1,group association,[Lex-26],[Lex-25],[Lex-29]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'inaccessible statement',
                                            'rhs' => [
-                                                      '[Lex-25]',
-                                                      '[Lex-26]',
+                                                      '[Lex-18]',
+                                                      '[Lex-6]',
                                                       'inaccessible treatment',
-                                                      '[Lex-27]',
-                                                      '[Lex-28]'
+                                                      '[Lex-19]',
+                                                      '[Lex-9]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1057,13 +1029,13 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]'
+                                           'xprid' => 'g1,inaccessible statement,[Lex-18],[Lex-6],inaccessible treatment,[Lex-19],[Lex-9]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'inaccessible treatment',
                                            'rhs' => [
-                                                      '[Lex-29]'
+                                                      '[Lex-20]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1071,13 +1043,13 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,inaccessible treatment,[Lex-29]'
+                                           'xprid' => 'g1,inaccessible treatment,[Lex-20]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'inaccessible treatment',
                                            'rhs' => [
-                                                      '[Lex-30]'
+                                                      '[Lex-21]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1085,13 +1057,13 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,inaccessible treatment,[Lex-30]'
+                                           'xprid' => 'g1,inaccessible treatment,[Lex-21]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'inaccessible treatment',
                                            'rhs' => [
-                                                      '[Lex-31]'
+                                                      '[Lex-22]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1099,15 +1071,15 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,inaccessible treatment,[Lex-31]'
+                                           'xprid' => 'g1,inaccessible treatment,[Lex-22]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'left association',
                                            'rhs' => [
-                                                      '[Lex-35]',
-                                                      '[Lex-36]',
-                                                      '[Lex-37]'
+                                                      '[Lex-26]',
+                                                      '[Lex-25]',
+                                                      '[Lex-27]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1117,7 +1089,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,left association,[Lex-35],[Lex-36],[Lex-37]'
+                                           'xprid' => 'g1,left association,[Lex-26],[Lex-25],[Lex-27]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1143,7 +1115,7 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'lexeme rule',
                                            'rhs' => [
-                                                      '[Lex-15]',
+                                                      '[Lex-13]',
                                                       'op declare match',
                                                       'symbol',
                                                       'adverb list'
@@ -1157,7 +1129,7 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,lexeme rule,[Lex-15],op declare match,symbol,adverb list'
+                                           'xprid' => 'g1,lexeme rule,[Lex-13],op declare match,symbol,adverb list'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1177,8 +1149,8 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'naming',
                                            'rhs' => [
-                                                      '[Lex-70]',
-                                                      '[Lex-71]',
+                                                      '[Lex-43]',
+                                                      '[Lex-25]',
                                                       'alternative name'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1189,13 +1161,13 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,naming,[Lex-70],[Lex-71],alternative name'
+                                           'xprid' => 'g1,naming,[Lex-43],[Lex-25],alternative name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'null adverb',
                                            'rhs' => [
-                                                      '[Lex-32]'
+                                                      '[Lex-23]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1203,13 +1175,13 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,null adverb,[Lex-32]'
+                                           'xprid' => 'g1,null adverb,[Lex-23]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'null ranking constant',
                                            'rhs' => [
-                                                      '[Lex-57]'
+                                                      '[Lex-36]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1217,13 +1189,13 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,null ranking constant,[Lex-57]'
+                                           'xprid' => 'g1,null ranking constant,[Lex-36]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'null ranking constant',
                                            'rhs' => [
-                                                      '[Lex-58]'
+                                                      '[Lex-37]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1231,14 +1203,14 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,null ranking constant,[Lex-58]'
+                                           'xprid' => 'g1,null ranking constant,[Lex-37]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'null ranking specification',
                                            'rhs' => [
-                                                      '[Lex-52]',
-                                                      '[Lex-53]',
+                                                      '[Lex-34]',
+                                                      '[Lex-25]',
                                                       'null ranking constant'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1249,15 +1221,15 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,null ranking specification,[Lex-52],[Lex-53],null ranking constant'
+                                           'xprid' => 'g1,null ranking specification,[Lex-34],[Lex-25],null ranking constant'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'null ranking specification',
                                            'rhs' => [
-                                                      '[Lex-54]',
-                                                      '[Lex-55]',
-                                                      '[Lex-56]',
+                                                      '[Lex-35]',
+                                                      '[Lex-33]',
+                                                      '[Lex-25]',
                                                       'null ranking constant'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1269,7 +1241,7 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,null ranking specification,[Lex-54],[Lex-55],[Lex-56],null ranking constant'
+                                           'xprid' => 'g1,null ranking specification,[Lex-35],[Lex-33],[Lex-25],null ranking constant'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1289,10 +1261,10 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'nulled event declaration',
                                            'rhs' => [
-                                                      '[Lex-19]',
+                                                      '[Lex-14]',
                                                       'event initialization',
-                                                      '[Lex-20]',
-                                                      '[Lex-21]',
+                                                      '[Lex-10]',
+                                                      '[Lex-16]',
                                                       'symbol name'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1305,13 +1277,13 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,nulled event declaration,[Lex-19],event initialization,[Lex-20],[Lex-21],symbol name'
+                                           'xprid' => 'g1,nulled event declaration,[Lex-14],event initialization,[Lex-10],[Lex-16],symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'on or off',
                                            'rhs' => [
-                                                      '[Lex-66]'
+                                                      '[Lex-40]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1319,13 +1291,13 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,on or off,[Lex-66]'
+                                           'xprid' => 'g1,on or off,[Lex-40]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'on or off',
                                            'rhs' => [
-                                                      '[Lex-67]'
+                                                      '[Lex-41]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1333,7 +1305,7 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,on or off,[Lex-67]'
+                                           'xprid' => 'g1,on or off,[Lex-41]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1367,9 +1339,9 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'parenthesized rhs primary list',
                                            'rhs' => [
-                                                      '[Lex-72]',
+                                                      '[Lex-44]',
                                                       'rhs primary list',
-                                                      '[Lex-73]'
+                                                      '[Lex-45]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1379,14 +1351,14 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,parenthesized rhs primary list,[Lex-72],rhs primary list,[Lex-73]'
+                                           'xprid' => 'g1,parenthesized rhs primary list,[Lex-44],rhs primary list,[Lex-45]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'pause specification',
                                            'rhs' => [
-                                                      '[Lex-61]',
-                                                      '[Lex-62]',
+                                                      '[Lex-39]',
+                                                      '[Lex-25]',
                                                       'before or after'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1397,16 +1369,16 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,pause specification,[Lex-61],[Lex-62],before or after'
+                                           'xprid' => 'g1,pause specification,[Lex-39],[Lex-25],before or after'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'prediction event declaration',
                                            'rhs' => [
-                                                      '[Lex-22]',
+                                                      '[Lex-14]',
                                                       'event initialization',
-                                                      '[Lex-23]',
-                                                      '[Lex-24]',
+                                                      '[Lex-10]',
+                                                      '[Lex-17]',
                                                       'symbol name'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1419,7 +1391,7 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name'
+                                           'xprid' => 'g1,prediction event declaration,[Lex-14],event initialization,[Lex-10],[Lex-17],symbol name'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1460,8 +1432,8 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'priority specification',
                                            'rhs' => [
-                                                      '[Lex-59]',
-                                                      '[Lex-60]',
+                                                      '[Lex-38]',
+                                                      '[Lex-25]',
                                                       'signed integer'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1472,14 +1444,14 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,priority specification,[Lex-59],[Lex-60],signed integer'
+                                           'xprid' => 'g1,priority specification,[Lex-38],[Lex-25],signed integer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'proper specification',
                                            'rhs' => [
-                                                      '[Lex-46]',
-                                                      '[Lex-47]',
+                                                      '[Lex-31]',
+                                                      '[Lex-25]',
                                                       'boolean'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1490,7 +1462,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,proper specification,[Lex-46],[Lex-47],boolean'
+                                           'xprid' => 'g1,proper specification,[Lex-31],[Lex-25],boolean'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1518,7 +1490,7 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'quantifier',
                                            'rhs' => [
-                                                      '[Lex-74]'
+                                                      '[Lex-46]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1526,13 +1498,13 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,quantifier,[Lex-74]'
+                                           'xprid' => 'g1,quantifier,[Lex-46]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'quantifier',
                                            'rhs' => [
-                                                      '[Lex-75]'
+                                                      '[Lex-47]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1540,14 +1512,14 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,quantifier,[Lex-75]'
+                                           'xprid' => 'g1,quantifier,[Lex-47]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'rank specification',
                                            'rhs' => [
-                                                      '[Lex-50]',
-                                                      '[Lex-51]',
+                                                      '[Lex-33]',
+                                                      '[Lex-25]',
                                                       'signed integer'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1558,7 +1530,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,rank specification,[Lex-50],[Lex-51],signed integer'
+                                           'xprid' => 'g1,rank specification,[Lex-33],[Lex-25],signed integer'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -1636,9 +1608,9 @@ $hashed_metag = {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'right association',
                                            'rhs' => [
-                                                      '[Lex-38]',
-                                                      '[Lex-39]',
-                                                      '[Lex-40]'
+                                                      '[Lex-26]',
+                                                      '[Lex-25]',
+                                                      '[Lex-28]'
                                                     ],
                                            'subgrammar' => 'g1',
                                            'xpr_dot' => [
@@ -1648,14 +1620,14 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,right association,[Lex-38],[Lex-39],[Lex-40]'
+                                           'xprid' => 'g1,right association,[Lex-26],[Lex-25],[Lex-28]'
                                          },
                                          {
                                            'action' => '[start,length,values]',
                                            'lhs' => 'separator specification',
                                            'rhs' => [
-                                                      '[Lex-44]',
-                                                      '[Lex-45]',
+                                                      '[Lex-30]',
+                                                      '[Lex-25]',
                                                       'single symbol'
                                                     ],
                                            'subgrammar' => 'g1',
@@ -1666,7 +1638,7 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'g1,separator specification,[Lex-44],[Lex-45],single symbol'
+                                           'xprid' => 'g1,separator specification,[Lex-30],[Lex-25],single symbol'
                                          },
                                          {
                                            'action' => '[start,length,values]',
@@ -2078,6 +2050,877 @@ $hashed_metag = {
                                            'xprid' => 'l0,[:discard:],whitespace'
                                          },
                                          {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'Perl name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],Perl name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[:discard:]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[:discard:]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-0]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-0]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-10]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-10]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-11]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-11]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-12]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-12]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-13]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-13]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-14]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-14]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-15]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-15]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-16]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-16]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-17]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-17]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-18]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-18]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-19]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-19]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-1]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-1]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-20]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-20]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-21]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-21]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-22]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-22]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-23]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-23]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-24]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-24]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-25]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-25]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-26]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-26]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-27]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-27]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-28]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-28]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-29]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-29]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-2]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-2]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-30]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-30]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-31]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-31]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-32]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-32]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-33]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-33]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-34]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-34]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-35]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-35]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-36]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-36]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-37]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-37]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-38]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-38]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-39]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-39]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-3]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-3]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-40]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-40]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-41]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-41]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-42]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-42]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-43]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-43]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-44]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-44]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-45]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-45]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-46]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-46]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-47]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-47]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-4]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-4]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-5]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-5]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-6]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-6]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-7]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-7]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-8]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-8]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[Lex-9]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[Lex-9]'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'array descriptor'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],array descriptor'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'bare name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],bare name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'before or after'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],before or after'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'boolean'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],boolean'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'bracketed name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],bracketed name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'character class'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],character class'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'op declare bnf'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],op declare bnf'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'op declare match'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],op declare match'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'op equal priority'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],op equal priority'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'op loosen'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],op loosen'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'reserved action name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],reserved action name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'reserved blessing name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],reserved blessing name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'reserved event name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],reserved event name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'signed integer'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],signed integer'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'single quoted name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],single quoted name'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'single quoted string'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],single quoted string'
+                                         },
+                                         {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      'standard name'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],standard name'
+                                         },
+                                         {
                                            'lhs' => '[Lex-0]',
                                            'rhs' => [
                                                       '[[\\;]]'
@@ -2131,44 +2974,6 @@ $hashed_metag = {
                                          {
                                            'lhs' => '[Lex-12]',
                                            'rhs' => [
-                                                      '[[d]]',
-                                                      '[[e]]',
-                                                      '[[f]]',
-                                                      '[[a]]',
-                                                      '[[u]]',
-                                                      '[[l]]',
-                                                      '[[t]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5,
-                                                          6,
-                                                          7
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-12],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-13]',
-                                           'rhs' => [
-                                                      '[[\\=]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-13],[[\\=]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-14]',
-                                           'rhs' => [
                                                       '[[\\:]]',
                                                       '[[d]]',
                                                       '[[i]]',
@@ -2191,10 +2996,10 @@ $hashed_metag = {
                                                           8
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-14],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
+                                           'xprid' => 'l0,[Lex-12],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-15]',
+                                           'lhs' => '[Lex-13]',
                                            'rhs' => [
                                                       '[[\\:]]',
                                                       '[[l]]',
@@ -2216,10 +3021,10 @@ $hashed_metag = {
                                                           7
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-15],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
+                                           'xprid' => 'l0,[Lex-13],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-16]',
+                                           'lhs' => '[Lex-14]',
                                            'rhs' => [
                                                       '[[e]]',
                                                       '[[v]]',
@@ -2237,23 +3042,10 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-16],[[e]],[[v]],[[e]],[[n]],[[t]]'
+                                           'xprid' => 'l0,[Lex-14],[[e]],[[v]],[[e]],[[n]],[[t]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-17]',
-                                           'rhs' => [
-                                                      '[[\\=]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-17],[[\\=]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-18]',
+                                           'lhs' => '[Lex-15]',
                                            'rhs' => [
                                                       '[[c]]',
                                                       '[[o]]',
@@ -2279,57 +3071,10 @@ $hashed_metag = {
                                                           9
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-18],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]'
+                                           'xprid' => 'l0,[Lex-15],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-19]',
-                                           'rhs' => [
-                                                      '[[e]]',
-                                                      '[[v]]',
-                                                      '[[e]]',
-                                                      '[[n]]',
-                                                      '[[t]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-19],[[e]],[[v]],[[e]],[[n]],[[t]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-1]',
-                                           'rhs' => [
-                                                      '[[\\{]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-1],[[\\{]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-20]',
-                                           'rhs' => [
-                                                      '[[\\=]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-20],[[\\=]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-21]',
+                                           'lhs' => '[Lex-16]',
                                            'rhs' => [
                                                       '[[n]]',
                                                       '[[u]]',
@@ -2349,44 +3094,10 @@ $hashed_metag = {
                                                           6
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-21],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]'
+                                           'xprid' => 'l0,[Lex-16],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-22]',
-                                           'rhs' => [
-                                                      '[[e]]',
-                                                      '[[v]]',
-                                                      '[[e]]',
-                                                      '[[n]]',
-                                                      '[[t]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-22],[[e]],[[v]],[[e]],[[n]],[[t]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-23]',
-                                           'rhs' => [
-                                                      '[[\\=]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-23],[[\\=]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-24]',
+                                           'lhs' => '[Lex-17]',
                                            'rhs' => [
                                                       '[[p]]',
                                                       '[[r]]',
@@ -2412,10 +3123,10 @@ $hashed_metag = {
                                                           9
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-24],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]'
+                                           'xprid' => 'l0,[Lex-17],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-25]',
+                                           'lhs' => '[Lex-18]',
                                            'rhs' => [
                                                       '[[i]]',
                                                       '[[n]]',
@@ -2447,25 +3158,10 @@ $hashed_metag = {
                                                           12
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-25],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]'
+                                           'xprid' => 'l0,[Lex-18],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-26]',
-                                           'rhs' => [
-                                                      '[[i]]',
-                                                      '[[s]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-26],[[i]],[[s]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-27]',
+                                           'lhs' => '[Lex-19]',
                                            'rhs' => [
                                                       '[[b]]',
                                                       '[[y]]'
@@ -2477,35 +3173,23 @@ $hashed_metag = {
                                                           2
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-27],[[b]],[[y]]'
+                                           'xprid' => 'l0,[Lex-19],[[b]],[[y]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-28]',
+                                           'lhs' => '[Lex-1]',
                                            'rhs' => [
-                                                      '[[d]]',
-                                                      '[[e]]',
-                                                      '[[f]]',
-                                                      '[[a]]',
-                                                      '[[u]]',
-                                                      '[[l]]',
-                                                      '[[t]]'
+                                                      '[[\\{]]'
                                                     ],
                                            'subgrammar' => 'l0',
                                            'xpr_dot' => [
                                                           0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5,
-                                                          6,
-                                                          7
+                                                          1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-28],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]'
+                                           'xprid' => 'l0,[Lex-1],[[\\{]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-29]',
+                                           'lhs' => '[Lex-20]',
                                            'rhs' => [
                                                       '[[w]]',
                                                       '[[a]]',
@@ -2521,23 +3205,10 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-29],[[w]],[[a]],[[r]],[[n]]'
+                                           'xprid' => 'l0,[Lex-20],[[w]],[[a]],[[r]],[[n]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-2]',
-                                           'rhs' => [
-                                                      '[[\\}]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-2],[[\\}]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-30]',
+                                           'lhs' => '[Lex-21]',
                                            'rhs' => [
                                                       '[[o]]',
                                                       '[[k]]'
@@ -2549,10 +3220,10 @@ $hashed_metag = {
                                                           2
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-30],[[o]],[[k]]'
+                                           'xprid' => 'l0,[Lex-21],[[o]],[[k]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-31]',
+                                           'lhs' => '[Lex-22]',
                                            'rhs' => [
                                                       '[[f]]',
                                                       '[[a]]',
@@ -2570,10 +3241,10 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-31],[[f]],[[a]],[[t]],[[a]],[[l]]'
+                                           'xprid' => 'l0,[Lex-22],[[f]],[[a]],[[t]],[[a]],[[l]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-32]',
+                                           'lhs' => '[Lex-23]',
                                            'rhs' => [
                                                       '[[\\,]]'
                                                     ],
@@ -2583,10 +3254,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-32],[[\\,]]'
+                                           'xprid' => 'l0,[Lex-23],[[\\,]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-33]',
+                                           'lhs' => '[Lex-24]',
                                            'rhs' => [
                                                       '[[a]]',
                                                       '[[c]]',
@@ -2606,10 +3277,10 @@ $hashed_metag = {
                                                           6
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]'
+                                           'xprid' => 'l0,[Lex-24],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-34]',
+                                           'lhs' => '[Lex-25]',
                                            'rhs' => [
                                                       '[[\\=]]',
                                                       '[[\\>]]'
@@ -2621,10 +3292,10 @@ $hashed_metag = {
                                                           2
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-34],[[\\=]],[[\\>]]'
+                                           'xprid' => 'l0,[Lex-25],[[\\=]],[[\\>]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-35]',
+                                           'lhs' => '[Lex-26]',
                                            'rhs' => [
                                                       '[[a]]',
                                                       '[[s]]',
@@ -2642,25 +3313,10 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]'
+                                           'xprid' => 'l0,[Lex-26],[[a]],[[s]],[[s]],[[o]],[[c]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-36]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-36],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-37]',
+                                           'lhs' => '[Lex-27]',
                                            'rhs' => [
                                                       '[[l]]',
                                                       '[[e]]',
@@ -2676,69 +3332,10 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-37],[[l]],[[e]],[[f]],[[t]]'
+                                           'xprid' => 'l0,[Lex-27],[[l]],[[e]],[[f]],[[t]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-38]',
-                                           'rhs' => [
-                                                      '[[a]]',
-                                                      '[[s]]',
-                                                      '[[s]]',
-                                                      '[[o]]',
-                                                      '[[c]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-39]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-39],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-3]',
-                                           'rhs' => [
-                                                      '[[\\:]]',
-                                                      '[[s]]',
-                                                      '[[t]]',
-                                                      '[[a]]',
-                                                      '[[r]]',
-                                                      '[[t]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5,
-                                                          6
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-40]',
+                                           'lhs' => '[Lex-28]',
                                            'rhs' => [
                                                       '[[r]]',
                                                       '[[i]]',
@@ -2756,46 +3353,10 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-40],[[r]],[[i]],[[g]],[[h]],[[t]]'
+                                           'xprid' => 'l0,[Lex-28],[[r]],[[i]],[[g]],[[h]],[[t]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-41]',
-                                           'rhs' => [
-                                                      '[[a]]',
-                                                      '[[s]]',
-                                                      '[[s]]',
-                                                      '[[o]]',
-                                                      '[[c]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-42]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-42],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-43]',
+                                           'lhs' => '[Lex-29]',
                                            'rhs' => [
                                                       '[[g]]',
                                                       '[[r]]',
@@ -2813,10 +3374,23 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]'
+                                           'xprid' => 'l0,[Lex-29],[[g]],[[r]],[[o]],[[u]],[[p]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-44]',
+                                           'lhs' => '[Lex-2]',
+                                           'rhs' => [
+                                                      '[[\\}]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-2],[[\\}]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-30]',
                                            'rhs' => [
                                                       '[[s]]',
                                                       '[[e]]',
@@ -2842,25 +3416,10 @@ $hashed_metag = {
                                                           9
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]'
+                                           'xprid' => 'l0,[Lex-30],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-45]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-45],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-46]',
+                                           'lhs' => '[Lex-31]',
                                            'rhs' => [
                                                       '[[p]]',
                                                       '[[r]]',
@@ -2880,25 +3439,10 @@ $hashed_metag = {
                                                           6
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]'
+                                           'xprid' => 'l0,[Lex-31],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-47]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-47],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-48]',
+                                           'lhs' => '[Lex-32]',
                                            'rhs' => [
                                                       '[[e]]',
                                                       '[[a]]',
@@ -2916,46 +3460,10 @@ $hashed_metag = {
                                                           5
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-48],[[e]],[[a]],[[g]],[[e]],[[r]]'
+                                           'xprid' => 'l0,[Lex-32],[[e]],[[a]],[[g]],[[e]],[[r]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-49]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-49],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-4]',
-                                           'rhs' => [
-                                                      '[[s]]',
-                                                      '[[t]]',
-                                                      '[[a]]',
-                                                      '[[r]]',
-                                                      '[[t]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-50]',
+                                           'lhs' => '[Lex-33]',
                                            'rhs' => [
                                                       '[[r]]',
                                                       '[[a]]',
@@ -2971,25 +3479,10 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-50],[[r]],[[a]],[[n]],[[k]]'
+                                           'xprid' => 'l0,[Lex-33],[[r]],[[a]],[[n]],[[k]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-51]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-51],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-52]',
+                                           'lhs' => '[Lex-34]',
                                            'rhs' => [
                                                       '[[n]]',
                                                       '[[u]]',
@@ -3021,25 +3514,10 @@ $hashed_metag = {
                                                           12
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-52],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]'
+                                           'xprid' => 'l0,[Lex-34],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-53]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-53],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-54]',
+                                           'lhs' => '[Lex-35]',
                                            'rhs' => [
                                                       '[[n]]',
                                                       '[[u]]',
@@ -3055,44 +3533,10 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-54],[[n]],[[u]],[[l]],[[l]]'
+                                           'xprid' => 'l0,[Lex-35],[[n]],[[u]],[[l]],[[l]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-55]',
-                                           'rhs' => [
-                                                      '[[r]]',
-                                                      '[[a]]',
-                                                      '[[n]]',
-                                                      '[[k]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-55],[[r]],[[a]],[[n]],[[k]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-56]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-56],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-57]',
+                                           'lhs' => '[Lex-36]',
                                            'rhs' => [
                                                       '[[l]]',
                                                       '[[o]]',
@@ -3106,10 +3550,10 @@ $hashed_metag = {
                                                           3
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-57],[[l]],[[o]],[[w]]'
+                                           'xprid' => 'l0,[Lex-36],[[l]],[[o]],[[w]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-58]',
+                                           'lhs' => '[Lex-37]',
                                            'rhs' => [
                                                       '[[h]]',
                                                       '[[i]]',
@@ -3125,10 +3569,10 @@ $hashed_metag = {
                                                           4
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-58],[[h]],[[i]],[[g]],[[h]]'
+                                           'xprid' => 'l0,[Lex-37],[[h]],[[i]],[[g]],[[h]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-59]',
+                                           'lhs' => '[Lex-38]',
                                            'rhs' => [
                                                       '[[p]]',
                                                       '[[r]]',
@@ -3152,7 +3596,196 @@ $hashed_metag = {
                                                           8
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-59],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]'
+                                           'xprid' => 'l0,[Lex-38],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-39]',
+                                           'rhs' => [
+                                                      '[[p]]',
+                                                      '[[a]]',
+                                                      '[[u]]',
+                                                      '[[s]]',
+                                                      '[[e]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4,
+                                                          5
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-39],[[p]],[[a]],[[u]],[[s]],[[e]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-3]',
+                                           'rhs' => [
+                                                      '[[\\:]]',
+                                                      '[[s]]',
+                                                      '[[t]]',
+                                                      '[[a]]',
+                                                      '[[r]]',
+                                                      '[[t]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4,
+                                                          5,
+                                                          6
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-40]',
+                                           'rhs' => [
+                                                      '[[o]]',
+                                                      '[[n]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-40],[[o]],[[n]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-41]',
+                                           'rhs' => [
+                                                      '[[o]]',
+                                                      '[[f]]',
+                                                      '[[f]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2,
+                                                          3
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-41],[[o]],[[f]],[[f]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-42]',
+                                           'rhs' => [
+                                                      '[[b]]',
+                                                      '[[l]]',
+                                                      '[[e]]',
+                                                      '[[s]]',
+                                                      '[[s]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4,
+                                                          5
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-42],[[b]],[[l]],[[e]],[[s]],[[s]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-43]',
+                                           'rhs' => [
+                                                      '[[n]]',
+                                                      '[[a]]',
+                                                      '[[m]]',
+                                                      '[[e]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-43],[[n]],[[a]],[[m]],[[e]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-44]',
+                                           'rhs' => [
+                                                      '[[\\(]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-44],[[\\(]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-45]',
+                                           'rhs' => [
+                                                      '[[\\)]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-45],[[\\)]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-46]',
+                                           'rhs' => [
+                                                      '[[\\*]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-46],[[\\*]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-47]',
+                                           'rhs' => [
+                                                      '[[\\+]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-47],[[\\+]]'
+                                         },
+                                         {
+                                           'lhs' => '[Lex-4]',
+                                           'rhs' => [
+                                                      '[[s]]',
+                                                      '[[t]]',
+                                                      '[[a]]',
+                                                      '[[r]]',
+                                                      '[[t]]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4,
+                                                          5
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]'
                                          },
                                          {
                                            'lhs' => '[Lex-5]',
@@ -3178,174 +3811,6 @@ $hashed_metag = {
                                            'xprid' => 'l0,[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]'
                                          },
                                          {
-                                           'lhs' => '[Lex-60]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-60],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-61]',
-                                           'rhs' => [
-                                                      '[[p]]',
-                                                      '[[a]]',
-                                                      '[[u]]',
-                                                      '[[s]]',
-                                                      '[[e]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-61],[[p]],[[a]],[[u]],[[s]],[[e]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-62]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-62],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-63]',
-                                           'rhs' => [
-                                                      '[[e]]',
-                                                      '[[v]]',
-                                                      '[[e]]',
-                                                      '[[n]]',
-                                                      '[[t]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-63],[[e]],[[v]],[[e]],[[n]],[[t]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-64]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-64],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-65]',
-                                           'rhs' => [
-                                                      '[[\\=]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-65],[[\\=]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-66]',
-                                           'rhs' => [
-                                                      '[[o]]',
-                                                      '[[n]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-66],[[o]],[[n]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-67]',
-                                           'rhs' => [
-                                                      '[[o]]',
-                                                      '[[f]]',
-                                                      '[[f]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-67],[[o]],[[f]],[[f]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-68]',
-                                           'rhs' => [
-                                                      '[[b]]',
-                                                      '[[l]]',
-                                                      '[[e]]',
-                                                      '[[s]]',
-                                                      '[[s]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4,
-                                                          5
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-68],[[b]],[[l]],[[e]],[[s]],[[s]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-69]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-69],[[\\=]],[[\\>]]'
-                                         },
-                                         {
                                            'lhs' => '[Lex-6]',
                                            'rhs' => [
                                                       '[[i]]',
@@ -3359,92 +3824,6 @@ $hashed_metag = {
                                                         ],
                                            'xpr_top' => 1,
                                            'xprid' => 'l0,[Lex-6],[[i]],[[s]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-70]',
-                                           'rhs' => [
-                                                      '[[n]]',
-                                                      '[[a]]',
-                                                      '[[m]]',
-                                                      '[[e]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2,
-                                                          3,
-                                                          4
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-70],[[n]],[[a]],[[m]],[[e]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-71]',
-                                           'rhs' => [
-                                                      '[[\\=]]',
-                                                      '[[\\>]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1,
-                                                          2
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-71],[[\\=]],[[\\>]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-72]',
-                                           'rhs' => [
-                                                      '[[\\(]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-72],[[\\(]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-73]',
-                                           'rhs' => [
-                                                      '[[\\)]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-73],[[\\)]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-74]',
-                                           'rhs' => [
-                                                      '[[\\*]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-74],[[\\*]]'
-                                         },
-                                         {
-                                           'lhs' => '[Lex-75]',
-                                           'rhs' => [
-                                                      '[[\\+]]'
-                                                    ],
-                                           'subgrammar' => 'l0',
-                                           'xpr_dot' => [
-                                                          0,
-                                                          1
-                                                        ],
-                                           'xpr_top' => 1,
-                                           'xprid' => 'l0,[Lex-75],[[\\+]]'
                                          },
                                          {
                                            'lhs' => '[Lex-7]',
@@ -4585,11 +4964,11 @@ $hashed_metag = {
                   'symbols' => {
                                  'g1' => {
                                            'Perl name' => {
-                                                            'wsyid' => 530,
+                                                            'wsyid' => 474,
                                                             'xsy' => 'Perl name'
                                                           },
                                            '[:start:]' => {
-                                                            'wsyid' => 713,
+                                                            'wsyid' => 657,
                                                             'xsy' => '[:start:]'
                                                           },
                                            '[Lex-0]' => {
@@ -4605,35 +4984,35 @@ $hashed_metag = {
                                                            'xsy' => '[Lex-11]'
                                                          },
                                            '[Lex-12]' => {
-                                                           'wsyid' => 102,
+                                                           'wsyid' => 116,
                                                            'xsy' => '[Lex-12]'
                                                          },
                                            '[Lex-13]' => {
-                                                           'wsyid' => 105,
+                                                           'wsyid' => 126,
                                                            'xsy' => '[Lex-13]'
                                                          },
                                            '[Lex-14]' => {
-                                                           'wsyid' => 120,
+                                                           'wsyid' => 133,
                                                            'xsy' => '[Lex-14]'
                                                          },
                                            '[Lex-15]' => {
-                                                           'wsyid' => 130,
+                                                           'wsyid' => 145,
                                                            'xsy' => '[Lex-15]'
                                                          },
                                            '[Lex-16]' => {
-                                                           'wsyid' => 137,
+                                                           'wsyid' => 161,
                                                            'xsy' => '[Lex-16]'
                                                          },
                                            '[Lex-17]' => {
-                                                           'wsyid' => 140,
+                                                           'wsyid' => 178,
                                                            'xsy' => '[Lex-17]'
                                                          },
                                            '[Lex-18]' => {
-                                                           'wsyid' => 151,
+                                                           'wsyid' => 192,
                                                            'xsy' => '[Lex-18]'
                                                          },
                                            '[Lex-19]' => {
-                                                           'wsyid' => 160,
+                                                           'wsyid' => 198,
                                                            'xsy' => '[Lex-19]'
                                                          },
                                            '[Lex-1]' => {
@@ -4641,43 +5020,43 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-1]'
                                                         },
                                            '[Lex-20]' => {
-                                                           'wsyid' => 163,
+                                                           'wsyid' => 212,
                                                            'xsy' => '[Lex-20]'
                                                          },
                                            '[Lex-21]' => {
-                                                           'wsyid' => 171,
+                                                           'wsyid' => 216,
                                                            'xsy' => '[Lex-21]'
                                                          },
                                            '[Lex-22]' => {
-                                                           'wsyid' => 178,
+                                                           'wsyid' => 223,
                                                            'xsy' => '[Lex-22]'
                                                          },
                                            '[Lex-23]' => {
-                                                           'wsyid' => 181,
+                                                           'wsyid' => 248,
                                                            'xsy' => '[Lex-23]'
                                                          },
                                            '[Lex-24]' => {
-                                                           'wsyid' => 192,
+                                                           'wsyid' => 256,
                                                            'xsy' => '[Lex-24]'
                                                          },
                                            '[Lex-25]' => {
-                                                           'wsyid' => 206,
+                                                           'wsyid' => 260,
                                                            'xsy' => '[Lex-25]'
                                                          },
                                            '[Lex-26]' => {
-                                                           'wsyid' => 210,
+                                                           'wsyid' => 268,
                                                            'xsy' => '[Lex-26]'
                                                          },
                                            '[Lex-27]' => {
-                                                           'wsyid' => 214,
+                                                           'wsyid' => 276,
                                                            'xsy' => '[Lex-27]'
                                                          },
                                            '[Lex-28]' => {
-                                                           'wsyid' => 223,
+                                                           'wsyid' => 290,
                                                            'xsy' => '[Lex-28]'
                                                          },
                                            '[Lex-29]' => {
-                                                           'wsyid' => 230,
+                                                           'wsyid' => 304,
                                                            'xsy' => '[Lex-29]'
                                                          },
                                            '[Lex-2]' => {
@@ -4685,43 +5064,43 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-2]'
                                                         },
                                            '[Lex-30]' => {
-                                                           'wsyid' => 234,
+                                                           'wsyid' => 315,
                                                            'xsy' => '[Lex-30]'
                                                          },
                                            '[Lex-31]' => {
-                                                           'wsyid' => 241,
+                                                           'wsyid' => 325,
                                                            'xsy' => '[Lex-31]'
                                                          },
                                            '[Lex-32]' => {
-                                                           'wsyid' => 266,
+                                                           'wsyid' => 335,
                                                            'xsy' => '[Lex-32]'
                                                          },
                                            '[Lex-33]' => {
-                                                           'wsyid' => 274,
+                                                           'wsyid' => 343,
                                                            'xsy' => '[Lex-33]'
                                                          },
                                            '[Lex-34]' => {
-                                                           'wsyid' => 278,
+                                                           'wsyid' => 360,
                                                            'xsy' => '[Lex-34]'
                                                          },
                                            '[Lex-35]' => {
-                                                           'wsyid' => 286,
+                                                           'wsyid' => 369,
                                                            'xsy' => '[Lex-35]'
                                                          },
                                            '[Lex-36]' => {
-                                                           'wsyid' => 290,
+                                                           'wsyid' => 380,
                                                            'xsy' => '[Lex-36]'
                                                          },
                                            '[Lex-37]' => {
-                                                           'wsyid' => 296,
+                                                           'wsyid' => 386,
                                                            'xsy' => '[Lex-37]'
                                                          },
                                            '[Lex-38]' => {
-                                                           'wsyid' => 303,
+                                                           'wsyid' => 396,
                                                            'xsy' => '[Lex-38]'
                                                          },
                                            '[Lex-39]' => {
-                                                           'wsyid' => 307,
+                                                           'wsyid' => 405,
                                                            'xsy' => '[Lex-39]'
                                                          },
                                            '[Lex-3]' => {
@@ -4729,161 +5108,49 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-3]'
                                                         },
                                            '[Lex-40]' => {
-                                                           'wsyid' => 314,
+                                                           'wsyid' => 423,
                                                            'xsy' => '[Lex-40]'
                                                          },
                                            '[Lex-41]' => {
-                                                           'wsyid' => 321,
+                                                           'wsyid' => 428,
                                                            'xsy' => '[Lex-41]'
                                                          },
                                            '[Lex-42]' => {
-                                                           'wsyid' => 325,
+                                                           'wsyid' => 435,
                                                            'xsy' => '[Lex-42]'
                                                          },
                                            '[Lex-43]' => {
-                                                           'wsyid' => 332,
+                                                           'wsyid' => 444,
                                                            'xsy' => '[Lex-43]'
                                                          },
                                            '[Lex-44]' => {
-                                                           'wsyid' => 343,
+                                                           'wsyid' => 465,
                                                            'xsy' => '[Lex-44]'
                                                          },
                                            '[Lex-45]' => {
-                                                           'wsyid' => 347,
+                                                           'wsyid' => 468,
                                                            'xsy' => '[Lex-45]'
                                                          },
                                            '[Lex-46]' => {
-                                                           'wsyid' => 355,
+                                                           'wsyid' => 503,
                                                            'xsy' => '[Lex-46]'
                                                          },
                                            '[Lex-47]' => {
-                                                           'wsyid' => 359,
+                                                           'wsyid' => 506,
                                                            'xsy' => '[Lex-47]'
-                                                         },
-                                           '[Lex-48]' => {
-                                                           'wsyid' => 367,
-                                                           'xsy' => '[Lex-48]'
-                                                         },
-                                           '[Lex-49]' => {
-                                                           'wsyid' => 371,
-                                                           'xsy' => '[Lex-49]'
                                                          },
                                            '[Lex-4]' => {
                                                           'wsyid' => 41,
                                                           'xsy' => '[Lex-4]'
                                                         },
-                                           '[Lex-50]' => {
-                                                           'wsyid' => 377,
-                                                           'xsy' => '[Lex-50]'
-                                                         },
-                                           '[Lex-51]' => {
-                                                           'wsyid' => 381,
-                                                           'xsy' => '[Lex-51]'
-                                                         },
-                                           '[Lex-52]' => {
-                                                           'wsyid' => 396,
-                                                           'xsy' => '[Lex-52]'
-                                                         },
-                                           '[Lex-53]' => {
-                                                           'wsyid' => 400,
-                                                           'xsy' => '[Lex-53]'
-                                                         },
-                                           '[Lex-54]' => {
-                                                           'wsyid' => 407,
-                                                           'xsy' => '[Lex-54]'
-                                                         },
-                                           '[Lex-55]' => {
-                                                           'wsyid' => 413,
-                                                           'xsy' => '[Lex-55]'
-                                                         },
-                                           '[Lex-56]' => {
-                                                           'wsyid' => 417,
-                                                           'xsy' => '[Lex-56]'
-                                                         },
-                                           '[Lex-57]' => {
-                                                           'wsyid' => 422,
-                                                           'xsy' => '[Lex-57]'
-                                                         },
-                                           '[Lex-58]' => {
-                                                           'wsyid' => 428,
-                                                           'xsy' => '[Lex-58]'
-                                                         },
-                                           '[Lex-59]' => {
-                                                           'wsyid' => 438,
-                                                           'xsy' => '[Lex-59]'
-                                                         },
                                            '[Lex-5]' => {
                                                           'wsyid' => 49,
                                                           'xsy' => '[Lex-5]'
                                                         },
-                                           '[Lex-60]' => {
-                                                           'wsyid' => 442,
-                                                           'xsy' => '[Lex-60]'
-                                                         },
-                                           '[Lex-61]' => {
-                                                           'wsyid' => 449,
-                                                           'xsy' => '[Lex-61]'
-                                                         },
-                                           '[Lex-62]' => {
-                                                           'wsyid' => 453,
-                                                           'xsy' => '[Lex-62]'
-                                                         },
-                                           '[Lex-63]' => {
-                                                           'wsyid' => 461,
-                                                           'xsy' => '[Lex-63]'
-                                                         },
-                                           '[Lex-64]' => {
-                                                           'wsyid' => 465,
-                                                           'xsy' => '[Lex-64]'
-                                                         },
-                                           '[Lex-65]' => {
-                                                           'wsyid' => 470,
-                                                           'xsy' => '[Lex-65]'
-                                                         },
-                                           '[Lex-66]' => {
-                                                           'wsyid' => 475,
-                                                           'xsy' => '[Lex-66]'
-                                                         },
-                                           '[Lex-67]' => {
-                                                           'wsyid' => 480,
-                                                           'xsy' => '[Lex-67]'
-                                                         },
-                                           '[Lex-68]' => {
-                                                           'wsyid' => 487,
-                                                           'xsy' => '[Lex-68]'
-                                                         },
-                                           '[Lex-69]' => {
-                                                           'wsyid' => 491,
-                                                           'xsy' => '[Lex-69]'
-                                                         },
                                            '[Lex-6]' => {
                                                           'wsyid' => 53,
                                                           'xsy' => '[Lex-6]'
                                                         },
-                                           '[Lex-70]' => {
-                                                           'wsyid' => 498,
-                                                           'xsy' => '[Lex-70]'
-                                                         },
-                                           '[Lex-71]' => {
-                                                           'wsyid' => 502,
-                                                           'xsy' => '[Lex-71]'
-                                                         },
-                                           '[Lex-72]' => {
-                                                           'wsyid' => 521,
-                                                           'xsy' => '[Lex-72]'
-                                                         },
-                                           '[Lex-73]' => {
-                                                           'wsyid' => 524,
-                                                           'xsy' => '[Lex-73]'
-                                                         },
-                                           '[Lex-74]' => {
-                                                           'wsyid' => 559,
-                                                           'xsy' => '[Lex-74]'
-                                                         },
-                                           '[Lex-75]' => {
-                                                           'wsyid' => 562,
-                                                           'xsy' => '[Lex-75]'
-                                                         },
                                            '[Lex-7]' => {
                                                           'wsyid' => 63,
                                                           'xsy' => '[Lex-7]'
@@ -4897,15 +5164,15 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-9]'
                                                         },
                                            'action' => {
-                                                         'wsyid' => 250,
+                                                         'wsyid' => 232,
                                                          'xsy' => 'action'
                                                        },
                                            'action name' => {
-                                                              'wsyid' => 280,
+                                                              'wsyid' => 262,
                                                               'xsy' => 'action name'
                                                             },
                                            'adverb item' => {
-                                                              'wsyid' => 249,
+                                                              'wsyid' => 231,
                                                               'xsy' => 'adverb item'
                                                             },
                                            'adverb list' => {
@@ -4913,51 +5180,51 @@ $hashed_metag = {
                                                               'xsy' => 'adverb list'
                                                             },
                                            'adverb list items' => {
-                                                                    'wsyid' => 248,
+                                                                    'wsyid' => 230,
                                                                     'xsy' => 'adverb list items'
                                                                   },
                                            'alternative' => {
-                                                              'wsyid' => 245,
+                                                              'wsyid' => 227,
                                                               'xsy' => 'alternative'
                                                             },
                                            'alternative name' => {
-                                                                   'wsyid' => 504,
+                                                                   'wsyid' => 448,
                                                                    'xsy' => 'alternative name'
                                                                  },
                                            'alternatives' => {
-                                                               'wsyid' => 243,
+                                                               'wsyid' => 225,
                                                                'xsy' => 'alternatives'
                                                              },
                                            'array descriptor' => {
-                                                                   'wsyid' => 532,
+                                                                   'wsyid' => 476,
                                                                    'xsy' => 'array descriptor'
                                                                  },
                                            'bare name' => {
-                                                            'wsyid' => 528,
+                                                            'wsyid' => 472,
                                                             'xsy' => 'bare name'
                                                           },
                                            'before or after' => {
-                                                                  'wsyid' => 455,
+                                                                  'wsyid' => 409,
                                                                   'xsy' => 'before or after'
                                                                 },
                                            'blessing' => {
-                                                           'wsyid' => 262,
+                                                           'wsyid' => 244,
                                                            'xsy' => 'blessing'
                                                          },
                                            'blessing name' => {
-                                                                'wsyid' => 493,
+                                                                'wsyid' => 439,
                                                                 'xsy' => 'blessing name'
                                                               },
                                            'boolean' => {
-                                                          'wsyid' => 361,
+                                                          'wsyid' => 329,
                                                           'xsy' => 'boolean'
                                                         },
                                            'bracketed name' => {
-                                                                 'wsyid' => 529,
+                                                                 'wsyid' => 473,
                                                                  'xsy' => 'bracketed name'
                                                                },
                                            'character class' => {
-                                                                  'wsyid' => 527,
+                                                                  'wsyid' => 471,
                                                                   'xsy' => 'character class'
                                                                 },
                                            'completion event declaration' => {
@@ -4977,7 +5244,7 @@ $hashed_metag = {
                                                                'xsy' => 'discard rule'
                                                              },
                                            'eager specification' => {
-                                                                      'wsyid' => 258,
+                                                                      'wsyid' => 240,
                                                                       'xsy' => 'eager specification'
                                                                     },
                                            'empty rule' => {
@@ -4985,23 +5252,23 @@ $hashed_metag = {
                                                              'xsy' => 'empty rule'
                                                            },
                                            'event initialization' => {
-                                                                       'wsyid' => 153,
+                                                                       'wsyid' => 147,
                                                                        'xsy' => 'event initialization'
                                                                      },
                                            'event initializer' => {
-                                                                    'wsyid' => 468,
+                                                                    'wsyid' => 418,
                                                                     'xsy' => 'event initializer'
                                                                   },
                                            'event name' => {
-                                                             'wsyid' => 467,
+                                                             'wsyid' => 417,
                                                              'xsy' => 'event name'
                                                            },
                                            'event specification' => {
-                                                                      'wsyid' => 259,
+                                                                      'wsyid' => 241,
                                                                       'xsy' => 'event specification'
                                                                     },
                                            'group association' => {
-                                                                    'wsyid' => 253,
+                                                                    'wsyid' => 235,
                                                                     'xsy' => 'group association'
                                                                   },
                                            'inaccessible statement' => {
@@ -5009,11 +5276,11 @@ $hashed_metag = {
                                                                          'xsy' => 'inaccessible statement'
                                                                        },
                                            'inaccessible treatment' => {
-                                                                         'wsyid' => 225,
+                                                                         'wsyid' => 207,
                                                                          'xsy' => 'inaccessible treatment'
                                                                        },
                                            'left association' => {
-                                                                   'wsyid' => 251,
+                                                                   'wsyid' => 233,
                                                                    'xsy' => 'left association'
                                                                  },
                                            'lexeme default statement' => {
@@ -5025,23 +5292,23 @@ $hashed_metag = {
                                                               'xsy' => 'lexeme rule'
                                                             },
                                            'lhs' => {
-                                                      'wsyid' => 107,
+                                                      'wsyid' => 103,
                                                       'xsy' => 'lhs'
                                                     },
                                            'naming' => {
-                                                         'wsyid' => 263,
+                                                         'wsyid' => 245,
                                                          'xsy' => 'naming'
                                                        },
                                            'null adverb' => {
-                                                              'wsyid' => 264,
+                                                              'wsyid' => 246,
                                                               'xsy' => 'null adverb'
                                                             },
                                            'null ranking constant' => {
-                                                                        'wsyid' => 402,
+                                                                        'wsyid' => 364,
                                                                         'xsy' => 'null ranking constant'
                                                                       },
                                            'null ranking specification' => {
-                                                                             'wsyid' => 257,
+                                                                             'wsyid' => 239,
                                                                              'xsy' => 'null ranking specification'
                                                                            },
                                            'null statement' => {
@@ -5053,11 +5320,11 @@ $hashed_metag = {
                                                                            'xsy' => 'nulled event declaration'
                                                                          },
                                            'on or off' => {
-                                                            'wsyid' => 472,
+                                                            'wsyid' => 420,
                                                             'xsy' => 'on or off'
                                                           },
                                            'op declare' => {
-                                                             'wsyid' => 108,
+                                                             'wsyid' => 104,
                                                              'xsy' => 'op declare'
                                                            },
                                            'op declare bnf' => {
@@ -5065,23 +5332,23 @@ $hashed_metag = {
                                                                  'xsy' => 'op declare bnf'
                                                                },
                                            'op declare match' => {
-                                                                   'wsyid' => 122,
+                                                                   'wsyid' => 118,
                                                                    'xsy' => 'op declare match'
                                                                  },
                                            'op equal priority' => {
-                                                                    'wsyid' => 246,
+                                                                    'wsyid' => 228,
                                                                     'xsy' => 'op equal priority'
                                                                   },
                                            'op loosen' => {
-                                                            'wsyid' => 244,
+                                                            'wsyid' => 226,
                                                             'xsy' => 'op loosen'
                                                           },
                                            'parenthesized rhs primary list' => {
-                                                                                 'wsyid' => 519,
+                                                                                 'wsyid' => 463,
                                                                                  'xsy' => 'parenthesized rhs primary list'
                                                                                },
                                            'pause specification' => {
-                                                                      'wsyid' => 261,
+                                                                      'wsyid' => 243,
                                                                       'xsy' => 'pause specification'
                                                                     },
                                            'prediction event declaration' => {
@@ -5089,7 +5356,7 @@ $hashed_metag = {
                                                                                'xsy' => 'prediction event declaration'
                                                                              },
                                            'priorities' => {
-                                                             'wsyid' => 109,
+                                                             'wsyid' => 105,
                                                              'xsy' => 'priorities'
                                                            },
                                            'priority rule' => {
@@ -5097,11 +5364,11 @@ $hashed_metag = {
                                                                 'xsy' => 'priority rule'
                                                               },
                                            'priority specification' => {
-                                                                         'wsyid' => 260,
+                                                                         'wsyid' => 242,
                                                                          'xsy' => 'priority specification'
                                                                        },
                                            'proper specification' => {
-                                                                       'wsyid' => 255,
+                                                                       'wsyid' => 237,
                                                                        'xsy' => 'proper specification'
                                                                      },
                                            'quantified rule' => {
@@ -5109,63 +5376,63 @@ $hashed_metag = {
                                                                   'xsy' => 'quantified rule'
                                                                 },
                                            'quantifier' => {
-                                                             'wsyid' => 111,
+                                                             'wsyid' => 107,
                                                              'xsy' => 'quantifier'
                                                            },
                                            'rank specification' => {
-                                                                     'wsyid' => 256,
+                                                                     'wsyid' => 238,
                                                                      'xsy' => 'rank specification'
                                                                    },
                                            'reserved action name' => {
-                                                                       'wsyid' => 531,
+                                                                       'wsyid' => 475,
                                                                        'xsy' => 'reserved action name'
                                                                      },
                                            'reserved blessing name' => {
-                                                                         'wsyid' => 516,
+                                                                         'wsyid' => 460,
                                                                          'xsy' => 'reserved blessing name'
                                                                        },
                                            'reserved event name' => {
-                                                                      'wsyid' => 507,
+                                                                      'wsyid' => 451,
                                                                       'xsy' => 'reserved event name'
                                                                     },
                                            'rhs' => {
-                                                      'wsyid' => 247,
+                                                      'wsyid' => 229,
                                                       'xsy' => 'rhs'
                                                     },
                                            'rhs primary' => {
-                                                              'wsyid' => 517,
+                                                              'wsyid' => 461,
                                                               'xsy' => 'rhs primary'
                                                             },
                                            'rhs primary list' => {
-                                                                   'wsyid' => 526,
+                                                                   'wsyid' => 470,
                                                                    'xsy' => 'rhs primary list'
                                                                  },
                                            'right association' => {
-                                                                    'wsyid' => 252,
+                                                                    'wsyid' => 234,
                                                                     'xsy' => 'right association'
                                                                   },
                                            'separator specification' => {
-                                                                          'wsyid' => 254,
+                                                                          'wsyid' => 236,
                                                                           'xsy' => 'separator specification'
                                                                         },
                                            'signed integer' => {
-                                                                 'wsyid' => 383,
+                                                                 'wsyid' => 347,
                                                                  'xsy' => 'signed integer'
                                                                },
                                            'single quoted name' => {
-                                                                     'wsyid' => 506,
+                                                                     'wsyid' => 450,
                                                                      'xsy' => 'single quoted name'
                                                                    },
                                            'single quoted string' => {
-                                                                       'wsyid' => 518,
+                                                                       'wsyid' => 462,
                                                                        'xsy' => 'single quoted string'
                                                                      },
                                            'single symbol' => {
-                                                                'wsyid' => 110,
+                                                                'wsyid' => 106,
                                                                 'xsy' => 'single symbol'
                                                               },
                                            'standard name' => {
-                                                                'wsyid' => 505,
+                                                                'wsyid' => 449,
                                                                 'xsy' => 'standard name'
                                                               },
                                            'start rule' => {
@@ -5189,22 +5456,27 @@ $hashed_metag = {
                                                          'xsy' => 'symbol'
                                                        },
                                            'symbol name' => {
-                                                              'wsyid' => 154,
+                                                              'wsyid' => 148,
                                                               'xsy' => 'symbol name'
                                                             }
                                          },
                                  'l0' => {
                                            'Perl identifier' => {
-                                                                  'wsyid' => 594,
+                                                                  'wsyid' => 538,
                                                                   'xsy' => 'Perl identifier'
                                                                 },
                                            'Perl name' => {
-                                                            'wsyid' => 598,
+                                                            'wsyid' => 542,
                                                             'xsy' => 'Perl name'
                                                           },
                                            '[:discard:]' => {
-                                                              'wsyid' => 536
+                                                              'wsyid' => 480,
+                                                              'xsy' => '[:discard:]'
                                                             },
+                                           '[:lex_start:]' => {
+                                                                'wsyid' => 724,
+                                                                'xsy' => '[:lex_start:]'
+                                                              },
                                            '[Lex-0]' => {
                                                           'wsyid' => 19,
                                                           'xsy' => '[Lex-0]'
@@ -5218,35 +5490,35 @@ $hashed_metag = {
                                                            'xsy' => '[Lex-11]'
                                                          },
                                            '[Lex-12]' => {
-                                                           'wsyid' => 103,
+                                                           'wsyid' => 117,
                                                            'xsy' => '[Lex-12]'
                                                          },
                                            '[Lex-13]' => {
-                                                           'wsyid' => 106,
+                                                           'wsyid' => 127,
                                                            'xsy' => '[Lex-13]'
                                                          },
                                            '[Lex-14]' => {
-                                                           'wsyid' => 121,
+                                                           'wsyid' => 134,
                                                            'xsy' => '[Lex-14]'
                                                          },
                                            '[Lex-15]' => {
-                                                           'wsyid' => 131,
+                                                           'wsyid' => 146,
                                                            'xsy' => '[Lex-15]'
                                                          },
                                            '[Lex-16]' => {
-                                                           'wsyid' => 138,
+                                                           'wsyid' => 162,
                                                            'xsy' => '[Lex-16]'
                                                          },
                                            '[Lex-17]' => {
-                                                           'wsyid' => 141,
+                                                           'wsyid' => 179,
                                                            'xsy' => '[Lex-17]'
                                                          },
                                            '[Lex-18]' => {
-                                                           'wsyid' => 152,
+                                                           'wsyid' => 193,
                                                            'xsy' => '[Lex-18]'
                                                          },
                                            '[Lex-19]' => {
-                                                           'wsyid' => 161,
+                                                           'wsyid' => 199,
                                                            'xsy' => '[Lex-19]'
                                                          },
                                            '[Lex-1]' => {
@@ -5254,43 +5526,43 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-1]'
                                                         },
                                            '[Lex-20]' => {
-                                                           'wsyid' => 164,
+                                                           'wsyid' => 213,
                                                            'xsy' => '[Lex-20]'
                                                          },
                                            '[Lex-21]' => {
-                                                           'wsyid' => 172,
+                                                           'wsyid' => 217,
                                                            'xsy' => '[Lex-21]'
                                                          },
                                            '[Lex-22]' => {
-                                                           'wsyid' => 179,
+                                                           'wsyid' => 224,
                                                            'xsy' => '[Lex-22]'
                                                          },
                                            '[Lex-23]' => {
-                                                           'wsyid' => 182,
+                                                           'wsyid' => 249,
                                                            'xsy' => '[Lex-23]'
                                                          },
                                            '[Lex-24]' => {
-                                                           'wsyid' => 193,
+                                                           'wsyid' => 257,
                                                            'xsy' => '[Lex-24]'
                                                          },
                                            '[Lex-25]' => {
-                                                           'wsyid' => 207,
+                                                           'wsyid' => 261,
                                                            'xsy' => '[Lex-25]'
                                                          },
                                            '[Lex-26]' => {
-                                                           'wsyid' => 211,
+                                                           'wsyid' => 269,
                                                            'xsy' => '[Lex-26]'
                                                          },
                                            '[Lex-27]' => {
-                                                           'wsyid' => 215,
+                                                           'wsyid' => 277,
                                                            'xsy' => '[Lex-27]'
                                                          },
                                            '[Lex-28]' => {
-                                                           'wsyid' => 224,
+                                                           'wsyid' => 291,
                                                            'xsy' => '[Lex-28]'
                                                          },
                                            '[Lex-29]' => {
-                                                           'wsyid' => 231,
+                                                           'wsyid' => 305,
                                                            'xsy' => '[Lex-29]'
                                                          },
                                            '[Lex-2]' => {
@@ -5298,43 +5570,43 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-2]'
                                                         },
                                            '[Lex-30]' => {
-                                                           'wsyid' => 235,
+                                                           'wsyid' => 316,
                                                            'xsy' => '[Lex-30]'
                                                          },
                                            '[Lex-31]' => {
-                                                           'wsyid' => 242,
+                                                           'wsyid' => 326,
                                                            'xsy' => '[Lex-31]'
                                                          },
                                            '[Lex-32]' => {
-                                                           'wsyid' => 267,
+                                                           'wsyid' => 336,
                                                            'xsy' => '[Lex-32]'
                                                          },
                                            '[Lex-33]' => {
-                                                           'wsyid' => 275,
+                                                           'wsyid' => 344,
                                                            'xsy' => '[Lex-33]'
                                                          },
                                            '[Lex-34]' => {
-                                                           'wsyid' => 279,
+                                                           'wsyid' => 361,
                                                            'xsy' => '[Lex-34]'
                                                          },
                                            '[Lex-35]' => {
-                                                           'wsyid' => 287,
+                                                           'wsyid' => 370,
                                                            'xsy' => '[Lex-35]'
                                                          },
                                            '[Lex-36]' => {
-                                                           'wsyid' => 291,
+                                                           'wsyid' => 381,
                                                            'xsy' => '[Lex-36]'
                                                          },
                                            '[Lex-37]' => {
-                                                           'wsyid' => 297,
+                                                           'wsyid' => 387,
                                                            'xsy' => '[Lex-37]'
                                                          },
                                            '[Lex-38]' => {
-                                                           'wsyid' => 304,
+                                                           'wsyid' => 397,
                                                            'xsy' => '[Lex-38]'
                                                          },
                                            '[Lex-39]' => {
-                                                           'wsyid' => 308,
+                                                           'wsyid' => 406,
                                                            'xsy' => '[Lex-39]'
                                                          },
                                            '[Lex-3]' => {
@@ -5342,161 +5614,49 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-3]'
                                                         },
                                            '[Lex-40]' => {
-                                                           'wsyid' => 315,
+                                                           'wsyid' => 424,
                                                            'xsy' => '[Lex-40]'
                                                          },
                                            '[Lex-41]' => {
-                                                           'wsyid' => 322,
+                                                           'wsyid' => 429,
                                                            'xsy' => '[Lex-41]'
                                                          },
                                            '[Lex-42]' => {
-                                                           'wsyid' => 326,
+                                                           'wsyid' => 436,
                                                            'xsy' => '[Lex-42]'
                                                          },
                                            '[Lex-43]' => {
-                                                           'wsyid' => 333,
+                                                           'wsyid' => 445,
                                                            'xsy' => '[Lex-43]'
                                                          },
                                            '[Lex-44]' => {
-                                                           'wsyid' => 344,
+                                                           'wsyid' => 466,
                                                            'xsy' => '[Lex-44]'
                                                          },
                                            '[Lex-45]' => {
-                                                           'wsyid' => 348,
+                                                           'wsyid' => 469,
                                                            'xsy' => '[Lex-45]'
                                                          },
                                            '[Lex-46]' => {
-                                                           'wsyid' => 356,
+                                                           'wsyid' => 504,
                                                            'xsy' => '[Lex-46]'
                                                          },
                                            '[Lex-47]' => {
-                                                           'wsyid' => 360,
+                                                           'wsyid' => 507,
                                                            'xsy' => '[Lex-47]'
-                                                         },
-                                           '[Lex-48]' => {
-                                                           'wsyid' => 368,
-                                                           'xsy' => '[Lex-48]'
-                                                         },
-                                           '[Lex-49]' => {
-                                                           'wsyid' => 372,
-                                                           'xsy' => '[Lex-49]'
                                                          },
                                            '[Lex-4]' => {
                                                           'wsyid' => 42,
                                                           'xsy' => '[Lex-4]'
                                                         },
-                                           '[Lex-50]' => {
-                                                           'wsyid' => 378,
-                                                           'xsy' => '[Lex-50]'
-                                                         },
-                                           '[Lex-51]' => {
-                                                           'wsyid' => 382,
-                                                           'xsy' => '[Lex-51]'
-                                                         },
-                                           '[Lex-52]' => {
-                                                           'wsyid' => 397,
-                                                           'xsy' => '[Lex-52]'
-                                                         },
-                                           '[Lex-53]' => {
-                                                           'wsyid' => 401,
-                                                           'xsy' => '[Lex-53]'
-                                                         },
-                                           '[Lex-54]' => {
-                                                           'wsyid' => 408,
-                                                           'xsy' => '[Lex-54]'
-                                                         },
-                                           '[Lex-55]' => {
-                                                           'wsyid' => 414,
-                                                           'xsy' => '[Lex-55]'
-                                                         },
-                                           '[Lex-56]' => {
-                                                           'wsyid' => 418,
-                                                           'xsy' => '[Lex-56]'
-                                                         },
-                                           '[Lex-57]' => {
-                                                           'wsyid' => 423,
-                                                           'xsy' => '[Lex-57]'
-                                                         },
-                                           '[Lex-58]' => {
-                                                           'wsyid' => 429,
-                                                           'xsy' => '[Lex-58]'
-                                                         },
-                                           '[Lex-59]' => {
-                                                           'wsyid' => 439,
-                                                           'xsy' => '[Lex-59]'
-                                                         },
                                            '[Lex-5]' => {
                                                           'wsyid' => 50,
                                                           'xsy' => '[Lex-5]'
                                                         },
-                                           '[Lex-60]' => {
-                                                           'wsyid' => 443,
-                                                           'xsy' => '[Lex-60]'
-                                                         },
-                                           '[Lex-61]' => {
-                                                           'wsyid' => 450,
-                                                           'xsy' => '[Lex-61]'
-                                                         },
-                                           '[Lex-62]' => {
-                                                           'wsyid' => 454,
-                                                           'xsy' => '[Lex-62]'
-                                                         },
-                                           '[Lex-63]' => {
-                                                           'wsyid' => 462,
-                                                           'xsy' => '[Lex-63]'
-                                                         },
-                                           '[Lex-64]' => {
-                                                           'wsyid' => 466,
-                                                           'xsy' => '[Lex-64]'
-                                                         },
-                                           '[Lex-65]' => {
-                                                           'wsyid' => 471,
-                                                           'xsy' => '[Lex-65]'
-                                                         },
-                                           '[Lex-66]' => {
-                                                           'wsyid' => 476,
-                                                           'xsy' => '[Lex-66]'
-                                                         },
-                                           '[Lex-67]' => {
-                                                           'wsyid' => 481,
-                                                           'xsy' => '[Lex-67]'
-                                                         },
-                                           '[Lex-68]' => {
-                                                           'wsyid' => 488,
-                                                           'xsy' => '[Lex-68]'
-                                                         },
-                                           '[Lex-69]' => {
-                                                           'wsyid' => 492,
-                                                           'xsy' => '[Lex-69]'
-                                                         },
                                            '[Lex-6]' => {
                                                           'wsyid' => 54,
                                                           'xsy' => '[Lex-6]'
                                                         },
-                                           '[Lex-70]' => {
-                                                           'wsyid' => 499,
-                                                           'xsy' => '[Lex-70]'
-                                                         },
-                                           '[Lex-71]' => {
-                                                           'wsyid' => 503,
-                                                           'xsy' => '[Lex-71]'
-                                                         },
-                                           '[Lex-72]' => {
-                                                           'wsyid' => 522,
-                                                           'xsy' => '[Lex-72]'
-                                                         },
-                                           '[Lex-73]' => {
-                                                           'wsyid' => 525,
-                                                           'xsy' => '[Lex-73]'
-                                                         },
-                                           '[Lex-74]' => {
-                                                           'wsyid' => 560,
-                                                           'xsy' => '[Lex-74]'
-                                                         },
-                                           '[Lex-75]' => {
-                                                           'wsyid' => 563,
-                                                           'xsy' => '[Lex-75]'
-                                                         },
                                            '[Lex-7]' => {
                                                           'wsyid' => 64,
                                                           'xsy' => '[Lex-7]'
@@ -5510,59 +5670,59 @@ $hashed_metag = {
                                                           'xsy' => '[Lex-9]'
                                                         },
                                            '[[\']]' => {
-                                                         'wsyid' => 680,
+                                                         'wsyid' => 624,
                                                          'xsy' => '[[\']]'
                                                        },
                                            '[[+-]]' => {
-                                                         'wsyid' => 579,
+                                                         'wsyid' => 523,
                                                          'xsy' => '[[+-]]'
                                                        },
                                            '[[,]]' => {
-                                                        'wsyid' => 619,
+                                                        'wsyid' => 563,
                                                         'xsy' => '[[,]]'
                                                       },
                                            '[[01]]' => {
-                                                         'wsyid' => 581,
+                                                         'wsyid' => 525,
                                                          'xsy' => '[[01]]'
                                                        },
                                            '[[1]]' => {
-                                                        'wsyid' => 639,
+                                                        'wsyid' => 583,
                                                         'xsy' => '[[1]]'
                                                       },
                                            '[[[:alnum:]]]' => {
-                                                                'wsyid' => 711,
+                                                                'wsyid' => 655,
                                                                 'xsy' => '[[[:alnum:]]]'
                                                               },
                                            '[[\\#]]' => {
-                                                          'wsyid' => 543,
+                                                          'wsyid' => 487,
                                                           'xsy' => '[[\\#]]'
                                                         },
                                            '[[\\(]]' => {
-                                                          'wsyid' => 520,
+                                                          'wsyid' => 464,
                                                           'xsy' => '[[\\(]]'
                                                         },
                                            '[[\\)]]' => {
-                                                          'wsyid' => 523,
+                                                          'wsyid' => 467,
                                                           'xsy' => '[[\\)]]'
                                                         },
                                            '[[\\*]]' => {
-                                                          'wsyid' => 558,
+                                                          'wsyid' => 502,
                                                           'xsy' => '[[\\*]]'
                                                         },
                                            '[[\\+]]' => {
-                                                          'wsyid' => 561,
+                                                          'wsyid' => 505,
                                                           'xsy' => '[[\\+]]'
                                                         },
                                            '[[\\,]]' => {
-                                                          'wsyid' => 265,
+                                                          'wsyid' => 247,
                                                           'xsy' => '[[\\,]]'
                                                         },
                                            '[[\\-]]' => {
-                                                          'wsyid' => 388,
+                                                          'wsyid' => 352,
                                                           'xsy' => '[[\\-]]'
                                                         },
                                            '[[\\:]]' => {
-                                                          'wsyid' => 709,
+                                                          'wsyid' => 653,
                                                           'xsy' => '[[\\:]]'
                                                         },
                                            '[[\\;]]' => {
@@ -5570,51 +5730,51 @@ $hashed_metag = {
                                                           'xsy' => '[[\\;]]'
                                                         },
                                            '[[\\<]]' => {
-                                                          'wsyid' => 603,
+                                                          'wsyid' => 547,
                                                           'xsy' => '[[\\<]]'
                                                         },
                                            '[[\\=]]' => {
-                                                          'wsyid' => 549,
+                                                          'wsyid' => 493,
                                                           'xsy' => '[[\\=]]'
                                                         },
                                            '[[\\>]]' => {
-                                                          'wsyid' => 604,
+                                                          'wsyid' => 548,
                                                           'xsy' => '[[\\>]]'
                                                         },
                                            '[[\\[]]' => {
-                                                          'wsyid' => 706,
+                                                          'wsyid' => 650,
                                                           'xsy' => '[[\\[]]'
                                                         },
                                            '[[\\\\]]' => {
-                                                           'wsyid' => 691,
+                                                           'wsyid' => 635,
                                                            'xsy' => '[[\\\\]]'
                                                          },
                                            '[[\\]]]' => {
-                                                          'wsyid' => 710,
+                                                          'wsyid' => 654,
                                                           'xsy' => '[[\\]]]'
                                                         },
                                            '[[\\^]]' => {
-                                                          'wsyid' => 708,
+                                                          'wsyid' => 652,
                                                           'xsy' => '[[\\^]]'
                                                         },
                                            '[[\\d]]' => {
-                                                          'wsyid' => 580,
+                                                          'wsyid' => 524,
                                                           'xsy' => '[[\\d]]'
                                                         },
                                            '[[\\s\\w]]' => {
-                                                             'wsyid' => 607,
+                                                             'wsyid' => 551,
                                                              'xsy' => '[[\\s\\w]]'
                                                            },
                                            '[[\\s]]' => {
-                                                          'wsyid' => 535,
+                                                          'wsyid' => 479,
                                                           'xsy' => '[[\\s]]'
                                                         },
                                            '[[\\w]]' => {
-                                                          'wsyid' => 599,
+                                                          'wsyid' => 543,
                                                           'xsy' => '[[\\w]]'
                                                         },
                                            '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
-                                                                                                 'wsyid' => 545,
+                                                                                                 'wsyid' => 489,
                                                                                                  'xsy' => '[[\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                },
                                            '[[\\{]]' => {
@@ -5622,7 +5782,7 @@ $hashed_metag = {
                                                           'xsy' => '[[\\{]]'
                                                         },
                                            '[[\\|]]' => {
-                                                          'wsyid' => 556,
+                                                          'wsyid' => 500,
                                                           'xsy' => '[[\\|]]'
                                                         },
                                            '[[\\}]]' => {
@@ -5630,299 +5790,299 @@ $hashed_metag = {
                                                           'xsy' => '[[\\}]]'
                                                         },
                                            '[[\\~]]' => {
-                                                          'wsyid' => 551,
+                                                          'wsyid' => 495,
                                                           'xsy' => '[[\\~]]'
                                                         },
                                            '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]' => {
-                                                                                                                 'wsyid' => 682,
+                                                                                                                 'wsyid' => 626,
                                                                                                                  'xsy' => '[[^\'\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                                                                                },
                                            '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]' => {
-                                                                                                                      'wsyid' => 689,
+                                                                                                                      'wsyid' => 633,
                                                                                                                       'xsy' => '[[^\\x{5d}\\x{0A}\\x{0B}\\x{0C}\\x{0D}\\x{0085}\\x{2028}\\x{2029}]]'
                                                                                                                     },
                                            '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]' => {
-                                                                                                  'wsyid' => 712,
+                                                                                                  'wsyid' => 656,
                                                                                                   'xsy' => '[[^\\x{A}\\x{B}\\x{C}\\x{D}\\x{2028}\\x{2029}]]'
                                                                                                 },
                                            '[[a-zA-Z]]' => {
-                                                             'wsyid' => 601,
+                                                             'wsyid' => 545,
                                                              'xsy' => '[[a-zA-Z]]'
                                                            },
                                            '[[a]]' => {
-                                                        'wsyid' => 669,
+                                                        'wsyid' => 613,
                                                         'xsy' => '[[a]]'
                                                       },
                                            '[[b]]' => {
-                                                        'wsyid' => 656,
+                                                        'wsyid' => 600,
                                                         'xsy' => '[[b]]'
                                                       },
                                            '[[c]]' => {
-                                                        'wsyid' => 698,
+                                                        'wsyid' => 642,
                                                         'xsy' => '[[c]]'
                                                       },
                                            '[[d]]' => {
-                                                        'wsyid' => 216,
+                                                        'wsyid' => 200,
                                                         'xsy' => '[[d]]'
                                                       },
                                            '[[e]]' => {
-                                                        'wsyid' => 672,
+                                                        'wsyid' => 616,
                                                         'xsy' => '[[e]]'
                                                       },
                                            '[[f]]' => {
-                                                        'wsyid' => 572,
+                                                        'wsyid' => 516,
                                                         'xsy' => '[[f]]'
                                                       },
                                            '[[g]]' => {
-                                                        'wsyid' => 643,
+                                                        'wsyid' => 587,
                                                         'xsy' => '[[g]]'
                                                       },
                                            '[[h]]' => {
-                                                        'wsyid' => 651,
+                                                        'wsyid' => 595,
                                                         'xsy' => '[[h]]'
                                                       },
                                            '[[i]]' => {
-                                                        'wsyid' => 700,
+                                                        'wsyid' => 644,
                                                         'xsy' => '[[i]]'
                                                       },
                                            '[[k]]' => {
-                                                        'wsyid' => 412,
+                                                        'wsyid' => 374,
                                                         'xsy' => '[[k]]'
                                                       },
                                            '[[l]]' => {
-                                                        'wsyid' => 670,
+                                                        'wsyid' => 614,
                                                         'xsy' => '[[l]]'
                                                       },
                                            '[[m]]' => {
-                                                        'wsyid' => 655,
+                                                        'wsyid' => 599,
                                                         'xsy' => '[[m]]'
                                                       },
                                            '[[n]]' => {
-                                                        'wsyid' => 646,
+                                                        'wsyid' => 590,
                                                         'xsy' => '[[n]]'
                                                       },
                                            '[[o]]' => {
-                                                        'wsyid' => 657,
+                                                        'wsyid' => 601,
                                                         'xsy' => '[[o]]'
                                                       },
                                            '[[p]]' => {
-                                                        'wsyid' => 444,
+                                                        'wsyid' => 400,
                                                         'xsy' => '[[p]]'
                                                       },
                                            '[[r]]' => {
-                                                        'wsyid' => 659,
+                                                        'wsyid' => 603,
                                                         'xsy' => '[[r]]'
                                                       },
                                            '[[s]]' => {
-                                                        'wsyid' => 673,
+                                                        'wsyid' => 617,
                                                         'xsy' => '[[s]]'
                                                       },
                                            '[[t]]' => {
-                                                        'wsyid' => 644,
+                                                        'wsyid' => 588,
                                                         'xsy' => '[[t]]'
                                                       },
                                            '[[u]]' => {
-                                                        'wsyid' => 671,
+                                                        'wsyid' => 615,
                                                         'xsy' => '[[u]]'
                                                       },
                                            '[[v]]' => {
-                                                        'wsyid' => 668,
+                                                        'wsyid' => 612,
                                                         'xsy' => '[[v]]'
                                                       },
                                            '[[w]]' => {
-                                                        'wsyid' => 421,
+                                                        'wsyid' => 379,
                                                         'xsy' => '[[w]]'
                                                       },
                                            '[[x]]' => {
-                                                        'wsyid' => 126,
+                                                        'wsyid' => 122,
                                                         'xsy' => '[[x]]'
                                                       },
                                            '[[y]]' => {
-                                                        'wsyid' => 654,
+                                                        'wsyid' => 598,
                                                         'xsy' => '[[y]]'
                                                       },
                                            'array descriptor' => {
-                                                                   'wsyid' => 608,
+                                                                   'wsyid' => 552,
                                                                    'xsy' => 'array descriptor'
                                                                  },
                                            'array descriptor left bracket' => {
-                                                                                'wsyid' => 609,
+                                                                                'wsyid' => 553,
                                                                                 'xsy' => 'array descriptor left bracket'
                                                                               },
                                            'array descriptor right bracket' => {
-                                                                                 'wsyid' => 611,
+                                                                                 'wsyid' => 555,
                                                                                  'xsy' => 'array descriptor right bracket'
                                                                                },
                                            'bare name' => {
-                                                            'wsyid' => 600,
+                                                            'wsyid' => 544,
                                                             'xsy' => 'bare name'
                                                           },
                                            'before or after' => {
-                                                                  'wsyid' => 570,
+                                                                  'wsyid' => 514,
                                                                   'xsy' => 'before or after'
                                                                 },
                                            'boolean' => {
-                                                          'wsyid' => 582,
+                                                          'wsyid' => 526,
                                                           'xsy' => 'boolean'
                                                         },
                                            'bracketed name' => {
-                                                                 'wsyid' => 605,
+                                                                 'wsyid' => 549,
                                                                  'xsy' => 'bracketed name'
                                                                },
                                            'bracketed name string' => {
-                                                                        'wsyid' => 606,
+                                                                        'wsyid' => 550,
                                                                         'xsy' => 'bracketed name string'
                                                                       },
                                            'cc element' => {
-                                                             'wsyid' => 687,
+                                                             'wsyid' => 631,
                                                              'xsy' => 'cc element'
                                                            },
                                            'cc elements' => {
-                                                              'wsyid' => 686,
+                                                              'wsyid' => 630,
                                                               'xsy' => 'cc elements'
                                                             },
                                            'character class' => {
-                                                                  'wsyid' => 685,
+                                                                  'wsyid' => 629,
                                                                   'xsy' => 'character class'
                                                                 },
                                            'character class modifier' => {
-                                                                           'wsyid' => 695,
+                                                                           'wsyid' => 639,
                                                                            'xsy' => 'character class modifier'
                                                                          },
                                            'character class modifiers' => {
-                                                                            'wsyid' => 678,
+                                                                            'wsyid' => 622,
                                                                             'xsy' => 'character class modifiers'
                                                                           },
                                            'double colon' => {
-                                                               'wsyid' => 597,
+                                                               'wsyid' => 541,
                                                                'xsy' => 'double colon'
                                                              },
                                            'escaped cc character' => {
-                                                                       'wsyid' => 690,
+                                                                       'wsyid' => 634,
                                                                        'xsy' => 'escaped cc character'
                                                                      },
                                            'hash comment' => {
-                                                               'wsyid' => 537,
+                                                               'wsyid' => 481,
                                                                'xsy' => 'hash comment'
                                                              },
                                            'hash comment body' => {
-                                                                    'wsyid' => 541,
+                                                                    'wsyid' => 485,
                                                                     'xsy' => 'hash comment body'
                                                                   },
                                            'hash comment char' => {
-                                                                    'wsyid' => 544,
+                                                                    'wsyid' => 488,
                                                                     'xsy' => 'hash comment char'
                                                                   },
                                            'horizontal character' => {
-                                                                       'wsyid' => 692,
+                                                                       'wsyid' => 636,
                                                                        'xsy' => 'horizontal character'
                                                                      },
                                            'integer' => {
-                                                          'wsyid' => 577,
+                                                          'wsyid' => 521,
                                                           'xsy' => 'integer'
                                                         },
                                            'negated posix char class' => {
-                                                                           'wsyid' => 694,
+                                                                           'wsyid' => 638,
                                                                            'xsy' => 'negated posix char class'
                                                                          },
                                            'one or more word characters' => {
-                                                                              'wsyid' => 586,
+                                                                              'wsyid' => 530,
                                                                               'xsy' => 'one or more word characters'
                                                                             },
                                            'op declare bnf' => {
-                                                                 'wsyid' => 550,
+                                                                 'wsyid' => 494,
                                                                  'xsy' => 'op declare bnf'
                                                                },
                                            'op declare match' => {
-                                                                   'wsyid' => 552,
+                                                                   'wsyid' => 496,
                                                                    'xsy' => 'op declare match'
                                                                  },
                                            'op equal priority' => {
-                                                                    'wsyid' => 557,
+                                                                    'wsyid' => 501,
                                                                     'xsy' => 'op equal priority'
                                                                   },
                                            'op loosen' => {
-                                                            'wsyid' => 555,
+                                                            'wsyid' => 499,
                                                             'xsy' => 'op loosen'
                                                           },
                                            'posix char class' => {
-                                                                   'wsyid' => 693,
+                                                                   'wsyid' => 637,
                                                                    'xsy' => 'posix char class'
                                                                  },
                                            'posix char class name' => {
-                                                                        'wsyid' => 705,
+                                                                        'wsyid' => 649,
                                                                         'xsy' => 'posix char class name'
                                                                       },
                                            'reserved action name' => {
-                                                                       'wsyid' => 585,
+                                                                       'wsyid' => 529,
                                                                        'xsy' => 'reserved action name'
                                                                      },
                                            'reserved blessing name' => {
-                                                                         'wsyid' => 589,
+                                                                         'wsyid' => 533,
                                                                          'xsy' => 'reserved blessing name'
                                                                        },
                                            'reserved event name' => {
-                                                                      'wsyid' => 515,
+                                                                      'wsyid' => 459,
                                                                       'xsy' => 'reserved event name'
                                                                     },
                                            'result item descriptor' => {
-                                                                         'wsyid' => 616,
+                                                                         'wsyid' => 560,
                                                                          'xsy' => 'result item descriptor'
                                                                        },
                                            'result item descriptor list' => {
-                                                                              'wsyid' => 610,
+                                                                              'wsyid' => 554,
                                                                               'xsy' => 'result item descriptor list'
                                                                             },
                                            'result item descriptor separator' => {
-                                                                                   'wsyid' => 617,
+                                                                                   'wsyid' => 561,
                                                                                    'xsy' => 'result item descriptor separator'
                                                                                  },
                                            'safe cc character' => {
-                                                                    'wsyid' => 688,
+                                                                    'wsyid' => 632,
                                                                     'xsy' => 'safe cc character'
                                                                   },
                                            'sign' => {
-                                                       'wsyid' => 578,
+                                                       'wsyid' => 522,
                                                        'xsy' => 'sign'
                                                      },
                                            'signed integer' => {
-                                                                 'wsyid' => 576,
+                                                                 'wsyid' => 520,
                                                                  'xsy' => 'signed integer'
                                                                },
                                            'single quoted name' => {
-                                                                     'wsyid' => 681,
+                                                                     'wsyid' => 625,
                                                                      'xsy' => 'single quoted name'
                                                                    },
                                            'single quoted string' => {
-                                                                       'wsyid' => 676,
+                                                                       'wsyid' => 620,
                                                                        'xsy' => 'single quoted string'
                                                                      },
                                            'standard name' => {
-                                                                'wsyid' => 602,
+                                                                'wsyid' => 546,
                                                                 'xsy' => 'standard name'
                                                               },
                                            'string without single quote or vertical space' => {
-                                                                                                'wsyid' => 677,
+                                                                                                'wsyid' => 621,
                                                                                                 'xsy' => 'string without single quote or vertical space'
                                                                                               },
                                            'terminated hash comment' => {
-                                                                          'wsyid' => 538,
+                                                                          'wsyid' => 482,
                                                                           'xsy' => 'terminated hash comment'
                                                                         },
                                            'unterminated final hash comment' => {
-                                                                                  'wsyid' => 539,
+                                                                                  'wsyid' => 483,
                                                                                   'xsy' => 'unterminated final hash comment'
                                                                                 },
                                            'vertical space char' => {
-                                                                      'wsyid' => 542,
+                                                                      'wsyid' => 486,
                                                                       'xsy' => 'vertical space char'
                                                                     },
                                            'whitespace' => {
-                                                             'wsyid' => 534,
+                                                             'wsyid' => 478,
                                                              'xsy' => 'whitespace'
                                                            },
                                            'zero or more word characters' => {
-                                                                               'wsyid' => 592,
+                                                                               'wsyid' => 536,
                                                                                'xsy' => 'zero or more word characters'
                                                                              }
                                          }
@@ -5991,7 +6151,7 @@ $hashed_metag = {
                                                                                   'subkey' => 1,
                                                                                   'xrlid' => 'action name@4664+40'
                                                                                 },
-                                       'g1,action,[Lex-33],[Lex-34],action name' => {
+                                       'g1,action,[Lex-24],[Lex-25],action name' => {
                                                                                       'action' => '[start,length,values]',
                                                                                       'bless' => 'action',
                                                                                       'length' => 40,
@@ -6003,8 +6163,8 @@ $hashed_metag = {
                                                                                                 ],
                                                                                       'name' => 'action',
                                                                                       'rhs' => [
-                                                                                                 '[Lex-33]',
-                                                                                                 '[Lex-34]',
+                                                                                                 '[Lex-24]',
+                                                                                                 '[Lex-25]',
                                                                                                  'action name'
                                                                                                ],
                                                                                       'start' => 2900,
@@ -6403,7 +6563,7 @@ $hashed_metag = {
                                                                              'subkey' => 1,
                                                                              'xrlid' => 'blessing name@4132+35'
                                                                            },
-                                       'g1,blessing,[Lex-68],[Lex-69],blessing name' => {
+                                       'g1,blessing,[Lex-42],[Lex-25],blessing name' => {
                                                                                           'action' => '[start,length,values]',
                                                                                           'bless' => 'blessing',
                                                                                           'length' => 45,
@@ -6415,8 +6575,8 @@ $hashed_metag = {
                                                                                                     ],
                                                                                           'name' => 'blessing',
                                                                                           'rhs' => [
-                                                                                                     '[Lex-68]',
-                                                                                                     '[Lex-69]',
+                                                                                                     '[Lex-42]',
+                                                                                                     '[Lex-25]',
                                                                                                      'blessing name'
                                                                                                    ],
                                                                                           'start' => 3853,
@@ -6424,7 +6584,7 @@ $hashed_metag = {
                                                                                           'subkey' => 1,
                                                                                           'xrlid' => 'blessing@3853+45'
                                                                                         },
-                                       'g1,completion event declaration,[Lex-16],event initialization,[Lex-17],[Lex-18],symbol name' => {
+                                       'g1,completion event declaration,[Lex-14],event initialization,[Lex-10],[Lex-15],symbol name' => {
                                                                                                                                           'action' => '[start,length,values]',
                                                                                                                                           'bless' => 'completion_event_declaration',
                                                                                                                                           'length' => 99,
@@ -6438,10 +6598,10 @@ $hashed_metag = {
                                                                                                                                                     ],
                                                                                                                                           'name' => 'completion event declaration',
                                                                                                                                           'rhs' => [
-                                                                                                                                                     '[Lex-16]',
+                                                                                                                                                     '[Lex-14]',
                                                                                                                                                      'event initialization',
-                                                                                                                                                     '[Lex-17]',
-                                                                                                                                                     '[Lex-18]',
+                                                                                                                                                     '[Lex-10]',
+                                                                                                                                                     '[Lex-15]',
                                                                                                                                                      'symbol name'
                                                                                                                                                    ],
                                                                                                                                           'start' => 1750,
@@ -6470,30 +6630,30 @@ $hashed_metag = {
                                                                                                  'subkey' => 1,
                                                                                                  'xrlid' => 'default rule@1220+60'
                                                                                                },
-                                       'g1,discard default statement,[Lex-11],[Lex-12],[Lex-13],adverb list' => {
-                                                                                                                  'action' => '[start,length,values]',
-                                                                                                                  'bless' => 'discard_default_statement',
-                                                                                                                  'length' => 71,
-                                                                                                                  'lhs' => 'discard default statement',
-                                                                                                                  'mask' => [
-                                                                                                                              0,
-                                                                                                                              0,
-                                                                                                                              0,
-                                                                                                                              1
-                                                                                                                            ],
-                                                                                                                  'name' => 'discard default statement',
-                                                                                                                  'rhs' => [
-                                                                                                                             '[Lex-11]',
-                                                                                                                             '[Lex-12]',
-                                                                                                                             '[Lex-13]',
-                                                                                                                             'adverb list'
+                                       'g1,discard default statement,[Lex-11],[Lex-9],[Lex-10],adverb list' => {
+                                                                                                                 'action' => '[start,length,values]',
+                                                                                                                 'bless' => 'discard_default_statement',
+                                                                                                                 'length' => 71,
+                                                                                                                 'lhs' => 'discard default statement',
+                                                                                                                 'mask' => [
+                                                                                                                             0,
+                                                                                                                             0,
+                                                                                                                             0,
+                                                                                                                             1
                                                                                                                            ],
-                                                                                                                  'start' => 1351,
-                                                                                                                  'subgrammar' => 'g1',
-                                                                                                                  'subkey' => 1,
-                                                                                                                  'xrlid' => 'discard default statement@1351+71'
-                                                                                                                },
-                                       'g1,discard rule,[Lex-14],op declare match,single symbol,adverb list' => {
+                                                                                                                 'name' => 'discard default statement',
+                                                                                                                 'rhs' => [
+                                                                                                                            '[Lex-11]',
+                                                                                                                            '[Lex-9]',
+                                                                                                                            '[Lex-10]',
+                                                                                                                            'adverb list'
+                                                                                                                          ],
+                                                                                                                 'start' => 1351,
+                                                                                                                 'subgrammar' => 'g1',
+                                                                                                                 'subkey' => 1,
+                                                                                                                 'xrlid' => 'discard default statement@1351+71'
+                                                                                                               },
+                                       'g1,discard rule,[Lex-12],op declare match,single symbol,adverb list' => {
                                                                                                                   'action' => '[start,length,values]',
                                                                                                                   'bless' => 'discard_rule',
                                                                                                                   'length' => 80,
@@ -6506,7 +6666,7 @@ $hashed_metag = {
                                                                                                                             ],
                                                                                                                   'name' => 'discard rule',
                                                                                                                   'rhs' => [
-                                                                                                                             '[Lex-14]',
+                                                                                                                             '[Lex-12]',
                                                                                                                              'op declare match',
                                                                                                                              'single symbol',
                                                                                                                              'adverb list'
@@ -6516,7 +6676,7 @@ $hashed_metag = {
                                                                                                                   'subkey' => 1,
                                                                                                                   'xrlid' => 'discard rule@1599+80'
                                                                                                                 },
-                                       'g1,eager specification,[Lex-48],[Lex-49],boolean' => {
+                                       'g1,eager specification,[Lex-32],[Lex-25],boolean' => {
                                                                                                'action' => '[start,length,values]',
                                                                                                'bless' => 'eager_specification',
                                                                                                'length' => 48,
@@ -6528,8 +6688,8 @@ $hashed_metag = {
                                                                                                          ],
                                                                                                'name' => 'eager specification',
                                                                                                'rhs' => [
-                                                                                                          '[Lex-48]',
-                                                                                                          '[Lex-49]',
+                                                                                                          '[Lex-32]',
+                                                                                                          '[Lex-25]',
                                                                                                           'boolean'
                                                                                                         ],
                                                                                                'start' => 3196,
@@ -6589,7 +6749,7 @@ $hashed_metag = {
                                                                    'subkey' => 0,
                                                                    'xrlid' => 'event initializer@3820+23'
                                                                  },
-                                       'g1,event initializer,[Lex-65],on or off' => {
+                                       'g1,event initializer,[Lex-10],on or off' => {
                                                                                       'action' => '[start,length,values]',
                                                                                       'bless' => 'event_initializer',
                                                                                       'length' => 41,
@@ -6600,7 +6760,7 @@ $hashed_metag = {
                                                                                                 ],
                                                                                       'name' => 'event initializer',
                                                                                       'rhs' => [
-                                                                                                 '[Lex-65]',
+                                                                                                 '[Lex-10]',
                                                                                                  'on or off'
                                                                                                ],
                                                                                       'start' => 3749,
@@ -6659,7 +6819,7 @@ $hashed_metag = {
                                                                           'subkey' => 1,
                                                                           'xrlid' => 'event name@4009+87'
                                                                         },
-                                       'g1,event specification,[Lex-63],[Lex-64],event initialization' => {
+                                       'g1,event specification,[Lex-14],[Lex-25],event initialization' => {
                                                                                                             'action' => '[start,length,values]',
                                                                                                             'bless' => 'event_specification',
                                                                                                             'length' => 63,
@@ -6671,8 +6831,8 @@ $hashed_metag = {
                                                                                                                       ],
                                                                                                             'name' => 'event specification',
                                                                                                             'rhs' => [
-                                                                                                                       '[Lex-63]',
-                                                                                                                       '[Lex-64]',
+                                                                                                                       '[Lex-14]',
+                                                                                                                       '[Lex-25]',
                                                                                                                        'event initialization'
                                                                                                                      ],
                                                                                                             'start' => 3625,
@@ -6680,7 +6840,7 @@ $hashed_metag = {
                                                                                                             'subkey' => 1,
                                                                                                             'xrlid' => 'event specification@3625+63'
                                                                                                           },
-                                       'g1,group association,[Lex-41],[Lex-42],[Lex-43]' => {
+                                       'g1,group association,[Lex-26],[Lex-25],[Lex-29]' => {
                                                                                               'action' => '[start,length,values]',
                                                                                               'bless' => 'group_association',
                                                                                               'length' => 46,
@@ -6692,41 +6852,41 @@ $hashed_metag = {
                                                                                                         ],
                                                                                               'name' => 'group association',
                                                                                               'rhs' => [
-                                                                                                         '[Lex-41]',
-                                                                                                         '[Lex-42]',
-                                                                                                         '[Lex-43]'
+                                                                                                         '[Lex-26]',
+                                                                                                         '[Lex-25]',
+                                                                                                         '[Lex-29]'
                                                                                                        ],
                                                                                               'start' => 3033,
                                                                                               'subgrammar' => 'g1',
                                                                                               'subkey' => 1,
                                                                                               'xrlid' => 'group association@3033+46'
                                                                                             },
-                                       'g1,inaccessible statement,[Lex-25],[Lex-26],inaccessible treatment,[Lex-27],[Lex-28]' => {
-                                                                                                                                   'action' => '[start,length,values]',
-                                                                                                                                   'bless' => 'inaccessible_statement',
-                                                                                                                                   'length' => 92,
-                                                                                                                                   'lhs' => 'inaccessible statement',
-                                                                                                                                   'mask' => [
-                                                                                                                                               0,
-                                                                                                                                               0,
-                                                                                                                                               1,
-                                                                                                                                               0,
-                                                                                                                                               0
-                                                                                                                                             ],
-                                                                                                                                   'name' => 'inaccessible statement',
-                                                                                                                                   'rhs' => [
-                                                                                                                                              '[Lex-25]',
-                                                                                                                                              '[Lex-26]',
-                                                                                                                                              'inaccessible treatment',
-                                                                                                                                              '[Lex-27]',
-                                                                                                                                              '[Lex-28]'
-                                                                                                                                            ],
-                                                                                                                                   'start' => 2044,
-                                                                                                                                   'subgrammar' => 'g1',
-                                                                                                                                   'subkey' => 1,
-                                                                                                                                   'xrlid' => 'inaccessible statement@2044+92'
-                                                                                                                                 },
-                                       'g1,inaccessible treatment,[Lex-29]' => {
+                                       'g1,inaccessible statement,[Lex-18],[Lex-6],inaccessible treatment,[Lex-19],[Lex-9]' => {
+                                                                                                                                 'action' => '[start,length,values]',
+                                                                                                                                 'bless' => 'inaccessible_statement',
+                                                                                                                                 'length' => 92,
+                                                                                                                                 'lhs' => 'inaccessible statement',
+                                                                                                                                 'mask' => [
+                                                                                                                                             0,
+                                                                                                                                             0,
+                                                                                                                                             1,
+                                                                                                                                             0,
+                                                                                                                                             0
+                                                                                                                                           ],
+                                                                                                                                 'name' => 'inaccessible statement',
+                                                                                                                                 'rhs' => [
+                                                                                                                                            '[Lex-18]',
+                                                                                                                                            '[Lex-6]',
+                                                                                                                                            'inaccessible treatment',
+                                                                                                                                            '[Lex-19]',
+                                                                                                                                            '[Lex-9]'
+                                                                                                                                          ],
+                                                                                                                                 'start' => 2044,
+                                                                                                                                 'subgrammar' => 'g1',
+                                                                                                                                 'subkey' => 1,
+                                                                                                                                 'xrlid' => 'inaccessible statement@2044+92'
+                                                                                                                               },
+                                       'g1,inaccessible treatment,[Lex-20]' => {
                                                                                  'action' => '[start,length,values]',
                                                                                  'bless' => 'inaccessible_treatment',
                                                                                  'length' => 52,
@@ -6736,14 +6896,14 @@ $hashed_metag = {
                                                                                            ],
                                                                                  'name' => 'inaccessible treatment',
                                                                                  'rhs' => [
-                                                                                            '[Lex-29]'
+                                                                                            '[Lex-20]'
                                                                                           ],
                                                                                  'start' => 2137,
                                                                                  'subgrammar' => 'g1',
                                                                                  'subkey' => 1,
                                                                                  'xrlid' => 'inaccessible treatment@2137+52'
                                                                                },
-                                       'g1,inaccessible treatment,[Lex-30]' => {
+                                       'g1,inaccessible treatment,[Lex-21]' => {
                                                                                  'action' => '[start,length,values]',
                                                                                  'bless' => 'inaccessible_treatment',
                                                                                  'length' => 4,
@@ -6753,14 +6913,14 @@ $hashed_metag = {
                                                                                            ],
                                                                                  'name' => 'inaccessible treatment',
                                                                                  'rhs' => [
-                                                                                            '[Lex-30]'
+                                                                                            '[Lex-21]'
                                                                                           ],
                                                                                  'start' => 2175,
                                                                                  'subgrammar' => 'g1',
                                                                                  'subkey' => 2,
                                                                                  'xrlid' => 'inaccessible treatment@2137+52'
                                                                                },
-                                       'g1,inaccessible treatment,[Lex-31]' => {
+                                       'g1,inaccessible treatment,[Lex-22]' => {
                                                                                  'action' => '[start,length,values]',
                                                                                  'bless' => 'inaccessible_treatment',
                                                                                  'length' => 7,
@@ -6770,14 +6930,14 @@ $hashed_metag = {
                                                                                            ],
                                                                                  'name' => 'inaccessible treatment',
                                                                                  'rhs' => [
-                                                                                            '[Lex-31]'
+                                                                                            '[Lex-22]'
                                                                                           ],
                                                                                  'start' => 2182,
                                                                                  'subgrammar' => 'g1',
                                                                                  'subkey' => 3,
                                                                                  'xrlid' => 'inaccessible treatment@2137+52'
                                                                                },
-                                       'g1,left association,[Lex-35],[Lex-36],[Lex-37]' => {
+                                       'g1,left association,[Lex-26],[Lex-25],[Lex-27]' => {
                                                                                              'action' => '[start,length,values]',
                                                                                              'bless' => 'left_association',
                                                                                              'length' => 44,
@@ -6789,9 +6949,9 @@ $hashed_metag = {
                                                                                                        ],
                                                                                              'name' => 'left association',
                                                                                              'rhs' => [
-                                                                                                        '[Lex-35]',
-                                                                                                        '[Lex-36]',
-                                                                                                        '[Lex-37]'
+                                                                                                        '[Lex-26]',
+                                                                                                        '[Lex-25]',
+                                                                                                        '[Lex-27]'
                                                                                                       ],
                                                                                              'start' => 2941,
                                                                                              'subgrammar' => 'g1',
@@ -6821,7 +6981,7 @@ $hashed_metag = {
                                                                                                                'subkey' => 1,
                                                                                                                'xrlid' => 'lexeme default statement@1281+69'
                                                                                                              },
-                                       'g1,lexeme rule,[Lex-15],op declare match,symbol,adverb list' => {
+                                       'g1,lexeme rule,[Lex-13],op declare match,symbol,adverb list' => {
                                                                                                           'action' => '[start,length,values]',
                                                                                                           'bless' => 'lexeme_rule',
                                                                                                           'length' => 69,
@@ -6834,7 +6994,7 @@ $hashed_metag = {
                                                                                                                     ],
                                                                                                           'name' => 'lexeme rule',
                                                                                                           'rhs' => [
-                                                                                                                     '[Lex-15]',
+                                                                                                                     '[Lex-13]',
                                                                                                                      'op declare match',
                                                                                                                      'symbol',
                                                                                                                      'adverb list'
@@ -6861,7 +7021,7 @@ $hashed_metag = {
                                                                  'subkey' => 1,
                                                                  'xrlid' => 'lhs@4214+21'
                                                                },
-                                       'g1,naming,[Lex-70],[Lex-71],alternative name' => {
+                                       'g1,naming,[Lex-43],[Lex-25],alternative name' => {
                                                                                            'action' => '[start,length,values]',
                                                                                            'bless' => 'naming',
                                                                                            'length' => 45,
@@ -6873,8 +7033,8 @@ $hashed_metag = {
                                                                                                      ],
                                                                                            'name' => 'naming',
                                                                                            'rhs' => [
-                                                                                                      '[Lex-70]',
-                                                                                                      '[Lex-71]',
+                                                                                                      '[Lex-43]',
+                                                                                                      '[Lex-25]',
                                                                                                       'alternative name'
                                                                                                     ],
                                                                                            'start' => 3899,
@@ -6882,7 +7042,7 @@ $hashed_metag = {
                                                                                            'subkey' => 1,
                                                                                            'xrlid' => 'naming@3899+45'
                                                                                          },
-                                       'g1,null adverb,[Lex-32]' => {
+                                       'g1,null adverb,[Lex-23]' => {
                                                                       'action' => '[start,length,values]',
                                                                       'bless' => 'null_adverb',
                                                                       'length' => 21,
@@ -6892,14 +7052,14 @@ $hashed_metag = {
                                                                                 ],
                                                                       'name' => 'null adverb',
                                                                       'rhs' => [
-                                                                                 '[Lex-32]'
+                                                                                 '[Lex-23]'
                                                                                ],
                                                                       'start' => 2878,
                                                                       'subgrammar' => 'g1',
                                                                       'subkey' => 1,
                                                                       'xrlid' => 'null adverb@2878+21'
                                                                     },
-                                       'g1,null ranking constant,[Lex-57]' => {
+                                       'g1,null ranking constant,[Lex-36]' => {
                                                                                 'action' => '[start,length,values]',
                                                                                 'bless' => 'null_ranking_constant',
                                                                                 'length' => 42,
@@ -6909,14 +7069,14 @@ $hashed_metag = {
                                                                                           ],
                                                                                 'name' => 'null ranking constant',
                                                                                 'rhs' => [
-                                                                                           '[Lex-57]'
+                                                                                           '[Lex-36]'
                                                                                          ],
                                                                                 'start' => 3458,
                                                                                 'subgrammar' => 'g1',
                                                                                 'subkey' => 1,
                                                                                 'xrlid' => 'null ranking constant@3458+42'
                                                                               },
-                                       'g1,null ranking constant,[Lex-58]' => {
+                                       'g1,null ranking constant,[Lex-37]' => {
                                                                                 'action' => '[start,length,values]',
                                                                                 'bless' => 'null_ranking_constant',
                                                                                 'length' => 6,
@@ -6926,14 +7086,14 @@ $hashed_metag = {
                                                                                           ],
                                                                                 'name' => 'null ranking constant',
                                                                                 'rhs' => [
-                                                                                           '[Lex-58]'
+                                                                                           '[Lex-37]'
                                                                                          ],
                                                                                 'start' => 3494,
                                                                                 'subgrammar' => 'g1',
                                                                                 'subkey' => 2,
                                                                                 'xrlid' => 'null ranking constant@3458+42'
                                                                               },
-                                       'g1,null ranking specification,[Lex-52],[Lex-53],null ranking constant' => {
+                                       'g1,null ranking specification,[Lex-34],[Lex-25],null ranking constant' => {
                                                                                                                     'action' => '[start,length,values]',
                                                                                                                     'bless' => 'null_ranking_specification',
                                                                                                                     'length' => 78,
@@ -6945,8 +7105,8 @@ $hashed_metag = {
                                                                                                                               ],
                                                                                                                     'name' => 'null ranking specification',
                                                                                                                     'rhs' => [
-                                                                                                                               '[Lex-52]',
-                                                                                                                               '[Lex-53]',
+                                                                                                                               '[Lex-34]',
+                                                                                                                               '[Lex-25]',
                                                                                                                                'null ranking constant'
                                                                                                                              ],
                                                                                                                     'start' => 3301,
@@ -6954,7 +7114,7 @@ $hashed_metag = {
                                                                                                                     'subkey' => 1,
                                                                                                                     'xrlid' => 'null ranking specification@3301+78'
                                                                                                                   },
-                                       'g1,null ranking specification,[Lex-54],[Lex-55],[Lex-56],null ranking constant' => {
+                                       'g1,null ranking specification,[Lex-35],[Lex-33],[Lex-25],null ranking constant' => {
                                                                                                                              'action' => '[start,length,values]',
                                                                                                                              'bless' => 'null_ranking_specification',
                                                                                                                              'length' => 77,
@@ -6967,9 +7127,9 @@ $hashed_metag = {
                                                                                                                                        ],
                                                                                                                              'name' => 'null ranking specification',
                                                                                                                              'rhs' => [
-                                                                                                                                        '[Lex-54]',
-                                                                                                                                        '[Lex-55]',
-                                                                                                                                        '[Lex-56]',
+                                                                                                                                        '[Lex-35]',
+                                                                                                                                        '[Lex-33]',
+                                                                                                                                        '[Lex-25]',
                                                                                                                                         'null ranking constant'
                                                                                                                                       ],
                                                                                                                              'start' => 3380,
@@ -6994,7 +7154,7 @@ $hashed_metag = {
                                                                         'subkey' => 1,
                                                                         'xrlid' => 'null statement@1052+24'
                                                                       },
-                                       'g1,nulled event declaration,[Lex-19],event initialization,[Lex-20],[Lex-21],symbol name' => {
+                                       'g1,nulled event declaration,[Lex-14],event initialization,[Lex-10],[Lex-16],symbol name' => {
                                                                                                                                       'action' => '[start,length,values]',
                                                                                                                                       'bless' => 'nulled_event_declaration',
                                                                                                                                       'length' => 92,
@@ -7008,10 +7168,10 @@ $hashed_metag = {
                                                                                                                                                 ],
                                                                                                                                       'name' => 'nulled event declaration',
                                                                                                                                       'rhs' => [
-                                                                                                                                                 '[Lex-19]',
+                                                                                                                                                 '[Lex-14]',
                                                                                                                                                  'event initialization',
-                                                                                                                                                 '[Lex-20]',
-                                                                                                                                                 '[Lex-21]',
+                                                                                                                                                 '[Lex-10]',
+                                                                                                                                                 '[Lex-16]',
                                                                                                                                                  'symbol name'
                                                                                                                                                ],
                                                                                                                                       'start' => 1850,
@@ -7019,7 +7179,7 @@ $hashed_metag = {
                                                                                                                                       'subkey' => 1,
                                                                                                                                       'xrlid' => 'nulled event declaration@1850+92'
                                                                                                                                     },
-                                       'g1,on or off,[Lex-66]' => {
+                                       'g1,on or off,[Lex-40]' => {
                                                                     'action' => '[start,length,values]',
                                                                     'bless' => 'on_or_off',
                                                                     'length' => 28,
@@ -7029,14 +7189,14 @@ $hashed_metag = {
                                                                               ],
                                                                     'name' => 'on or off',
                                                                     'rhs' => [
-                                                                               '[Lex-66]'
+                                                                               '[Lex-40]'
                                                                              ],
                                                                     'start' => 3791,
                                                                     'subgrammar' => 'g1',
                                                                     'subkey' => 1,
                                                                     'xrlid' => 'on or off@3791+28'
                                                                   },
-                                       'g1,on or off,[Lex-67]' => {
+                                       'g1,on or off,[Lex-41]' => {
                                                                     'action' => '[start,length,values]',
                                                                     'bless' => 'on_or_off',
                                                                     'length' => 5,
@@ -7046,7 +7206,7 @@ $hashed_metag = {
                                                                               ],
                                                                     'name' => 'on or off',
                                                                     'rhs' => [
-                                                                               '[Lex-67]'
+                                                                               '[Lex-41]'
                                                                              ],
                                                                     'start' => 3814,
                                                                     'subgrammar' => 'g1',
@@ -7087,7 +7247,7 @@ $hashed_metag = {
                                                                              'subkey' => 2,
                                                                              'xrlid' => 'op declare@2191+54'
                                                                            },
-                                       'g1,parenthesized rhs primary list,[Lex-72],rhs primary list,[Lex-73]' => {
+                                       'g1,parenthesized rhs primary list,[Lex-44],rhs primary list,[Lex-45]' => {
                                                                                                                    'action' => '[start,length,values]',
                                                                                                                    'bless' => 'parenthesized_rhs_primary_list',
                                                                                                                    'length' => 67,
@@ -7099,16 +7259,16 @@ $hashed_metag = {
                                                                                                                              ],
                                                                                                                    'name' => 'parenthesized rhs primary list',
                                                                                                                    'rhs' => [
-                                                                                                                              '[Lex-72]',
+                                                                                                                              '[Lex-44]',
                                                                                                                               'rhs primary list',
-                                                                                                                              '[Lex-73]'
+                                                                                                                              '[Lex-45]'
                                                                                                                             ],
                                                                                                                    'start' => 4385,
                                                                                                                    'subgrammar' => 'g1',
                                                                                                                    'subkey' => 1,
                                                                                                                    'xrlid' => 'parenthesized rhs primary list@4385+67'
                                                                                                                  },
-                                       'g1,pause specification,[Lex-61],[Lex-62],before or after' => {
+                                       'g1,pause specification,[Lex-39],[Lex-25],before or after' => {
                                                                                                        'action' => '[start,length,values]',
                                                                                                        'bless' => 'pause_specification',
                                                                                                        'length' => 58,
@@ -7120,8 +7280,8 @@ $hashed_metag = {
                                                                                                                  ],
                                                                                                        'name' => 'pause specification',
                                                                                                        'rhs' => [
-                                                                                                                  '[Lex-61]',
-                                                                                                                  '[Lex-62]',
+                                                                                                                  '[Lex-39]',
+                                                                                                                  '[Lex-25]',
                                                                                                                   'before or after'
                                                                                                                 ],
                                                                                                        'start' => 3565,
@@ -7129,7 +7289,7 @@ $hashed_metag = {
                                                                                                        'subkey' => 1,
                                                                                                        'xrlid' => 'pause specification@3565+58'
                                                                                                      },
-                                       'g1,prediction event declaration,[Lex-22],event initialization,[Lex-23],[Lex-24],symbol name' => {
+                                       'g1,prediction event declaration,[Lex-14],event initialization,[Lex-10],[Lex-17],symbol name' => {
                                                                                                                                           'action' => '[start,length,values]',
                                                                                                                                           'bless' => 'prediction_event_declaration',
                                                                                                                                           'length' => 99,
@@ -7143,10 +7303,10 @@ $hashed_metag = {
                                                                                                                                                     ],
                                                                                                                                           'name' => 'prediction event declaration',
                                                                                                                                           'rhs' => [
-                                                                                                                                                     '[Lex-22]',
+                                                                                                                                                     '[Lex-14]',
                                                                                                                                                      'event initialization',
-                                                                                                                                                     '[Lex-23]',
-                                                                                                                                                     '[Lex-24]',
+                                                                                                                                                     '[Lex-10]',
+                                                                                                                                                     '[Lex-17]',
                                                                                                                                                      'symbol name'
                                                                                                                                                    ],
                                                                                                                                           'start' => 1943,
@@ -7192,7 +7352,7 @@ $hashed_metag = {
                                                                                          'subkey' => 1,
                                                                                          'xrlid' => 'priority rule@1423+47'
                                                                                        },
-                                       'g1,priority specification,[Lex-59],[Lex-60],signed integer' => {
+                                       'g1,priority specification,[Lex-38],[Lex-25],signed integer' => {
                                                                                                          'action' => '[start,length,values]',
                                                                                                          'bless' => 'priority_specification',
                                                                                                          'length' => 63,
@@ -7204,8 +7364,8 @@ $hashed_metag = {
                                                                                                                    ],
                                                                                                          'name' => 'priority specification',
                                                                                                          'rhs' => [
-                                                                                                                    '[Lex-59]',
-                                                                                                                    '[Lex-60]',
+                                                                                                                    '[Lex-38]',
+                                                                                                                    '[Lex-25]',
                                                                                                                     'signed integer'
                                                                                                                   ],
                                                                                                          'start' => 3501,
@@ -7213,7 +7373,7 @@ $hashed_metag = {
                                                                                                          'subkey' => 1,
                                                                                                          'xrlid' => 'priority specification@3501+63'
                                                                                                        },
-                                       'g1,proper specification,[Lex-46],[Lex-47],boolean' => {
+                                       'g1,proper specification,[Lex-31],[Lex-25],boolean' => {
                                                                                                 'action' => '[start,length,values]',
                                                                                                 'bless' => 'proper_specification',
                                                                                                 'length' => 50,
@@ -7225,8 +7385,8 @@ $hashed_metag = {
                                                                                                           ],
                                                                                                 'name' => 'proper specification',
                                                                                                 'rhs' => [
-                                                                                                           '[Lex-46]',
-                                                                                                           '[Lex-47]',
+                                                                                                           '[Lex-31]',
+                                                                                                           '[Lex-25]',
                                                                                                            'boolean'
                                                                                                          ],
                                                                                                 'start' => 3145,
@@ -7259,7 +7419,7 @@ $hashed_metag = {
                                                                                                                      'subkey' => 1,
                                                                                                                      'xrlid' => 'quantified rule@1519+79'
                                                                                                                    },
-                                       'g1,quantifier,[Lex-74]' => {
+                                       'g1,quantifier,[Lex-46]' => {
                                                                      'action' => '[start,length,values]',
                                                                      'bless' => 'quantifier',
                                                                      'length' => 24,
@@ -7269,14 +7429,14 @@ $hashed_metag = {
                                                                                ],
                                                                      'name' => 'quantifier',
                                                                      'rhs' => [
-                                                                                '[Lex-74]'
+                                                                                '[Lex-46]'
                                                                               ],
                                                                      'start' => 5308,
                                                                      'subgrammar' => 'g1',
                                                                      'subkey' => 1,
                                                                      'xrlid' => 'quantifier@5308+24'
                                                                    },
-                                       'g1,quantifier,[Lex-75]' => {
+                                       'g1,quantifier,[Lex-47]' => {
                                                                      'action' => '[start,length,values]',
                                                                      'bless' => 'quantifier',
                                                                      'length' => 3,
@@ -7286,14 +7446,14 @@ $hashed_metag = {
                                                                                ],
                                                                      'name' => 'quantifier',
                                                                      'rhs' => [
-                                                                                '[Lex-75]'
+                                                                                '[Lex-47]'
                                                                               ],
                                                                      'start' => 5329,
                                                                      'subgrammar' => 'g1',
                                                                      'subkey' => 2,
                                                                      'xrlid' => 'quantifier@5308+24'
                                                                    },
-                                       'g1,rank specification,[Lex-50],[Lex-51],signed integer' => {
+                                       'g1,rank specification,[Lex-33],[Lex-25],signed integer' => {
                                                                                                      'action' => '[start,length,values]',
                                                                                                      'bless' => 'rank_specification',
                                                                                                      'length' => 55,
@@ -7305,8 +7465,8 @@ $hashed_metag = {
                                                                                                                ],
                                                                                                      'name' => 'rank specification',
                                                                                                      'rhs' => [
-                                                                                                                '[Lex-50]',
-                                                                                                                '[Lex-51]',
+                                                                                                                '[Lex-33]',
+                                                                                                                '[Lex-25]',
                                                                                                                 'signed integer'
                                                                                                               ],
                                                                                                      'start' => 3245,
@@ -7395,7 +7555,7 @@ $hashed_metag = {
                                                                  'subkey' => 0,
                                                                  'xrlid' => 'rhs@4236+22'
                                                                },
-                                       'g1,right association,[Lex-38],[Lex-39],[Lex-40]' => {
+                                       'g1,right association,[Lex-26],[Lex-25],[Lex-28]' => {
                                                                                               'action' => '[start,length,values]',
                                                                                               'bless' => 'right_association',
                                                                                               'length' => 46,
@@ -7407,16 +7567,16 @@ $hashed_metag = {
                                                                                                         ],
                                                                                               'name' => 'right association',
                                                                                               'rhs' => [
-                                                                                                         '[Lex-38]',
-                                                                                                         '[Lex-39]',
-                                                                                                         '[Lex-40]'
+                                                                                                         '[Lex-26]',
+                                                                                                         '[Lex-25]',
+                                                                                                         '[Lex-28]'
                                                                                                        ],
                                                                                               'start' => 2986,
                                                                                               'subgrammar' => 'g1',
                                                                                               'subkey' => 1,
                                                                                               'xrlid' => 'right association@2986+46'
                                                                                             },
-                                       'g1,separator specification,[Lex-44],[Lex-45],single symbol' => {
+                                       'g1,separator specification,[Lex-30],[Lex-25],single symbol' => {
                                                                                                          'action' => '[start,length,values]',
                                                                                                          'bless' => 'separator_specification',
                                                                                                          'length' => 64,
@@ -7428,8 +7588,8 @@ $hashed_metag = {
                                                                                                                    ],
                                                                                                          'name' => 'separator specification',
                                                                                                          'rhs' => [
-                                                                                                                    '[Lex-44]',
-                                                                                                                    '[Lex-45]',
+                                                                                                                    '[Lex-30]',
+                                                                                                                    '[Lex-25]',
                                                                                                                     'single symbol'
                                                                                                                   ],
                                                                                                          'start' => 3080,
@@ -7909,6 +8069,676 @@ $hashed_metag = {
                                                                         'subkey' => 0,
                                                                         'symbol_as_event' => 'whitespace'
                                                                       },
+                                       'l0,[:lex_start:],Perl name' => {
+                                                                         'length' => 0,
+                                                                         'lhs' => '[:lex_start:]',
+                                                                         'rhs' => [
+                                                                                    'Perl name'
+                                                                                  ],
+                                                                         'start' => 0,
+                                                                         'subgrammar' => 'l0',
+                                                                         'subkey' => 0
+                                                                       },
+                                       'l0,[:lex_start:],[:discard:]' => {
+                                                                           'length' => 0,
+                                                                           'lhs' => '[:lex_start:]',
+                                                                           'rhs' => [
+                                                                                      '[:discard:]'
+                                                                                    ],
+                                                                           'start' => 0,
+                                                                           'subgrammar' => 'l0',
+                                                                           'subkey' => 0
+                                                                         },
+                                       'l0,[:lex_start:],[Lex-0]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-0]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-10]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-10]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-11]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-11]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-12]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-12]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-13]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-13]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-14]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-14]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-15]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-15]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-16]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-16]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-17]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-17]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-18]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-18]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-19]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-19]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-1]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-1]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-20]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-20]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-21]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-21]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-22]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-22]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-23]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-23]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-24]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-24]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-25]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-25]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-26]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-26]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-27]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-27]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-28]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-28]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-29]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-29]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-2]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-2]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-30]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-30]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-31]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-31]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-32]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-32]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-33]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-33]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-34]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-34]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-35]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-35]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-36]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-36]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-37]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-37]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-38]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-38]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-39]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-39]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-3]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-3]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-40]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-40]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-41]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-41]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-42]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-42]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-43]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-43]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-44]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-44]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-45]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-45]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-46]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-46]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-47]' => {
+                                                                        'length' => 0,
+                                                                        'lhs' => '[:lex_start:]',
+                                                                        'rhs' => [
+                                                                                   '[Lex-47]'
+                                                                                 ],
+                                                                        'start' => 0,
+                                                                        'subgrammar' => 'l0',
+                                                                        'subkey' => 0
+                                                                      },
+                                       'l0,[:lex_start:],[Lex-4]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-4]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-5]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-5]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-6]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-6]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-7]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-7]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-8]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-8]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],[Lex-9]' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  '[Lex-9]'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],array descriptor' => {
+                                                                                'length' => 0,
+                                                                                'lhs' => '[:lex_start:]',
+                                                                                'rhs' => [
+                                                                                           'array descriptor'
+                                                                                         ],
+                                                                                'start' => 0,
+                                                                                'subgrammar' => 'l0',
+                                                                                'subkey' => 0
+                                                                              },
+                                       'l0,[:lex_start:],bare name' => {
+                                                                         'length' => 0,
+                                                                         'lhs' => '[:lex_start:]',
+                                                                         'rhs' => [
+                                                                                    'bare name'
+                                                                                  ],
+                                                                         'start' => 0,
+                                                                         'subgrammar' => 'l0',
+                                                                         'subkey' => 0
+                                                                       },
+                                       'l0,[:lex_start:],before or after' => {
+                                                                               'length' => 0,
+                                                                               'lhs' => '[:lex_start:]',
+                                                                               'rhs' => [
+                                                                                          'before or after'
+                                                                                        ],
+                                                                               'start' => 0,
+                                                                               'subgrammar' => 'l0',
+                                                                               'subkey' => 0
+                                                                             },
+                                       'l0,[:lex_start:],boolean' => {
+                                                                       'length' => 0,
+                                                                       'lhs' => '[:lex_start:]',
+                                                                       'rhs' => [
+                                                                                  'boolean'
+                                                                                ],
+                                                                       'start' => 0,
+                                                                       'subgrammar' => 'l0',
+                                                                       'subkey' => 0
+                                                                     },
+                                       'l0,[:lex_start:],bracketed name' => {
+                                                                              'length' => 0,
+                                                                              'lhs' => '[:lex_start:]',
+                                                                              'rhs' => [
+                                                                                         'bracketed name'
+                                                                                       ],
+                                                                              'start' => 0,
+                                                                              'subgrammar' => 'l0',
+                                                                              'subkey' => 0
+                                                                            },
+                                       'l0,[:lex_start:],character class' => {
+                                                                               'length' => 0,
+                                                                               'lhs' => '[:lex_start:]',
+                                                                               'rhs' => [
+                                                                                          'character class'
+                                                                                        ],
+                                                                               'start' => 0,
+                                                                               'subgrammar' => 'l0',
+                                                                               'subkey' => 0
+                                                                             },
+                                       'l0,[:lex_start:],op declare bnf' => {
+                                                                              'length' => 0,
+                                                                              'lhs' => '[:lex_start:]',
+                                                                              'rhs' => [
+                                                                                         'op declare bnf'
+                                                                                       ],
+                                                                              'start' => 0,
+                                                                              'subgrammar' => 'l0',
+                                                                              'subkey' => 0
+                                                                            },
+                                       'l0,[:lex_start:],op declare match' => {
+                                                                                'length' => 0,
+                                                                                'lhs' => '[:lex_start:]',
+                                                                                'rhs' => [
+                                                                                           'op declare match'
+                                                                                         ],
+                                                                                'start' => 0,
+                                                                                'subgrammar' => 'l0',
+                                                                                'subkey' => 0
+                                                                              },
+                                       'l0,[:lex_start:],op equal priority' => {
+                                                                                 'length' => 0,
+                                                                                 'lhs' => '[:lex_start:]',
+                                                                                 'rhs' => [
+                                                                                            'op equal priority'
+                                                                                          ],
+                                                                                 'start' => 0,
+                                                                                 'subgrammar' => 'l0',
+                                                                                 'subkey' => 0
+                                                                               },
+                                       'l0,[:lex_start:],op loosen' => {
+                                                                         'length' => 0,
+                                                                         'lhs' => '[:lex_start:]',
+                                                                         'rhs' => [
+                                                                                    'op loosen'
+                                                                                  ],
+                                                                         'start' => 0,
+                                                                         'subgrammar' => 'l0',
+                                                                         'subkey' => 0
+                                                                       },
+                                       'l0,[:lex_start:],reserved action name' => {
+                                                                                    'length' => 0,
+                                                                                    'lhs' => '[:lex_start:]',
+                                                                                    'rhs' => [
+                                                                                               'reserved action name'
+                                                                                             ],
+                                                                                    'start' => 0,
+                                                                                    'subgrammar' => 'l0',
+                                                                                    'subkey' => 0
+                                                                                  },
+                                       'l0,[:lex_start:],reserved blessing name' => {
+                                                                                      'length' => 0,
+                                                                                      'lhs' => '[:lex_start:]',
+                                                                                      'rhs' => [
+                                                                                                 'reserved blessing name'
+                                                                                               ],
+                                                                                      'start' => 0,
+                                                                                      'subgrammar' => 'l0',
+                                                                                      'subkey' => 0
+                                                                                    },
+                                       'l0,[:lex_start:],reserved event name' => {
+                                                                                   'length' => 0,
+                                                                                   'lhs' => '[:lex_start:]',
+                                                                                   'rhs' => [
+                                                                                              'reserved event name'
+                                                                                            ],
+                                                                                   'start' => 0,
+                                                                                   'subgrammar' => 'l0',
+                                                                                   'subkey' => 0
+                                                                                 },
+                                       'l0,[:lex_start:],signed integer' => {
+                                                                              'length' => 0,
+                                                                              'lhs' => '[:lex_start:]',
+                                                                              'rhs' => [
+                                                                                         'signed integer'
+                                                                                       ],
+                                                                              'start' => 0,
+                                                                              'subgrammar' => 'l0',
+                                                                              'subkey' => 0
+                                                                            },
+                                       'l0,[:lex_start:],single quoted name' => {
+                                                                                  'length' => 0,
+                                                                                  'lhs' => '[:lex_start:]',
+                                                                                  'rhs' => [
+                                                                                             'single quoted name'
+                                                                                           ],
+                                                                                  'start' => 0,
+                                                                                  'subgrammar' => 'l0',
+                                                                                  'subkey' => 0
+                                                                                },
+                                       'l0,[:lex_start:],single quoted string' => {
+                                                                                    'length' => 0,
+                                                                                    'lhs' => '[:lex_start:]',
+                                                                                    'rhs' => [
+                                                                                               'single quoted string'
+                                                                                             ],
+                                                                                    'start' => 0,
+                                                                                    'subgrammar' => 'l0',
+                                                                                    'subkey' => 0
+                                                                                  },
+                                       'l0,[:lex_start:],standard name' => {
+                                                                             'length' => 0,
+                                                                             'lhs' => '[:lex_start:]',
+                                                                             'rhs' => [
+                                                                                        'standard name'
+                                                                                      ],
+                                                                             'start' => 0,
+                                                                             'subgrammar' => 'l0',
+                                                                             'subkey' => 0
+                                                                           },
                                        'l0,[Lex-0],[[\\;]]' => {
                                                                  'length' => 3,
                                                                  'lhs' => '[Lex-0]',
@@ -7960,47 +8790,9 @@ $hashed_metag = {
                                                                                                     'subgrammar' => 'l0',
                                                                                                     'subkey' => 0
                                                                                                   },
-                                       'l0,[Lex-12],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]' => {
-                                                                                                    'length' => 9,
-                                                                                                    'lhs' => '[Lex-12]',
-                                                                                                    'mask' => [
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1
-                                                                                                              ],
-                                                                                                    'rhs' => [
-                                                                                                               '[[d]]',
-                                                                                                               '[[e]]',
-                                                                                                               '[[f]]',
-                                                                                                               '[[a]]',
-                                                                                                               '[[u]]',
-                                                                                                               '[[l]]',
-                                                                                                               '[[t]]'
-                                                                                                             ],
-                                                                                                    'start' => 1394,
-                                                                                                    'subgrammar' => 'l0',
-                                                                                                    'subkey' => 0
-                                                                                                  },
-                                       'l0,[Lex-13],[[\\=]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-13]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\=]]'
-                                                                           ],
-                                                                  'start' => 1404,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-14],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]' => {
+                                       'l0,[Lex-12],[[\\:]],[[d]],[[i]],[[s]],[[c]],[[a]],[[r]],[[d]]' => {
                                                                                                             'length' => 10,
-                                                                                                            'lhs' => '[Lex-14]',
+                                                                                                            'lhs' => '[Lex-12]',
                                                                                                             'mask' => [
                                                                                                                         1,
                                                                                                                         1,
@@ -8025,9 +8817,9 @@ $hashed_metag = {
                                                                                                             'subgrammar' => 'l0',
                                                                                                             'subkey' => 0
                                                                                                           },
-                                       'l0,[Lex-15],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]' => {
+                                       'l0,[Lex-13],[[\\:]],[[l]],[[e]],[[x]],[[e]],[[m]],[[e]]' => {
                                                                                                       'length' => 9,
-                                                                                                      'lhs' => '[Lex-15]',
+                                                                                                      'lhs' => '[Lex-13]',
                                                                                                       'mask' => [
                                                                                                                   1,
                                                                                                                   1,
@@ -8050,9 +8842,9 @@ $hashed_metag = {
                                                                                                       'subgrammar' => 'l0',
                                                                                                       'subkey' => 0
                                                                                                     },
-                                       'l0,[Lex-16],[[e]],[[v]],[[e]],[[n]],[[t]]' => {
+                                       'l0,[Lex-14],[[e]],[[v]],[[e]],[[n]],[[t]]' => {
                                                                                         'length' => 7,
-                                                                                        'lhs' => '[Lex-16]',
+                                                                                        'lhs' => '[Lex-14]',
                                                                                         'mask' => [
                                                                                                     1,
                                                                                                     1,
@@ -8071,22 +8863,9 @@ $hashed_metag = {
                                                                                         'subgrammar' => 'l0',
                                                                                         'subkey' => 0
                                                                                       },
-                                       'l0,[Lex-17],[[\\=]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-17]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\=]]'
-                                                                           ],
-                                                                  'start' => 1819,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-18],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]' => {
+                                       'l0,[Lex-15],[[c]],[[o]],[[m]],[[p]],[[l]],[[e]],[[t]],[[e]],[[d]]' => {
                                                                                                                 'length' => 11,
-                                                                                                                'lhs' => '[Lex-18]',
+                                                                                                                'lhs' => '[Lex-15]',
                                                                                                                 'mask' => [
                                                                                                                             1,
                                                                                                                             1,
@@ -8113,56 +8892,9 @@ $hashed_metag = {
                                                                                                                 'subgrammar' => 'l0',
                                                                                                                 'subkey' => 0
                                                                                                               },
-                                       'l0,[Lex-19],[[e]],[[v]],[[e]],[[n]],[[t]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-19]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[e]]',
-                                                                                                   '[[v]]',
-                                                                                                   '[[e]]',
-                                                                                                   '[[n]]',
-                                                                                                   '[[t]]'
-                                                                                                 ],
-                                                                                        'start' => 1882,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-1],[[\\{]]' => {
-                                                                 'length' => 3,
-                                                                 'lhs' => '[Lex-1]',
-                                                                 'mask' => [
-                                                                             1
-                                                                           ],
-                                                                 'rhs' => [
-                                                                            '[[\\{]]'
-                                                                          ],
-                                                                 'start' => 1100,
-                                                                 'subgrammar' => 'l0',
-                                                                 'subkey' => 0
-                                                               },
-                                       'l0,[Lex-20],[[\\=]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-20]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\=]]'
-                                                                           ],
-                                                                  'start' => 1915,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-21],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]' => {
+                                       'l0,[Lex-16],[[n]],[[u]],[[l]],[[l]],[[e]],[[d]]' => {
                                                                                               'length' => 8,
-                                                                                              'lhs' => '[Lex-21]',
+                                                                                              'lhs' => '[Lex-16]',
                                                                                               'mask' => [
                                                                                                           1,
                                                                                                           1,
@@ -8183,43 +8915,9 @@ $hashed_metag = {
                                                                                               'subgrammar' => 'l0',
                                                                                               'subkey' => 0
                                                                                             },
-                                       'l0,[Lex-22],[[e]],[[v]],[[e]],[[n]],[[t]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-22]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[e]]',
-                                                                                                   '[[v]]',
-                                                                                                   '[[e]]',
-                                                                                                   '[[n]]',
-                                                                                                   '[[t]]'
-                                                                                                 ],
-                                                                                        'start' => 1979,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-23],[[\\=]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-23]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\=]]'
-                                                                           ],
-                                                                  'start' => 2012,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-24],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]' => {
+                                       'l0,[Lex-17],[[p]],[[r]],[[e]],[[d]],[[i]],[[c]],[[t]],[[e]],[[d]]' => {
                                                                                                                 'length' => 11,
-                                                                                                                'lhs' => '[Lex-24]',
+                                                                                                                'lhs' => '[Lex-17]',
                                                                                                                 'mask' => [
                                                                                                                             1,
                                                                                                                             1,
@@ -8246,9 +8944,9 @@ $hashed_metag = {
                                                                                                                 'subgrammar' => 'l0',
                                                                                                                 'subkey' => 0
                                                                                                               },
-                                       'l0,[Lex-25],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]' => {
+                                       'l0,[Lex-18],[[i]],[[n]],[[a]],[[c]],[[c]],[[e]],[[s]],[[s]],[[i]],[[b]],[[l]],[[e]]' => {
                                                                                                                                   'length' => 14,
-                                                                                                                                  'lhs' => '[Lex-25]',
+                                                                                                                                  'lhs' => '[Lex-18]',
                                                                                                                                   'mask' => [
                                                                                                                                               1,
                                                                                                                                               1,
@@ -8281,24 +8979,9 @@ $hashed_metag = {
                                                                                                                                   'subgrammar' => 'l0',
                                                                                                                                   'subkey' => 0
                                                                                                                                 },
-                                       'l0,[Lex-26],[[i]],[[s]]' => {
+                                       'l0,[Lex-19],[[b]],[[y]]' => {
                                                                       'length' => 4,
-                                                                      'lhs' => '[Lex-26]',
-                                                                      'mask' => [
-                                                                                  1,
-                                                                                  1
-                                                                                ],
-                                                                      'rhs' => [
-                                                                                 '[[i]]',
-                                                                                 '[[s]]'
-                                                                               ],
-                                                                      'start' => 2089,
-                                                                      'subgrammar' => 'l0',
-                                                                      'subkey' => 0
-                                                                    },
-                                       'l0,[Lex-27],[[b]],[[y]]' => {
-                                                                      'length' => 4,
-                                                                      'lhs' => '[Lex-27]',
+                                                                      'lhs' => '[Lex-19]',
                                                                       'mask' => [
                                                                                   1,
                                                                                   1
@@ -8311,34 +8994,22 @@ $hashed_metag = {
                                                                       'subgrammar' => 'l0',
                                                                       'subkey' => 0
                                                                     },
-                                       'l0,[Lex-28],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]' => {
-                                                                                                    'length' => 9,
-                                                                                                    'lhs' => '[Lex-28]',
-                                                                                                    'mask' => [
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1,
-                                                                                                                1
-                                                                                                              ],
-                                                                                                    'rhs' => [
-                                                                                                               '[[d]]',
-                                                                                                               '[[e]]',
-                                                                                                               '[[f]]',
-                                                                                                               '[[a]]',
-                                                                                                               '[[u]]',
-                                                                                                               '[[l]]',
-                                                                                                               '[[t]]'
-                                                                                                             ],
-                                                                                                    'start' => 2126,
-                                                                                                    'subgrammar' => 'l0',
-                                                                                                    'subkey' => 0
-                                                                                                  },
-                                       'l0,[Lex-29],[[w]],[[a]],[[r]],[[n]]' => {
+                                       'l0,[Lex-1],[[\\{]]' => {
+                                                                 'length' => 3,
+                                                                 'lhs' => '[Lex-1]',
+                                                                 'mask' => [
+                                                                             1
+                                                                           ],
+                                                                 'rhs' => [
+                                                                            '[[\\{]]'
+                                                                          ],
+                                                                 'start' => 1100,
+                                                                 'subgrammar' => 'l0',
+                                                                 'subkey' => 0
+                                                               },
+                                       'l0,[Lex-20],[[w]],[[a]],[[r]],[[n]]' => {
                                                                                   'length' => 6,
-                                                                                  'lhs' => '[Lex-29]',
+                                                                                  'lhs' => '[Lex-20]',
                                                                                   'mask' => [
                                                                                               1,
                                                                                               1,
@@ -8355,22 +9026,9 @@ $hashed_metag = {
                                                                                   'subgrammar' => 'l0',
                                                                                   'subkey' => 0
                                                                                 },
-                                       'l0,[Lex-2],[[\\}]]' => {
-                                                                 'length' => 3,
-                                                                 'lhs' => '[Lex-2]',
-                                                                 'mask' => [
-                                                                             1
-                                                                           ],
-                                                                 'rhs' => [
-                                                                            '[[\\}]]'
-                                                                          ],
-                                                                 'start' => 1116,
-                                                                 'subgrammar' => 'l0',
-                                                                 'subkey' => 0
-                                                               },
-                                       'l0,[Lex-30],[[o]],[[k]]' => {
+                                       'l0,[Lex-21],[[o]],[[k]]' => {
                                                                       'length' => 4,
-                                                                      'lhs' => '[Lex-30]',
+                                                                      'lhs' => '[Lex-21]',
                                                                       'mask' => [
                                                                                   1,
                                                                                   1
@@ -8383,9 +9041,9 @@ $hashed_metag = {
                                                                       'subgrammar' => 'l0',
                                                                       'subkey' => 0
                                                                     },
-                                       'l0,[Lex-31],[[f]],[[a]],[[t]],[[a]],[[l]]' => {
+                                       'l0,[Lex-22],[[f]],[[a]],[[t]],[[a]],[[l]]' => {
                                                                                         'length' => 7,
-                                                                                        'lhs' => '[Lex-31]',
+                                                                                        'lhs' => '[Lex-22]',
                                                                                         'mask' => [
                                                                                                     1,
                                                                                                     1,
@@ -8404,9 +9062,9 @@ $hashed_metag = {
                                                                                         'subgrammar' => 'l0',
                                                                                         'subkey' => 0
                                                                                       },
-                                       'l0,[Lex-32],[[\\,]]' => {
+                                       'l0,[Lex-23],[[\\,]]' => {
                                                                   'length' => 3,
-                                                                  'lhs' => '[Lex-32]',
+                                                                  'lhs' => '[Lex-23]',
                                                                   'mask' => [
                                                                               1
                                                                             ],
@@ -8417,9 +9075,9 @@ $hashed_metag = {
                                                                   'subgrammar' => 'l0',
                                                                   'subkey' => 0
                                                                 },
-                                       'l0,[Lex-33],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]' => {
+                                       'l0,[Lex-24],[[a]],[[c]],[[t]],[[i]],[[o]],[[n]]' => {
                                                                                               'length' => 8,
-                                                                                              'lhs' => '[Lex-33]',
+                                                                                              'lhs' => '[Lex-24]',
                                                                                               'mask' => [
                                                                                                           1,
                                                                                                           1,
@@ -8440,9 +9098,9 @@ $hashed_metag = {
                                                                                               'subgrammar' => 'l0',
                                                                                               'subkey' => 0
                                                                                             },
-                                       'l0,[Lex-34],[[\\=]],[[\\>]]' => {
+                                       'l0,[Lex-25],[[\\=]],[[\\>]]' => {
                                                                           'length' => 4,
-                                                                          'lhs' => '[Lex-34]',
+                                                                          'lhs' => '[Lex-25]',
                                                                           'mask' => [
                                                                                       1,
                                                                                       1
@@ -8455,9 +9113,9 @@ $hashed_metag = {
                                                                           'subgrammar' => 'l0',
                                                                           'subkey' => 0
                                                                         },
-                                       'l0,[Lex-35],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
+                                       'l0,[Lex-26],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
                                                                                         'length' => 7,
-                                                                                        'lhs' => '[Lex-35]',
+                                                                                        'lhs' => '[Lex-26]',
                                                                                         'mask' => [
                                                                                                     1,
                                                                                                     1,
@@ -8476,24 +9134,9 @@ $hashed_metag = {
                                                                                         'subgrammar' => 'l0',
                                                                                         'subkey' => 0
                                                                                       },
-                                       'l0,[Lex-36],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-36]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 2973,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-37],[[l]],[[e]],[[f]],[[t]]' => {
+                                       'l0,[Lex-27],[[l]],[[e]],[[f]],[[t]]' => {
                                                                                   'length' => 6,
-                                                                                  'lhs' => '[Lex-37]',
+                                                                                  'lhs' => '[Lex-27]',
                                                                                   'mask' => [
                                                                                               1,
                                                                                               1,
@@ -8510,68 +9153,9 @@ $hashed_metag = {
                                                                                   'subgrammar' => 'l0',
                                                                                   'subkey' => 0
                                                                                 },
-                                       'l0,[Lex-38],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
+                                       'l0,[Lex-28],[[r]],[[i]],[[g]],[[h]],[[t]]' => {
                                                                                         'length' => 7,
-                                                                                        'lhs' => '[Lex-38]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[a]]',
-                                                                                                   '[[s]]',
-                                                                                                   '[[s]]',
-                                                                                                   '[[o]]',
-                                                                                                   '[[c]]'
-                                                                                                 ],
-                                                                                        'start' => 3011,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-39],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-39]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3019,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
-                                                                                               'length' => 8,
-                                                                                               'lhs' => '[Lex-3]',
-                                                                                               'mask' => [
-                                                                                                           1,
-                                                                                                           1,
-                                                                                                           1,
-                                                                                                           1,
-                                                                                                           1,
-                                                                                                           1
-                                                                                                         ],
-                                                                                               'rhs' => [
-                                                                                                          '[[\\:]]',
-                                                                                                          '[[s]]',
-                                                                                                          '[[t]]',
-                                                                                                          '[[a]]',
-                                                                                                          '[[r]]',
-                                                                                                          '[[t]]'
-                                                                                                        ],
-                                                                                               'start' => 1138,
-                                                                                               'subgrammar' => 'l0',
-                                                                                               'subkey' => 0
-                                                                                             },
-                                       'l0,[Lex-40],[[r]],[[i]],[[g]],[[h]],[[t]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-40]',
+                                                                                        'lhs' => '[Lex-28]',
                                                                                         'mask' => [
                                                                                                     1,
                                                                                                     1,
@@ -8590,45 +9174,9 @@ $hashed_metag = {
                                                                                         'subgrammar' => 'l0',
                                                                                         'subkey' => 0
                                                                                       },
-                                       'l0,[Lex-41],[[a]],[[s]],[[s]],[[o]],[[c]]' => {
+                                       'l0,[Lex-29],[[g]],[[r]],[[o]],[[u]],[[p]]' => {
                                                                                         'length' => 7,
-                                                                                        'lhs' => '[Lex-41]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[a]]',
-                                                                                                   '[[s]]',
-                                                                                                   '[[s]]',
-                                                                                                   '[[o]]',
-                                                                                                   '[[c]]'
-                                                                                                 ],
-                                                                                        'start' => 3058,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-42],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-42]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3066,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-43],[[g]],[[r]],[[o]],[[u]],[[p]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-43]',
+                                                                                        'lhs' => '[Lex-29]',
                                                                                         'mask' => [
                                                                                                     1,
                                                                                                     1,
@@ -8647,9 +9195,22 @@ $hashed_metag = {
                                                                                         'subgrammar' => 'l0',
                                                                                         'subkey' => 0
                                                                                       },
-                                       'l0,[Lex-44],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]' => {
+                                       'l0,[Lex-2],[[\\}]]' => {
+                                                                 'length' => 3,
+                                                                 'lhs' => '[Lex-2]',
+                                                                 'mask' => [
+                                                                             1
+                                                                           ],
+                                                                 'rhs' => [
+                                                                            '[[\\}]]'
+                                                                          ],
+                                                                 'start' => 1116,
+                                                                 'subgrammar' => 'l0',
+                                                                 'subkey' => 0
+                                                               },
+                                       'l0,[Lex-30],[[s]],[[e]],[[p]],[[a]],[[r]],[[a]],[[t]],[[o]],[[r]]' => {
                                                                                                                 'length' => 11,
-                                                                                                                'lhs' => '[Lex-44]',
+                                                                                                                'lhs' => '[Lex-30]',
                                                                                                                 'mask' => [
                                                                                                                             1,
                                                                                                                             1,
@@ -8676,24 +9237,9 @@ $hashed_metag = {
                                                                                                                 'subgrammar' => 'l0',
                                                                                                                 'subkey' => 0
                                                                                                               },
-                                       'l0,[Lex-45],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-45]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3123,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-46],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]' => {
+                                       'l0,[Lex-31],[[p]],[[r]],[[o]],[[p]],[[e]],[[r]]' => {
                                                                                               'length' => 8,
-                                                                                              'lhs' => '[Lex-46]',
+                                                                                              'lhs' => '[Lex-31]',
                                                                                               'mask' => [
                                                                                                           1,
                                                                                                           1,
@@ -8714,24 +9260,9 @@ $hashed_metag = {
                                                                                               'subgrammar' => 'l0',
                                                                                               'subkey' => 0
                                                                                             },
-                                       'l0,[Lex-47],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-47]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3182,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-48],[[e]],[[a]],[[g]],[[e]],[[r]]' => {
+                                       'l0,[Lex-32],[[e]],[[a]],[[g]],[[e]],[[r]]' => {
                                                                                         'length' => 7,
-                                                                                        'lhs' => '[Lex-48]',
+                                                                                        'lhs' => '[Lex-32]',
                                                                                         'mask' => [
                                                                                                     1,
                                                                                                     1,
@@ -8750,45 +9281,9 @@ $hashed_metag = {
                                                                                         'subgrammar' => 'l0',
                                                                                         'subkey' => 0
                                                                                       },
-                                       'l0,[Lex-49],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-49]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3231,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
-                                                                                       'length' => 7,
-                                                                                       'lhs' => '[Lex-4]',
-                                                                                       'mask' => [
-                                                                                                   1,
-                                                                                                   1,
-                                                                                                   1,
-                                                                                                   1,
-                                                                                                   1
-                                                                                                 ],
-                                                                                       'rhs' => [
-                                                                                                  '[[s]]',
-                                                                                                  '[[t]]',
-                                                                                                  '[[a]]',
-                                                                                                  '[[r]]',
-                                                                                                  '[[t]]'
-                                                                                                ],
-                                                                                       'start' => 1190,
-                                                                                       'subgrammar' => 'l0',
-                                                                                       'subkey' => 0
-                                                                                     },
-                                       'l0,[Lex-50],[[r]],[[a]],[[n]],[[k]]' => {
+                                       'l0,[Lex-33],[[r]],[[a]],[[n]],[[k]]' => {
                                                                                   'length' => 6,
-                                                                                  'lhs' => '[Lex-50]',
+                                                                                  'lhs' => '[Lex-33]',
                                                                                   'mask' => [
                                                                                               1,
                                                                                               1,
@@ -8805,24 +9300,9 @@ $hashed_metag = {
                                                                                   'subgrammar' => 'l0',
                                                                                   'subkey' => 0
                                                                                 },
-                                       'l0,[Lex-51],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-51]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3278,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-52],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]' => {
+                                       'l0,[Lex-34],[[n]],[[u]],[[l]],[[l]],[[\\-]],[[r]],[[a]],[[n]],[[k]],[[i]],[[n]],[[g]]' => {
                                                                                                                                     'length' => 14,
-                                                                                                                                    'lhs' => '[Lex-52]',
+                                                                                                                                    'lhs' => '[Lex-34]',
                                                                                                                                     'mask' => [
                                                                                                                                                 1,
                                                                                                                                                 1,
@@ -8855,24 +9335,9 @@ $hashed_metag = {
                                                                                                                                     'subgrammar' => 'l0',
                                                                                                                                     'subkey' => 0
                                                                                                                                   },
-                                       'l0,[Lex-53],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-53]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3350,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-54],[[n]],[[u]],[[l]],[[l]]' => {
+                                       'l0,[Lex-35],[[n]],[[u]],[[l]],[[l]]' => {
                                                                                   'length' => 6,
-                                                                                  'lhs' => '[Lex-54]',
+                                                                                  'lhs' => '[Lex-35]',
                                                                                   'mask' => [
                                                                                               1,
                                                                                               1,
@@ -8889,43 +9354,9 @@ $hashed_metag = {
                                                                                   'subgrammar' => 'l0',
                                                                                   'subkey' => 0
                                                                                 },
-                                       'l0,[Lex-55],[[r]],[[a]],[[n]],[[k]]' => {
-                                                                                  'length' => 6,
-                                                                                  'lhs' => '[Lex-55]',
-                                                                                  'mask' => [
-                                                                                              1,
-                                                                                              1,
-                                                                                              1,
-                                                                                              1
-                                                                                            ],
-                                                                                  'rhs' => [
-                                                                                             '[[r]]',
-                                                                                             '[[a]]',
-                                                                                             '[[n]]',
-                                                                                             '[[k]]'
-                                                                                           ],
-                                                                                  'start' => 3421,
-                                                                                  'subgrammar' => 'l0',
-                                                                                  'subkey' => 0
-                                                                                },
-                                       'l0,[Lex-56],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-56]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3428,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-57],[[l]],[[o]],[[w]]' => {
+                                       'l0,[Lex-36],[[l]],[[o]],[[w]]' => {
                                                                             'length' => 5,
-                                                                            'lhs' => '[Lex-57]',
+                                                                            'lhs' => '[Lex-36]',
                                                                             'mask' => [
                                                                                         1,
                                                                                         1,
@@ -8940,9 +9371,9 @@ $hashed_metag = {
                                                                             'subgrammar' => 'l0',
                                                                             'subkey' => 0
                                                                           },
-                                       'l0,[Lex-58],[[h]],[[i]],[[g]],[[h]]' => {
+                                       'l0,[Lex-37],[[h]],[[i]],[[g]],[[h]]' => {
                                                                                   'length' => 6,
-                                                                                  'lhs' => '[Lex-58]',
+                                                                                  'lhs' => '[Lex-37]',
                                                                                   'mask' => [
                                                                                               1,
                                                                                               1,
@@ -8959,9 +9390,9 @@ $hashed_metag = {
                                                                                   'subgrammar' => 'l0',
                                                                                   'subkey' => 0
                                                                                 },
-                                       'l0,[Lex-59],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]' => {
+                                       'l0,[Lex-38],[[p]],[[r]],[[i]],[[o]],[[r]],[[i]],[[t]],[[y]]' => {
                                                                                                           'length' => 10,
-                                                                                                          'lhs' => '[Lex-59]',
+                                                                                                          'lhs' => '[Lex-38]',
                                                                                                           'mask' => [
                                                                                                                       1,
                                                                                                                       1,
@@ -8986,6 +9417,195 @@ $hashed_metag = {
                                                                                                           'subgrammar' => 'l0',
                                                                                                           'subkey' => 0
                                                                                                         },
+                                       'l0,[Lex-39],[[p]],[[a]],[[u]],[[s]],[[e]]' => {
+                                                                                        'length' => 7,
+                                                                                        'lhs' => '[Lex-39]',
+                                                                                        'mask' => [
+                                                                                                    1,
+                                                                                                    1,
+                                                                                                    1,
+                                                                                                    1,
+                                                                                                    1
+                                                                                                  ],
+                                                                                        'rhs' => [
+                                                                                                   '[[p]]',
+                                                                                                   '[[a]]',
+                                                                                                   '[[u]]',
+                                                                                                   '[[s]]',
+                                                                                                   '[[e]]'
+                                                                                                 ],
+                                                                                        'start' => 3592,
+                                                                                        'subgrammar' => 'l0',
+                                                                                        'subkey' => 0
+                                                                                      },
+                                       'l0,[Lex-3],[[\\:]],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
+                                                                                               'length' => 8,
+                                                                                               'lhs' => '[Lex-3]',
+                                                                                               'mask' => [
+                                                                                                           1,
+                                                                                                           1,
+                                                                                                           1,
+                                                                                                           1,
+                                                                                                           1,
+                                                                                                           1
+                                                                                                         ],
+                                                                                               'rhs' => [
+                                                                                                          '[[\\:]]',
+                                                                                                          '[[s]]',
+                                                                                                          '[[t]]',
+                                                                                                          '[[a]]',
+                                                                                                          '[[r]]',
+                                                                                                          '[[t]]'
+                                                                                                        ],
+                                                                                               'start' => 1138,
+                                                                                               'subgrammar' => 'l0',
+                                                                                               'subkey' => 0
+                                                                                             },
+                                       'l0,[Lex-40],[[o]],[[n]]' => {
+                                                                      'length' => 4,
+                                                                      'lhs' => '[Lex-40]',
+                                                                      'mask' => [
+                                                                                  1,
+                                                                                  1
+                                                                                ],
+                                                                      'rhs' => [
+                                                                                 '[[o]]',
+                                                                                 '[[n]]'
+                                                                               ],
+                                                                      'start' => 3807,
+                                                                      'subgrammar' => 'l0',
+                                                                      'subkey' => 0
+                                                                    },
+                                       'l0,[Lex-41],[[o]],[[f]],[[f]]' => {
+                                                                            'length' => 5,
+                                                                            'lhs' => '[Lex-41]',
+                                                                            'mask' => [
+                                                                                        1,
+                                                                                        1,
+                                                                                        1
+                                                                                      ],
+                                                                            'rhs' => [
+                                                                                       '[[o]]',
+                                                                                       '[[f]]',
+                                                                                       '[[f]]'
+                                                                                     ],
+                                                                            'start' => 3814,
+                                                                            'subgrammar' => 'l0',
+                                                                            'subkey' => 0
+                                                                          },
+                                       'l0,[Lex-42],[[b]],[[l]],[[e]],[[s]],[[s]]' => {
+                                                                                        'length' => 7,
+                                                                                        'lhs' => '[Lex-42]',
+                                                                                        'mask' => [
+                                                                                                    1,
+                                                                                                    1,
+                                                                                                    1,
+                                                                                                    1,
+                                                                                                    1
+                                                                                                  ],
+                                                                                        'rhs' => [
+                                                                                                   '[[b]]',
+                                                                                                   '[[l]]',
+                                                                                                   '[[e]]',
+                                                                                                   '[[s]]',
+                                                                                                   '[[s]]'
+                                                                                                 ],
+                                                                                        'start' => 3869,
+                                                                                        'subgrammar' => 'l0',
+                                                                                        'subkey' => 0
+                                                                                      },
+                                       'l0,[Lex-43],[[n]],[[a]],[[m]],[[e]]' => {
+                                                                                  'length' => 6,
+                                                                                  'lhs' => '[Lex-43]',
+                                                                                  'mask' => [
+                                                                                              1,
+                                                                                              1,
+                                                                                              1,
+                                                                                              1
+                                                                                            ],
+                                                                                  'rhs' => [
+                                                                                             '[[n]]',
+                                                                                             '[[a]]',
+                                                                                             '[[m]]',
+                                                                                             '[[e]]'
+                                                                                           ],
+                                                                                  'start' => 3913,
+                                                                                  'subgrammar' => 'l0',
+                                                                                  'subkey' => 0
+                                                                                },
+                                       'l0,[Lex-44],[[\\(]]' => {
+                                                                  'length' => 3,
+                                                                  'lhs' => '[Lex-44]',
+                                                                  'mask' => [
+                                                                              1
+                                                                            ],
+                                                                  'rhs' => [
+                                                                             '[[\\(]]'
+                                                                           ],
+                                                                  'start' => 4423,
+                                                                  'subgrammar' => 'l0',
+                                                                  'subkey' => 0
+                                                                },
+                                       'l0,[Lex-45],[[\\)]]' => {
+                                                                  'length' => 3,
+                                                                  'lhs' => '[Lex-45]',
+                                                                  'mask' => [
+                                                                              1
+                                                                            ],
+                                                                  'rhs' => [
+                                                                             '[[\\)]]'
+                                                                           ],
+                                                                  'start' => 4448,
+                                                                  'subgrammar' => 'l0',
+                                                                  'subkey' => 0
+                                                                },
+                                       'l0,[Lex-46],[[\\*]]' => {
+                                                                  'length' => 3,
+                                                                  'lhs' => '[Lex-46]',
+                                                                  'mask' => [
+                                                                              1
+                                                                            ],
+                                                                  'rhs' => [
+                                                                             '[[\\*]]'
+                                                                           ],
+                                                                  'start' => 5323,
+                                                                  'subgrammar' => 'l0',
+                                                                  'subkey' => 0
+                                                                },
+                                       'l0,[Lex-47],[[\\+]]' => {
+                                                                  'length' => 3,
+                                                                  'lhs' => '[Lex-47]',
+                                                                  'mask' => [
+                                                                              1
+                                                                            ],
+                                                                  'rhs' => [
+                                                                             '[[\\+]]'
+                                                                           ],
+                                                                  'start' => 5329,
+                                                                  'subgrammar' => 'l0',
+                                                                  'subkey' => 0
+                                                                },
+                                       'l0,[Lex-4],[[s]],[[t]],[[a]],[[r]],[[t]]' => {
+                                                                                       'length' => 7,
+                                                                                       'lhs' => '[Lex-4]',
+                                                                                       'mask' => [
+                                                                                                   1,
+                                                                                                   1,
+                                                                                                   1,
+                                                                                                   1,
+                                                                                                   1
+                                                                                                 ],
+                                                                                       'rhs' => [
+                                                                                                  '[[s]]',
+                                                                                                  '[[t]]',
+                                                                                                  '[[a]]',
+                                                                                                  '[[r]]',
+                                                                                                  '[[t]]'
+                                                                                                ],
+                                                                                       'start' => 1190,
+                                                                                       'subgrammar' => 'l0',
+                                                                                       'subkey' => 0
+                                                                                     },
                                        'l0,[Lex-5],[[s]],[[y]],[[m]],[[b]],[[o]],[[l]]' => {
                                                                                              'length' => 8,
                                                                                              'lhs' => '[Lex-5]',
@@ -9009,174 +9629,6 @@ $hashed_metag = {
                                                                                              'subgrammar' => 'l0',
                                                                                              'subkey' => 0
                                                                                            },
-                                       'l0,[Lex-60],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-60]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3542,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-61],[[p]],[[a]],[[u]],[[s]],[[e]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-61]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[p]]',
-                                                                                                   '[[a]]',
-                                                                                                   '[[u]]',
-                                                                                                   '[[s]]',
-                                                                                                   '[[e]]'
-                                                                                                 ],
-                                                                                        'start' => 3592,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-62],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-62]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3600,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-63],[[e]],[[v]],[[e]],[[n]],[[t]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-63]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[e]]',
-                                                                                                   '[[v]]',
-                                                                                                   '[[e]]',
-                                                                                                   '[[n]]',
-                                                                                                   '[[t]]'
-                                                                                                 ],
-                                                                                        'start' => 3652,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-64],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-64]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3660,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-65],[[\\=]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-65]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\=]]'
-                                                                           ],
-                                                                  'start' => 3774,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-66],[[o]],[[n]]' => {
-                                                                      'length' => 4,
-                                                                      'lhs' => '[Lex-66]',
-                                                                      'mask' => [
-                                                                                  1,
-                                                                                  1
-                                                                                ],
-                                                                      'rhs' => [
-                                                                                 '[[o]]',
-                                                                                 '[[n]]'
-                                                                               ],
-                                                                      'start' => 3807,
-                                                                      'subgrammar' => 'l0',
-                                                                      'subkey' => 0
-                                                                    },
-                                       'l0,[Lex-67],[[o]],[[f]],[[f]]' => {
-                                                                            'length' => 5,
-                                                                            'lhs' => '[Lex-67]',
-                                                                            'mask' => [
-                                                                                        1,
-                                                                                        1,
-                                                                                        1
-                                                                                      ],
-                                                                            'rhs' => [
-                                                                                       '[[o]]',
-                                                                                       '[[f]]',
-                                                                                       '[[f]]'
-                                                                                     ],
-                                                                            'start' => 3814,
-                                                                            'subgrammar' => 'l0',
-                                                                            'subkey' => 0
-                                                                          },
-                                       'l0,[Lex-68],[[b]],[[l]],[[e]],[[s]],[[s]]' => {
-                                                                                        'length' => 7,
-                                                                                        'lhs' => '[Lex-68]',
-                                                                                        'mask' => [
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1,
-                                                                                                    1
-                                                                                                  ],
-                                                                                        'rhs' => [
-                                                                                                   '[[b]]',
-                                                                                                   '[[l]]',
-                                                                                                   '[[e]]',
-                                                                                                   '[[s]]',
-                                                                                                   '[[s]]'
-                                                                                                 ],
-                                                                                        'start' => 3869,
-                                                                                        'subgrammar' => 'l0',
-                                                                                        'subkey' => 0
-                                                                                      },
-                                       'l0,[Lex-69],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-69]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3877,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
                                        'l0,[Lex-6],[[i]],[[s]]' => {
                                                                      'length' => 4,
                                                                      'lhs' => '[Lex-6]',
@@ -9192,92 +9644,6 @@ $hashed_metag = {
                                                                      'subgrammar' => 'l0',
                                                                      'subkey' => 0
                                                                    },
-                                       'l0,[Lex-70],[[n]],[[a]],[[m]],[[e]]' => {
-                                                                                  'length' => 6,
-                                                                                  'lhs' => '[Lex-70]',
-                                                                                  'mask' => [
-                                                                                              1,
-                                                                                              1,
-                                                                                              1,
-                                                                                              1
-                                                                                            ],
-                                                                                  'rhs' => [
-                                                                                             '[[n]]',
-                                                                                             '[[a]]',
-                                                                                             '[[m]]',
-                                                                                             '[[e]]'
-                                                                                           ],
-                                                                                  'start' => 3913,
-                                                                                  'subgrammar' => 'l0',
-                                                                                  'subkey' => 0
-                                                                                },
-                                       'l0,[Lex-71],[[\\=]],[[\\>]]' => {
-                                                                          'length' => 4,
-                                                                          'lhs' => '[Lex-71]',
-                                                                          'mask' => [
-                                                                                      1,
-                                                                                      1
-                                                                                    ],
-                                                                          'rhs' => [
-                                                                                     '[[\\=]]',
-                                                                                     '[[\\>]]'
-                                                                                   ],
-                                                                          'start' => 3920,
-                                                                          'subgrammar' => 'l0',
-                                                                          'subkey' => 0
-                                                                        },
-                                       'l0,[Lex-72],[[\\(]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-72]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\(]]'
-                                                                           ],
-                                                                  'start' => 4423,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-73],[[\\)]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-73]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\)]]'
-                                                                           ],
-                                                                  'start' => 4448,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-74],[[\\*]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-74]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\*]]'
-                                                                           ],
-                                                                  'start' => 5323,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
-                                       'l0,[Lex-75],[[\\+]]' => {
-                                                                  'length' => 3,
-                                                                  'lhs' => '[Lex-75]',
-                                                                  'mask' => [
-                                                                              1
-                                                                            ],
-                                                                  'rhs' => [
-                                                                             '[[\\+]]'
-                                                                           ],
-                                                                  'start' => 5329,
-                                                                  'subgrammar' => 'l0',
-                                                                  'subkey' => 0
-                                                                },
                                        'l0,[Lex-7],[[\\:]],[[d]],[[e]],[[f]],[[a]],[[u]],[[l]],[[t]]' => {
                                                                                                            'length' => 10,
                                                                                                            'lhs' => '[Lex-7]',
@@ -11248,6 +11614,10 @@ $hashed_metag = {
                                                 'dsl_form' => '[:discard:]',
                                                 'name_source' => 'internal'
                                               },
+                             '[:lex_start:]' => {
+                                                  'dsl_form' => '[:lex_start:]',
+                                                  'name_source' => 'internal'
+                                                },
                              '[:start:]' => {
                                               'dsl_form' => '[:start:]',
                                               'name_source' => 'internal'
@@ -11265,35 +11635,35 @@ $hashed_metag = {
                                              'name_source' => 'internal'
                                            },
                              '[Lex-12]' => {
-                                             'dsl_form' => '\'default\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-13]' => {
-                                             'dsl_form' => '\'=\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-14]' => {
                                              'dsl_form' => '\':discard\'',
                                              'name_source' => 'internal'
                                            },
-                             '[Lex-15]' => {
+                             '[Lex-13]' => {
                                              'dsl_form' => '\':lexeme\'',
                                              'name_source' => 'internal'
                                            },
-                             '[Lex-16]' => {
+                             '[Lex-14]' => {
                                              'dsl_form' => '\'event\'',
                                              'name_source' => 'internal'
                                            },
-                             '[Lex-17]' => {
-                                             'dsl_form' => '\'=\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-18]' => {
+                             '[Lex-15]' => {
                                              'dsl_form' => '\'completed\'',
                                              'name_source' => 'internal'
                                            },
+                             '[Lex-16]' => {
+                                             'dsl_form' => '\'nulled\'',
+                                             'name_source' => 'internal'
+                                           },
+                             '[Lex-17]' => {
+                                             'dsl_form' => '\'predicted\'',
+                                             'name_source' => 'internal'
+                                           },
+                             '[Lex-18]' => {
+                                             'dsl_form' => '\'inaccessible\'',
+                                             'name_source' => 'internal'
+                                           },
                              '[Lex-19]' => {
-                                             'dsl_form' => '\'event\'',
+                                             'dsl_form' => '\'by\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-1]' => {
@@ -11301,43 +11671,43 @@ $hashed_metag = {
                                             'name_source' => 'internal'
                                           },
                              '[Lex-20]' => {
-                                             'dsl_form' => '\'=\'',
+                                             'dsl_form' => '\'warn\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-21]' => {
-                                             'dsl_form' => '\'nulled\'',
+                                             'dsl_form' => '\'ok\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-22]' => {
-                                             'dsl_form' => '\'event\'',
+                                             'dsl_form' => '\'fatal\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-23]' => {
-                                             'dsl_form' => '\'=\'',
+                                             'dsl_form' => '\',\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-24]' => {
-                                             'dsl_form' => '\'predicted\'',
+                                             'dsl_form' => '\'action\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-25]' => {
-                                             'dsl_form' => '\'inaccessible\'',
+                                             'dsl_form' => '\'=>\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-26]' => {
-                                             'dsl_form' => '\'is\'',
+                                             'dsl_form' => '\'assoc\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-27]' => {
-                                             'dsl_form' => '\'by\'',
+                                             'dsl_form' => '\'left\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-28]' => {
-                                             'dsl_form' => '\'default\'',
+                                             'dsl_form' => '\'right\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-29]' => {
-                                             'dsl_form' => '\'warn\'',
+                                             'dsl_form' => '\'group\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-2]' => {
@@ -11345,43 +11715,43 @@ $hashed_metag = {
                                             'name_source' => 'internal'
                                           },
                              '[Lex-30]' => {
-                                             'dsl_form' => '\'ok\'',
+                                             'dsl_form' => '\'separator\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-31]' => {
-                                             'dsl_form' => '\'fatal\'',
+                                             'dsl_form' => '\'proper\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-32]' => {
-                                             'dsl_form' => '\',\'',
+                                             'dsl_form' => '\'eager\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-33]' => {
-                                             'dsl_form' => '\'action\'',
+                                             'dsl_form' => '\'rank\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-34]' => {
-                                             'dsl_form' => '\'=>\'',
+                                             'dsl_form' => '\'null-ranking\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-35]' => {
-                                             'dsl_form' => '\'assoc\'',
+                                             'dsl_form' => '\'null\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-36]' => {
-                                             'dsl_form' => '\'=>\'',
+                                             'dsl_form' => '\'low\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-37]' => {
-                                             'dsl_form' => '\'left\'',
+                                             'dsl_form' => '\'high\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-38]' => {
-                                             'dsl_form' => '\'assoc\'',
+                                             'dsl_form' => '\'priority\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-39]' => {
-                                             'dsl_form' => '\'=>\'',
+                                             'dsl_form' => '\'pause\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-3]' => {
@@ -11389,161 +11759,49 @@ $hashed_metag = {
                                             'name_source' => 'internal'
                                           },
                              '[Lex-40]' => {
-                                             'dsl_form' => '\'right\'',
+                                             'dsl_form' => '\'on\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-41]' => {
-                                             'dsl_form' => '\'assoc\'',
+                                             'dsl_form' => '\'off\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-42]' => {
-                                             'dsl_form' => '\'=>\'',
+                                             'dsl_form' => '\'bless\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-43]' => {
-                                             'dsl_form' => '\'group\'',
+                                             'dsl_form' => '\'name\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-44]' => {
-                                             'dsl_form' => '\'separator\'',
+                                             'dsl_form' => '\'(\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-45]' => {
-                                             'dsl_form' => '\'=>\'',
+                                             'dsl_form' => '\')\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-46]' => {
-                                             'dsl_form' => '\'proper\'',
+                                             'dsl_form' => '\'*\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-47]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-48]' => {
-                                             'dsl_form' => '\'eager\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-49]' => {
-                                             'dsl_form' => '\'=>\'',
+                                             'dsl_form' => '\'+\'',
                                              'name_source' => 'internal'
                                            },
                              '[Lex-4]' => {
                                             'dsl_form' => '\'start\'',
                                             'name_source' => 'internal'
                                           },
-                             '[Lex-50]' => {
-                                             'dsl_form' => '\'rank\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-51]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-52]' => {
-                                             'dsl_form' => '\'null-ranking\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-53]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-54]' => {
-                                             'dsl_form' => '\'null\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-55]' => {
-                                             'dsl_form' => '\'rank\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-56]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-57]' => {
-                                             'dsl_form' => '\'low\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-58]' => {
-                                             'dsl_form' => '\'high\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-59]' => {
-                                             'dsl_form' => '\'priority\'',
-                                             'name_source' => 'internal'
-                                           },
                              '[Lex-5]' => {
                                             'dsl_form' => '\'symbol\'',
                                             'name_source' => 'internal'
                                           },
-                             '[Lex-60]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-61]' => {
-                                             'dsl_form' => '\'pause\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-62]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-63]' => {
-                                             'dsl_form' => '\'event\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-64]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-65]' => {
-                                             'dsl_form' => '\'=\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-66]' => {
-                                             'dsl_form' => '\'on\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-67]' => {
-                                             'dsl_form' => '\'off\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-68]' => {
-                                             'dsl_form' => '\'bless\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-69]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
                              '[Lex-6]' => {
                                             'dsl_form' => '\'is\'',
                                             'name_source' => 'internal'
                                           },
-                             '[Lex-70]' => {
-                                             'dsl_form' => '\'name\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-71]' => {
-                                             'dsl_form' => '\'=>\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-72]' => {
-                                             'dsl_form' => '\'(\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-73]' => {
-                                             'dsl_form' => '\')\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-74]' => {
-                                             'dsl_form' => '\'*\'',
-                                             'name_source' => 'internal'
-                                           },
-                             '[Lex-75]' => {
-                                             'dsl_form' => '\'+\'',
-                                             'name_source' => 'internal'
-                                           },
                              '[Lex-7]' => {
                                             'dsl_form' => '\':default\'',
                                             'name_source' => 'internal'

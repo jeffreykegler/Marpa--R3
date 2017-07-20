@@ -509,17 +509,6 @@ END_OF_LUA
 
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
 
-    if ($is_meta) { # TODO remove after development
-    push @{$lexer_rules}, map {
-        ;
-        {
-            #   description => "Internal lexical start rule for <$_>",
-            lhs => $lex_start_symbol_name,
-            rhs => [$_]
-        }
-    } @lex_lexeme_names;
-    }
-
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 's', $lex_start_symbol_name);
