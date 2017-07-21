@@ -594,101 +594,88 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::g1_progress_show {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my ($last_ordinal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local recce = ...; return recce.g1:latest_earley_set()', '' );
-
-    if ( not defined $start_ordinal ) {
-        $start_ordinal = $last_ordinal;
-    }
-    if ( $start_ordinal < 0 ) {
-        $start_ordinal += $last_ordinal + 1;
-    }
-    else {
-        if ( $start_ordinal < 0 or $start_ordinal > $last_ordinal ) {
-            return
-"Marpa::R3::Scanless::R::g1_progress_show start index is $start_ordinal, "
-              . "must be in range 0-$last_ordinal";
-        }
-    } ## end else [ if ( $start_ordinal < 0 ) ]
-
-    if ( not defined $end_ordinal ) {
-        $end_ordinal = $start_ordinal;
-    }
-    else {
-        my $end_ordinal_argument = $end_ordinal;
-        if ( $end_ordinal < 0 ) {
-            $end_ordinal += $last_ordinal + 1;
-        }
-        if ( $end_ordinal < 0 ) {
-            return
-"Marpa::R3::Scanless::R::g1_progress_show end index is $end_ordinal_argument, "
-              . sprintf ' must be in range %d-%d', -( $last_ordinal + 1 ),
-              $last_ordinal;
-        } ## end if ( $end_ordinal < 0 )
-    } ## end else [ if ( not defined $end_ordinal ) ]
-
-    my $text = q{};
-    for my $current_ordinal ( $start_ordinal .. $end_ordinal ) {
-
-        my ($piece) = $slr->call_by_tag(
+    my ($text) = $slr->call_by_tag(
             ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $current_ordinal );
-    local slr, current_ordinal = ...
+            <<'END_OF_LUA', 'ii', $start_ordinal, $end_ordinal );
+    local slr, start_ordinal_arg, end_ordinal_arg = ...
     local slg = slr.slg
     local g1g = slg.g1
-    local items = slr:g1_progress(current_ordinal)
-    table.sort(items, function(i, j)
-            if i[1] < j[1] then return true end
-            if i[1] > j[1] then return false end
-            if i[2] < j[2] then return true end
-            if i[2] > j[2] then return false end
-            if i[3] < j[3] then return true end
-            return false
-        end)
-    local function item_iter()
-        return coroutine.wrap(function ()
-            if #items < 1 then return end
-            local this_item = items[1]
-            local work_rule_id = this_item[1]
-            local work_position = this_item[2]
-            local origins = { this_item[3] }
-            for ix = 2, #items do
-                local this_item = items[ix]
-                local this_rule_id = this_item[1]
-                local this_position = this_item[2]
-                local this_origin = this_item[3]
-                if this_rule_id == work_rule_id
-                   and this_position == work_position
-                then
-                    origins[#origins+1] = this_origin
-                else
-                    coroutine.yield(work_rule_id, work_position, origins)
-                    work_rule_id = this_rule_id
-                    work_position = this_position
-                    origins = { this_origin }
-                end
-            end
-            coroutine.yield(work_rule_id, work_position, origins)
-        end)
+    local g1r = slr.g1
+    local last_ordinal = g1r:latest_earley_set()
+    local start_ordinal = math.tointeger(start_ordinal_arg) or last_ordinal
+    if start_ordinal < 0 then start_ordinal = last_ordinal + 1 + start_ordinal end
+    if start_ordinal > last_ordinal or start_ordinal < 0 then
+         _M._internal_error(
+            "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+             must be in range 0-%d",
+             inspect(start_ordinal_arg, {depth=1}),
+             last_ordinal
+         )
+    end
+    local end_ordinal = math.tointeger(end_ordinal_arg) or start_ordinal
+    if end_ordinal < 0 then end_ordinal = last_ordinal + 1 + end_ordinal end
+    if end_ordinal > last_ordinal or end_ordinal < 0 then
+         _M._internal_error(
+            "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+             must be in range 0-%d",
+             inspect(end_ordinal_arg, {depth=1}),
+             last_ordinal
+         )
     end
     local lines = {}
-    for rule_id, position, origins in item_iter() do
-        if position == -1 then
-            position = g1g:rule_length(rule_id)
+    for current_ordinal = start_ordinal, end_ordinal do
+        local items = slr:g1_progress(current_ordinal)
+        table.sort(items, function(i, j)
+                if i[1] < j[1] then return true end
+                if i[1] > j[1] then return false end
+                if i[2] < j[2] then return true end
+                if i[2] > j[2] then return false end
+                if i[3] < j[3] then return true end
+                return false
+            end)
+        local function item_iter()
+            return coroutine.wrap(function ()
+                if #items < 1 then return end
+                local this_item = items[1]
+                local work_rule_id = this_item[1]
+                local work_position = this_item[2]
+                local origins = { this_item[3] }
+                for ix = 2, #items do
+                    local this_item = items[ix]
+                    local this_rule_id = this_item[1]
+                    local this_position = this_item[2]
+                    local this_origin = this_item[3]
+                    if this_rule_id == work_rule_id
+                       and this_position == work_position
+                    then
+                        origins[#origins+1] = this_origin
+                    else
+                        coroutine.yield(work_rule_id, work_position, origins)
+                        work_rule_id = this_rule_id
+                        work_position = this_position
+                        origins = { this_origin }
+                    end
+                end
+                coroutine.yield(work_rule_id, work_position, origins)
+            end)
         end
-        -- io.stderr:write('origins: ', inspect(origins, {depth=3}), "\n")
-        lines[#lines+1] = {slr:_progress_line_do(
-            current_ordinal, origins, rule_id, position
-        )}
-        -- io.stderr:write('do result: ', inspect(lines[#lines], {depth=3}), "\n")
+        for rule_id, position, origins in item_iter() do
+            if position == -1 then
+                position = g1g:rule_length(rule_id)
+            end
+            -- io.stderr:write('origins: ', inspect(origins, {depth=3}), "\n")
+            lines[#lines+1] = {slr:_progress_line_do(
+                current_ordinal, origins, rule_id, position
+            )}
+            -- io.stderr:write('do result: ', inspect(lines[#lines], {depth=3}), "\n")
+        end
+        -- io.stderr:write(inspect(lines, {depth=3}), "\n")
+        table.sort(lines, function(i, j)
+            -- io.stderr:write('i: ', inspect(i, {depth=3}), "\n")
+            -- io.stderr:write('j: ', inspect(j, {depth=3}), "\n")
+        return _M.cmp_seq(i[2], j[2]) end)
     end
-    -- io.stderr:write(inspect(lines, {depth=3}), "\n")
-    table.sort(lines, function(i, j)
-        -- io.stderr:write('i: ', inspect(i, {depth=3}), "\n")
-        -- io.stderr:write('j: ', inspect(j, {depth=3}), "\n")
-    return _M.cmp_seq(i[2], j[2]) end)
     for ix = 1, #lines do
         lines[ix] = lines[ix][1]
     end
@@ -696,9 +683,6 @@ sub Marpa::R3::Scanless::R::g1_progress_show {
     return table.concat(lines, "\n")
 END_OF_LUA
 
-        $text .= $piece;
-
-    } ## end for my $current_ordinal ( $start_ordinal .. $end_ordinal)
     return $text;
 }
 
