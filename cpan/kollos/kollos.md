@@ -3680,6 +3680,87 @@ or nil if there was none.
 
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_progress_show(slr, start_ordinal_arg, end_ordinal_arg)
+        local slg = slr.slg
+        local g1g = slg.g1
+        local g1r = slr.g1
+        local last_ordinal = g1r:latest_earley_set()
+        local start_ordinal = math.tointeger(start_ordinal_arg) or last_ordinal
+        if start_ordinal < 0 then start_ordinal = last_ordinal + 1 + start_ordinal end
+        if start_ordinal > last_ordinal or start_ordinal < 0 then
+             _M._internal_error(
+                "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+                 must be in range 0-%d",
+                 inspect(start_ordinal_arg, {depth=1}),
+                 last_ordinal
+             )
+        end
+        local end_ordinal = math.tointeger(end_ordinal_arg) or start_ordinal
+        if end_ordinal < 0 then end_ordinal = last_ordinal + 1 + end_ordinal end
+        if end_ordinal > last_ordinal or end_ordinal < 0 then
+             _M._internal_error(
+                "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+                 must be in range 0-%d",
+                 inspect(end_ordinal_arg, {depth=1}),
+                 last_ordinal
+             )
+        end
+        local items = {}
+        for current_ordinal = start_ordinal, end_ordinal do
+            local current_items = slr:g1_progress(current_ordinal)
+            for ix = 1, #current_items do
+                local rule_id, position, origin = table.unpack(current_items[ix])
+                if position == -1 then
+                    position = g1g:rule_length(rule_id)
+                end
+                items[#items+1] = { current_ordinal, rule_id, position, origin }
+            end
+        end
+        table.sort(items, _M.cmp_seq)
+        local function item_iter()
+            return coroutine.wrap(function ()
+                if #items < 1 then return end
+                local this_item = items[1]
+                local work_ordinal = this_item[1]
+                local work_rule_id = this_item[2]
+                local work_position = this_item[3]
+                local origins = { this_item[4] }
+                for ix = 2, #items do
+                    local this_item = items[ix]
+                    local this_ordinal = this_item[1]
+                    local this_rule_id = this_item[2]
+                    local this_position = this_item[3]
+                    local this_origin = this_item[4]
+                    if work_ordinal == this_ordinal
+                       and this_rule_id == work_rule_id
+                       and this_position == work_position
+                    then
+                        origins[#origins+1] = this_origin
+                    else
+                        coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
+                        work_ordinal = this_ordinal
+                        work_rule_id = this_rule_id
+                        work_position = this_position
+                        origins = { this_origin }
+                    end
+                end
+                coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
+            end)
+        end
+        local lines = {}
+        for current_ordinal, rule_id, position, origins in item_iter() do
+            lines[#lines+1] = slr:_progress_line_do(
+                current_ordinal, origins, rule_id, position
+            )
+        end
+        -- io.stderr:write(inspect(lines, {depth=3}), "\n")
+        lines[#lines+1] = '' -- to get a final "\n"
+        return table.concat(lines, "\n")
+    end
+```
+
 ### SLR diagnostics
 
 TODO -- after development, this should be a local function.
@@ -3813,7 +3894,7 @@ part of a "Pure Lua" implementation.
         end
         ::HAVE_RANGE::
         pcs[#pcs+1] = slg:g1_dotted_rule_show(rule_id, position)
-        return table.concat(pcs, ' '), { current_ordinal, rule_id, position } ;
+        return table.concat(pcs, ' ')
     end
 ```
 
