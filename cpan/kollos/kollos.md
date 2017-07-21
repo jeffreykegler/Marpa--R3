@@ -3680,8 +3680,41 @@ or nil if there was none.
 
 ```
 
+TODO: Make `collected_progress_items a local, after development.
+
 ```
     -- miranda: section+ most Lua function definitions
+        function _M.collected_progress_items(items)
+            table.sort(items, _M.cmp_seq)
+            return coroutine.wrap(function ()
+                if #items < 1 then return end
+                local this_item = items[1]
+                local work_ordinal = this_item[1]
+                local work_rule_id = this_item[2]
+                local work_position = this_item[3]
+                local origins = { this_item[4] }
+                for ix = 2, #items do
+                    local this_item = items[ix]
+                    local this_ordinal = this_item[1]
+                    local this_rule_id = this_item[2]
+                    local this_position = this_item[3]
+                    local this_origin = this_item[4]
+                    if work_ordinal == this_ordinal
+                       and this_rule_id == work_rule_id
+                       and this_position == work_position
+                    then
+                        origins[#origins+1] = this_origin
+                    else
+                        coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
+                        work_ordinal = this_ordinal
+                        work_rule_id = this_rule_id
+                        work_position = this_position
+                        origins = { this_origin }
+                    end
+                end
+                coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
+            end)
+        end
     function _M.class_slr.g1_progress_show(slr, start_ordinal_arg, end_ordinal_arg)
         local slg = slr.slg
         local g1g = slg.g1
@@ -3718,39 +3751,8 @@ or nil if there was none.
                 items[#items+1] = { current_ordinal, rule_id, position, origin }
             end
         end
-        table.sort(items, _M.cmp_seq)
-        local function item_iter()
-            return coroutine.wrap(function ()
-                if #items < 1 then return end
-                local this_item = items[1]
-                local work_ordinal = this_item[1]
-                local work_rule_id = this_item[2]
-                local work_position = this_item[3]
-                local origins = { this_item[4] }
-                for ix = 2, #items do
-                    local this_item = items[ix]
-                    local this_ordinal = this_item[1]
-                    local this_rule_id = this_item[2]
-                    local this_position = this_item[3]
-                    local this_origin = this_item[4]
-                    if work_ordinal == this_ordinal
-                       and this_rule_id == work_rule_id
-                       and this_position == work_position
-                    then
-                        origins[#origins+1] = this_origin
-                    else
-                        coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
-                        work_ordinal = this_ordinal
-                        work_rule_id = this_rule_id
-                        work_position = this_position
-                        origins = { this_origin }
-                    end
-                end
-                coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
-            end)
-        end
         local lines = {}
-        for current_ordinal, rule_id, position, origins in item_iter() do
+        for current_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
             lines[#lines+1] = slr:_progress_line_do(
                 current_ordinal, origins, rule_id, position
             )
