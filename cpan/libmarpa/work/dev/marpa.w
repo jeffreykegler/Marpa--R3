@@ -9761,13 +9761,13 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
       marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
                      struct marpa_progress_item, 1);
 
-    MARPA_DEBUG2("%s, === Adding report item ===", STRLOC);
-    MARPA_DEBUG3("%s, report irl = %d", STRLOC, IRLID_of_AHM(report_ahm));
-    MARPA_DEBUG3("%s, report irl position = %d", STRLOC, Position_of_AHM(report_ahm));
+    MARPA_OFF_DEBUG2("%s, === Adding report item ===", STRLOC);
+    MARPA_OFF_DEBUG3("%s, report irl = %d", STRLOC, IRLID_of_AHM(report_ahm));
+    MARPA_OFF_DEBUG3("%s, report irl position = %d", STRLOC, Position_of_AHM(report_ahm));
 
-    MARPA_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
-    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
-    MARPA_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
+    MARPA_OFF_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
+    MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
+    MARPA_OFF_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
 
     Position_of_PROGRESS (new_report_item) = xrl_position;
     Origin_of_PROGRESS (new_report_item) = origin_of_xrl;
@@ -16208,9 +16208,6 @@ struct s_marpa_yim_look {
     Marpa_Earley_Set_ID t_yim_look_origin_id;
     Marpa_IRL_ID t_yim_look_irl_id;
     int t_yim_look_irl_dot;
-    SRCL t_yim_look_leo_src;
-    SRCL t_yim_look_token_src;
-    SRCL t_yim_look_completion_src;
 };
 typedef struct s_marpa_yim_look Marpa_Earley_Item_Look;
 
@@ -16250,9 +16247,6 @@ PRIVATE int look_yim(Marpa_Earley_Item_Look* look,
   marpa_eim_look_origin(look) = Origin_Ord_of_YIM(earley_item);
   marpa_eim_look_irl_id(look) = IRLID_of_AHM(ahm);
   marpa_eim_look_irl_dot(look) = Position_of_AHM(ahm);
-  look->t_yim_look_leo_src = First_Leo_SRCL_of_YIM(item);
-  look->t_yim_look_token_src = First_Token_SRCL_of_YIM(item);
-  look->t_yim_look_completion_src = First_Completion_SRCL_of_YIM(item);
   return raw_xrl_position;
 }
 

@@ -7517,7 +7517,6 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
         marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
-        if (0) fprintf (stderr, "%s %s %d tos=%s\n", __PRETTY_FUNCTION__, __FILE__, __LINE__, marpa_luaL_typename(L, -1));
         marpa_lua_getfield (L, -1, "_libmarpa");
         g = *(Marpa_Grammar *) marpa_lua_touserdata (L, -1);
         es_id = (Marpa_Earley_Set_ID)marpa_luaL_checkinteger (L, 2);
