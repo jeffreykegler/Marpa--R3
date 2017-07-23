@@ -100,6 +100,12 @@ sub constants {
             File::Spec->updir(), qw{engine read_only steps.table}
         )
     );
+    $constants .= sprintf(
+        "MARPA_H = %s\n",
+        File::Spec->catfile(
+            File::Spec->updir(), qw{engine read_only marpa.h}
+        )
+    );
     $constants .= sprintf( "MY_CCFLAGS = %s\n", $my_ccflags);
 
     return $constants;
@@ -138,7 +144,7 @@ step_table.md: gen_step_table.lua
 	$(LUA_INTERP) gen_step_table.lua $(STEP_TABLE) > $@
 
 kollos.c: kollos.md error_table.md event_table.md step_table.md \
-	  kollos.h
+	  kollos.h $(MARPA_H)
 	$(LUA_INTERP) miranda error_table.md event_table.md step_table.md \
 	  kollos.md kollos_c=kollos.c
 

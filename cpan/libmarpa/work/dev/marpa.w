@@ -16210,15 +16210,15 @@ struct marpa_yim_look_s {
     Marpa_Earley_Set_ID t_yim_look_origin_id;
     Marpa_IRL_ID t_yim_look_irl_id;
     int t_yim_look_irl_dot;
-    MARPA_SRCL t_yim_leo_srcl;
+    MARPA_SRCL t_yim_look_leo_srcl;
 
-    MARPA_SRCL t_yim_token_srcl;
-    Marpa_Earley_Set_ID t_yim_token_predecessor_ysid;
-    Marpa_Earley_Item_ID t_yim_token_predecessor_yimid;
-    Marpa_NSY_ID t_yim_token_nsyid;
-    int t_yim_token_value;
+    MARPA_SRCL t_yim_look_token_srcl;
+    Marpa_Earley_Set_ID t_yim_look_token_predecessor_ysid;
+    Marpa_Earley_Item_ID t_yim_look_token_predecessor_yimid;
+    Marpa_NSY_ID t_yim_look_token_nsyid;
+    int t_yim_look_token_value;
 
-    MARPA_SRCL t_yim_completion_srcl;
+    MARPA_SRCL t_yim_look_completion_srcl;
 };
 typedef struct marpa_yim_look_s Marpa_Earley_Item_Look;
 
@@ -16229,6 +16229,14 @@ typedef struct marpa_yim_look_s Marpa_Earley_Item_Look;
 #define marpa_eim_look_origin(l) ((l)->t_yim_look_origin_id)
 #define marpa_eim_look_irl_id(l) ((l)->t_yim_look_irl_id)
 #define marpa_eim_look_irl_dot(l) ((l)->t_yim_look_irl_dot)
+#define marpa_eim_look_token_predecessor_esid(l) \
+  ((l)->t_yim_look_token_predecessor_ysid)
+#define marpa_eim_look_token_predecessor_eimid(l) \
+  ((l)->t_yim_look_token_predecessor_yimid)
+#define marpa_eim_look_token_nsyid(l) \
+  ((l)->t_yim_look_token_nsyid)
+#define marpa_eim_look_token_value(l) \
+  ((l)->t_yim_look_token_value)
 
 @ The YIM looker returns data specific to a YIM.
 It is also necessary before the use of any
@@ -16258,6 +16266,17 @@ PRIVATE int look_yim(Marpa_Earley_Item_Look* look,
   marpa_eim_look_origin(look) = Origin_Ord_of_YIM(earley_item);
   marpa_eim_look_irl_id(look) = IRLID_of_AHM(ahm);
   marpa_eim_look_irl_dot(look) = Position_of_AHM(ahm);
+
+  look->t_yim_look_leo_srcl = 0;
+  marpa_eim_look_token_predecessor_esid(look) = -1;
+  marpa_eim_look_token_predecessor_eimid(look) = -1;
+  marpa_eim_look_token_nsyid(look) = -1;
+  marpa_eim_look_token_value(look) = -1;
+
+  look->t_yim_look_token_srcl = 0;
+
+  look->t_yim_look_completion_srcl = 0;
+
   return raw_xrl_position;
 }
 
