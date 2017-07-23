@@ -3689,16 +3689,13 @@ TODO: Make `collected_progress_items a local, after development.
             return coroutine.wrap(function ()
                 if #items < 1 then return end
                 local this_item = items[1]
-                local work_ordinal = this_item[1]
-                local work_rule_id = this_item[2]
-                local work_position = this_item[3]
-                local origins = { this_item[4] }
+                local work_ordinal, _, work_rule_id, work_position, work_origin
+                    = table.unpack(this_item)
+                local origins = { work_origin }
                 for ix = 2, #items do
                     local this_item = items[ix]
-                    local this_ordinal = this_item[1]
-                    local this_rule_id = this_item[2]
-                    local this_position = this_item[3]
-                    local this_origin = this_item[4]
+                    local this_ordinal, _, this_rule_id, this_position, this_origin
+                        = table.unpack(this_item)
                     if work_ordinal == this_ordinal
                        and this_rule_id == work_rule_id
                        and this_position == work_position
@@ -3744,11 +3741,16 @@ TODO: Make `collected_progress_items a local, after development.
         for current_ordinal = start_ordinal, end_ordinal do
             local current_items = slr:g1_progress(current_ordinal)
             for ix = 1, #current_items do
+                -- item_type is 0 for prediction, 1 for medial, 2 for completed
+                local item_type = 1
                 local rule_id, position, origin = table.unpack(current_items[ix])
-                if position == -1 then
+                if position == 0 then
+                    item_type = 0
+                elseif position == -1 then
                     position = g1g:rule_length(rule_id)
+                    item_type = 2
                 end
-                items[#items+1] = { current_ordinal, rule_id, position, origin }
+                items[#items+1] = { current_ordinal, item_type, rule_id, position, origin }
             end
         end
         local lines = {}
@@ -7510,6 +7512,8 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         Marpa_Earley_Item_ID eim_id;
         int check_result;
 
+        if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         r = *(Marpa_Recce *) marpa_lua_touserdata (L, -1);
         marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
@@ -7530,6 +7534,9 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
             return marpa_luaL_error(L, "yim_look(%d, %d): No such earley set",
                 es_id, eim_id);
         }
+
+        if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+
         (void) _marpa_r_look_yim(r, &look, es_id, eim_id);
         /* The "raw xrl dot" is a development hack to test a fix
          * to the xrl dot value.
@@ -7538,23 +7545,22 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         {
             const lua_Integer raw_xrl_dot = (lua_Integer)marpa_eim_look_dot(&look);
             lua_Integer xrl_dot = raw_xrl_dot;
-            const lua_Integer irl_dot = (lua_Integer)marpa_eim_look_irl_dot(&look);
-            const lua_Integer irl_id = marpa_eim_look_irl_id(&look);
-            if (0) fprintf (stderr, "%s %s %d; xrl dot = %ld; irl dot = %ld; irl length = %ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__,
+            const lua_Integer nrl_dot = (lua_Integer)marpa_eim_look_irl_dot(&look);
+            const lua_Integer nrl_id = marpa_eim_look_irl_id(&look);
+            const lua_Integer xrl_id = (lua_Integer)marpa_eim_look_rule_id(&look);
+            const lua_Integer origin = (lua_Integer)marpa_eim_look_origin(&look);
+            if (0) fprintf (stderr, "%s %s %d; xrl id = %ld; xrl dot = %ld;"
+                        "nrl id = %ld; nrl dot = %ld; nrl length = %ld\n", __PRETTY_FUNCTION__, __FILE__, __LINE__,
+                (long)xrl_id,
                 (long)xrl_dot,
-                (long)irl_dot,
-                (long)_marpa_g_irl_length(g, (Marpa_IRL_ID)irl_id));
-            if (irl_dot < 0) {
-                xrl_dot = -1;
-            }
-            if (irl_dot >= (lua_Integer)_marpa_g_irl_length(g, (Marpa_IRL_ID)irl_id)) {
-                xrl_dot = -1;
-            }
-            marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_rule_id(&look));
+                (long)nrl_id,
+                (long)nrl_dot,
+                (long)_marpa_g_irl_length(g, (Marpa_IRL_ID)nrl_id));
+            marpa_lua_pushinteger(L, xrl_id);
             marpa_lua_pushinteger(L, xrl_dot);
-            marpa_lua_pushinteger(L, (lua_Integer)marpa_eim_look_origin(&look));
-            marpa_lua_pushinteger(L, irl_id);
-            marpa_lua_pushinteger(L, irl_dot);
+            marpa_lua_pushinteger(L, origin);
+            marpa_lua_pushinteger(L, nrl_id);
+            marpa_lua_pushinteger(L, nrl_dot);
         }
         return 5;
     }
@@ -7598,7 +7604,7 @@ is returned.
             return 1;
         }
         if (check_result == -1) {
-            return marpa_luaL_error (L, "yim_look(%d, %d): No such earley set",
+            return marpa_luaL_error (L, "postdot_eims(%d, %d): No such earley set",
                 es_id, 0);
         }
         marpa_lua_newtable (L);

@@ -59,16 +59,18 @@ R1 [:start:] ::= S
 R2 S ::= A A A A A A A
 R3 A ::=
 R4 A ::= 'a'
-R5 'a' ~ [a]
+R5 [:lex_start:] ~ 'a'
+R6 'a' ~ [a]
 EOS
 
 Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
 S1 A
 S2 S
-S3 [:start:]
-S4 'a'
-S5 [a]
+S3 [:lex_start:]
+S4 [:start:]
+S5 'a'
+S6 [a]
 EOS
 
 Marpa::R3::Test::is( $grammar->nrls_show(),
@@ -119,6 +121,13 @@ sub earley_set_display {
       local function origin_gen(es_id, eim_id)
           local irl_id, irl_dot, this_origin, nrl_id, nrl_dot
               = g1r:earley_item_look(es_id, eim_id)
+
+          if irl_dot == 0 or nrl_dot == 0 then
+              io.stderr:write(table.concat(
+                  { '!!!', irl_id, irl_dot, this_origin, nrl_id, nrl_dot }, ' ')
+                  .. "\n")
+          end
+
           if irl_id < 0 then return end
           if g1g:_nrl_is_virtual_lhs(nrl_id) == 0 then
               coroutine.yield( this_origin )
