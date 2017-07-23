@@ -7270,15 +7270,17 @@ struct s_source {
      /* A type field could go here */
 };
 
+@ @<Public typedefs@> =
+struct marpa_source_link_s;
+typedef struct marpa_source_link_s* MARPA_SRCL;
 @ @<Private typedefs@> =
-struct s_source_link;
-typedef struct s_source_link* SRCL;
+typedef struct marpa_source_link_s* SRCL;
 @ @<Source object structure@>=
-struct s_source_link {
+struct marpa_source_link_s {
     SRCL t_next;
     struct s_source t_source;
 };
-typedef struct s_source_link SRCL_Object;
+typedef struct marpa_source_link_s SRCL_Object;
 
 @ @<Source object structure@>=
 struct s_ambiguous_source {
@@ -7290,7 +7292,7 @@ struct s_ambiguous_source {
 @ @<Source object structure@>=
 union u_source_container {
     struct s_ambiguous_source t_ambiguous;
-    struct s_source_link t_unique;
+    struct marpa_source_link_s t_unique;
 };
 
 @
@@ -16202,14 +16204,23 @@ This is because the lookers mutators
 reuse data fields.
 
 @<Public structures@> =
-struct s_marpa_yim_look {
+struct marpa_yim_look_s {
     Marpa_Rule_ID t_yim_look_rule_id;
     int t_yim_look_dot;
     Marpa_Earley_Set_ID t_yim_look_origin_id;
     Marpa_IRL_ID t_yim_look_irl_id;
     int t_yim_look_irl_dot;
+    MARPA_SRCL t_yim_leo_srcl;
+
+    MARPA_SRCL t_yim_token_srcl;
+    Marpa_Earley_Set_ID t_yim_token_predecessor_ysid;
+    Marpa_Earley_Item_ID t_yim_token_predecessor_yimid;
+    Marpa_NSY_ID t_yim_token_nsyid;
+    int t_yim_token_value;
+
+    MARPA_SRCL t_yim_completion_srcl;
 };
-typedef struct s_marpa_yim_look Marpa_Earley_Item_Look;
+typedef struct marpa_yim_look_s Marpa_Earley_Item_Look;
 
 @ These accessors are valid for |marpa_r_look_yim|.
 @<Public defines@> =
@@ -16323,11 +16334,11 @@ Eventually there will be a lot of fields for LIM data.
 |t_pim_eim_id| is $-1$ if PIM is a LIM,
 otherwise it is the ordinal of the EIM.
 @<Public structures@> =
-struct s_marpa_pim_look {
+struct marpa_pim_look_s {
     _Marpa_PIM t_pim_look_current;
     Marpa_Earley_Item_ID t_pim_look_eim_id;
 };
-typedef struct s_marpa_pim_look Marpa_Postdot_Item_Look;
+typedef struct marpa_pim_look_s Marpa_Postdot_Item_Look;
 
 @ These accessors are valid for |marpa_r_look_pim_eim_first|
 and |marpa_r_look_pim_eim_next|.
