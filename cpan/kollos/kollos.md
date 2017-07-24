@@ -1712,8 +1712,7 @@ together.
         setmetatable(slr, _M.class_slr)
         slr.phase = 'initial'
         slr.slg = slg
-        local registry = debug.getregistry()
-        slr.regix = _M.register(registry, slr)
+        slr.regix = _M.register(_M.registry, slr)
 
         local l0g = slg.l0
         slr.l0 = {}

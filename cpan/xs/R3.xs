@@ -1407,7 +1407,9 @@ PPCODE:
     msghandler_ix = marpa_lua_gettop(L);
 
     if (lua_ref > 0) {
-        marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, lua_ref);
+        marpa_lua_getglobal (L, "kollos");
+        marpa_lua_getfield (L, -1, "registry");
+        marpa_lua_rawgeti (L, -1, lua_ref);
         /* Lua stack: [ recce_table ] */
         object_stack_ix = marpa_lua_gettop (L);
     }

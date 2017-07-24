@@ -45,9 +45,8 @@ sub pre_construct {
         ('@' .__FILE__ . ':' .  __LINE__),
        <<'END_OF_LUA', '');
         local slg = {}
-        local registry = debug.getregistry()
         setmetatable(slg, _M.class_slg)
-        local regix = _M.register(registry, slg)
+        local regix = _M.register(_M.registry, slg)
 
         slg.exhaustion_action = 'fatal'
         slg.rejection_action = 'fatal'
@@ -123,8 +122,7 @@ sub Marpa::R3::Scanless::G::DESTROY {
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $regix);
     local grammar, regix = ...
-    local registry = debug.getregistry()
-    _M.unregister(registry, regix)
+    _M.unregister(_M.registry, regix)
 END_OF_LUA
 }
 
