@@ -1403,6 +1403,8 @@ PPCODE:
     /* warn("%s %d is_method=%ld lua_ref=%ld", __FILE__, __LINE__,
        (long)is_method, (long)lua_ref); */
 
+    marpa_luaL_checkstack(L, 30, "xlua EXEC_SIG_BODY");
+
     marpa_lua_pushcfunction(L, glue_msghandler);
     msghandler_ix = marpa_lua_gettop(L);
 

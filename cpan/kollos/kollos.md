@@ -455,15 +455,6 @@ perhaps because it is buggy.
 
 ```
     -- miranda: section+ kollos table methods
-    static int lca_registry_get(lua_State* L)
-    {
-      /* Lua stack [ recce_ref ] */
-      lua_Integer recce_ref = marpa_luaL_checkinteger(L, 1);
-      marpa_lua_rawgeti (L, LUA_REGISTRYINDEX, recce_ref);
-      /* Lua stack [ recce_ref, recce_table ] */
-      return 1;
-    }
-
     static int
     lca_register(lua_State* L)
     {
@@ -487,7 +478,6 @@ perhaps because it is buggy.
       { "memcmp", lca_memcmp },
       { "from_vlq", lca_from_vlq },
       { "to_vlq", lca_to_vlq },
-      { "registry_get", lca_registry_get },
       { "register", lca_register },
       { "unregister", lca_unregister },
       { NULL, NULL },
