@@ -2250,6 +2250,8 @@ rule, false otherwise.
         local es_id = l0r:latest_earley_set()
         -- Do we have a completion of a lexeme rule?
         for eim_id = 0, math.maxinteger do
+            -- TODO create more efficient, special purpose method
+            --   to replace earley_item_look?
             local rule_id, dot = l0r:earley_item_look(es_id, eim_id)
             if not rule_id then goto LAST_EIM end
             -- ignore rules with no XRL
@@ -6528,6 +6530,9 @@ a special "configuration" argument.
     -- miranda: insert luacheck declarations
 
     local _M = require "kollos.metal"
+    _M.upvalues.kollos = _M
+    _M.defines = {}
+    _M.registry = {}
 
     -- miranda: insert forward declarations
     -- miranda: insert internal utilities
@@ -6540,8 +6545,6 @@ a special "configuration" argument.
     -- set up various tables
 
     -- miranda: insert constant Lua tables
-    _M.upvalues.kollos = _M
-    _M.defines = {}
 
     -- miranda: insert create sandbox table
 
@@ -8020,9 +8023,6 @@ Marpa::R3.
 
         /* Create the shared upvalue table */
         {
-            /* TODO increase initial buffer capacity
-             * after testing.
-             */
             const size_t initial_buffer_capacity = 1;
             marpa_lua_newtable (L);
             upvalue_stack_ix = marpa_lua_gettop (L);

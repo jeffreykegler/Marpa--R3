@@ -8,6 +8,11 @@ version:=$(shell cat libmarpa/LIB_VERSION)
 dummy:
 	echo No default target
 
+# To allow all debugging, you need to
+#   1.) Run this 'debug' target to set up the Makefile
+#   2.) Run the 'meta' target to recompile Libmarpa
+#   3.) Set MARPA_AUTHOR_TEST=1 in the environment
+#   3.) Set MARPA_DEBUG=1 in the environment ??
 debug:
 	make clean
 	MARPA_DEBUG_FLAG="-DMARPA_DEBUG=1" perl Makefile.PL OPTIMIZE=-g

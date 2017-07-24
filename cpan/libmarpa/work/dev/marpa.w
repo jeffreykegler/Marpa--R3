@@ -16183,6 +16183,12 @@ production-quality way of examining the Earley tables.
 For the recognizer data, in Kollos,
 they will replace the ``trace'' functions.
 
+Unlike the ``trace'' functions,
+lookers are not safe at the Libmarpa level --
+looker objects hold pointers into the recognizer,
+but do not hold a reference to it.
+They assume that this is being done in Lua code.
+
 Lookers are internal.
 Many Libmarpa internal calls currently do
 some checking of arguments.
