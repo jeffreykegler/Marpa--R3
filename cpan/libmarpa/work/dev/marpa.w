@@ -10348,51 +10348,6 @@ typedef union u_or_node OR_Object;
 static const int dummy_or_node_type = DUMMY_OR_NODE;
 static const OR dummy_or_node = (OR)&dummy_or_node_type;
 
-@ @d ORs_of_B(b) ((b)->t_or_nodes)
-@d OR_of_B_by_ID(b, id) (ORs_of_B(b)[(id)])
-@d OR_Count_of_B(b) ((b)->t_or_node_count)
-@d OR_Capacity_of_B(b) ((b)->t_or_node_capacity)
-@d ANDs_of_B(b) ((b)->t_and_nodes)
-@d AND_Count_of_B(b) ((b)->t_and_node_count)
-@d Top_ORID_of_B(b) ((b)->t_top_or_node_id)
-@<Widely aligned bocage elements@> =
-OR* t_or_nodes;
-AND t_and_nodes;
-@ @<Int aligned bocage elements@> =
-int t_or_node_capacity;
-int t_or_node_count;
-int t_and_node_count;
-ORID t_top_or_node_id;
-
-@ @<Initialize bocage elements@> =
-ORs_of_B(b) = NULL;
-OR_Count_of_B(b) = 0;
-ANDs_of_B(b) = NULL;
-AND_Count_of_B(b) = 0;
-Top_ORID_of_B(b) = -1;
-
-@ @<Destroy bocage elements, main phase@> =
-{
-  OR* or_nodes = ORs_of_B (b);
-  AND and_nodes = ANDs_of_B (b);
-
-  grammar_unref (G_of_B(b));
-  my_free (or_nodes);
-  ORs_of_B (b) = NULL;
-  my_free (and_nodes);
-  ANDs_of_B (b) = NULL;
-}
-
-@ @d G_of_B(b) ((b)->t_grammar)
-@<Widely aligned bocage elements@> =
-    GRAMMAR t_grammar;
-
-@ @<Initialize bocage elements@> =
-{
-    G_of_B(b) = G_of_R(r);
-    grammar_ref(g);
-}
-
 @*0 Create the or-nodes.
 @<Create the or-nodes for all earley sets@> =
 {
@@ -11146,6 +11101,51 @@ struct marpa_bocage {
     @<Int aligned bocage elements@>@;
     @<Bit aligned bocage elements@>@;
 };
+
+@ @d ORs_of_B(b) ((b)->t_or_nodes)
+@d OR_of_B_by_ID(b, id) (ORs_of_B(b)[(id)])
+@d OR_Count_of_B(b) ((b)->t_or_node_count)
+@d OR_Capacity_of_B(b) ((b)->t_or_node_capacity)
+@d ANDs_of_B(b) ((b)->t_and_nodes)
+@d AND_Count_of_B(b) ((b)->t_and_node_count)
+@d Top_ORID_of_B(b) ((b)->t_top_or_node_id)
+@<Widely aligned bocage elements@> =
+OR* t_or_nodes;
+AND t_and_nodes;
+@ @<Int aligned bocage elements@> =
+int t_or_node_capacity;
+int t_or_node_count;
+int t_and_node_count;
+ORID t_top_or_node_id;
+
+@ @<Initialize bocage elements@> =
+ORs_of_B(b) = NULL;
+OR_Count_of_B(b) = 0;
+ANDs_of_B(b) = NULL;
+AND_Count_of_B(b) = 0;
+Top_ORID_of_B(b) = -1;
+
+@ @<Destroy bocage elements, main phase@> =
+{
+  OR* or_nodes = ORs_of_B (b);
+  AND and_nodes = ANDs_of_B (b);
+
+  grammar_unref (G_of_B(b));
+  my_free (or_nodes);
+  ORs_of_B (b) = NULL;
+  my_free (and_nodes);
+  ANDs_of_B (b) = NULL;
+}
+
+@ @d G_of_B(b) ((b)->t_grammar)
+@<Widely aligned bocage elements@> =
+    GRAMMAR t_grammar;
+
+@ @<Initialize bocage elements@> =
+{
+    G_of_B(b) = G_of_R(r);
+    grammar_ref(g);
+}
 
 @*0 The base objects of the bocage.
 

@@ -252,12 +252,12 @@ typedef Marpa_Recognizer Marpa_Recce;
 #line 7159 "./marpa.w"
 
 union _Marpa_PIM_Object;
-/*:667*//*936:*/
-#line 11138 "./marpa.w"
+/*:667*//*930:*/
+#line 11093 "./marpa.w"
 
 struct marpa_bocage;
 typedef struct marpa_bocage*Marpa_Bocage;
-/*:936*//*972:*/
+/*:930*//*972:*/
 #line 11460 "./marpa.w"
 
 struct marpa_order;
@@ -339,11 +339,11 @@ typedef struct marpa_source_link_s*MARPA_SRCL;
 #line 10265 "./marpa.w"
 
 typedef int Marpa_Or_Node_ID;
-/*:875*//*929:*/
-#line 11073 "./marpa.w"
+/*:875*//*923:*/
+#line 11028 "./marpa.w"
 
 typedef int Marpa_And_Node_ID;
-/*:929*//*1044:*/
+/*:923*//*1044:*/
 #line 12443 "./marpa.w"
 
 typedef int Marpa_Nook_ID;
