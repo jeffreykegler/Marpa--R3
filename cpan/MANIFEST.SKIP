@@ -14,6 +14,7 @@
 ^grep[.]pl$
 ^look1[.]t$
 ^look2[.]t$
+^progress1[.]t$
 
 # Permanent
 
@@ -22,6 +23,7 @@
 /errs$
 /junk$
 /junk2$
+^test[.]out$
 [.]DS_Store$
 [.]a$
 [.]gitignore$

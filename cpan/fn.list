@@ -1,3 +1,0 @@
-sub Marpa::R3::Scanless::G::symbol_is_accessible {
-sub Marpa::R3::Scanless::G::symbol_is_nulling {
-sub Marpa::R3::Scanless::G::symbol_is_productive {

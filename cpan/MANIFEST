@@ -297,6 +297,7 @@ t/pascal.t
 t/prefix.t
 t/g1_progress1.t
 t/g1_progress2.t
+t/g1_progress3.t
 t/rabend.t
 t/randal.t
 t/rank.t

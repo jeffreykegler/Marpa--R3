@@ -5,6 +5,7 @@
 dovg.log
 [.]DS_Store
 errs
+test[.]out
 .gdb_history
 /hide/
 junk
