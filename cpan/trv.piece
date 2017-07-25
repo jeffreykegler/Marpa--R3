@@ -1,0 +1,183 @@
+@** Parse traverser code (TRV).
+@ Pre-initialization is making the elements safe for the deallocation logic
+to be called.  Often it is setting the value to zero, so that the deallocation
+logic knows when {\bf not} to try deallocating a not-yet uninitialized value.
+@s Marpa_Traverser int
+@<Public incomplete structures@> =
+struct marpa_traverser;
+typedef struct marpa_traverser* Marpa_Traverser;
+@ @<Private incomplete structures@> =
+typedef struct marpa_traverser* TRAVERSER;
+@ @<Bocage structure@> =
+struct marpa_traverser {
+    @<Widely aligned traverser elements@>@;
+    @<Int aligned traverser elements@>@;
+    @<Bit aligned traverser elements@>@;
+};
+
+@ @d YS_of_TRV(b) ((b)->t_trv_ys)
+@d YIM_of_TRV(b) ((b)->t_trv_yim)
+@<Widely aligned traverser elements@> =
+YS t_trv_ys;
+YIM t_trv_yim;
+
+@ @<Initialize traverser elements@> =
+YS_of_TRV(b) = NULL;
+YIM_of_TRV(b) = NULL;
+
+@ The un-reference of the recce also
+releases the grammar.
+@<Destroy traverser elements@> =
+{
+  recce_unref (R_of_TRV(b));
+  YS_of_TRV(b) = NULL;
+  YIM_of_TRV(b) = NULL;
+}
+
+@ @d G_of_B(b) ((b)->t_grammar)
+@d R_of_B(b) ((b)->t_recce)
+@<Widely aligned traverser elements@> =
+    GRAMMAR t_grammar;
+    RECCE t_recce;
+
+@ The reference to the recce also
+holds the grammar.
+@<Initialize traverser elements@> =
+{
+    R_of_B(b) = r;
+    recce_ref(g);
+    G_of_B(b) = G_of_R(r);
+}
+
+@ @<Set |end_of_parse_earley_set| and |end_of_parse_earleme|@> =
+
+@*0 Bocage construction.
+@<Function definitions@> =
+Marpa_Bocage marpa_b_new(Marpa_Recognizer r,
+    Marpa_Earley_Set_ID es_arg,
+    Marpa_Earley_Item_ID eim_arg
+    )
+{
+    @<Return |NULL| on failure@>@;
+    const GRAMMAR g = G_of_R(r);
+    YS end_of_parse_earley_set;
+
+    @<Fail if fatal error@>@;
+    if (_MARPA_UNLIKELY( es_arg <= -2 ))
+    {
+        MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+        return failure_indicator;
+    }
+
+    @<Fail if recognizer not started@>@;
+
+    {
+      if (es_arg == -1)
+	{
+	  end_of_parse_earley_set = YS_at_Current_Earleme_of_R (r);
+	}
+      else
+	{                           /* |ordinal_arg| != -1 */
+	  if (!ES_Ord_is_Valid (r, es_arg))
+	    {
+	      MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	      return failure_indicator;
+	    }
+	  TODO !!! set earley set
+	  end_of_parse_earley_set = YS_of_R_by_Ord (r, es_arg);
+	}
+
+      if (!end_of_parse_earley_set)
+	goto NO_PARSE;
+    }
+
+    TODO check YIM argument !!!
+
+    b = my_malloc(sizeof(*b));
+    @<Initialize traverser elements@>@;
+
+    if (G_is_Trivial(g)) {
+        TRV_is_Trivial(b) = 1;
+        return trv;
+    }
+    r_update_earley_sets(r);
+    if (end_of_parse_earleme == 0)
+    return b;
+    NO_PARSE: ;
+          MARPA_ERROR(MARPA_ERR_NO_PARSE);
+    if (b) {
+        @<Destroy bocage elements@>;
+    }
+    return NULL;
+}
+
+@*0 Reference counting and destructors.
+@ @<Int aligned traverser elements@>= int t_ref_count;
+@ @<Initialize traverser elements@> =
+trv->t_ref_count = 1;
+@ Decrement the traverser reference count.
+@<Function definitions@> =
+PRIVATE void
+traverser_unref (BOCAGE b)
+{
+  MARPA_ASSERT (trv->t_ref_count > 0)
+  trv->t_ref_count--;
+  if (trv->t_ref_count <= 0)
+    {
+      traverser_free(trv);
+    }
+}
+void
+marpa_trv_unref (Marpa_Traverser trv)
+{
+   traverser_unref(trv);
+}
+
+@ Increment the bocage reference count.
+@<Function definitions@> =
+PRIVATE BOCAGE
+bocage_ref (BOCAGE b)
+{
+  MARPA_ASSERT(b->t_ref_count > 0)
+  b->t_ref_count++;
+  return b;
+}
+Marpa_Bocage
+marpa_b_ref (Marpa_Bocage b)
+{
+   return bocage_ref(b);
+}
+
+@*0 Bocage destruction.
+
+@ This function is safe to call even
+if the bocage already has been freed,
+or was never initialized.
+@<Function definitions@> =
+PRIVATE void
+bocage_free (BOCAGE b)
+{
+  @<Unpack bocage objects@>@;
+  if (b)
+    {
+      @<Destroy bocage elements@>;
+    }
+  my_free(b);
+}
+
+@*0 Bocage is nulling?.
+Is this bocage for a nulling parse?
+@d B_is_Nulling(b) ((b)->t_is_nulling)
+@ @<Bit aligned bocage elements@> =
+BITFIELD t_is_nulling:1;
+@ @<Initialize bocage elements@> =
+B_is_Nulling(b) = 0;
+@ @<Function definitions@> =
+int marpa_b_is_null(Marpa_Bocage b)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack bocage objects@>@;
+  @<Fail if fatal error@>@;
+  return B_is_Nulling(b);
+}
+
