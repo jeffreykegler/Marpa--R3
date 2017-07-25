@@ -8,34 +8,34 @@ struct marpa_traverser;
 typedef struct marpa_traverser* Marpa_Traverser;
 @ @<Private incomplete structures@> =
 typedef struct marpa_traverser* TRAVERSER;
-@ @<Bocage structure@> =
+@ @<Traverser structure@> =
 struct marpa_traverser {
     @<Widely aligned traverser elements@>@;
     @<Int aligned traverser elements@>@;
     @<Bit aligned traverser elements@>@;
 };
 
-@ @d YS_of_TRV(b) ((b)->t_trv_ys)
-@d YIM_of_TRV(b) ((b)->t_trv_yim)
+@ @d YS_of_TRV(trv) ((trv)->t_trv_ys)
+@d YIM_of_TRV(trv) ((trv)->t_trv_yim)
 @<Widely aligned traverser elements@> =
 YS t_trv_ys;
 YIM t_trv_yim;
 
 @ @<Initialize traverser elements@> =
-YS_of_TRV(b) = NULL;
-YIM_of_TRV(b) = NULL;
+YS_of_TRV(trv) = NULL;
+YIM_of_TRV(trv) = NULL;
 
 @ The un-reference of the recce also
 releases the grammar.
 @<Destroy traverser elements@> =
 {
-  recce_unref (R_of_TRV(b));
-  YS_of_TRV(b) = NULL;
-  YIM_of_TRV(b) = NULL;
+  recce_unref (R_of_TRV(trv));
+  YS_of_TRV(trv) = NULL;
+  YIM_of_TRV(trv) = NULL;
 }
 
-@ @d G_of_B(b) ((b)->t_grammar)
-@d R_of_B(b) ((b)->t_recce)
+@ @d G_of_TRV(trv) ((trv)->t_grammar)
+@d R_of_TRV(trv) ((trv)->t_recce)
 @<Widely aligned traverser elements@> =
     GRAMMAR t_grammar;
     RECCE t_recce;
@@ -44,23 +44,23 @@ releases the grammar.
 holds the grammar.
 @<Initialize traverser elements@> =
 {
-    R_of_B(b) = r;
+    R_of_TRV(trv) = r;
     recce_ref(g);
-    G_of_B(b) = G_of_R(r);
+    G_of_TRV(trv) = G_of_R(r);
 }
 
 @ @<Set |end_of_parse_earley_set| and |end_of_parse_earleme|@> =
 
-@*0 Bocage construction.
+@*0 Traverser construction.
 @<Function definitions@> =
-Marpa_Bocage marpa_b_new(Marpa_Recognizer r,
+Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
     Marpa_Earley_Set_ID es_arg,
     Marpa_Earley_Item_ID eim_arg
     )
 {
     @<Return |NULL| on failure@>@;
     const GRAMMAR g = G_of_R(r);
-    YS end_of_parse_earley_set;
+    YS end_of_es;
 
     @<Fail if fatal error@>@;
     if (_MARPA_UNLIKELY( es_arg <= -2 ))
@@ -71,10 +71,21 @@ Marpa_Bocage marpa_b_new(Marpa_Recognizer r,
 
     @<Fail if recognizer not started@>@;
 
+    if (G_is_Trivial(g)) {
+        switch (es_arg) {
+          default: goto NO_PARSE;
+          case 0: case -1: break;
+        }
+        TRV_is_Nulling(trv) = 1;
+        TRV_is_Trivial(trv) = 1;
+        return trv;
+    }
+
+    r_update_earley_sets(r);
     {
       if (es_arg == -1)
 	{
-	  end_of_parse_earley_set = YS_at_Current_Earleme_of_R (r);
+	  end_of_es = YS_at_Current_Earleme_of_R (r);
 	}
       else
 	{                           /* |ordinal_arg| != -1 */
@@ -83,30 +94,23 @@ Marpa_Bocage marpa_b_new(Marpa_Recognizer r,
 	      MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
 	      return failure_indicator;
 	    }
-	  TODO !!! set earley set
-	  end_of_parse_earley_set = YS_of_R_by_Ord (r, es_arg);
+	  end_of_es = YS_of_R_by_Ord (r, es_arg);
 	}
 
-      if (!end_of_parse_earley_set)
+      if (!end_of_es)
 	goto NO_PARSE;
     }
 
     TODO check YIM argument !!!
 
-    b = my_malloc(sizeof(*b));
+    trv = my_malloc(sizeof(*trv));
     @<Initialize traverser elements@>@;
 
-    if (G_is_Trivial(g)) {
-        TRV_is_Trivial(b) = 1;
-        return trv;
-    }
-    r_update_earley_sets(r);
-    if (end_of_parse_earleme == 0)
-    return b;
+    return trv;
     NO_PARSE: ;
           MARPA_ERROR(MARPA_ERR_NO_PARSE);
-    if (b) {
-        @<Destroy bocage elements@>;
+    if (trv) {
+        @<Destroy traverser elements@>;
     }
     return NULL;
 }
@@ -118,7 +122,7 @@ trv->t_ref_count = 1;
 @ Decrement the traverser reference count.
 @<Function definitions@> =
 PRIVATE void
-traverser_unref (BOCAGE b)
+traverser_unref (TRAVERSER trv)
 {
   MARPA_ASSERT (trv->t_ref_count > 0)
   trv->t_ref_count--;
@@ -133,51 +137,51 @@ marpa_trv_unref (Marpa_Traverser trv)
    traverser_unref(trv);
 }
 
-@ Increment the bocage reference count.
+@ Increment the traverser reference count.
 @<Function definitions@> =
-PRIVATE BOCAGE
-bocage_ref (BOCAGE b)
+PRIVATE TRAVERSER
+traverser_ref (TRAVERSER trv)
 {
-  MARPA_ASSERT(b->t_ref_count > 0)
-  b->t_ref_count++;
-  return b;
+  MARPA_ASSERT(trv->t_ref_count > 0)
+  trv->t_ref_count++;
+  return trv;
 }
-Marpa_Bocage
-marpa_b_ref (Marpa_Bocage b)
+Marpa_Traverser
+marpa_trv_ref (Marpa_Traverser trv)
 {
-   return bocage_ref(b);
+   return traverser_ref(trv);
 }
 
-@*0 Bocage destruction.
+@*0 Traverser destruction.
 
 @ This function is safe to call even
-if the bocage already has been freed,
+if the traverser already has been freed,
 or was never initialized.
 @<Function definitions@> =
 PRIVATE void
-bocage_free (BOCAGE b)
+traverser_free (TRAVERSER trv)
 {
-  @<Unpack bocage objects@>@;
-  if (b)
+  @<Unpack traverser objects@>@;
+  if (trv)
     {
-      @<Destroy bocage elements@>;
+      @<Destroy traverser elements@>;
     }
-  my_free(b);
+  my_free(trv);
 }
 
-@*0 Bocage is nulling?.
-Is this bocage for a nulling parse?
-@d B_is_Nulling(b) ((b)->t_is_nulling)
-@ @<Bit aligned bocage elements@> =
+@*0 Traverser is nulling?.
+Is this traverser for a nulling parse?
+@d TRV_is_Nulling(trv) ((trv)->t_is_nulling)
+@ @<Bit aligned traverser elements@> =
 BITFIELD t_is_nulling:1;
-@ @<Initialize bocage elements@> =
-B_is_Nulling(b) = 0;
+@ @<Initialize traverser elements@> =
+TRV_is_Nulling(trv) = 0;
 @ @<Function definitions@> =
-int marpa_b_is_null(Marpa_Bocage b)
+int marpa_trv_is_null(Marpa_Traverser trv)
 {
   @<Return |-2| on failure@>@;
-  @<Unpack bocage objects@>@;
+  @<Unpack traverser objects@>@;
   @<Fail if fatal error@>@;
-  return B_is_Nulling(b);
+  return TRV_is_Nulling(trv);
 }
 
