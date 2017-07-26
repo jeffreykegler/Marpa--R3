@@ -22,8 +22,8 @@ YS t_trv_ys;
 YIM t_trv_yim;
 
 @ @<Initialize traverser elements@> =
-YS_of_TRV(trv) = NULL;
-YIM_of_TRV(trv) = NULL;
+YS_of_TRV(trv) = trv_ys;
+YIM_of_TRV(trv) = trv_eim;
 
 @ The un-reference of the recce also
 releases the grammar.
@@ -49,8 +49,6 @@ holds the grammar.
     G_of_TRV(trv) = G_of_R(r);
 }
 
-@ @<Set |end_of_parse_earley_set| and |end_of_parse_earleme|@> =
-
 @*0 Traverser construction.
 @<Function definitions@> =
 Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
@@ -60,7 +58,10 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 {
     @<Return |NULL| on failure@>@;
     const GRAMMAR g = G_of_R(r);
-    YS end_of_es;
+    int item_count;
+    YS trv_ys;
+    YIM trv_eim;
+    int trv_is_trivial = 0;
 
     @<Fail if fatal error@>@;
     if (_MARPA_UNLIKELY( es_arg <= -2 ))
@@ -68,51 +69,53 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
         MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
         return failure_indicator;
     }
+    if (_MARPA_UNLIKELY( eim_arg <= 0 ))
+    {
+	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+        return failure_indicator;
+    }
 
     @<Fail if recognizer not started@>@;
 
     if (G_is_Trivial(g)) {
-        switch (es_arg) {
-          default: goto NO_PARSE;
-          case 0: case -1: break;
-        }
-        TRV_is_Nulling(trv) = 1;
+        if (es_arg > 0) {
+	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	    return failure_indicator;
+	}
         TRV_is_Trivial(trv) = 1;
-        return trv;
     }
 
     r_update_earley_sets(r);
+    if (es_arg == -1)
     {
-      if (es_arg == -1)
+      trv_ys = YS_at_Current_Earleme_of_R (r);
+    }
+    else
+    {                           /* |ordinal_arg| != -1 */
+	if (!ES_Ord_is_Valid (r, es_arg))
 	{
-	  end_of_es = YS_at_Current_Earleme_of_R (r);
+	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	    return failure_indicator;
 	}
-      else
-	{                           /* |ordinal_arg| != -1 */
-	  if (!ES_Ord_is_Valid (r, es_arg))
-	    {
-	      MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
-	      return failure_indicator;
-	    }
-	  end_of_es = YS_of_R_by_Ord (r, es_arg);
-	}
+	trv_ys = YS_of_R_by_Ord (r, es_arg);
+     }
 
-      if (!end_of_es)
-	goto NO_PARSE;
+    if (!trv_ys) {
+	MARPA_ERROR (MARPA_ERR_INVALID_LOCATION);
+	return failure_indicator;
     }
+    item_count = YIM_Count_of_YS (earley_set);
+    if (eim_arg >= item_count) {
+	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+	return failure_indicator;
+    }
+    trv_yim = eim_arg;
 
-    TODO check YIM argument !!!
-
-    trv = my_malloc(sizeof(*trv));
+    trv = my_malloc (sizeof (*trv));
     @<Initialize traverser elements@>@;
-
+    trv->t_trv_ys = trv_ys;
+    trv->t_trv_yim = trv_yim;
     return trv;
-    NO_PARSE: ;
-          MARPA_ERROR(MARPA_ERR_NO_PARSE);
-    if (trv) {
-        @<Destroy traverser elements@>;
-    }
-    return NULL;
 }
 
 @*0 Reference counting and destructors.
@@ -169,19 +172,19 @@ traverser_free (TRAVERSER trv)
   my_free(trv);
 }
 
-@*0 Traverser is nulling?.
-Is this traverser for a nulling parse?
-@d TRV_is_Nulling(trv) ((trv)->t_is_nulling)
+@*0 Traverser is trivial?.
+Is this traverser for a trivial parse?
+@d TRV_is_Trivial(trv) ((trv)->t_is_trivial)
 @ @<Bit aligned traverser elements@> =
-BITFIELD t_is_nulling:1;
+BITFIELD t_is_trivial:1;
 @ @<Initialize traverser elements@> =
-TRV_is_Nulling(trv) = 0;
+TRV_is_Trivial(trv) = 0;
 @ @<Function definitions@> =
-int marpa_trv_is_null(Marpa_Traverser trv)
+int marpa_trv_is_trivial(Marpa_Traverser trv)
 {
   @<Return |-2| on failure@>@;
   @<Unpack traverser objects@>@;
   @<Fail if fatal error@>@;
-  return TRV_is_Nulling(trv);
+  return TRV_is_Trivial(trv);
 }
 
