@@ -11255,8 +11255,7 @@ marpa_trv_ref (Marpa_Traverser trv)
 @*0 Traverser destruction.
 
 @ This function is safe to call even
-if the traverser already has been freed,
-or was never initialized.
+if the traverser was never initialized.
 @<Function definitions@> =
 PRIVATE void
 traverser_free (TRAVERSER trv)
@@ -11626,8 +11625,7 @@ marpa_b_ref (Marpa_Bocage b)
 @<Destroy bocage elements, final phase@>;
 
 @ This function is safe to call even
-if the bocage already has been freed,
-or was never initialized.
+if the bocage was never initialized.
 @<Function definitions@> =
 PRIVATE void
 bocage_free (BOCAGE b)
