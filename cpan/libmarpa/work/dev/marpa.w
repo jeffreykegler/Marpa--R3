@@ -11212,7 +11212,7 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
         LEO_SRCL_of_TRV (trv) = leo_srcl;
         LIM_of_TRV (trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
     }
-    TRV_is_Trivial(trv) = trv_is_trivial;
+    TRV_is_Trivial(trv) = trv_is_trivial ? 1 : 0;
     return trv;
 }
 
