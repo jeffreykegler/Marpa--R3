@@ -11084,6 +11084,205 @@ typedef struct s_and_node AND_Object;
   MARPA_ASSERT (and_node_id == unique_draft_and_node_count);
 }
 
+@** Parse traverser code (TRV, TRAVERSER).
+@ Pre-initialization is making the elements safe for the deallocation logic
+to be called.  Often it is setting the value to zero, so that the deallocation
+logic knows when {\bf not} to try deallocating a not-yet uninitialized value.
+@s Marpa_Traverser int
+@<Public incomplete structures@> =
+struct marpa_traverser;
+typedef struct marpa_traverser* Marpa_Traverser;
+@ @<Private incomplete structures@> =
+typedef struct marpa_traverser* TRAVERSER;
+@ @<Traverser structure@> =
+struct marpa_traverser {
+    @<Widely aligned traverser elements@>@;
+    @<Int aligned traverser elements@>@;
+    @<Bit aligned traverser elements@>@;
+};
+
+@ @d YS_of_TRV(trv) ((trv)->t_trv_ys)
+@d YIM_of_TRV(trv) ((trv)->t_trv_yim)
+@d LEO_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
+@d TOKEN_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
+@d COMPLETION_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
+@d LIM_of_TRV(trv) ((trv)->t_trv_lim)
+
+@<Widely aligned traverser elements@> =
+YS t_trv_ys;
+YIM t_trv_yim;
+SRCL t_trv_leo_srcl;
+SRCL t_trv_token_srcl;
+SRCL t_trv_completion_srcl;
+LIM t_trv_lim;
+RECCE t_trv_recce;
+
+@ The un-reference of the recce also
+releases the grammar.
+No need to clear traverset elements during
+destruction, but we may need to do so if we
+create ``reset'' mutators.
+@<Destroy traverser elements@> =
+{
+  recce_unref (R_of_TRV(trv));
+}
+
+@ @d R_of_TRV(trv) ((trv)->t_trv_recce)
+@<Widely aligned traverser elements@> =
+    GRAMMAR t_grammar;
+    RECCE t_recce;
+
+@ @<Unpack traverser objects@> =
+    const RECCE r @,@, UNUSED = R_of_TRV(trv);
+    const GRAMMAR g @,@, UNUSED = G_of_R(r);
+
+@*0 Traverser construction.
+@<Function definitions@> =
+Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
+    Marpa_Earley_Set_ID es_arg,
+    Marpa_Earley_Item_ID eim_arg
+    )
+{
+    @<Return |NULL| on failure@>@;
+    const GRAMMAR g = G_of_R(r);
+    TRAVERSER trv;
+    int item_count;
+    YS trv_ys;
+    YIM trv_yim;
+    int trv_is_trivial = 0;
+
+    @<Fail if fatal error@>@;
+    if (_MARPA_UNLIKELY( es_arg <= -2 ))
+    {
+        MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+        return failure_indicator;
+    }
+    if (_MARPA_UNLIKELY( eim_arg <= 0 ))
+    {
+	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+        return failure_indicator;
+    }
+
+    @<Fail if recognizer not started@>@;
+
+    if (G_is_Trivial(g)) {
+        if (es_arg > 0) {
+	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	    return failure_indicator;
+	}
+        trv_is_trivial = 1;
+    }
+
+    r_update_earley_sets(r);
+    if (es_arg == -1)
+    {
+      trv_ys = YS_at_Current_Earleme_of_R (r);
+    }
+    else
+    {                           /* |ordinal_arg| != -1 */
+	if (!YS_Ord_is_Valid (r, es_arg))
+	{
+	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	    return failure_indicator;
+	}
+	trv_ys = YS_of_R_by_Ord (r, es_arg);
+     }
+
+    if (!trv_ys) {
+	MARPA_ERROR (MARPA_ERR_INVALID_LOCATION);
+	return failure_indicator;
+    }
+
+    item_count = YIM_Count_of_YS (trv_ys);
+    if (eim_arg >= item_count) {
+	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+	return failure_indicator;
+    }
+
+    trv = my_malloc (sizeof (*trv));
+    R_of_TRV(trv) = r;
+    recce_ref(r);
+    YS_of_TRV (trv) = trv_ys;
+
+    trv->t_ref_count = 1;
+    TOKEN_SRCL_of_TRV (trv) = First_Token_SRCL_of_YIM (trv_yim);
+    COMPLETION_SRCL_of_TRV (trv) = First_Completion_SRCL_of_YIM (trv_yim);
+    {
+        const SRCL leo_srcl = First_Leo_SRCL_of_YIM (trv_yim);
+        LEO_SRCL_of_TRV (trv) = leo_srcl;
+        LIM_of_TRV (trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
+    }
+    TRV_is_Trivial(trv) = trv_is_trivial;
+    return trv;
+}
+
+@*0 Reference counting and destructors.
+@ @<Int aligned traverser elements@>=
+  int t_ref_count;
+@ Decrement the traverser reference count.
+@<Function definitions@> =
+PRIVATE void
+traverser_unref (TRAVERSER trv)
+{
+  MARPA_ASSERT (trv->t_ref_count > 0)
+  trv->t_ref_count--;
+  if (trv->t_ref_count <= 0)
+    {
+      traverser_free(trv);
+    }
+}
+void
+marpa_trv_unref (Marpa_Traverser trv)
+{
+   traverser_unref(trv);
+}
+
+@ Increment the traverser reference count.
+@<Function definitions@> =
+PRIVATE TRAVERSER
+traverser_ref (TRAVERSER trv)
+{
+  MARPA_ASSERT(trv->t_ref_count > 0)
+  trv->t_ref_count++;
+  return trv;
+}
+Marpa_Traverser
+marpa_trv_ref (Marpa_Traverser trv)
+{
+   return traverser_ref(trv);
+}
+
+@*0 Traverser destruction.
+
+@ This function is safe to call even
+if the traverser already has been freed,
+or was never initialized.
+@<Function definitions@> =
+PRIVATE void
+traverser_free (TRAVERSER trv)
+{
+  @<Unpack traverser objects@>@;
+  if (trv)
+    {
+      @<Destroy traverser elements@>;
+    }
+  my_free(trv);
+}
+
+@*0 Traverser is trivial?.
+Is this traverser for a trivial parse?
+@d TRV_is_Trivial(trv) ((trv)->t_is_trivial)
+@ @<Bit aligned traverser elements@> =
+BITFIELD t_is_trivial:1;
+@ @<Function definitions@> =
+int marpa_trv_is_trivial(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  return TRV_is_Trivial(trv);
+}
+
 
 @** Parse bocage code (B, BOCAGE).
 @ Pre-initialization is making the elements safe for the deallocation logic
@@ -16628,6 +16827,7 @@ or used strictly for debugging.
 @<Recognizer structure@>@;
 @<Source object structure@>@;
 @<Earley item structure@>@;
+@<Traverser structure@>@;
 @<Bocage structure@>@;
 
 @ @(marpa.c.p50@> =

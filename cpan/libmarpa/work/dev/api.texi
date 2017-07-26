@@ -75,6 +75,7 @@ Published @value{UPDATED} by Jeffrey Kegler
 * Grammar methods::
 * Recognizer methods::
 * Progress reports::
+* Traverser methods::
 * Bocage methods::
 * Ordering methods::
 * Tree methods::
@@ -143,6 +144,24 @@ Recognizer methods
 * Recognizer life cycle mutators::
 * Location accessors::
 * Other parse status methods::
+
+Progress reports
+
+* Traverser methods::
+* Traverser overview::
+* Traverser constructor::
+* Traverser reference counting::
+* Bocage overview::
+* Bocage constructor::
+* Bocage reference counting::
+* Bocage accessor::
+
+Traverser methods
+
+* Traverser overview::
+* Traverser constructor::
+* Traverser reference counting::
+* Traverser accessors::
 
 Bocage methods
 
@@ -3124,7 +3143,7 @@ if @var{symbol_id} is not the ID of a valid
 symbol.
 @end deftypefun
 
-@node Progress reports, Bocage methods, Recognizer methods, Top
+@node Progress reports, Traverser methods, Recognizer methods, Top
 @chapter Progress reports
 
 An important advantage of the Marpa algorithm is the ability
@@ -3234,7 +3253,94 @@ argument is @code{NULL},
 or on other failure, @minus{}2.
 @end deftypefun
 
-@node Bocage methods, Ordering methods, Progress reports, Top
+@menu
+* Traverser methods::
+* Traverser overview::
+* Traverser constructor::
+* Traverser reference counting::
+* Bocage overview::
+* Bocage constructor::
+* Bocage reference counting::
+* Bocage accessor::
+@end menu
+
+@node Traverser methods, Bocage methods, Progress reports, Top
+@chapter Traverser methods
+
+@menu
+* Traverser overview::
+* Traverser constructor::
+* Traverser reference counting::
+* Traverser accessors::
+@end menu
+
+@node Traverser overview, Traverser constructor, Traverser methods, Traverser methods
+@section Overview
+
+The traverser is an object used in traversing the data in the
+recognizer's Earley sets/
+
+To create a traverser, use the @code{marpa_trv_new()} method.
+
+When a traverser is no longer in use, its memory can be freed
+using the 
+@code{marpa_trv_unref()} method.
+
+@node Traverser constructor, Traverser reference counting, Traverser overview, Traverser methods
+@section Creating a new traverser
+
+@deftypefun Marpa_Traverser marpa_trv_new (Marpa_Recognizer @var{r}, @
+    Marpa_Earley_Set_ID @var{earley_set_ID}, @
+    Marpa_Earley_Item_ID @var{earley_item_ID})
+
+Creates a new traverser object, with a reference count of 1.
+The reference count of its parent recognizer object, @var{r},
+is increased by 1.
+If @var{earley_set_ID} is @minus{}1,
+the Earley set at the current earleme is used,
+if there is one.
+
+Success return value: On success, the new traverser object.
+On failure, @code{NULL}.
+@end deftypefun
+
+@node Traverser reference counting, Traverser accessors, Traverser constructor, Traverser methods
+@section  Reference counting
+@deftypefun Marpa_Traverser marpa_trv_ref (Marpa_Traverser @var{trv})
+Increases the reference count by 1.
+Not needed by most applications.
+
+Return value:
+On success, @var{trv}.
+On failure, @code{NULL}.
+@end deftypefun
+
+@deftypefun void marpa_trv_unref (Marpa_Traverser @var{trv})
+Decreases the reference count by 1,
+destroying @var{trv} once the reference count reaches
+zero.
+When @var{trv} is destroyed, the reference count
+of its parent recognizer is decreased by 1.
+If this takes the reference count of the parent recognizer
+to zero, it too is destroyed.
+If the parent recognizer is destroyed, the reference count
+of its base grammar is decreased by 1.
+If this takes the reference count of the base grammar
+to zero, it too is destroyed.
+
+@end deftypefun
+
+@node Traverser accessors,  , Traverser reference counting, Traverser methods
+@section Accessors
+
+@deftypefun int marpa_trv_is_trivial(Marpa_Traverser @var{trv})
+
+Return value on success: 1 is @var{trv} is trivial, 0 otherwise.
+
+Return value on failure: @code{NULL}.
+@end deftypefun
+
+@node Bocage methods, Ordering methods, Traverser methods, Top
 @chapter Bocage methods
 
 @menu
@@ -3247,7 +3353,7 @@ or on other failure, @minus{}2.
 @node Bocage overview, Bocage constructor, Bocage methods, Bocage methods
 @section Overview
 
-A bocage is structure containing the full set of parses found
+The bocage is the structure containing the full set of parses found
 by processing the input according to the grammar.
 The bocage structure is new with Libmarpa, but is very similar
 in purpose to the more familar parse forests.
