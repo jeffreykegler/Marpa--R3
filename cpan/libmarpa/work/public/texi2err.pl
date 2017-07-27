@@ -43,8 +43,10 @@ open my $codes_table, '>', $ARGV[1];
 # memory-efficiently in an array,
 # error codes are assigned numbers in sequence
 # and based on their order in this list.
-# For backward compatibility, new error codes
-# should always be added at the end.
+#
+# IMPORTANT: For backward compatibility,
+# new error codes should always be added at the end.
+#
 my @error_codes = qw(
 MARPA_ERR_NONE
 MARPA_ERR_AHFA_IX_NEGATIVE
@@ -146,6 +148,7 @@ MARPA_ERR_INVALID_ASSERTION_ID
 MARPA_ERR_NO_SUCH_ASSERTION_ID
 MARPA_ERR_HEADERS_DO_NOT_MATCH
 MARPA_ERR_NOT_A_SEQUENCE
+MARPA_ERR_GRAMMAR_IS_TRIVIAL
 );
 
 my %error_number = map { $error_codes[$_], $_ } (0 .. $#error_codes);

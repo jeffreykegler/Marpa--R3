@@ -11320,6 +11320,46 @@ int marpa_trv_is_trivial(Marpa_Traverser trv)
   @<Fail if fatal error@>@;
   return TRV_is_Trivial(trv);
 }
+@ @<Fail if traverser grammar is trivial@> =
+  if (TRV_is_Trivial(trv)) {
+    MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+    return failure_indicator;
+  }
+
+@*0 Earley item accessors.
+
+@
+@<Function definitions@> =
+Marpa_Rule_ID marpa_trv_rule_id(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    const AHM ahm = AHM_of_YIM(yim);
+    const XRL xrl = XRL_of_AHM(ahm);
+    if (xrl) return ID_of_XRL(xrl);
+  }
+  return -1;
+}
+
+@ Returns the ``cooked'' dot position.
+@<Function definitions@> =
+int marpa_trv_dot(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    const AHM ahm = AHM_of_YIM(yim);
+    return XRL_Position_of_AHM(ahm);
+  }
+  return -1;
+}
 
 @** Parse bocage code (B, BOCAGE).
 @ Pre-initialization is making the elements safe for the deallocation logic

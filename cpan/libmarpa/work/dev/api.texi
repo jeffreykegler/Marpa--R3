@@ -3335,9 +3335,28 @@ to zero, it too is destroyed.
 
 @deftypefun int marpa_trv_is_trivial(Marpa_Traverser @var{trv})
 
-Return value on success: 1 is @var{trv} is trivial, 0 otherwise.
+Return value on success: 1 if @var{trv} is trivial, 0 otherwise.
 
 Return value on failure: @code{NULL}.
+@end deftypefun
+
+@deftypefun Marpa_Rule_ID marpa_trv_rule_id(Marpa_Traverser @var{trv})
+
+Return value on success: the IRL ID.
+If there is no IRL for the current item, @minus{}1.
+
+Return value on failure:
+If the grammar is trivial, or on other failure, @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_dot(Marpa_Traverser @var{trv})
+
+Return value on success: The IRL dot position,
+in ``cooked'' form.
+If there is no IRL for the current item, @minus{}1.
+
+Return value on failure:
+If the grammar is trivial, or on other failure, @minus{}2.
 @end deftypefun
 
 @node Bocage methods, Ordering methods, Traverser methods, Top
@@ -4697,6 +4716,18 @@ it as fatal.
 For more see the description of @ref{marpa_g_precompute}.
 Numeric value: 17.
 Suggested message: "Grammar has cycle".
+@end deftypevr
+
+@deftypevr Macro int MARPA_ERR_GRAMMAR_IS_TRIVIAL
+The grammar is trivial.
+Many method calls are
+not appropriate with a trivial grammar,
+and the current method call is one of them.
+This is a recoverable error,
+although most applications will want to treat
+it as fatal.
+Numeric value: 100.
+Suggested message: "Grammar is trivial".
 @end deftypevr
 
 @deftypevr Macro int MARPA_ERR_HEADERS_DO_NOT_MATCH
