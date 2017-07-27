@@ -11094,12 +11094,14 @@ struct marpa_traverser;
 typedef struct marpa_traverser* Marpa_Traverser;
 @ @<Private incomplete structures@> =
 typedef struct marpa_traverser* TRAVERSER;
-@ @<Traverser structure@> =
+@ @s TRAVERSER_Object int
+@<Traverser structure@> =
 struct marpa_traverser {
     @<Widely aligned traverser elements@>@;
     @<Int aligned traverser elements@>@;
     @<Bit aligned traverser elements@>@;
 };
+typedef struct marpa_traverser TRAVERSER_Object;
 
 @ @d YS_of_TRV(trv) ((trv)->t_trv_ys)
 @d YIM_of_TRV(trv) ((trv)->t_trv_yim)
@@ -11115,13 +11117,25 @@ SRCL t_trv_leo_srcl;
 SRCL t_trv_token_srcl;
 SRCL t_trv_completion_srcl;
 LIM t_trv_lim;
-RECCE t_trv_recce;
+@ @<Clear traverser@> =
+  YS_of_TRV(trv) = NULL;
+  YIM_of_TRV(trv) = NULL;
+  LEO_SRCL_of_TRV(trv) = NULL;
+  TOKEN_SRCL_of_TRV(trv) = NULL;
+  COMPLETION_SRCL_of_TRV(trv) = NULL;
 
-@ The un-reference of the recce also
-releases the grammar.
-No need to clear traverset elements during
-destruction, but we may need to do so if we
-create ``reset'' mutators.
+@ Clearing (or ``pre-initializing'') traverser elements
+sets them to defaults which are safe for calling
+the destructor.
+@<Function definitions@> =
+PRIVATE void
+traverser_clear(TRAVERSER trv)
+{
+    @<Clear traverser@>
+}
+
+@ No need to clear traverser elements during
+destruction.
 @<Destroy traverser elements@> =
 {
   recce_unref (R_of_TRV(trv));
@@ -11129,14 +11143,19 @@ create ``reset'' mutators.
 
 @ @d R_of_TRV(trv) ((trv)->t_trv_recce)
 @<Widely aligned traverser elements@> =
-    GRAMMAR t_grammar;
-    RECCE t_recce;
+    RECCE t_trv_recce;
+@ @<Clear traverser@> =
+    R_of_TRV(trv) = NULL;
 
 @ @<Unpack traverser objects@> =
     const RECCE r @,@, UNUSED = R_of_TRV(trv);
     const GRAMMAR g @,@, UNUSED = G_of_R(r);
 
 @*0 Traverser construction.
+@Strictly speaking,
+trivial grammars have no Earley items but,
+as a special case,
+an |eim_arg| of 0 is allowed for them.
 @<Function definitions@> =
 Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
     Marpa_Earley_Set_ID es_arg,
@@ -11145,12 +11164,10 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 {
     @<Return |NULL| on failure@>@;
     const GRAMMAR g = G_of_R(r);
+    TRAVERSER_Object work_trv;
     TRAVERSER trv;
-    int item_count;
-    YS trv_ys;
-    YIM trv_yim;
-    int trv_is_trivial = 0;
 
+    traverser_clear(&work_trv);
     @<Fail if fatal error@>@;
     if (_MARPA_UNLIKELY( es_arg <= -2 ))
     {
@@ -11170,55 +11187,70 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
 	    return failure_indicator;
 	}
-        trv_is_trivial = 1;
+        if (eim_arg != 0) {
+            MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+	    return failure_indicator;
+	}
+        goto FINISH;
     }
 
     r_update_earley_sets(r);
-    if (es_arg == -1)
+
     {
-      trv_ys = YS_at_Current_Earleme_of_R (r);
-    }
-    else
-    {                           /* |ordinal_arg| != -1 */
-	if (!YS_Ord_is_Valid (r, es_arg))
-	{
-	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
-	    return failure_indicator;
-	}
-	trv_ys = YS_of_R_by_Ord (r, es_arg);
-     }
+      YIM* earley_items;
+      YIM yim;
+      YS ys;
+      int item_count;
 
-    if (!trv_ys) {
-	MARPA_ERROR (MARPA_ERR_INVALID_LOCATION);
-	return failure_indicator;
+      if (es_arg == -1)
+      {
+        ys = YS_at_Current_Earleme_of_R (r);
+      }
+      else
+      {                           /* |ordinal_arg| != -1 */
+          if (!YS_Ord_is_Valid (r, es_arg))
+          {
+              MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+              return failure_indicator;
+          }
+          ys = YS_of_R_by_Ord (r, es_arg);
+      }
+
+      YS_of_TRV(&work_trv) = ys;
+      item_count = YIM_Count_of_YS (ys);
+      if (eim_arg >= item_count) {
+          MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+          return failure_indicator;
+      }
+
+      earley_items = YIMs_of_YS(ys);
+      yim = earley_items[eim_arg];
+      YIM_of_TRV(&work_trv) = yim;
+
+      TOKEN_SRCL_of_TRV (&work_trv) = First_Token_SRCL_of_YIM (yim);
+      COMPLETION_SRCL_of_TRV (&work_trv) = First_Completion_SRCL_of_YIM (yim);
+      {
+          const SRCL leo_srcl = First_Leo_SRCL_of_YIM (yim);
+          LEO_SRCL_of_TRV (&work_trv) = leo_srcl;
+          LIM_of_TRV (&work_trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
+      }
     }
 
-    item_count = YIM_Count_of_YS (trv_ys);
-    if (eim_arg >= item_count) {
-	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
-	return failure_indicator;
-    }
+    TRV_is_Trivial(&work_trv) = 0;
 
+    FINISH: ;
     trv = my_malloc (sizeof (*trv));
+    *trv = work_trv;
     R_of_TRV(trv) = r;
     recce_ref(r);
-    YS_of_TRV (trv) = trv_ys;
-
-    trv->t_ref_count = 1;
-    TOKEN_SRCL_of_TRV (trv) = First_Token_SRCL_of_YIM (trv_yim);
-    COMPLETION_SRCL_of_TRV (trv) = First_Completion_SRCL_of_YIM (trv_yim);
-    {
-        const SRCL leo_srcl = First_Leo_SRCL_of_YIM (trv_yim);
-        LEO_SRCL_of_TRV (trv) = leo_srcl;
-        LIM_of_TRV (trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
-    }
-    TRV_is_Trivial(trv) = trv_is_trivial ? 1 : 0;
     return trv;
 }
 
 @*0 Reference counting and destructors.
 @ @<Int aligned traverser elements@>=
   int t_ref_count;
+@ @<Clear traverser@> =
+    trv->t_ref_count = 1;
 @ Decrement the traverser reference count.
 @<Function definitions@> =
 PRIVATE void
@@ -11273,6 +11305,13 @@ Is this traverser for a trivial parse?
 @d TRV_is_Trivial(trv) ((trv)->t_is_trivial)
 @ @<Bit aligned traverser elements@> =
 BITFIELD t_is_trivial:1;
+@ An uninitialized traverser acts like one
+with a trivial grammar.
+In that way a failure in our logic produces
+a slightly misleading bug report,
+and not a segment violation.
+@<Clear traverser@> =
+  TRV_is_Trivial(trv) = 1;
 @ @<Function definitions@> =
 int marpa_trv_is_trivial(Marpa_Traverser trv)
 {
@@ -11281,7 +11320,6 @@ int marpa_trv_is_trivial(Marpa_Traverser trv)
   @<Fail if fatal error@>@;
   return TRV_is_Trivial(trv);
 }
-
 
 @** Parse bocage code (B, BOCAGE).
 @ Pre-initialization is making the elements safe for the deallocation logic
