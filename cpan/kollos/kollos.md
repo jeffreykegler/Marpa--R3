@@ -5901,6 +5901,7 @@ It should free all memory associated with the valuation.
     libmarpa_class_type = {
       g = "Marpa_Grammar",
       r = "Marpa_Recognizer",
+      trv = "Marpa_Traverser",
       b = "Marpa_Bocage",
       o = "Marpa_Order",
       t = "Marpa_Tree",
@@ -5910,13 +5911,20 @@ It should free all memory associated with the valuation.
     libmarpa_class_name = {
       g = "grammar",
       r = "recce",
+      trv = "traverser",
       b = "bocage",
       o = "order",
       t = "tree",
       v = "value",
     };
 
-    libmarpa_class_sequence = { 'g', 'r', 'b', 'o', 't', 'v'}
+    libmarpa_base_class = {
+      r = "g",
+      b = "r",
+      o = "b",
+      t = "o",
+      v = "t",
+    };
 
     function wrap_libmarpa_method(signature)
        local arg_count = math.floor(#signature/2)
@@ -6340,13 +6348,13 @@ It is specified directly, which can be easier for a first reading.
         ]]
         -- for every class with a base,
         -- so that grammar constructor is special case
-        for class_ix = 2, #libmarpa_class_sequence do
-            local class_letter = libmarpa_class_sequence[class_ix]
-            -- bocage constructor is special case
-            if class_letter == 'b' then goto NEXT_CLASS end
+        -- grammar, bocage and traverser constructors are special cases
+        local class_sequence = { 'r', 'o', 't', 'v'}
+        for class_ix = 1, #class_sequence do
+            local class_letter = class_sequence[class_ix]
             local class_name = libmarpa_class_name[class_letter]
             local class_type = libmarpa_class_type[class_letter]
-            local base_class_letter = libmarpa_class_sequence[class_ix-1]
+            local base_class_letter = libmarpa_base_class[class_letter]
             local base_class_name = libmarpa_class_name[base_class_letter]
             local base_class_type = libmarpa_class_type[base_class_letter]
             local this_piece =
@@ -7801,7 +7809,12 @@ is returned.
       { NULL, NULL },
     };
 
-    -- miranda: section+ luaL_Reg definitions
+    static const struct luaL_Reg traverser_methods[] = {
+      { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
+      { "error_description", lca_libmarpa_error_description },
+      { NULL, NULL },
+    };
 
     static const struct luaL_Reg bocage_methods[] = {
       { "error", lca_libmarpa_error },
@@ -7812,16 +7825,12 @@ is returned.
 
     /* order wrappers which need to be hand-written */
 
-    -- miranda: section+ luaL_Reg definitions
-
     static const struct luaL_Reg order_methods[] = {
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
       { NULL, NULL },
     };
-
-    -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg tree_methods[] = {
       { "error", lca_libmarpa_error },
@@ -8017,10 +8026,6 @@ is returned.
                    :gsub("!TYPE!", class_type)
                    :gsub("!LETTER!", letter)
         end
-       result[#result+1] = pipe_dedent(template)
-                   :gsub("!NAME!", "trv")
-                   :gsub("!TYPE!", "Marpa_Traverser")
-                   :gsub("!LETTER!", "trv")
         return table.concat(result)
     ]==]
 
@@ -8175,7 +8180,7 @@ Marpa::R3.
         marpa_lua_newtable (L);
         /* [ kollos, mt_ud_traverser ] */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
-        marpa_lua_pushcclosure (L, l_trv_ud_mt_gc, 1);
+        marpa_lua_pushcclosure (L, l_traverser_ud_mt_gc, 1);
         /* [ kollos, mt_trv_ud, gc_function ] */
         marpa_lua_setfield (L, -2, "__gc");
         /* [ kollos, mt_trv_ud ] */
