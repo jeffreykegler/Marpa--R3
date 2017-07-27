@@ -6364,6 +6364,96 @@ It is specified directly, which can be easier for a first reading.
   ]==]
 ```
 
+The traverser constructor is a special case
+for two reasons:
+It takes two extra arguments.
+And traversers are not a "main sequence" class.
+
+```
+    -- miranda: section+ object constructors
+    static int
+    wrap_traverser_new (lua_State * L)
+    {
+      const int recce_stack_ix = 1;
+      const int es_ordinal_stack_ix = 2;
+      const int eim_ordinal_stack_ix = 3;
+      int traverser_stack_ix;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+        }
+
+      marpa_lua_newtable(L);
+      traverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_traverser" metatable */
+      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_setmetatable (L, traverser_stack_ix);
+
+      {
+        Marpa_Recognizer *recce_ud;
+
+        Marpa_Traverser *traverser_ud =
+          (Marpa_Traverser *) marpa_lua_newuserdata (L, sizeof (Marpa_Traverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, traverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
+
+        {
+          int is_ok = 0;
+          lua_Integer es_ordinal = -1;
+          lua_Integer eim_ordinal = -1;
+          if (marpa_lua_isnil(L, es_ordinal_stack_ix)) {
+             is_ok = 1;
+          } else {
+             es_ordinal = marpa_lua_tointegerx(L, es_ordinal_stack_ix, &is_ok);
+          }
+          if (!is_ok) {
+              marpa_luaL_error(L,
+                  "problem with traverser_new() arg #2, type was %s",
+                  marpa_luaL_typename(L, es_ordinal_stack_ix)
+              );
+          }
+          is_ok = 0;
+          if (marpa_lua_isnil(L, eim_ordinal_stack_ix)) {
+             is_ok = 1;
+          } else {
+             eim_ordinal = marpa_lua_tointegerx(L, eim_ordinal_stack_ix, &is_ok);
+          }
+          if (!is_ok) {
+              marpa_luaL_error(L,
+                  "problem with traverser_new() arg #3, type was %s",
+                  marpa_luaL_typename(L, eim_ordinal_stack_ix)
+              );
+          }
+          *traverser_ud = marpa_trv_new (*recce_ud, (int)es_ordinal, (int)eim_ordinal);
+        }
+
+        if (!*traverser_ud)
+          {
+            return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_new()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, traverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
 The bocage constructor takes an extra argument, so it's a special
 case.
 It's close to the standard constructor.
@@ -6862,6 +6952,7 @@ Luacheck declarations
     */
     static char kollos_g_ud_mt_key;
     static char kollos_r_ud_mt_key;
+    static char kollos_trv_ud_mt_key;
     static char kollos_b_ud_mt_key;
     static char kollos_o_ud_mt_key;
     static char kollos_t_ud_mt_key;
@@ -7926,6 +8017,10 @@ is returned.
                    :gsub("!TYPE!", class_type)
                    :gsub("!LETTER!", letter)
         end
+       result[#result+1] = pipe_dedent(template)
+                   :gsub("!NAME!", "trv")
+                   :gsub("!TYPE!", "Marpa_Traverser")
+                   :gsub("!LETTER!", "trv")
         return table.concat(result)
     ]==]
 
@@ -8076,6 +8171,17 @@ Marpa::R3.
         marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_r_ud_mt_key);
         /* [ kollos ] */
 
+        /* Set up Kollos traverser userdata metatable */
+        marpa_lua_newtable (L);
+        /* [ kollos, mt_ud_traverser ] */
+        marpa_lua_pushvalue (L, upvalue_stack_ix);
+        marpa_lua_pushcclosure (L, l_trv_ud_mt_gc, 1);
+        /* [ kollos, mt_trv_ud, gc_function ] */
+        marpa_lua_setfield (L, -2, "__gc");
+        /* [ kollos, mt_trv_ud ] */
+        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
+        /* [ kollos ] */
+
         /* Set up Kollos bocage userdata metatable */
         marpa_lua_newtable (L);
         /* [ kollos, mt_ud_bocage ] */
@@ -8158,6 +8264,11 @@ Marpa::R3.
         marpa_lua_getfield (L, kollos_table_stack_ix, "class_recce");
         marpa_lua_pushcclosure (L, wrap_recce_new, 2);
         marpa_lua_setfield (L, kollos_table_stack_ix, "recce_new");
+
+        marpa_lua_pushvalue (L, upvalue_stack_ix);
+        marpa_lua_getfield (L, kollos_table_stack_ix, "class_traverser");
+        marpa_lua_pushcclosure (L, wrap_traverser_new, 2);
+        marpa_lua_setfield (L, kollos_table_stack_ix, "traverser_new");
 
         marpa_lua_pushvalue (L, upvalue_stack_ix);
         marpa_lua_getfield (L, kollos_table_stack_ix, "class_bocage");
