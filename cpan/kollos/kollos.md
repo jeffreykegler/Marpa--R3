@@ -6209,6 +6209,9 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
     {"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
+    {"marpa_trv_is_trivial"},
+    {"marpa_trv_rule_id"},
+    {"marpa_trv_dot"},
   }
   local result = {}
   for ix = 1,#signatures do
@@ -6420,7 +6423,7 @@ And traversers are not a "main sequence" class.
         {
           int is_ok = 0;
           lua_Integer es_ordinal = -1;
-          lua_Integer eim_ordinal = -1;
+          lua_Integer eim_ordinal = 0;
           if (marpa_lua_isnil(L, es_ordinal_stack_ix)) {
              is_ok = 1;
           } else {
