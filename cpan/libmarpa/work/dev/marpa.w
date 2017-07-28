@@ -615,9 +615,15 @@ struct marpa_config {
 };
 typedef struct marpa_config Marpa_Config;
 
-@ @<Function definitions@> =
+@ The |MARPA_OFF_DEBUG3|
+macro should be kept in the production code,
+to help developers who wonder if debugging has been
+successfully turned on.
+@<Function definitions@> =
 int marpa_c_init (Marpa_Config *config)
 {
+    MARPA_DEBUG3("Debugging at level %ld is on: %s\n",
+      marpa__debug_level, STRLOC);
     config->t_is_ok = I_AM_OK;
     config->t_error = MARPA_ERR_NONE;
     config->t_error_string = NULL;
@@ -661,10 +667,16 @@ typedef struct marpa_g* Marpa_Grammar;
 typedef struct marpa_g* GRAMMAR;
 
 @*0 Constructors.
-@ @<Function definitions@> =
+@ The |MARPA_OFF_DEBUG3|
+macro should be kept in the production code,
+to help developers who wonder if debugging has been
+successfully turned on.
+@<Function definitions@> =
 Marpa_Grammar marpa_g_new (Marpa_Config* configuration)
 {
     GRAMMAR g;
+    MARPA_OFF_DEBUG3("Debugging at level %ld is on: %s\n",
+      marpa__debug_level, STRLOC);
     if (configuration && configuration->t_is_ok != I_AM_OK) {
         configuration->t_error = MARPA_ERR_I_AM_NOT_OK;
         return NULL;
@@ -11174,7 +11186,7 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
         MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
         return failure_indicator;
     }
-    if (_MARPA_UNLIKELY( eim_arg <= 0 ))
+    if (_MARPA_UNLIKELY( eim_arg < 0 ))
     {
 	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
         return failure_indicator;
@@ -11356,9 +11368,13 @@ int marpa_trv_dot(Marpa_Traverser trv)
   {
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
-    return XRL_Position_of_AHM(ahm);
+    const int xrl_position = XRL_Position_of_AHM(ahm);
+    if (xrl_position < -1) {
+        MARPA_ERROR (MARPA_ERR_NO_SUCH_RULE_ID);
+        return failure_indicator;
+    }
+    return xrl_position;
   }
-  return -1;
 }
 
 @** Parse bocage code (B, BOCAGE).

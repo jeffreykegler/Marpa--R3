@@ -2238,14 +2238,14 @@ rule, false otherwise.
         local complete_lexemes = false
         local es_id = l0r:latest_earley_set()
         -- Do we have a completion of a lexeme rule?
-        for eim_id = 0, math.maxinteger do
+        local max_eim = l0r:_earley_set_size(es_id) - 1
+        for eim_id = 0, max_eim do
             -- TODO create more efficient, special purpose method
             --   to replace earley_item_look?
-            local rule_id, dot = l0r:earley_item_look(es_id, eim_id)
+            local trv = _M.traverser_new(l0r, es_id, eim_id)
+            local rule_id = trv:rule_id()
             if not rule_id then goto LAST_EIM end
-            -- ignore rules with no XRL
-            if rule_id < 0 then goto NEXT_EIM end
-            -- ignore non-completions
+            local dot = trv:dot()
             if dot >= 0 then goto NEXT_EIM end
             complete_lexemes = true
             -- when we expand this, the ID of the g1 lexeme
@@ -6211,7 +6211,6 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
     {"marpa_trv_is_trivial"},
     {"marpa_trv_rule_id"},
-    {"marpa_trv_dot"},
   }
   local result = {}
   for ix = 1,#signatures do
@@ -7812,7 +7811,37 @@ is returned.
       { NULL, NULL },
     };
 
+```
+
+For `trv_dot()`, -1 is a valid return value,
+not a soft error.
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int wrap_trv_dot(lua_State *L)
+    {
+      Marpa_Traverser self;
+      const int self_stack_ix = 1;
+      int result;
+
+      marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);
+      marpa_lua_getfield (L, -1, "_libmarpa");
+      self = *(Marpa_Traverser*)marpa_lua_touserdata (L, -1);
+      marpa_lua_pop(L, 1);
+      result = (int)marpa_trv_dot(self);
+      if (result < -1) {
+       return libmarpa_error_handle(L, self_stack_ix, "wrap_trv_dot()");
+      }
+      marpa_lua_pushinteger(L, (lua_Integer)result);
+      return 1;
+    }
+```
+
+```
+
+    -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg traverser_methods[] = {
+      { "dot", wrap_trv_dot },
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
