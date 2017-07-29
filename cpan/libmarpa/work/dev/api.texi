@@ -3353,10 +3353,26 @@ If the grammar is trivial, or on other failure, @minus{}2.
 
 Return value on success: The IRL dot position,
 in ``cooked'' form.
-If there is no IRL for the current item, @minus{}1.
 
 Return value on failure:
-If the grammar is trivial, or on other failure, @minus{}2.
+If the grammar is trivial,
+if there is no IRL for the current item,
+or on other failure, @minus{}2.
+
+@code{trv_dot()} fails if there is no external rule IRL for 
+the current Earley item.
+To check, use @code{trv_rule_id()}.
+@end deftypefun
+
+@deftypefun int marpa_trv_origin(Marpa_Traverser @var{trv})
+
+Return value on success: The origin of the base Earley item.
+
+Return value on failure:
+If the grammar is trivial,
+if there is no IRL for the current item,
+or on other failure, @minus{}2.
+
 @end deftypefun
 
 @node Bocage methods, Ordering methods, Traverser methods, Top

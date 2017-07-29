@@ -2240,8 +2240,6 @@ rule, false otherwise.
         -- Do we have a completion of a lexeme rule?
         local max_eim = l0r:_earley_set_size(es_id) - 1
         for eim_id = 0, max_eim do
-            -- TODO create more efficient, special purpose method
-            --   to replace earley_item_look?
             local trv = _M.traverser_new(l0r, es_id, eim_id)
             local rule_id = trv:rule_id()
             if not rule_id then goto LAST_EIM end

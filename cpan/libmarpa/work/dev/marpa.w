@@ -11129,22 +11129,6 @@ SRCL t_trv_leo_srcl;
 SRCL t_trv_token_srcl;
 SRCL t_trv_completion_srcl;
 LIM t_trv_lim;
-@ @<Clear traverser@> =
-  YS_of_TRV(trv) = NULL;
-  YIM_of_TRV(trv) = NULL;
-  LEO_SRCL_of_TRV(trv) = NULL;
-  TOKEN_SRCL_of_TRV(trv) = NULL;
-  COMPLETION_SRCL_of_TRV(trv) = NULL;
-
-@ Clearing (or ``pre-initializing'') traverser elements
-sets them to defaults which are safe for calling
-the destructor.
-@<Function definitions@> =
-PRIVATE void
-traverser_clear(TRAVERSER trv)
-{
-    @<Clear traverser@>
-}
 
 @ No need to clear traverser elements during
 destruction.
@@ -11156,15 +11140,42 @@ destruction.
 @ @d R_of_TRV(trv) ((trv)->t_trv_recce)
 @<Widely aligned traverser elements@> =
     RECCE t_trv_recce;
-@ @<Clear traverser@> =
-    R_of_TRV(trv) = NULL;
+@ @<Initialize traverser |trv|@> =
+    R_of_TRV(trv) = r;
 
 @ @<Unpack traverser objects@> =
     const RECCE r @,@, UNUSED = R_of_TRV(trv);
     const GRAMMAR g @,@, UNUSED = G_of_R(r);
 
 @*0 Traverser construction.
-@Strictly speaking,
+@<Function definitions@> =
+PRIVATE Marpa_Traverser
+trv_new(RECCE r, YS es, YIM eim)
+{
+    const GRAMMAR g = G_of_R(r);
+    TRAVERSER trv;
+
+    trv = my_malloc (sizeof (*trv));
+    @<Initialize traverser |trv|@>
+    recce_ref(r);
+    if (!es) {
+        TRV_is_Trivial(trv) = 1;
+        return trv;
+    }
+    TRV_is_Trivial(trv) = 0;
+    YS_of_TRV(trv) = es;
+    YIM_of_TRV(trv) = eim;
+    TOKEN_SRCL_of_TRV (trv) = First_Token_SRCL_of_YIM (eim);
+    COMPLETION_SRCL_of_TRV (trv) = First_Completion_SRCL_of_YIM (eim);
+    {
+	const SRCL leo_srcl = First_Leo_SRCL_of_YIM (eim);
+	LEO_SRCL_of_TRV (trv) = leo_srcl;
+	LIM_of_TRV (trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
+    }
+    return trv;
+}
+
+@ Strictly speaking,
 trivial grammars have no Earley items but,
 as a special case,
 an |eim_arg| of 0 is allowed for them.
@@ -11176,11 +11187,8 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 {
     @<Return |NULL| on failure@>@;
     const GRAMMAR g = G_of_R(r);
-    TRAVERSER_Object work_trv;
-    TRAVERSER trv;
-
-    traverser_clear(&work_trv);
     @<Fail if fatal error@>@;
+
     if (_MARPA_UNLIKELY( es_arg <= -2 ))
     {
         MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
@@ -11203,7 +11211,7 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
             MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
 	    return failure_indicator;
 	}
-        goto FINISH;
+        return trv_new(r, NULL, NULL);
     }
 
     r_update_earley_sets(r);
@@ -11228,7 +11236,6 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
           ys = YS_of_R_by_Ord (r, es_arg);
       }
 
-      YS_of_TRV(&work_trv) = ys;
       item_count = YIM_Count_of_YS (ys);
       if (eim_arg >= item_count) {
           MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
@@ -11237,31 +11244,14 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 
       earley_items = YIMs_of_YS(ys);
       yim = earley_items[eim_arg];
-      YIM_of_TRV(&work_trv) = yim;
-
-      TOKEN_SRCL_of_TRV (&work_trv) = First_Token_SRCL_of_YIM (yim);
-      COMPLETION_SRCL_of_TRV (&work_trv) = First_Completion_SRCL_of_YIM (yim);
-      {
-          const SRCL leo_srcl = First_Leo_SRCL_of_YIM (yim);
-          LEO_SRCL_of_TRV (&work_trv) = leo_srcl;
-          LIM_of_TRV (&work_trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
-      }
+      return trv_new(r, ys, yim);
     }
-
-    TRV_is_Trivial(&work_trv) = 0;
-
-    FINISH: ;
-    trv = my_malloc (sizeof (*trv));
-    *trv = work_trv;
-    R_of_TRV(trv) = r;
-    recce_ref(r);
-    return trv;
 }
 
 @*0 Reference counting and destructors.
 @ @<Int aligned traverser elements@>=
   int t_ref_count;
-@ @<Clear traverser@> =
+@ @<Initialize traverser |trv|@> =
     trv->t_ref_count = 1;
 @ Decrement the traverser reference count.
 @<Function definitions@> =
@@ -11322,8 +11312,6 @@ with a trivial grammar.
 In that way a failure in our logic produces
 a slightly misleading bug report,
 and not a segment violation.
-@<Clear traverser@> =
-  TRV_is_Trivial(trv) = 1;
 @ @<Function definitions@> =
 int marpa_trv_is_trivial(Marpa_Traverser trv)
 {
@@ -11374,6 +11362,20 @@ int marpa_trv_dot(Marpa_Traverser trv)
         return failure_indicator;
     }
     return xrl_position;
+  }
+}
+
+@
+@<Function definitions@> =
+int marpa_trv_origin(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    return Origin_Ord_of_YIM(yim);
   }
 }
 
