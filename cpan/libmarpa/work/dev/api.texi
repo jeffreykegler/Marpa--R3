@@ -161,6 +161,8 @@ Traverser methods
 * Traverser overview::
 * Traverser constructor::
 * Traverser reference counting::
+* Traverser mutators::
+* Traverser link constructors::
 * Traverser accessors::
 
 Bocage methods
@@ -3271,6 +3273,8 @@ or on other failure, @minus{}2.
 * Traverser overview::
 * Traverser constructor::
 * Traverser reference counting::
+* Traverser mutators::
+* Traverser link constructors::
 * Traverser accessors::
 @end menu
 
@@ -3304,7 +3308,7 @@ Success return value: On success, the new traverser object.
 On failure, @code{NULL}.
 @end deftypefun
 
-@node Traverser reference counting, Traverser accessors, Traverser constructor, Traverser methods
+@node Traverser reference counting, Traverser mutators, Traverser constructor, Traverser methods
 @section  Reference counting
 @deftypefun Marpa_Traverser marpa_trv_ref (Marpa_Traverser @var{trv})
 Increases the reference count by 1.
@@ -3330,7 +3334,43 @@ to zero, it too is destroyed.
 
 @end deftypefun
 
-@node Traverser accessors,  , Traverser reference counting, Traverser methods
+@node Traverser mutators, Traverser link constructors, Traverser reference counting, Traverser methods
+@section Mutators
+
+@deftypefun int marpa_trv_completion_next(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the completion link was advanced,
+0 if that was not possible.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_token_next(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the token link was advanced,
+0 if that was not possible.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@node Traverser link constructors, Traverser accessors, Traverser mutators, Traverser methods
+@section Link constructors
+
+@deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the completion predecessor.
+
+Return value on failure: NULL.
+@end deftypefun
+
+@deftypefun Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the token predecessor.
+
+Return value on failure: NULL.
+@end deftypefun
+
+@node Traverser accessors,  , Traverser link constructors, Traverser methods
 @section Accessors
 
 @deftypefun int marpa_trv_is_trivial(Marpa_Traverser @var{trv})

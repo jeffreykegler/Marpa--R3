@@ -11115,15 +11115,15 @@ struct marpa_traverser {
 };
 typedef struct marpa_traverser TRAVERSER_Object;
 
-@ @d YS_of_TRV(trv) ((trv)->t_trv_ys)
+@
 @d YIM_of_TRV(trv) ((trv)->t_trv_yim)
+@d YS_of_TRV(trv) (YS_of_YIM(YIM_of_TRV(trv))
 @d LEO_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
 @d TOKEN_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
 @d COMPLETION_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
 @d LIM_of_TRV(trv) ((trv)->t_trv_lim)
 
 @<Widely aligned traverser elements@> =
-YS t_trv_ys;
 YIM t_trv_yim;
 SRCL t_trv_leo_srcl;
 SRCL t_trv_token_srcl;
@@ -11137,6 +11137,12 @@ destruction.
   recce_unref (R_of_TRV(trv));
 }
 
+@ @d TRV_has_Soft_Error(trv) ((trv)->t_trv_soft_error)
+@<Bit aligned traverser elements@> =
+    int t_trv_soft_error;
+@ @<Initialize traverser |trv|@> =
+    TRV_has_Soft_Error(trv) = 0;
+
 @ @d R_of_TRV(trv) ((trv)->t_trv_recce)
 @<Widely aligned traverser elements@> =
     RECCE t_trv_recce;
@@ -11147,10 +11153,14 @@ destruction.
     const RECCE r @,@, UNUSED = R_of_TRV(trv);
     const GRAMMAR g @,@, UNUSED = G_of_R(r);
 
-@*0 Traverser construction.
+@*0 Traverser constructors.
+@ There are several traverser constructors,
+because source links are followed by returning
+new traversers.
+
 @<Function definitions@> =
 PRIVATE Marpa_Traverser
-trv_new(RECCE r, YS es, YIM eim)
+trv_new(RECCE r, YIM yim)
 {
     const GRAMMAR g = G_of_R(r);
     TRAVERSER trv;
@@ -11158,17 +11168,16 @@ trv_new(RECCE r, YS es, YIM eim)
     trv = my_malloc (sizeof (*trv));
     @<Initialize traverser |trv|@>
     recce_ref(r);
-    if (!es) {
+    if (!yim) {
         TRV_is_Trivial(trv) = 1;
         return trv;
     }
     TRV_is_Trivial(trv) = 0;
-    YS_of_TRV(trv) = es;
-    YIM_of_TRV(trv) = eim;
-    TOKEN_SRCL_of_TRV (trv) = First_Token_SRCL_of_YIM (eim);
-    COMPLETION_SRCL_of_TRV (trv) = First_Completion_SRCL_of_YIM (eim);
+    YIM_of_TRV(trv) = yim;
+    TOKEN_SRCL_of_TRV (trv) = First_Token_SRCL_of_YIM (yim);
+    COMPLETION_SRCL_of_TRV (trv) = First_Completion_SRCL_of_YIM (yim);
     {
-	const SRCL leo_srcl = First_Leo_SRCL_of_YIM (eim);
+	const SRCL leo_srcl = First_Leo_SRCL_of_YIM (yim);
 	LEO_SRCL_of_TRV (trv) = leo_srcl;
 	LIM_of_TRV (trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
     }
@@ -11211,7 +11220,7 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
             MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
 	    return failure_indicator;
 	}
-        return trv_new(r, NULL, NULL);
+        return trv_new(r, NULL);
     }
 
     r_update_earley_sets(r);
@@ -11244,8 +11253,109 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 
       earley_items = YIMs_of_YS(ys);
       yim = earley_items[eim_arg];
-      return trv_new(r, ys, yim);
+      return trv_new(r, yim);
     }
+}
+
+@
+{\bf To Do}: @^To Do@> Should the error code for no completion SRCL
+be |MARPA_ERR_NOT_TRACING_COMPLETION_LINKS|, or something new?
+
+@<Function definitions@> =
+Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser trv)
+{
+    @<Return |NULL| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    YIM predecessor;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) {
+        TRV_has_Soft_Error(trv) = 1;
+        MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+        return NULL;
+    }
+    srcl = COMPLETION_SRCL_of_TRV (trv);
+    if (!srcl) {
+        MARPA_ERROR (MARPA_ERR_DEVELOPMENT);
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    predecessor = Predecessor_of_SRCL(srcl);
+    if (!predecessor) {
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    return trv_new(r, predecessor);
+}
+
+@
+{\bf To Do}: @^To Do@> Should the error code for no token SRCL
+be |MARPA_ERR_NOT_TRACING_TOKEN_LINKS|, or something new?
+
+@<Function definitions@> =
+Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser trv)
+{
+    @<Return |NULL| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    YIM predecessor;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) {
+        TRV_has_Soft_Error(trv) = 1;
+        MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+        return NULL;
+    }
+    srcl = TOKEN_SRCL_of_TRV (trv);
+    if (!srcl) {
+        MARPA_ERROR (MARPA_ERR_DEVELOPMENT);
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    predecessor = Predecessor_of_SRCL(srcl);
+    if (!predecessor) {
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    return trv_new(r, predecessor);
+}
+
+@*0 Traverser mutators.
+@
+@<Function definitions@> =
+int marpa_trv_completion_next(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+    if (G_is_Trivial(g)) {
+       return 0;
+    }
+    srcl = COMPLETION_SRCL_of_TRV (trv);
+    if (!srcl) return 0;
+    srcl = COMPLETION_SRCL_of_TRV (trv) = Next_SRCL_of_SRCL(srcl);
+    if (!srcl) return 0;
+    return 1;
+}
+
+@
+@<Function definitions@> =
+int marpa_trv_token_next(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+    if (G_is_Trivial(g)) {
+       return 0;
+    }
+    srcl = TOKEN_SRCL_of_TRV (trv);
+    if (!srcl) return 0;
+    srcl = TOKEN_SRCL_of_TRV (trv) = Next_SRCL_of_SRCL(srcl);
+    if (!srcl) return 0;
+    return 1;
 }
 
 @*0 Reference counting and destructors.
