@@ -832,6 +832,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+Exhaustion events are location events.
 An exhaustion parse event triggers on asynchronous parse exhaustion,
 if the grammar's C<exhaustion> setting is "C<event>".
 The name of the event is
@@ -950,6 +951,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+Rejection events are location events.
 A rejection event triggers if
 all lexemes at a G1 location are rejected,
 and the grammar's C<rejection> setting is "C<event>".
