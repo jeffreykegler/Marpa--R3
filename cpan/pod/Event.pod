@@ -171,36 +171,31 @@ some of this terminology is defined more
 carefully
 L<below|"Details">.
 
-=head1 The life cycle of events
+=head1 Types of parse event
+
+Prase events are of two types:
 
 =over 4
 
-=item * An SLIF parse event must be B<declared>.
-
-=item * A declared event may B<trigger>.
-
-=back
-
-A parse event is either a B<parse location event>
-(aka B<location event>)
-or a B<parse instance event>
-(aka B<instance event>).
-B<Location events>
-are those which are deal with the status of the
-parse at a particular parse location.
-Location events are declared using named arguments of
-the SLIF recognizer constructor.
-
-B<Instance events> are those which report
-the status of a symbol instance.
-The symbol instance whose status the event
-reports does not have to be an
-actual symbol instance.
+=item * B<Instance events> report
+the status of one particular symbol instance,
+which may be actual or potential.
 Prediction events,
 for example,
 report potential symbol instances.
 Instance events are declared in the SLIF DSL.
 
+=item * B<Location events> report the general status
+of the parse at particular location,
+rather than the status of one particular instance.
+The symbol instance whose status the event
+reports does not have to be an
+actual symbol instance.
+
+=back
+
+Any event which is not an instance event, is a
+location event.
 There are two types
 of location event:
 rejection and exhaustion.
@@ -224,6 +219,16 @@ each type of parse event
 will state whether it is a location event,
 a lexeme event
 or a non-lexeme event.
+
+=head1 The life cycle of events
+
+=over 4
+
+=item * An SLIF parse event must be B<declared>.
+
+=item * A declared event may B<trigger>.
+
+=back
 
 Once declared, a parse event
 may trigger during any event-triggering SLIF
