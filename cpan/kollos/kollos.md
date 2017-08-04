@@ -6372,10 +6372,9 @@ It is specified directly, which can be easier for a first reading.
   ]==]
 ```
 
-The traverser constructor is a special case
-for two reasons:
-It takes two extra arguments.
-And traversers are not a "main sequence" class.
+The traverser constructors are special cases
+because
+traversers are not a "main sequence" class.
 
 ```
     -- miranda: section+ object constructors
@@ -6416,6 +6415,7 @@ And traversers are not a "main sequence" class.
         marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
+        marpa_lua_setfield (L, recce_stack_ix, "lmw_r");
 
         {
           int is_ok = 0;
@@ -6450,6 +6450,61 @@ And traversers are not a "main sequence" class.
         if (!*traverser_ud)
           {
             return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_new()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, traverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
+
+```
+    -- miranda: section+ object constructors
+    static int
+    wrap_token_predecessor (lua_State * L)
+    {
+      const int base_traverser_stack_ix = 1;
+      int traverser_stack_ix;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+        }
+
+      marpa_lua_newtable(L);
+      traverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_traverser" metatable */
+      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_setmetatable (L, traverser_stack_ix);
+
+      {
+        Marpa_Recce *recce_ud;
+        Marpa_Traverser *traverser_ud =
+          (Marpa_Traverser *) marpa_lua_newuserdata (L, sizeof (Marpa_Traverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, traverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
+        marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_r");
+        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
+        marpa_lua_setfield (L, traverser_stack_ix, "lmw_r");
+
+	*traverser_ud = marpa_trv_token_predecessor (*recce_ud);
+        if (!*traverser_ud)
+          {
+            return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_token_predecessor()");
           }
       }
 
