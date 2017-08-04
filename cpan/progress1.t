@@ -113,11 +113,14 @@ sub earley_set_display {
       local result = {}
       for item_id = 0, math.maxinteger do
           -- IRL data for debugging only -- delete
-          local irl_id, irl_dot, origin, nrl_id, nrl_dot = g1r:earley_item_look(earley_set_id, item_id)
+          local trv = _M.traverser_new(g1r, earley_set_id, item_id)
+          local irl_id = trv:rule_id()
           if not irl_id then break end
+          local origin = trv:origin()
+          local irl_dot = trv:dot()
           result[#result+1] = string.format(
-               "irl_id=%d, ird_dot=%d, origin=%d, nrl_id=%d, nrl_dot=%d\n",
-              irl_id, irl_dot, origin, nrl_id, nrl_dot
+               "irl_id=%d, irl_dot=%d, origin=%d\n",
+              irl_id, irl_dot, origin
           )
       end
       return "=== Earley Set $earley_set ===\n"
