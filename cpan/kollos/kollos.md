@@ -6415,7 +6415,6 @@ traversers are not a "main sequence" class.
         marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
         marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
         recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
-        marpa_lua_setfield (L, recce_stack_ix, "lmw_r");
 
         {
           int is_ok = 0;
@@ -6464,19 +6463,22 @@ traversers are not a "main sequence" class.
 
 
 ```
-    -- miranda: section+ object constructors
+    -- miranda: section+ non-standard wrappers
     static int
-    wrap_token_predecessor (lua_State * L)
+    lca_trv_token_predecessor (lua_State * L)
     {
       const int base_traverser_stack_ix = 1;
       int traverser_stack_ix;
+      Marpa_Traverser *base_traverser_ud;
 
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       if (1)
         {
-          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+          marpa_luaL_checktype(L, base_traverser_stack_ix, LUA_TTABLE);
         }
+      marpa_lua_getfield (L, base_traverser_stack_ix, "_libmarpa");
+      base_traverser_ud = marpa_lua_touserdata(L, -1);
 
       marpa_lua_newtable(L);
       traverser_stack_ix = marpa_lua_gettop(L);
@@ -6485,7 +6487,6 @@ traversers are not a "main sequence" class.
       marpa_lua_setmetatable (L, traverser_stack_ix);
 
       {
-        Marpa_Recce *recce_ud;
         Marpa_Traverser *traverser_ud =
           (Marpa_Traverser *) marpa_lua_newuserdata (L, sizeof (Marpa_Traverser));
         /* [ base_table, class_table, class_ud ] */
@@ -6497,11 +6498,8 @@ traversers are not a "main sequence" class.
         marpa_lua_setfield (L, traverser_stack_ix, "_libmarpa");
         marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_g");
         marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
-        marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_r");
-        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
-        marpa_lua_setfield (L, traverser_stack_ix, "lmw_r");
 
-	*traverser_ud = marpa_trv_token_predecessor (*recce_ud);
+        *traverser_ud = marpa_trv_token_predecessor (*base_traverser_ud);
         if (!*traverser_ud)
           {
             return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_token_predecessor()");
@@ -6767,13 +6765,11 @@ Luacheck declarations
     -- miranda: insert private step code declarations
     -- miranda: insert define step codes
 
-    -- miranda: insert error object code from okollos.c.lua
     -- miranda: insert base error handlers
 
-    -- miranda: insert utilities from okollos.c.lua
     -- miranda: insert utility function definitions
 
-    -- miranda: insert event related code from okollos.c.lua
+    -- miranda: insert event related code
     -- miranda: insert step structure code
     -- miranda: insert metatable keys
     -- miranda: insert non-standard wrappers
@@ -6794,7 +6790,7 @@ Luacheck declarations
 
 ```
 
-    -- miranda: section utilities from okollos.c.lua
+    -- miranda: section+ utility function definitions
 
     /* For debugging */
     static void dump_stack (lua_State *L) UNUSED;
@@ -6836,7 +6832,7 @@ Luacheck declarations
        const char* description;
     };
 
-    -- miranda: section+ error object code from okollos.c.lua
+    -- miranda: section+ base error handlers
 
     /* error objects
      *
@@ -6854,7 +6850,7 @@ Luacheck declarations
      * it actually is easier to write them in C than in Lua.
      */
 
-    -- miranda: section+ error object code from okollos.c.lua
+    -- miranda: section+ base error handlers
 
     static inline const char *
     error_description_by_code (lua_Integer error_code)
@@ -6929,7 +6925,7 @@ Luacheck declarations
        const char* description;
     };
 
-    -- miranda: section+ event related code from okollos.c.lua
+    -- miranda: section+ event related code
 
     static inline const char* event_description_by_code(lua_Integer event_code)
     {
@@ -7898,6 +7894,7 @@ not a soft error.
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
+      { "token_predecessor", lca_trv_token_predecessor },
       { NULL, NULL },
     };
 
