@@ -6207,8 +6207,11 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
     {"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
+    {"marpa_trv_completion_next"},
     {"marpa_trv_is_trivial"},
+    {"marpa_trv_origin"},
     {"marpa_trv_rule_id"},
+    {"marpa_trv_token_next"},
   }
   local result = {}
   for ix = 1,#signatures do
@@ -6461,6 +6464,58 @@ traversers are not a "main sequence" class.
 
 ```
 
+```
+    -- miranda: section+ non-standard wrappers
+    static int
+    lca_trv_completion_predecessor (lua_State * L)
+    {
+      const int base_traverser_stack_ix = 1;
+      int traverser_stack_ix;
+      Marpa_Traverser *base_traverser_ud;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, base_traverser_stack_ix, LUA_TTABLE);
+        }
+      marpa_lua_getfield (L, base_traverser_stack_ix, "_libmarpa");
+      base_traverser_ud = marpa_lua_touserdata(L, -1);
+
+      marpa_lua_newtable(L);
+      traverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_traverser" metatable */
+      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_setmetatable (L, traverser_stack_ix);
+
+      {
+        Marpa_Traverser *traverser_ud =
+          (Marpa_Traverser *) marpa_lua_newuserdata (L, sizeof (Marpa_Traverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, traverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
+
+        *traverser_ud = marpa_trv_completion_predecessor (*base_traverser_ud);
+        if (!*traverser_ud)
+          {
+            return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_completion_predecessor()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, traverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
 
 ```
     -- miranda: section+ non-standard wrappers
@@ -7894,6 +7949,7 @@ not a soft error.
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
+      { "completion_predecessor", lca_trv_completion_predecessor },
       { "token_predecessor", lca_trv_token_predecessor },
       { NULL, NULL },
     };
