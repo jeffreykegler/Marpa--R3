@@ -3744,8 +3744,8 @@ TODO: Make `collected_progress_items a local, after development.
         end
         local lines = {}
         for current_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
-            lines[#lines+1] = slr:_progress_line_do(
-                current_ordinal, origins, rule_id, position
+            lines[#lines+1] = g1_progress_line_do(
+                slr, current_ordinal, origins, rule_id, position
             )
         end
         -- io.stderr:write(inspect(lines, {depth=3}), "\n")
@@ -3825,8 +3825,10 @@ part of a "Pure Lua" implementation.
 ```
 
 ```
+    -- miranda: section+ forward declarations
+    local g1_progress_line_do
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr._progress_line_do(
+    function g1_progress_line_do(
         slr, current_ordinal, origins, rule_id, position
     )
 
