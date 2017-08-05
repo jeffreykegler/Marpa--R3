@@ -108,6 +108,71 @@ sub earley_set_display {
     my ($result) = $recce->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $earley_set );
       local slr, earley_set_id = ...
+      local slg = slr.slg
+
+    local function progress_line_do(
+        slr, current_ordinal, origins, rule_id, position
+    )
+
+        -- For origins[0], we apply
+        --     -1 to convert earley set to G1, then
+        --     +1 because it is an origin and the character
+        --        doesn't begin until the next Earley set
+        -- In other words, they balance and we do nothing
+        local g1_first = origins[1]
+
+        local slg = slr.slg
+        local pcs = {}
+
+        local origins_desc = #origins <= 3
+             and table.concat(origins, ',')
+             or origins[1] .. '...' .. origins[#origins]
+
+        local dotted_type
+        if position >= g1g:rule_length(rule_id) then
+            dotted_type = 'F'
+            pcs[#pcs+1] = 'F' .. rule_id
+            goto TAG_FOUND
+        end
+        if position > 0 then
+            dotted_type = 'R'
+            pcs[#pcs+1] = 'R' .. rule_id .. ':' .. position
+            goto TAG_FOUND
+        end
+        dotted_type = 'P'
+        pcs[#pcs+1] = 'P' .. rule_id
+        ::TAG_FOUND::
+
+        if #origins > 1 then
+            pcs[#pcs+1] = 'x' .. #origins
+        end
+
+        local current_earleme = slr.g1:earleme(current_ordinal)
+        pcs[#pcs+1] = '@' .. origins_desc .. '-' .. current_earleme
+
+        -- find the range
+        if current_ordinal <= 0 then
+            pcs[#pcs+1] = 'B0L0c0'
+            goto HAVE_RANGE
+        end
+        if dotted_type == 'P' then
+            local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
+            pcs[#pcs+1] = slr:lc_brief(pos, block)
+            goto HAVE_RANGE
+        end
+        do
+            if g1_first < 0 then g1_first = 0 end
+            local g1_last = current_ordinal - 1
+            local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+            local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
+            pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+            goto HAVE_RANGE
+        end
+        ::HAVE_RANGE::
+        pcs[#pcs+1] = slg:dotted_rule_show(rule_id, position)
+        return table.concat(pcs, ' ')
+    end
+
       io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
       local g1r = slr.g1
       local result = {}
@@ -116,12 +181,25 @@ sub earley_set_display {
           local trv = _M.traverser_new(g1r, earley_set_id, item_id)
           local irl_id = trv:rule_id()
           if not irl_id then break end
-          local origin = trv:origin()
-          local irl_dot = trv:dot()
-          result[#result+1] = string.format(
-               "irl_id=%d, irl_dot=%d, origin=%d\n",
-              irl_id, irl_dot, origin
-          )
+          local xpr_id = slg:g1_rule_to_xprid(irl_id)
+          if xpr_id then
+              local xpr_dots = slg:g1_rule_to_xpr_dot(irl_id)
+              -- print('xpr_dots', inspect(xpr_dots))
+              local irl_dot = trv:dot()
+              -- print('irl_dot', inspect(irl_dot))
+              local xpr_dot
+              if irl_dot == -1 then
+                  xpr_dot = xpr_dots[#xpr_dots]
+              else
+                  xpr_dot = xpr_dots[irl_dot+1]
+              end
+              -- print('xpr_dot', inspect(xpr_dot))
+              local origin = trv:origin()
+              result[#result+1] = string.format(
+                   "xpr_id=%d, xpr_dot=%d, origin=%d\n",
+                  xpr_id, xpr_dot, origin
+              )
+          end
       end
       return "=== Earley Set $earley_set ===\n"
           .. table.concat(result)

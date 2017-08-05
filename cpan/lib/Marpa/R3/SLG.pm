@@ -1680,6 +1680,10 @@ kwgen(__LINE__, qw(lmg_rule_to_production_id lmg_rule_to_xprid si));
 kwgen(__LINE__, qw(g1_rule_to_production_id g1_rule_to_xprid i));
 kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xprid i));
 
+kwgen(__LINE__, qw(lmg_rule_to_production_dot lmg_rule_to_xpr_dot si));
+kwgen(__LINE__, qw(g1_rule_to_production_dot g1_rule_to_xpr_dot i));
+kwgen(__LINE__, qw(l0_rule_to_production_dot l0_rule_to_xpr_dot i));
+
 kwgen(__LINE__, qw(highest_production_id highest_xprid), '');
 kwgen(__LINE__, qw(lmg_highest_rule_id lmg_highest_rule_id), '');
 kwgen(__LINE__, qw(g1_highest_rule_id g1_highest_rule_id), '');

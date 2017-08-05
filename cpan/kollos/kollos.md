@@ -725,6 +725,25 @@ Display any XPR
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_rule_to_xpr_dot(slg, subg_name, irlid)
+        local subg = slg[subg_name]
+        local irl = subg.irls[irlid]
+        if not irl then
+            return _M._internal_error('lmg_rule_to_xprid(), bad argument = %d', irlid)
+        end
+        -- print(inspect(irl, {depth=1}))
+        return irl.xpr_dot
+    end
+    function _M.class_slg.g1_rule_to_xpr_dot(slg, irlid)
+        return slg:lmg_rule_to_xpr_dot('g1', irlid)
+    end
+    function _M.class_slg.l0_rule_to_xpr_dot(slg, irlid)
+        return slg:lmg_rule_to_xpr_dot('l0', irlid)
+    end
+```
+
 TODO -- Turn lmg_*() forms into local functions?
 
 TODO -- Census all Lua and perl symbol name functions, including
@@ -1593,6 +1612,8 @@ one for each subgrammar.
         -- right now, the action & mask of an irl
         -- is always the action/mask of its xpr.
         -- But some day each irl may need its own.
+        irl.xpr_top = options.xpr_top
+        irl.xpr_dot = options.xpr_dot
         irl.action = xpr.action
         irl.mask = xpr.mask
     end
