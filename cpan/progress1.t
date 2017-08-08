@@ -168,23 +168,30 @@ sub earley_set_display {
         return table.concat(pcs, ' ')
     end
 
-      local function origin_gen(traverser)
-          local irl_id = traverser:rule_id()
-          if slg:g1_rule_is_xpr_top(irl_id) then coroutine.yield(traverser:origin()) end
-          local at_link = traverser:at_completion()
-          while at_link do
-              local predecessor = traverser:completion_predecessor()
-              coroutine.yield(traverser:origin())
-              at_link = traverser:completion_next()
-          end
-          at_link = traverser:at_token()
-          while at_link do
-              local predecessor = traverser:token_predecessor()
-              coroutine.yield(traverser:origin())
-              at_link = traverser:token_next()
-          end
-      end
       local function origins(traverser)
+          local g1g = slg.g1
+          local function origin_gen(traverser)
+              local nrl_id = traverser:nrl_id()
+              if g1g:_nrl_semantic_equivalent(nrl_id) then
+                  local irl_id = traverser:rule_id()
+                  if slg:g1_rule_is_xpr_top(irl_id) then
+                      coroutine.yield(traverser:origin())
+                      return
+                  end
+              end
+              local at_link = traverser:at_completion()
+              while at_link do
+                  local predecessor = traverser:completion_predecessor()
+                  coroutine.yield(traverser:origin())
+                  at_link = traverser:completion_next()
+              end
+              at_link = traverser:at_token()
+              while at_link do
+                  local predecessor = traverser:token_predecessor()
+                  coroutine.yield(traverser:origin())
+                  at_link = traverser:token_next()
+              end
+          end
           return coroutine.wrap(
                   function () origin_gen(traverser) end
           )
