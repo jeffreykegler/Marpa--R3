@@ -11524,6 +11524,23 @@ int marpa_trv_origin(Marpa_Traverser trv)
   }
 }
 
+@
+@<Function definitions@> =
+Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    const AHM ahm = AHM_of_YIM(yim);
+    const IRL nrl = IRL_of_AHM(ahm);
+    if (nrl) return ID_of_IRL(nrl);
+  }
+  return -1;
+}
+
 @** Parse bocage code (B, BOCAGE).
 @ Pre-initialization is making the elements safe for the deallocation logic
 to be called.  Often it is setting the value to zero, so that the deallocation

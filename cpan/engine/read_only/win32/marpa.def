@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Tue Aug  8 15:42:52 2017
+; Tue Aug  8 16:24:29 2017
 EXPORTS
    marpa_check_version
    marpa_version
@@ -94,6 +94,7 @@ EXPORTS
    marpa_trv_soft_error
    marpa_trv_dot
    marpa_trv_origin
+   marpa_trv_nrl_id
    marpa_b_new
    marpa_b_ref
    marpa_b_unref
