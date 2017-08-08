@@ -6106,7 +6106,11 @@ It should free all memory associated with the valuation.
                             "   return libmarpa_error_handle(L, self_stack_ix, %q);\n",
                             wrapper_name .. '()')
        result[#result+1] = "  }\n"
-       result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
+       if signature.return_type == 'boolean' then
+           result[#result+1] = "  marpa_lua_pushboolean(L, result ? 1 : 0);\n"
+       else
+           result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
+       end
        result[#result+1] = "  return 1;\n"
        result[#result+1] = "}\n\n"
 
@@ -6312,13 +6316,13 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
     {"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
-    {"marpa_trv_at_completion"},
-    {"marpa_trv_at_token"},
-    {"marpa_trv_completion_next"},
+    {"marpa_trv_at_completion", return_type='boolean'},
+    {"marpa_trv_at_token", return_type='boolean'},
+    {"marpa_trv_completion_next", return_type='boolean'},
     {"marpa_trv_is_trivial"},
     {"marpa_trv_origin"},
     {"marpa_trv_rule_id"},
-    {"marpa_trv_token_next"},
+    {"marpa_trv_token_next", return_type='boolean'},
   }
   local result = {}
   for ix = 1,#signatures do
