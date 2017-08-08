@@ -192,9 +192,11 @@ sub earley_set_display {
               end
               if xpr_dot == 0 then item_type = 0 end
               -- print('xpr_dot', inspect(xpr_dot))
-              local origin = trv:origin()
-              items[#items+1] = { earley_set_id, item_type,
-                  xpr_id, xpr_dot, origin }
+              local origins = { trv:origin() }
+              for ix = 1, #origins do
+                  items[#items+1] = { earley_set_id, item_type,
+                      xpr_id, xpr_dot, origins[ix] }
+              end
           end
       end
       local last_ordinal
