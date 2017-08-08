@@ -11137,11 +11137,16 @@ destruction.
   recce_unref (R_of_TRV(trv));
 }
 
-@ @d TRV_has_Soft_Error(trv) ((trv)->t_trv_soft_error)
-@<Bit aligned traverser elements@> =
+@ @<Bit aligned traverser elements@> =
     int t_trv_soft_error;
+@ @d TRV_has_Soft_Error(trv) ((trv)->t_trv_soft_error)
 @ @<Initialize traverser |trv|@> =
     TRV_has_Soft_Error(trv) = 0;
+@ @<Function definitions@> =
+int marpa_trv_soft_error(Marpa_Traverser trv)
+{
+    return TRV_has_Soft_Error(trv);
+}
 
 @ @d R_of_TRV(trv) ((trv)->t_trv_recce)
 @<Widely aligned traverser elements@> =
@@ -11297,6 +11302,7 @@ Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser trv)
     SRCL srcl;
     YIM predecessor;
     @<Fail if fatal error@>@;
+    TRV_has_Soft_Error(trv) = 0;
 
     if (G_is_Trivial(g)) {
         TRV_has_Soft_Error(trv) = 1;
@@ -11329,6 +11335,7 @@ Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser trv)
     SRCL srcl;
     YIM predecessor;
     @<Fail if fatal error@>@;
+    TRV_has_Soft_Error(trv) = 0;
 
     if (G_is_Trivial(g)) {
         TRV_has_Soft_Error(trv) = 1;

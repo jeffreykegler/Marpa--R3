@@ -6611,7 +6611,11 @@ traversers are not a "main sequence" class.
         *traverser_ud = marpa_trv_completion_predecessor (*base_traverser_ud);
         if (!*traverser_ud)
           {
-            return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_completion_predecessor()");
+            if (marpa_trv_soft_error(*base_traverser_ud)) {
+                marpa_lua_pushnil(L);
+                return 1;
+            }
+            return libmarpa_error_handle (L, base_traverser_stack_ix, "marpa_trv_completion_predecessor()");
           }
       }
 
@@ -6664,7 +6668,11 @@ traversers are not a "main sequence" class.
         *traverser_ud = marpa_trv_token_predecessor (*base_traverser_ud);
         if (!*traverser_ud)
           {
-            return libmarpa_error_handle (L, traverser_stack_ix, "marpa_trv_token_predecessor()");
+            if (marpa_trv_soft_error(*base_traverser_ud)) {
+                marpa_lua_pushnil(L);
+                return 1;
+            }
+            return libmarpa_error_handle (L, base_traverser_stack_ix, "marpa_trv_token_predecessor()");
           }
       }
 

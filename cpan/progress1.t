@@ -168,6 +168,28 @@ sub earley_set_display {
         return table.concat(pcs, ' ')
     end
 
+      local function origin_gen(traverser)
+          local irl_id = traverser:rule_id()
+          if slg:g1_rule_is_xpr_top(irl_id) then coroutine.yield(traverser:origin()) end
+          local at_link = traverser:at_completion()
+          while at_link do
+              local predecessor = traverser:completion_predecessor()
+              coroutine.yield(traverser:origin())
+              at_link = traverser:completion_next()
+          end
+          at_link = traverser:at_token()
+          while at_link do
+              local predecessor = traverser:token_predecessor()
+              coroutine.yield(traverser:origin())
+              at_link = traverser:token_next()
+          end
+      end
+      local function origins(traverser)
+          return coroutine.wrap(
+                  function () origin_gen(traverser) end
+          )
+      end
+
       io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
       local result = { "=== Earley Set " .. earley_set_id .. "===" }
       local items = {}
@@ -191,17 +213,6 @@ sub earley_set_display {
                   xpr_dot = xpr_dots[irl_dot+1]
               end
               if xpr_dot == 0 then item_type = 0 end
-              -- print('xpr_dot', inspect(xpr_dot))
-              local function origin_gen(traverser)
-                  local irl_id = traverser:rule_id()
-                  if slg:g1_rule_is_xpr_top(irl_id) then coroutine.yield(traverser:origin()) end
-              end
-              local function origins(traverser)
-                  return coroutine.wrap(
-                          function () origin_gen(traverser) end
-                  )
-              end
-              -- local origins = { trv:origin() }
               for origin in origins(trv) do
                   items[#items+1] = { earley_set_id, item_type,
                       xpr_id, xpr_dot, origin }

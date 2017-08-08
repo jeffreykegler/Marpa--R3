@@ -3356,6 +3356,27 @@ Return value on failure: @minus{}2.
 @node Traverser link constructors, Traverser accessors, Traverser mutators, Traverser methods
 @section Link constructors
 
+@deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the completion predecessor.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
+@deftypefun Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the token predecessor.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
+@node Traverser accessors,  , Traverser link constructors, Traverser methods
+@section Accessors
+
 @deftypefun int marpa_trv_at_completion(Marpa_Traverser @var{trv})
 
 Return value on success: 1 if the traverser is at a valid completion link,
@@ -3372,25 +3393,6 @@ Return value on success: 1 if the traverser is at a valid token link,
 Return value on failure: @minus{}2.
 @end deftypefun
 
-int marpa_trv_at_token(Marpa_Traverser trv)
-
-@deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
-
-Return value on success: A traverser for the completion predecessor.
-
-Return value on failure: NULL.
-@end deftypefun
-
-@deftypefun Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser @var{trv})
-
-Return value on success: A traverser for the token predecessor.
-
-Return value on failure: NULL.
-@end deftypefun
-
-@node Traverser accessors,  , Traverser link constructors, Traverser methods
-@section Accessors
-
 @deftypefun int marpa_trv_is_trivial(Marpa_Traverser @var{trv})
 
 Return value on success: 1 if @var{trv} is trivial, 0 otherwise.
@@ -3405,6 +3407,17 @@ If there is no IRL for the current item, @minus{}1.
 
 Return value on failure:
 If the grammar is trivial, or on other failure, @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_soft_error(Marpa_Traverser @var{trv})
+
+Only certain method calls, all of them documented to do so,
+set the soft error flag.
+
+Return value on success: 1 if the soft error flag is on, 0 otherwise.
+
+Return value on failure: Never fails.  This is because, pedantically,
+the error (soft or hard) occurred in a previous method call.
 @end deftypefun
 
 @deftypefun int marpa_trv_dot(Marpa_Traverser @var{trv})
