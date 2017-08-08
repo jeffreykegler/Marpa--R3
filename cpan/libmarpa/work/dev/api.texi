@@ -3356,6 +3356,24 @@ Return value on failure: @minus{}2.
 @node Traverser link constructors, Traverser accessors, Traverser mutators, Traverser methods
 @section Link constructors
 
+@deftypefun int marpa_trv_at_completion(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the traverser is at a valid completion link,
+0 otherwise.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_at_token(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the traverser is at a valid token link,
+0 otherwise.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+int marpa_trv_at_token(Marpa_Traverser trv)
+
 @deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
 
 Return value on success: A traverser for the completion predecessor.

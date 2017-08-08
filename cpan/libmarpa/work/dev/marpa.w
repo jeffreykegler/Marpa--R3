@@ -11258,6 +11258,34 @@ Marpa_Traverser marpa_trv_new(Marpa_Recognizer r,
 }
 
 @
+@<Function definitions@> =
+int marpa_trv_at_completion(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    srcl = COMPLETION_SRCL_of_TRV (trv);
+    return srcl ? 1 : 0;
+}
+
+@
+@<Function definitions@> =
+int marpa_trv_at_token(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    srcl = TOKEN_SRCL_of_TRV (trv);
+    return srcl ? 1 : 0;
+}
+
+@
 {\bf To Do}: @^To Do@> Should the error code for no completion SRCL
 be |MARPA_ERR_NOT_TRACING_COMPLETION_LINKS|, or something new?
 

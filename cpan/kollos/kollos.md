@@ -807,6 +807,25 @@ Display any XPR
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.lmg_rule_is_xpr_top(slg, subg_name, irlid)
+        local subg = slg[subg_name]
+        local irl = subg.irls[irlid]
+        if not irl then
+            return _M._internal_error('lmg_rule_to_xprid(), bad argument = %d', irlid)
+        end
+        -- print(inspect(irl, {depth=1}))
+        return irl.xpr_top
+    end
+    function _M.class_slg.g1_rule_is_xpr_top(slg, irlid)
+        return slg:lmg_rule_is_xpr_top('g1', irlid)
+    end
+    function _M.class_slg.l0_rule_is_xpr_top(slg, irlid)
+        return slg:lmg_rule_is_xpr_top('l0', irlid)
+    end
+```
+
 TODO -- Turn lmg_*() forms into local functions?
 
 TODO -- Census all Lua and perl symbol name functions, including
@@ -1673,15 +1692,20 @@ one for each subgrammar.
         local xpr = slg.xprs[xpr_id]
         local irl = slg.g1.irls[base_irl_id]
         irl.xpr = xpr
-        -- right now, the action & mask of an irl
-        -- is always the action/mask of its xpr.
-        -- But some day each irl may need its own.
-        irl.xpr_top = options.xpr_top
+
+        -- TODO: Normalization to boolean may not be needed after
+        --       conversion to Perl
+        irl.xpr_top = options.xpr_top and true or nil
+
         -- TODO: Remove math.tointeger() conversion after conversion from Perl
         irl.xpr_dot = {}
         for ix = 1, #options.xpr_dot do
            irl.xpr_dot[ix] = math.tointeger(options.xpr_dot[ix])
         end
+
+        -- right now, the action & mask of an irl
+        -- is always the action/mask of its xpr.
+        -- But some day each irl may need its own.
         irl.action = xpr.action
         irl.mask = xpr.mask
     end
@@ -6033,23 +6057,13 @@ It should free all memory associated with the valuation.
        end
        result[#result+1] = "  int result;\n\n"
 
-       -- These wrappers will not be external interfaces
-       -- so eventually they will run unsafe.
-       -- But for now we check arguments, and we'll leave
-       -- the possibility for debugging
-       local safe = true;
-       if (safe) then
-          result[#result+1] = "  if (1) {\n"
-
-          result[#result+1] = "    marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);"
-          -- I do not get the values from the integer checks,
-          -- because this code
-          -- will be turned off most of the time
-          for arg_ix = 1, arg_count do
-              result[#result+1] = "    marpa_luaL_checkinteger(L, " .. (arg_ix+1) .. ");\n"
-          end
-          result[#result+1] = "  }\n"
-       end -- if (!unsafe)
+       result[#result+1] = "  if (1) {\n"
+       result[#result+1] = "    marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);"
+       -- TODO: Should I get the values from the integer checks?
+       for arg_ix = 1, arg_count do
+           result[#result+1] = "    marpa_luaL_checkinteger(L, " .. (arg_ix+1) .. ");\n"
+       end
+       result[#result+1] = "  }\n"
 
        for arg_ix = arg_count, 1, -1 do
          local arg_type = signature[arg_ix*2]
@@ -6298,6 +6312,8 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
     {"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
+    {"marpa_trv_at_completion"},
+    {"marpa_trv_at_token"},
     {"marpa_trv_completion_next"},
     {"marpa_trv_is_trivial"},
     {"marpa_trv_origin"},

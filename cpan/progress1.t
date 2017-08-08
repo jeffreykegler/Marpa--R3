@@ -109,6 +109,7 @@ sub earley_set_display {
         <<'END_OF_LUA', 'i', $earley_set );
       local slr, earley_set_id = ...
       local slg = slr.slg
+      local g1r = slr.g1
 
     local function progress_line_do(
         slr, current_ordinal, origins, production_id, position
@@ -168,7 +169,6 @@ sub earley_set_display {
     end
 
       io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
-      local g1r = slr.g1
       local result = { "=== Earley Set " .. earley_set_id .. "===" }
       local items = {}
       for item_id = 0, math.maxinteger do
@@ -192,10 +192,19 @@ sub earley_set_display {
               end
               if xpr_dot == 0 then item_type = 0 end
               -- print('xpr_dot', inspect(xpr_dot))
-              local origins = { trv:origin() }
-              for ix = 1, #origins do
+              local function origin_gen(traverser)
+                  local irl_id = traverser:rule_id()
+                  if slg:g1_rule_is_xpr_top(irl_id) then coroutine.yield(traverser:origin()) end
+              end
+              local function origins(traverser)
+                  return coroutine.wrap(
+                          function () origin_gen(traverser) end
+                  )
+              end
+              -- local origins = { trv:origin() }
+              for origin in origins(trv) do
                   items[#items+1] = { earley_set_id, item_type,
-                      xpr_id, xpr_dot, origins[ix] }
+                      xpr_id, xpr_dot, origin }
               end
           end
       end
