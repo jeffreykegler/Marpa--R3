@@ -111,7 +111,7 @@ sub earley_set_display {
       local slg = slr.slg
 
     local function progress_line_do(
-        slr, current_ordinal, origins, rule_id, position
+        slr, current_ordinal, origins, production_id, position
     )
 
         -- For origins[0], we apply
@@ -124,31 +124,25 @@ sub earley_set_display {
         local slg = slr.slg
         local pcs = {}
 
-        local origins_desc = #origins <= 3
-             and table.concat(origins, ',')
-             or origins[1] .. '...' .. origins[#origins]
 
         local dotted_type
-        if position >= g1g:rule_length(rule_id) then
+        if position >= slg:xpr_length(production_id) then
             dotted_type = 'F'
-            pcs[#pcs+1] = 'F' .. rule_id
+            pcs[#pcs+1] = 'F' .. production_id
             goto TAG_FOUND
         end
         if position > 0 then
             dotted_type = 'R'
-            pcs[#pcs+1] = 'R' .. rule_id .. ':' .. position
+            pcs[#pcs+1] = 'R' .. production_id .. ':' .. position
             goto TAG_FOUND
         end
         dotted_type = 'P'
-        pcs[#pcs+1] = 'P' .. rule_id
+        pcs[#pcs+1] = 'P' .. production_id
         ::TAG_FOUND::
 
         if #origins > 1 then
             pcs[#pcs+1] = 'x' .. #origins
         end
-
-        local current_earleme = slr.g1:earleme(current_ordinal)
-        pcs[#pcs+1] = '@' .. origins_desc .. '-' .. current_earleme
 
         -- find the range
         if current_ordinal <= 0 then
@@ -162,20 +156,21 @@ sub earley_set_display {
         end
         do
             if g1_first < 0 then g1_first = 0 end
-            local g1_last = current_ordinal - 1
+            local g1_last = origins[#origins]
             local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
             local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
             pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
             goto HAVE_RANGE
         end
         ::HAVE_RANGE::
-        pcs[#pcs+1] = slg:dotted_rule_show(rule_id, position)
+        pcs[#pcs+1] = slg:xpr_dotted_show(production_id, position)
         return table.concat(pcs, ' ')
     end
 
       io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
       local g1r = slr.g1
-      local result = {}
+      local result = { "=== Earley Set " .. earley_set_id .. "===" }
+      local items = {}
       for item_id = 0, math.maxinteger do
           -- IRL data for debugging only -- delete
           local trv = _M.traverser_new(g1r, earley_set_id, item_id)
@@ -183,26 +178,42 @@ sub earley_set_display {
           if not irl_id then break end
           local xpr_id = slg:g1_rule_to_xprid(irl_id)
           if xpr_id then
-              local xpr_dots = slg:g1_rule_to_xpr_dot(irl_id)
-              -- print('xpr_dots', inspect(xpr_dots))
+              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
               local irl_dot = trv:dot()
               -- print('irl_dot', inspect(irl_dot))
               local xpr_dot
+              local item_type = 1
+              -- item_type is 0 for prediction, 1 for medial, 2 for completed
               if irl_dot == -1 then
                   xpr_dot = xpr_dots[#xpr_dots]
+                  item_type = 2
               else
                   xpr_dot = xpr_dots[irl_dot+1]
               end
+              if xpr_dot == 0 then item_type = 0 end
               -- print('xpr_dot', inspect(xpr_dot))
               local origin = trv:origin()
-              result[#result+1] = string.format(
-                   "xpr_id=%d, xpr_dot=%d, origin=%d\n",
-                  xpr_id, xpr_dot, origin
-              )
+              items[#items+1] = { earley_set_id, item_type,
+                  xpr_id, xpr_dot, origin }
           end
       end
-      return "=== Earley Set $earley_set ===\n"
-          .. table.concat(result)
+      local last_ordinal
+      local lines = {}
+      for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
+          if this_ordinal ~= last_ordinal then
+              local location = 'B0L0c0'
+              if this_ordinal > 0 then
+                    local block, pos = slr:g1_pos_to_l0_first(this_ordinal)
+                    location = slr:lc_brief(pos, block)
+              end
+              lines = { string.format('=== Earley set %d at %s ===', this_ordinal, location) }
+              last_ordinal = this_ordinal
+          end
+          lines[#lines+1] = progress_line_do( 
+            slr, this_ordinal, origins, rule_id, position )
+      end
+      lines[#lines+1] = '' -- to get a final "\n"
+      return table.concat(lines, "\n")
 END_OF_LUA
     return $result;
 }

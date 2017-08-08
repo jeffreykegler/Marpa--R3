@@ -1670,6 +1670,7 @@ kwgen(__LINE__, qw(g1_symbol_is_accessible g1_symbol_is_accessible i));
 kwgen(__LINE__, qw(g1_symbol_is_nulling g1_symbol_is_nulling i));
 kwgen(__LINE__, qw(g1_symbol_is_productive g1_symbol_is_productive i));
 
+kwgen(__LINE__, qw(production_dotted_show xpr_dotted_show ii));
 kwgen(__LINE__, qw(lmg_dotted_rule_show lmg_dotted_rule_show sii));
 kwgen(__LINE__, qw(g1_dotted_rule_show g1_dotted_rule_show ii));
 kwgen(__LINE__, qw(l0_dotted_rule_show l0_dotted_rule_show ii));
@@ -1680,9 +1681,9 @@ kwgen(__LINE__, qw(lmg_rule_to_production_id lmg_rule_to_xprid si));
 kwgen(__LINE__, qw(g1_rule_to_production_id g1_rule_to_xprid i));
 kwgen(__LINE__, qw(l0_rule_to_production_id l0_rule_to_xprid i));
 
-kwgen(__LINE__, qw(lmg_rule_to_production_dot lmg_rule_to_xpr_dot si));
-kwgen(__LINE__, qw(g1_rule_to_production_dot g1_rule_to_xpr_dot i));
-kwgen(__LINE__, qw(l0_rule_to_production_dot l0_rule_to_xpr_dot i));
+kwgen(__LINE__, qw(lmg_rule_to_production_dot lmg_rule_to_xpr_dots si));
+kwgen(__LINE__, qw(g1_rule_to_production_dot g1_rule_to_xpr_dots i));
+kwgen(__LINE__, qw(l0_rule_to_production_dot l0_rule_to_xpr_dots i));
 
 kwgen(__LINE__, qw(highest_production_id highest_xprid), '');
 kwgen(__LINE__, qw(lmg_highest_rule_id lmg_highest_rule_id), '');
@@ -1693,6 +1694,8 @@ kwgen_arr(__LINE__, qw(production_expand xpr_expand i));
 kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
 kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
 kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
+
+kwgen_arr(__LINE__, qw(production_length xpr_length i));
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;

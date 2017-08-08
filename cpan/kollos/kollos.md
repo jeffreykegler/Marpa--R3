@@ -576,6 +576,51 @@ Display any XPR
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xpr_dotted_show(slg, xprid, dot_arg)
+        local xprs = slg.xprs
+        local xpr = xprs[xprid]
+        local name_fn = _M.class_xsy.display_form
+        local pieces = {}
+        local subg = xpr.subgrammar
+        pieces[#pieces+1] = name_fn(xpr.lhs)
+        pieces[#pieces+1] = subg == 'g1' and '::=' or '~'
+        local rhs = xpr.rhs
+        local dot_used
+        local dot = dot_arg == -1 and #rhs + 1 or dot_arg
+        if dot == 0 then
+          pieces[#pieces+1] = "."
+          dot_used = true
+        end
+        for ix = 1, #rhs do
+            pieces[#pieces+1] = name_fn(rhs[ix])
+            if dot == ix then
+              pieces[#pieces+1] = "."
+              dot_used = true
+            end
+        end
+        if not dot_used then
+             _M.userX(
+                 "xpr_dotted_show(%s, %s): dot is %s; must be -1, or 0-%d",
+                 xprid, dot_arg, dot_arg, #rhs + 1
+             )
+        end
+        local minimum = xpr.min
+        if minimum then
+            pieces[#pieces+1] =
+                minimum <= 0 and '*' or '+'
+        end
+        local precedence = xpr.precedence
+        if precedence then
+            -- add a semi-colon to the most recent piece
+            pieces[#pieces] = pieces[#pieces] .. ';'
+            pieces[#pieces+1] = 'prec=' .. precedence
+        end
+        return table.concat(pieces, ' ')
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slg.xpr_expand_o(slg, xpr)
         local xsys = { xpr.lhs.id }
         local rhs = xpr.rhs
@@ -595,6 +640,24 @@ Display any XPR
             )
         end
         return slg:xpr_expand_o(xpr)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.xpr_length_o(slg, xpr)
+        return #xpr.rhs
+    end
+    function _M.class_slg.xpr_length(slg, xprid)
+        local xprs = slg.xprs
+        local xpr = xprs[xprid]
+        if not xpr then
+            _M.userX(
+                "xpr_length(): %s is not a valid irlid",
+                inspect(xprid)
+            )
+        end
+        return slg:xpr_length_o(xpr)
     end
 ```
 
@@ -727,7 +790,7 @@ Display any XPR
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.lmg_rule_to_xpr_dot(slg, subg_name, irlid)
+    function _M.class_slg.lmg_rule_to_xpr_dots(slg, subg_name, irlid)
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
@@ -736,11 +799,11 @@ Display any XPR
         -- print(inspect(irl, {depth=1}))
         return irl.xpr_dot
     end
-    function _M.class_slg.g1_rule_to_xpr_dot(slg, irlid)
-        return slg:lmg_rule_to_xpr_dot('g1', irlid)
+    function _M.class_slg.g1_rule_to_xpr_dots(slg, irlid)
+        return slg:lmg_rule_to_xpr_dots('g1', irlid)
     end
-    function _M.class_slg.l0_rule_to_xpr_dot(slg, irlid)
-        return slg:lmg_rule_to_xpr_dot('l0', irlid)
+    function _M.class_slg.l0_rule_to_xpr_dots(slg, irlid)
+        return slg:lmg_rule_to_xpr_dots('l0', irlid)
     end
 ```
 
@@ -1003,6 +1066,7 @@ Lowest ISYID is 0.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.lmg_rule_show(slg, subg_name, irlid, options)
+        options = options or {}
         local name_fn = options.diag and _M.class_grammar.symbol_diag_form
             or _M.class_grammar.symbol_display_form
         local subg = slg[subg_name]
@@ -1613,7 +1677,11 @@ one for each subgrammar.
         -- is always the action/mask of its xpr.
         -- But some day each irl may need its own.
         irl.xpr_top = options.xpr_top
-        irl.xpr_dot = options.xpr_dot
+        -- TODO: Remove math.tointeger() conversion after conversion from Perl
+        irl.xpr_dot = {}
+        for ix = 1, #options.xpr_dot do
+           irl.xpr_dot[ix] = math.tointeger(options.xpr_dot[ix])
+        end
         irl.action = xpr.action
         irl.mask = xpr.mask
     end
