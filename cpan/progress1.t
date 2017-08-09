@@ -175,20 +175,20 @@ sub earley_set_display {
               if g1g:_nrl_semantic_equivalent(nrl_id) then
                   local irl_id = traverser:rule_id()
                   if slg:g1_rule_is_xpr_top(irl_id) then
-                      coroutine.yield(traverser:origin())
+                      coroutine.yield(traverser:dot(), traverser:rule_id(), traverser:origin())
                       return
                   end
               end
               local at_link = traverser:at_completion()
               while at_link do
                   local predecessor = traverser:completion_predecessor()
-                  coroutine.yield(traverser:origin())
+                  coroutine.yield(traverser:dot(), traverser:rule_id(), traverser:origin())
                   at_link = traverser:completion_next()
               end
               at_link = traverser:at_token()
               while at_link do
                   local predecessor = traverser:token_predecessor()
-                  coroutine.yield(traverser:origin())
+                  coroutine.yield(traverser:dot(), traverser:rule_id(), traverser:origin())
                   at_link = traverser:token_next()
               end
           end
@@ -203,10 +203,9 @@ sub earley_set_display {
       for item_id = 0, math.maxinteger do
           -- IRL data for debugging only -- delete
           local trv = _M.traverser_new(g1r, earley_set_id, item_id)
-          local irl_id = trv:rule_id()
-          if not irl_id then break end
-          local xpr_id = slg:g1_rule_to_xprid(irl_id)
-          if xpr_id then
+          if not trv:rule_id() then break end
+          for irl_dot, irl_id, origin in origins(trv) do
+              local xpr_id = slg:g1_rule_to_xprid(irl_id)
               local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
               local irl_dot = trv:dot()
               -- print('irl_dot', inspect(irl_dot))
@@ -220,10 +219,8 @@ sub earley_set_display {
                   xpr_dot = xpr_dots[irl_dot+1]
               end
               if xpr_dot == 0 then item_type = 0 end
-              for origin in origins(trv) do
-                  items[#items+1] = { earley_set_id, item_type,
-                      xpr_id, xpr_dot, origin }
-              end
+              items[#items+1] = { earley_set_id, item_type,
+                  xpr_id, xpr_dot, origin }
           end
       end
       local last_ordinal
