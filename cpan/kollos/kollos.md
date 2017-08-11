@@ -367,7 +367,7 @@ interpreter.
         const int base_of_stack = marpa_lua_gettop(L);
         marpa_lua_pushvalue(L, marpa_lua_upvalueindex(1));
         if (!marpa_lua_istable(L, -1)) {
-            internal_error_handle(L, "missing upvalue table",
+            (void) internal_error_handle(L, "missing upvalue table",
             __PRETTY_FUNCTION__, __FILE__, __LINE__);
         }
         marpa_lua_getfield(L, -1, "buffer");
@@ -380,7 +380,7 @@ interpreter.
     /* I probably will, in the final version, want this to be a
      * static utility, internal to Kollos
      */
-    void kollos_shared_buffer_resize(
+    int kollos_shared_buffer_resize(
         lua_State* L,
         size_t desired_capacity);
 ```
@@ -391,7 +391,7 @@ leaving it as is.
 
 ```
     -- miranda: section external C function definitions
-    void kollos_shared_buffer_resize(
+    int kollos_shared_buffer_resize(
         lua_State* L,
         size_t desired_capacity)
     {
@@ -401,14 +401,14 @@ leaving it as is.
 
         marpa_lua_pushvalue(L, marpa_lua_upvalueindex(1));
         if (!marpa_lua_istable(L, -1)) {
-            internal_error_handle(L, "missing upvalue table",
+            return internal_error_handle(L, "missing upvalue table",
             __PRETTY_FUNCTION__, __FILE__, __LINE__);
         }
         marpa_lua_getfield(L, upvalue_ix, "buffer_capacity");
         buffer_capacity = (size_t)marpa_lua_tointeger(L, -1);
         /* Is this test needed after development? */
         if (buffer_capacity < 1) {
-            internal_error_handle(L, "bad buffer capacity",
+            return internal_error_handle(L, "bad buffer capacity",
             __PRETTY_FUNCTION__, __FILE__, __LINE__);
         }
         if (desired_capacity > buffer_capacity) {
@@ -422,6 +422,7 @@ leaving it as is.
             marpa_lua_setfield(L, upvalue_ix, "buffer_capacity");
         }
         marpa_lua_settop(L, base_of_stack);
+        return 0;
     }
 
 ```
@@ -813,7 +814,7 @@ Display any XPR
         local subg = slg[subg_name]
         local irl = subg.irls[irlid]
         if not irl then
-            return _M._internal_error('lmg_rule_to_xprid(), bad argument = %d', irlid)
+            return _M._internal_error('lmg_rule_to_xprid(), bad argument = %s', inspect(irlid))
         end
         -- print(inspect(irl, {depth=1}))
         return irl.xpr_top
@@ -6100,15 +6101,20 @@ It should free all memory associated with the valuation.
          result[#result+1] = "     ," .. arg_name .. "\n"
        end
        result[#result+1] = "    );\n"
-       result[#result+1] = "  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n"
+
        result[#result+1] = "  if (result < -1) {\n"
        result[#result+1] = string.format(
                             "   return libmarpa_error_handle(L, self_stack_ix, %q);\n",
                             wrapper_name .. '()')
        result[#result+1] = "  }\n"
+
        if signature.return_type == 'boolean' then
-           result[#result+1] = "  marpa_lua_pushboolean(L, result ? 1 : 0);\n"
+           result[#result+1] = "  if (result == -1) {\n"
+           result[#result+1] = '      return internal_error_handle(L, "unexpected soft error", __PRETTY_FUNCTION__, __FILE__, __LINE__);'
+           result[#result+1] = "  }\n"
+           result[#result+1] = "  marpa_lua_pushboolean(L, (result ? 1 : 0));\n"
        else
+           result[#result+1] = "  if (result == -1) { marpa_lua_pushnil(L); return 1; }\n"
            result[#result+1] = "  marpa_lua_pushinteger(L, (lua_Integer)result);\n"
        end
        result[#result+1] = "  return 1;\n"
@@ -7295,7 +7301,7 @@ The "throw" flag is ignored.
 
 ```
     -- miranda: section+ base error handlers
-    static void
+    static int
     internal_error_handle (lua_State * L,
                             const char *details,
                             const char *function,
@@ -7315,6 +7321,7 @@ The "throw" flag is ignored.
       marpa_lua_pushvalue(L, error_object_ix);
       marpa_lua_setfield(L, marpa_lua_upvalueindex(1), "error_object");
       marpa_lua_error(L);
+      return 0; /* NOTREACHED -- to silence warning message */
     }
 
     static int out_of_memory(lua_State* L) UNUSED;
@@ -8053,6 +8060,8 @@ not a soft error.
       self = *(Marpa_Traverser*)marpa_lua_touserdata (L, -1);
       marpa_lua_pop(L, 1);
       result = (int)marpa_trv_dot(self);
+      if (1) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1) fprintf (stderr, "dot=%ld\n", (long)result);
       if (result < -1) {
        return libmarpa_error_handle(L, self_stack_ix, "wrap_trv_dot()");
       }
@@ -8321,7 +8330,7 @@ Marpa::R3.
                 EXPECTED_LIBMARPA_MICRO, MARPA_MAJOR_VERSION,
                 MARPA_MINOR_VERSION, MARPA_MICRO_VERSION);
             message = marpa_lua_tostring (L, -1);
-            internal_error_handle (L, message,
+            return internal_error_handle (L, message,
                 __PRETTY_FUNCTION__, __FILE__, __LINE__);
         }
 
@@ -8336,7 +8345,7 @@ Marpa::R3.
                 marpa_lua_pushfstring (L, "marpa_version() failed: %s",
                     description);
                 message = marpa_lua_tostring (L, -1);
-                internal_error_handle (L, message, __PRETTY_FUNCTION__,
+                return internal_error_handle (L, message, __PRETTY_FUNCTION__,
                     __FILE__, __LINE__);
             }
             if (version[0] != EXPECTED_LIBMARPA_MAJOR ||
@@ -8350,7 +8359,7 @@ Marpa::R3.
                     EXPECTED_LIBMARPA_MICRO, version[0], version[1],
                     version[2]);
                 message = marpa_lua_tostring (L, -1);
-                internal_error_handle (L, message, __PRETTY_FUNCTION__,
+                return internal_error_handle (L, message, __PRETTY_FUNCTION__,
                     __FILE__, __LINE__);
             }
         }

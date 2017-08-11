@@ -170,30 +170,42 @@ sub earley_set_display {
 
       local function origins(traverser)
           local g1g = slg.g1
-          local function origin_gen(traverser)
-              local nrl_id = traverser:nrl_id()
-              if g1g:_nrl_semantic_equivalent(nrl_id) then
-                  local irl_id = traverser:rule_id()
-                  if slg:g1_rule_is_xpr_top(irl_id) then
-                      coroutine.yield(traverser:dot(), traverser:rule_id(), traverser:origin())
-                      return
-                  end
+          local function origin_gen(base_trv, origin_trv)
+              print(string.format('Calling origin gen %s %s', base_trv, origin_trv))
+              local nrl_id = origin_trv:nrl_id()
+              local irl_id = origin_trv:rule_id()
+              if irl_id
+                  and g1g:_nrl_semantic_equivalent(nrl_id)
+                  and slg:g1_rule_is_xpr_top(irl_id)
+              then
+                  coroutine.yield(base_trv:dot(), base_trv:rule_id(), origin_trv:origin())
+                  return
               end
-              local at_link = traverser:at_completion()
+              -- Do not recurse on sequence rules
+              print(inspect(g1g:sequence_min(irl_id)))
+              if g1g:sequence_min(irl_id) then return end
+              -- If here, we are at a CHAF rule
+              local at_link = origin_trv:at_completion()
+              print(string.format('origin gen at completion link %s', inspect(at_link)))
               while at_link do
-                  local predecessor = traverser:completion_predecessor()
-                  coroutine.yield(traverser:dot(), traverser:rule_id(), traverser:origin())
-                  at_link = traverser:completion_next()
+                  local predecessor = origin_trv:completion_predecessor()
+                  print(string.format('origin gen completion predecessor %s', predecessor or 0))
+                  if predecessor then origin_gen(base_trv, predecessor) end
+                  at_link = origin_trv:completion_next()
+                  print(string.format('origin gen at completion link %s', inspect(at_link)))
               end
-              at_link = traverser:at_token()
+              at_link = origin_trv:at_token()
+              print(string.format('origin gen at token link %s', inspect(at_link)))
               while at_link do
-                  local predecessor = traverser:token_predecessor()
-                  coroutine.yield(traverser:dot(), traverser:rule_id(), traverser:origin())
-                  at_link = traverser:token_next()
+                  local predecessor = origin_trv:token_predecessor()
+                  print(string.format('origin gen token predecessor %s', predecessor or 0))
+                  if predecessor then origin_gen(base_trv, predecessor) end
+                  at_link = origin_trv:token_next()
+                  print(string.format('origin gen at token link %s', inspect(at_link)))
               end
           end
           return coroutine.wrap(
-                  function () origin_gen(traverser) end
+                  function () origin_gen(traverser, traverser) end
           )
       end
 
@@ -208,7 +220,7 @@ sub earley_set_display {
               local xpr_id = slg:g1_rule_to_xprid(irl_id)
               local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
               local irl_dot = trv:dot()
-              -- print('irl_dot', inspect(irl_dot))
+              print('irl_dot', inspect(irl_dot))
               local xpr_dot
               local item_type = 1
               -- item_type is 0 for prediction, 1 for medial, 2 for completed

@@ -11502,6 +11502,10 @@ int marpa_trv_dot(Marpa_Traverser trv)
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
     const int xrl_position = XRL_Position_of_AHM(ahm);
+    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (ahm));
+    MARPA_DEBUG3("%s, nrl dot = %d", STRLOC, Position_of_AHM (ahm));
+    MARPA_DEBUG3("%s, ahm = %s", STRLOC, ahm_tag (ahm));
+    MARPA_DEBUG3("%s, yim = %s", STRLOC, yim_tag (g, ahm));
     if (xrl_position < -1) {
         MARPA_ERROR (MARPA_ERR_NO_SUCH_RULE_ID);
         return failure_indicator;
