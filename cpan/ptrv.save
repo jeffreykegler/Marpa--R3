@@ -1,0 +1,303 @@
+@** PIM traverser code (PTRV, PTRAVERSER).
+@ Pre-initialization is making the elements safe for the deallocation logic
+to be called.  Often it is setting the value to zero, so that the deallocation
+logic knows when {\bf not} to try deallocating a not-yet uninitialized value.
+@s Marpa_PTraverser int
+@<Public incomplete structures@> =
+struct marpa_ptraverser;
+typedef struct marpa_ptraverser* Marpa_PTraverser;
+@ @<Private incomplete structures@> =
+typedef struct marpa_ptraverser* PTRAVERSER;
+@ @s PTRAVERSER_Object int
+@<Traverser structure@> =
+struct marpa_ptraverser {
+    @<Widely aligned ptraverser elements@>@;
+    @<Int aligned ptraverser elements@>@;
+    @<Bit aligned ptraverser elements@>@;
+};
+typedef struct marpa_ptraverser PTRAVERSER_Object;
+
+@
+@d PIM_of_PTRV(ptrv) ((ptrv)->t_ptrv_pim)
+@d YS_of_PTRV(ptrv) ((ptrv)->t_ptrv_ys)
+
+@<Widely aligned traverser elements@> =
+PIM t_trv_pim;
+YS t_trv_ys;
+
+@ No need to clear traverser elements during
+destruction.
+@<Destroy ptraverser elements@> =
+{
+  recce_unref (R_of_PTRV(ptrv));
+}
+
+@ @d R_of_PTRV(ptrv) ((ptrv)->t_ptrv_recce)
+@<Widely aligned ptraverser elements@> =
+    RECCE t_ptrv_recce;
+@ @<Initialize ptraverser |trv|@> =
+    R_of_PTRV(ptrv) = r;
+
+@ @<Unpack ptraverser objects@> =
+    const RECCE r @,@, UNUSED = R_of_TRV(trv);
+    const GRAMMAR g @,@, UNUSED = G_of_R(r);
+
+@*0 Traverser constructors.
+@ There are several traverser constructors,
+because source links are followed by returning
+new traversers.
+
+@<Function definitions@> =
+PRIVATE Marpa_PTraverser
+ptrv_new(RECCE r, YS ys, NSYID nsyid)
+{
+    const GRAMMAR g = G_of_R(r);
+    PTRAVERSER ptrv;
+    PIM pim;
+
+    ptrv = my_malloc (sizeof (*ptrv));
+    @<Initialize ptraverser |ptrv|@>
+    recce_ref(r);
+    if (!nsy) {
+        PTRV_is_Trivial(ptrv) = 1;
+        return ptrv;
+    }
+    PIM_of_PTRV(ptrv) = First_PIM_of_YS_by_NSYID (ys, nsyid);
+    PTRV_is_Trivial(ptrv) = 0;
+    YS_of_PTRV(ptrv) = ys;
+    return ptrv;
+}
+
+@ Strictly speaking,
+trivial grammars have no Earley items but,
+as a special case,
+an |eim_arg| of 0 is allowed for them.
+@<Function definitions@> =
+Marpa_PTraverser marpa_ptrv_new(Marpa_Recognizer r,
+    Marpa_Earley_Set_ID es_arg,
+    Marpa_NSY_ID nsyid
+    )
+{
+    @<Return |NULL| on failure@>@;
+    const GRAMMAR g = G_of_R(r);
+    @<Fail if fatal error@>@;
+
+    if (_MARPA_UNLIKELY( es_arg <= -2 ))
+    {
+        MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+        return failure_indicator;
+    }
+    if (_MARPA_UNLIKELY( nsyid < 0 ))
+    {
+	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+        return failure_indicator;
+    }
+
+    @<Fail if recognizer not started@>@;
+
+    if (G_is_Trivial(g)) {
+        if (es_arg > 0) {
+	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	    return failure_indicator;
+	}
+        return trv_new(r, NULL);
+    }
+
+    r_update_earley_sets(r);
+
+    {
+      YS ys;
+
+      if (es_arg == -1)
+      {
+        ys = YS_at_Current_Earleme_of_R (r);
+      }
+      else
+      {                           /* |ordinal_arg| != -1 */
+          if (!YS_Ord_is_Valid (r, es_arg))
+          {
+              MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+              return failure_indicator;
+          }
+          ys = YS_of_R_by_Ord (r, es_arg);
+      }
+
+      return ptrv_new(r, ys, nsyid);
+    }
+}
+
+@
+@<Function definitions@> =
+int marpa_ptrv_at_lim(Marpa_PTraverser ptrv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    PIM pim;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    pim = PIM_of_PTRV(ptrv)
+    if (!pim) return 0;
+    return PIM_is_LIM(pim);
+}
+
+@
+@<Function definitions@> =
+int marpa_ptrv_at_yim(Marpa_PTraverser ptrv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    PIM pim;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    pim = PIM_of_PTRV(ptrv)
+    if (!pim) return 0;
+    return !PIM_is_LIM(pim);
+}
+
+@<Function definitions@> =
+Marpa_PTraverser marpa_ptrv_yim_iter(Marpa_PTraverser ptrv)
+{
+    @<Return |NULL| on failure@>@;
+    @<Unpack traverser objects@>@;
+    PIM pim;
+    @<Fail if fatal error@>@;
+    TRV_has_Soft_Error(trv) = 0;
+
+    if (G_is_Trivial(g)) {
+        TRV_has_Soft_Error(trv) = 1;
+        MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+        return NULL;
+    }
+    srcl = COMPLETION_SRCL_of_TRV (trv);
+    if (!srcl) {
+        MARPA_ERROR (MARPA_ERR_DEVELOPMENT);
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    predecessor = Predecessor_of_SRCL(srcl);
+    if (!predecessor) {
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    return trv_new(r, predecessor);
+}
+
+!!! TO HERE
+
+@*0 Traverser mutators.
+@
+@<Function definitions@> =
+int marpa_trv_completion_next(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+    if (G_is_Trivial(g)) {
+       return 0;
+    }
+    srcl = COMPLETION_SRCL_of_TRV (trv);
+    if (!srcl) return 0;
+    srcl = COMPLETION_SRCL_of_TRV (trv) = Next_SRCL_of_SRCL(srcl);
+    if (!srcl) return 0;
+    return 1;
+}
+
+@
+@<Function definitions@> =
+int marpa_trv_token_next(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+    if (G_is_Trivial(g)) {
+       return 0;
+    }
+    srcl = TOKEN_SRCL_of_TRV (trv);
+    if (!srcl) return 0;
+    srcl = TOKEN_SRCL_of_TRV (trv) = Next_SRCL_of_SRCL(srcl);
+    if (!srcl) return 0;
+    return 1;
+}
+
+@*0 Reference counting and destructors.
+@ @<Int aligned traverser elements@>=
+  int t_ref_count;
+@ @<Initialize traverser |trv|@> =
+    trv->t_ref_count = 1;
+@ Decrement the traverser reference count.
+@<Function definitions@> =
+PRIVATE void
+traverser_unref (TRAVERSER trv)
+{
+  MARPA_ASSERT (trv->t_ref_count > 0)
+  trv->t_ref_count--;
+  if (trv->t_ref_count <= 0)
+    {
+      traverser_free(trv);
+    }
+}
+void
+marpa_trv_unref (Marpa_Traverser trv)
+{
+   traverser_unref(trv);
+}
+
+@ Increment the traverser reference count.
+@<Function definitions@> =
+PRIVATE TRAVERSER
+traverser_ref (TRAVERSER trv)
+{
+  MARPA_ASSERT(trv->t_ref_count > 0)
+  trv->t_ref_count++;
+  return trv;
+}
+Marpa_Traverser
+marpa_trv_ref (Marpa_Traverser trv)
+{
+   return traverser_ref(trv);
+}
+
+@*0 Traverser destruction.
+
+@ This function is safe to call even
+if the traverser was never initialized.
+@<Function definitions@> =
+PRIVATE void
+traverser_free (TRAVERSER trv)
+{
+  @<Unpack traverser objects@>@;
+  if (trv)
+    {
+      @<Destroy traverser elements@>;
+    }
+  my_free(trv);
+}
+
+@*0 Traverser is trivial?.
+Is this traverser for a trivial parse?
+@d TRV_is_Trivial(trv) ((trv)->t_is_trivial)
+@ @<Bit aligned traverser elements@> =
+BITFIELD t_is_trivial:1;
+@ An uninitialized traverser acts like one
+with a trivial grammar.
+In that way a failure in our logic produces
+a slightly misleading bug report,
+and not a segment violation.
+@ @<Function definitions@> =
+int marpa_trv_is_trivial(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  return TRV_is_Trivial(trv);
+}
+@ @<Fail if traverser grammar is trivial@> =
+  if (TRV_is_Trivial(trv)) {
+    MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+    return failure_indicator;
+  }
+
