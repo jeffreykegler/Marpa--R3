@@ -6332,6 +6332,9 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_o_and_order_get", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
     {"_marpa_o_or_node_and_node_count", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_o_or_node_and_node_id_by_ix", "Marpa_Or_Node_ID", "or_node_id", "int", "ix"},
+    {"marpa_ptrv_at_eim", return_type='boolean'},
+    {"marpa_ptrv_at_lim", return_type='boolean'},
+    {"marpa_ptrv_is_trivial"},
     {"marpa_trv_at_completion", return_type='boolean'},
     {"marpa_trv_at_token", return_type='boolean'},
     {"marpa_trv_completion_next", return_type='boolean'},
@@ -6593,91 +6596,6 @@ traversers are not a "main sequence" class.
 ```
 
 ```
-    -- miranda: section+ object constructors
-    static int
-    wrap_ptraverser_new (lua_State * L)
-    {
-      const int recce_stack_ix = 1;
-      const int es_ordinal_stack_ix = 2;
-      const int nsyid_ordinal_stack_ix = 3;
-      int ptraverser_stack_ix;
-
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      if (1)
-        {
-          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
-        }
-
-      marpa_lua_newtable(L);
-      ptraverser_stack_ix = marpa_lua_gettop(L);
-      /* push "class_ptraverser" metatable */
-      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
-      marpa_lua_setmetatable (L, ptraverser_stack_ix);
-
-      {
-        Marpa_Recognizer *recce_ud;
-
-        Marpa_PTraverser *ptraverser_ud =
-          (Marpa_PTraverser *) marpa_lua_newuserdata (L, sizeof (Marpa_PTraverser));
-        /* [ base_table, class_table, class_ud ] */
-        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_ptrv_ud_mt_key);
-        /* [ class_table, class_ud, class_ud_mt ] */
-        marpa_lua_setmetatable (L, -2);
-        /* [ class_table, class_ud ] */
-
-        marpa_lua_setfield (L, ptraverser_stack_ix, "_libmarpa");
-        marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
-        marpa_lua_setfield (L, ptraverser_stack_ix, "lmw_g");
-        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
-        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
-
-        {
-          int is_ok = 0;
-          lua_Integer es_ordinal = -1;
-          lua_Integer nsyid_ordinal = 0;
-          if (marpa_lua_isnil(L, es_ordinal_stack_ix)) {
-             is_ok = 1;
-          } else {
-             es_ordinal = marpa_lua_tointegerx(L, es_ordinal_stack_ix, &is_ok);
-          }
-          if (!is_ok) {
-              marpa_luaL_error(L,
-                  "problem with traverser_new() arg #2, type was %s",
-                  marpa_luaL_typename(L, es_ordinal_stack_ix)
-              );
-          }
-          is_ok = 0;
-          if (marpa_lua_isnil(L, nsyid_ordinal_stack_ix)) {
-             is_ok = 1;
-          } else {
-             nsyid_ordinal = marpa_lua_tointegerx(L, nsyid_ordinal_stack_ix, &is_ok);
-          }
-          if (!is_ok) {
-              marpa_luaL_error(L,
-                  "problem with ptraverser_new() arg #3, type was %s",
-                  marpa_luaL_typename(L, nsyid_ordinal_stack_ix)
-              );
-          }
-          *ptraverser_ud = marpa_ptrv_new (*recce_ud, (int)es_ordinal, (int)nsyid_ordinal);
-        }
-
-        if (!*ptraverser_ud)
-          {
-            return libmarpa_error_handle (L, ptraverser_stack_ix, "marpa_ptrv_new()");
-          }
-      }
-
-      if (0)
-        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      marpa_lua_settop(L, ptraverser_stack_ix );
-      /* [ base_table, class_table ] */
-      return 1;
-    }
-
-```
-
-```
     -- miranda: section+ non-standard wrappers
     static int
     lca_trv_completion_predecessor (lua_State * L)
@@ -6779,6 +6697,154 @@ traversers are not a "main sequence" class.
                 return 1;
             }
             return libmarpa_error_handle (L, base_traverser_stack_ix, "marpa_trv_token_predecessor()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, traverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
+```
+    -- miranda: section+ object constructors
+    static int
+    wrap_ptraverser_new (lua_State * L)
+    {
+      const int recce_stack_ix = 1;
+      const int es_ordinal_stack_ix = 2;
+      const int nsyid_ordinal_stack_ix = 3;
+      int ptraverser_stack_ix;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, recce_stack_ix, LUA_TTABLE);
+        }
+
+      marpa_lua_newtable(L);
+      ptraverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_ptraverser" metatable */
+      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_setmetatable (L, ptraverser_stack_ix);
+
+      {
+        Marpa_Recognizer *recce_ud;
+
+        Marpa_PTraverser *ptraverser_ud =
+          (Marpa_PTraverser *) marpa_lua_newuserdata (L, sizeof (Marpa_PTraverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_ptrv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, ptraverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, recce_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, ptraverser_stack_ix, "lmw_g");
+        marpa_lua_getfield (L, recce_stack_ix, "_libmarpa");
+        recce_ud = (Marpa_Recognizer *) marpa_lua_touserdata (L, -1);
+
+        {
+          int is_ok = 0;
+          lua_Integer es_ordinal = -1;
+          lua_Integer nsyid_ordinal = 0;
+          if (marpa_lua_isnil(L, es_ordinal_stack_ix)) {
+             is_ok = 1;
+          } else {
+             es_ordinal = marpa_lua_tointegerx(L, es_ordinal_stack_ix, &is_ok);
+          }
+          if (!is_ok) {
+              marpa_luaL_error(L,
+                  "problem with traverser_new() arg #2, type was %s",
+                  marpa_luaL_typename(L, es_ordinal_stack_ix)
+              );
+          }
+          is_ok = 0;
+          if (marpa_lua_isnil(L, nsyid_ordinal_stack_ix)) {
+             is_ok = 1;
+          } else {
+             nsyid_ordinal = marpa_lua_tointegerx(L, nsyid_ordinal_stack_ix, &is_ok);
+          }
+          if (!is_ok) {
+              marpa_luaL_error(L,
+                  "problem with ptraverser_new() arg #3, type was %s",
+                  marpa_luaL_typename(L, nsyid_ordinal_stack_ix)
+              );
+          }
+          *ptraverser_ud = marpa_ptrv_new (*recce_ud, (int)es_ordinal, (int)nsyid_ordinal);
+        }
+
+        if (!*ptraverser_ud)
+          {
+            return libmarpa_error_handle (L, ptraverser_stack_ix, "marpa_ptrv_new()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, ptraverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
+`lca_ptrv_eim_iter` returns an EIM iterator from an PIM
+traverser.
+It's slightly tricky -- it is called on a PIM Traverser,
+but returns a EIM Traverser.
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int
+    lca_ptrv_eim_iter (lua_State * L)
+    {
+      const int ptraverser_stack_ix = 1;
+      int traverser_stack_ix;
+      Marpa_PTraverser *ptraverser_ud;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, ptraverser_stack_ix, LUA_TTABLE);
+        }
+      marpa_lua_getfield (L, ptraverser_stack_ix, "_libmarpa");
+      ptraverser_ud = marpa_lua_touserdata(L, -1);
+
+      marpa_lua_newtable(L);
+      traverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_ptraverser" metatable */
+      marpa_lua_getglobal(L, "_M");
+      marpa_lua_getfield(L, -1, "class_ptraverser");
+      marpa_lua_setmetatable (L, traverser_stack_ix);
+
+      {
+        Marpa_Traverser *traverser_ud =
+          (Marpa_Traverser *) marpa_lua_newuserdata (L, sizeof (Marpa_Traverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, traverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, ptraverser_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
+
+        *traverser_ud = marpa_ptrv_eim_iter (*ptraverser_ud);
+        if (!*traverser_ud)
+          {
+            if (marpa_ptrv_soft_error(*ptraverser_ud)) {
+                marpa_lua_pushnil(L);
+                return 1;
+            }
+            return libmarpa_error_handle (L, ptraverser_stack_ix, "marpa_ptrv_eim_iter()");
           }
       }
 
@@ -8183,6 +8249,7 @@ not a soft error.
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
+      { "eim_iter", lca_ptrv_eim_iter },
       { NULL, NULL },
     };
 
