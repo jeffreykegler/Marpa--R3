@@ -249,6 +249,14 @@ The `discard default` statement would be modeled on the
    discard default => event => ::name=off
 ```
 
+### Remove Libmarpa trace facility
+
+This is replaced by the traversers.
+
+### Remove Libmarpa lookers
+
+These are replaced by the traversers.
+
 ## Concepts
 
 This section describes those Kollos concepts who do

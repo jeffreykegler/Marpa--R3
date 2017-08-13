@@ -12,10 +12,17 @@ dummy:
 #   1.) Run this 'debug' target to set up the Makefile
 #   2.) Run the 'meta' target to recompile Libmarpa
 #   3.) Set MARPA_AUTHOR_TEST=1 in the environment
+#
+# There are some infelicities in this target -- sometimes
+# dependences on libmarpa do not cause a remake.  I plan to redo
+# the make and when I do I expect these issues will go away
 debug:
 	make clean
 	MARPA_DEBUG_FLAG="-DMARPA_DEBUG=1" perl Makefile.PL OPTIMIZE=-g
 	make
+
+texi:
+	(cd libmarpa/work/dev; make update_texi)
 
 license:
 	perl etc/check_license.pl

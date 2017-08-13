@@ -11502,10 +11502,10 @@ int marpa_trv_dot(Marpa_Traverser trv)
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
     const int xrl_position = XRL_Position_of_AHM(ahm);
-    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (ahm));
-    MARPA_DEBUG3("%s, nrl dot = %d", STRLOC, Position_of_AHM (ahm));
-    MARPA_DEBUG3("%s, ahm = %s", STRLOC, ahm_tag (ahm));
-    MARPA_DEBUG3("%s, yim = %s", STRLOC, yim_tag (g, ahm));
+    MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (ahm));
+    MARPA_OFF_DEBUG3("%s, nrl dot = %d", STRLOC, Position_of_AHM (ahm));
+    MARPA_OFF_DEBUG3("%s, ahm = %s", STRLOC, ahm_tag (ahm));
+    MARPA_OFF_DEBUG3("%s, yim = %s", STRLOC, yim_tag (g, yim));
     if (xrl_position < -1) {
         MARPA_ERROR (MARPA_ERR_NO_SUCH_RULE_ID);
         return failure_indicator;
@@ -11544,6 +11544,286 @@ Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
   }
   return -1;
 }
+
+@** PIM traverser code (PTRV, PTRAVERSER).
+@ Pre-initialization is making the elements safe for the deallocation logic
+to be called.  Often it is setting the value to zero, so that the deallocation
+logic knows when {\bf not} to try deallocating a not-yet uninitialized value.
+@s Marpa_PTraverser int
+@<Public incomplete structures@> =
+struct marpa_ptraverser;
+typedef struct marpa_ptraverser* Marpa_PTraverser;
+@ @<Private incomplete structures@> =
+typedef struct marpa_ptraverser* PTRAVERSER;
+@ @s PTRAVERSER_Object int
+@<PIM traverser structure@> =
+struct marpa_ptraverser {
+    @<Widely aligned PIM traverser elements@>@;
+    @<Int aligned PIM traverser elements@>@;
+    @<Bit aligned PIM traverser elements@>@;
+};
+typedef struct marpa_ptraverser PTRAVERSER_Object;
+
+@
+@d PIM_of_PTRV(ptrv) ((ptrv)->t_ptrv_pim)
+@d YS_of_PTRV(ptrv) ((ptrv)->t_ptrv_ys)
+
+@<Widely aligned PIM traverser elements@> =
+PIM t_ptrv_pim;
+YS t_ptrv_ys;
+
+@ No need to clear traverser elements during
+destruction.
+@<Destroy PIM traverser elements@> =
+{
+  recce_unref (R_of_PTRV(ptrv));
+}
+
+@ @<Bit aligned PIM traverser elements@> =
+    int t_ptrv_soft_error;
+@ @d PTRV_has_Soft_Error(ptrv) ((ptrv)->t_ptrv_soft_error)
+@ @<Initialize PIM traverser |ptrv|@> =
+    PTRV_has_Soft_Error(ptrv) = 0;
+@ @<Function definitions@> =
+int marpa_ptrv_soft_error(Marpa_PTraverser ptrv)
+{
+    return PTRV_has_Soft_Error(ptrv);
+}
+
+@ @d R_of_PTRV(ptrv) ((ptrv)->t_ptrv_recce)
+@<Widely aligned PIM traverser elements@> =
+    RECCE t_ptrv_recce;
+@ @<Initialize PIM traverser |ptrv|@> =
+    R_of_PTRV(ptrv) = r;
+
+@ @<Unpack PIM traverser objects@> =
+    const RECCE r @,@, UNUSED = R_of_PTRV(ptrv);
+    const GRAMMAR g @,@, UNUSED = G_of_R(r);
+
+@*0 Traverser constructors.
+@ There are several traverser constructors,
+because source links are followed by returning
+new traversers.
+
+@<Function definitions@> =
+PRIVATE Marpa_PTraverser
+ptrv_new(RECCE r, YS ys, NSYID nsyid)
+{
+    const GRAMMAR g = G_of_R(r);
+    PTRAVERSER ptrv;
+    const PIM pim = First_PIM_of_YS_by_NSYID (ys, nsyid);
+
+    if (!pim) return NULL;
+    ptrv = my_malloc (sizeof (*ptrv));
+    @<Initialize PIM traverser |ptrv|@>
+    recce_ref(r);
+    PIM_of_PTRV(ptrv) = pim;
+    PTRV_is_Trivial(ptrv) = 0;
+    YS_of_PTRV(ptrv) = ys;
+    return ptrv;
+}
+
+@ 
+Trivial grammars have no Earley items but,
+as a special case,
+any non-negative |nsyid| is allowed for them.
+@<Function definitions@> =
+Marpa_PTraverser marpa_ptrv_new(Marpa_Recognizer r,
+    Marpa_Earley_Set_ID es_arg,
+    Marpa_NSY_ID nsyid
+    )
+{
+    @<Return |NULL| on failure@>@;
+    const GRAMMAR g = G_of_R(r);
+    @<Fail if fatal error@>@;
+
+    if (_MARPA_UNLIKELY( es_arg <= -2 ))
+    {
+        MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+        return failure_indicator;
+    }
+    if (_MARPA_UNLIKELY( nsyid < 0 ))
+    {
+	MARPA_ERROR (MARPA_ERR_YIM_ID_INVALID);
+        return failure_indicator;
+    }
+
+    @<Fail if recognizer not started@>@;
+
+    if (G_is_Trivial(g)) {
+        if (es_arg > 0) {
+	    MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+	    return failure_indicator;
+	}
+        return NULL;
+    }
+
+    r_update_earley_sets(r);
+
+    {
+      YS ys;
+
+      if (es_arg == -1)
+      {
+        ys = YS_at_Current_Earleme_of_R (r);
+      }
+      else
+      {                           /* |ordinal_arg| != -1 */
+          if (!YS_Ord_is_Valid (r, es_arg))
+          {
+              MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
+              return failure_indicator;
+          }
+          ys = YS_of_R_by_Ord (r, es_arg);
+      }
+
+      return ptrv_new(r, ys, nsyid);
+    }
+}
+
+@
+@<Function definitions@> =
+int marpa_ptrv_at_lim(Marpa_PTraverser ptrv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack PIM traverser objects@>@;
+    PIM pim;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    pim = PIM_of_PTRV(ptrv);
+    if (!pim) return 0;
+    return PIM_is_LIM(pim);
+}
+
+@
+@<Function definitions@> =
+int marpa_ptrv_at_eim(Marpa_PTraverser ptrv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack PIM traverser objects@>@;
+    PIM pim;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    pim = PIM_of_PTRV(ptrv);
+    if (!pim) return 0;
+    return !PIM_is_LIM(pim);
+}
+
+@*0 PIM Traverser mutators.
+@
+{\bf To Do}: @^To Do@>
+Rename |MARPA_ERR_NO_TRACE_PIM| and
+|MARPA_ERR_NO_TRACE_YIM|?
+@<Function definitions@> =
+Marpa_Traverser marpa_ptrv_eim_iter(Marpa_PTraverser ptrv)
+{
+    @<Return |NULL| on failure@>@;
+    @<Unpack PIM traverser objects@>@;
+    PIM pim;
+    YIM yim;
+    @<Fail if fatal error@>@;
+    PTRV_has_Soft_Error(ptrv) = 0;
+
+    if (G_is_Trivial(g)) {
+        PTRV_has_Soft_Error(ptrv) = 1;
+        MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+        return NULL;
+    }
+    pim = PIM_of_PTRV (ptrv);
+    if (!pim) {
+        MARPA_ERROR (MARPA_ERR_NO_TRACE_PIM);
+        PTRV_has_Soft_Error(ptrv) = 1;
+        return NULL;
+    }
+    if (PIM_is_LIM(pim)) {
+        MARPA_ERROR (MARPA_ERR_NO_TRACE_YIM);
+        PTRV_has_Soft_Error(ptrv) = 1;
+        return NULL;
+    }
+    yim = YIM_of_PIM(pim);
+    PIM_of_PTRV (ptrv) = Next_PIM_of_PIM(pim);
+    return trv_new(r, yim);
+}
+
+@*0 Reference counting and destructors.
+@ @<Int aligned PIM traverser elements@>=
+  int t_ref_count;
+@ @<Initialize PIM traverser |ptrv|@> =
+    ptrv->t_ref_count = 1;
+@ Decrement the PIM traverser reference count.
+@<Function definitions@> =
+PRIVATE void
+ptraverser_unref (PTRAVERSER ptrv)
+{
+  MARPA_ASSERT (ptrv->t_ref_count > 0)
+  ptrv->t_ref_count--;
+  if (ptrv->t_ref_count <= 0)
+    {
+      ptraverser_free(ptrv);
+    }
+}
+void
+marpa_ptrv_unref (Marpa_PTraverser ptrv)
+{
+   ptraverser_unref(ptrv);
+}
+
+@ Increment the PIM traverser reference count.
+@<Function definitions@> =
+PRIVATE PTRAVERSER
+ptraverser_ref (PTRAVERSER ptrv)
+{
+  MARPA_ASSERT(ptrv->t_ref_count > 0)
+  ptrv->t_ref_count++;
+  return ptrv;
+}
+Marpa_PTraverser
+marpa_ptrv_ref (Marpa_PTraverser ptrv)
+{
+   return ptraverser_ref(ptrv);
+}
+
+@*0 Traverser destruction.
+
+@ This function is safe to call even
+if the traverser was never initialized.
+@<Function definitions@> =
+PRIVATE void
+ptraverser_free (PTRAVERSER ptrv)
+{
+  @<Unpack PIM traverser objects@>@;
+  if (ptrv)
+    {
+      @<Destroy PIM traverser elements@>;
+    }
+  my_free(ptrv);
+}
+
+@*0 Traverser is trivial?.
+Is this traverser for a trivial parse?
+@d PTRV_is_Trivial(ptrv) ((ptrv)->t_is_trivial)
+@ @<Bit aligned PIM traverser elements@> =
+BITFIELD t_is_trivial:1;
+@ An uninitialized traverser acts like one
+with a trivial grammar.
+In that way a failure in our logic produces
+a slightly misleading bug report,
+and not a segment violation.
+@ @<Function definitions@> =
+int marpa_ptrv_is_trivial(Marpa_PTraverser ptrv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack PIM traverser objects@>@;
+  @<Fail if fatal error@>@;
+  return PTRV_is_Trivial(ptrv);
+}
+@ @<Fail if PIM traverser grammar is trivial@> =
+  if (PTRV_is_Trivial(ptrv)) {
+    MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+    return failure_indicator;
+  }
 
 @** Parse bocage code (B, BOCAGE).
 @ Pre-initialization is making the elements safe for the deallocation logic
@@ -17088,6 +17368,7 @@ or used strictly for debugging.
 @<Source object structure@>@;
 @<Earley item structure@>@;
 @<Traverser structure@>@;
+@<PIM traverser structure@>@;
 @<Bocage structure@>@;
 
 @ @(marpa.c.p50@> =

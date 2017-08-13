@@ -11,9 +11,9 @@ typedef struct marpa_ptraverser* PTRAVERSER;
 @ @s PTRAVERSER_Object int
 @<PIM Traverser structure@> =
 struct marpa_ptraverser {
-    @<Widely aligned ptraverser elements@>@;
-    @<Int aligned ptraverser elements@>@;
-    @<Bit aligned ptraverser elements@>@;
+    @<Widely aligned PIM traverser elements@>@;
+    @<Int aligned PIM traverser elements@>@;
+    @<Bit aligned PIM traverser elements@>@;
 };
 typedef struct marpa_ptraverser PTRAVERSER_Object;
 
@@ -21,24 +21,24 @@ typedef struct marpa_ptraverser PTRAVERSER_Object;
 @d PIM_of_PTRV(ptrv) ((ptrv)->t_ptrv_pim)
 @d YS_of_PTRV(ptrv) ((ptrv)->t_ptrv_ys)
 
-@<Widely aligned traverser elements@> =
+@<Widely aligned PIM traverser elements@> =
 PIM t_ptrv_pim;
 YS t_ptrv_ys;
 
 @ No need to clear traverser elements during
 destruction.
-@<Destroy ptraverser elements@> =
+@<Destroy PIM traverser elements@> =
 {
   recce_unref (R_of_PTRV(ptrv));
 }
 
 @ @d R_of_PTRV(ptrv) ((ptrv)->t_ptrv_recce)
-@<Widely aligned ptraverser elements@> =
+@<Widely aligned PIM traverser elements@> =
     RECCE t_ptrv_recce;
-@ @<Initialize ptraverser |ptrv|@> =
+@ @<Initialize PIM traverser |ptrv|@> =
     R_of_PTRV(ptrv) = r;
 
-@ @<Unpack ptraverser objects@> =
+@ @<Unpack PIM traverser objects@> =
     const RECCE r @,@, UNUSED = R_of_PTRV(ptrv);
     const GRAMMAR g @,@, UNUSED = G_of_R(r);
 
@@ -56,7 +56,7 @@ ptrv_new(RECCE r, YS ys, NSYID nsyid)
     PIM pim;
 
     ptrv = my_malloc (sizeof (*ptrv));
-    @<Initialize ptraverser |ptrv|@>
+    @<Initialize PIM traverser |ptrv|@>
     recce_ref(r);
     if (!nsy) {
         PTRV_is_Trivial(ptrv) = 1;
@@ -68,10 +68,10 @@ ptrv_new(RECCE r, YS ys, NSYID nsyid)
     return ptrv;
 }
 
-@ Strictly speaking,
-trivial grammars have no Earley items but,
+@ 
+Trivial grammars have no Earley items but,
 as a special case,
-an |eim_arg| of 0 is allowed for them.
+any non-negative |nsyid| is allowed for them.
 @<Function definitions@> =
 Marpa_PTraverser marpa_ptrv_new(Marpa_Recognizer r,
     Marpa_Earley_Set_ID es_arg,
@@ -131,7 +131,7 @@ Marpa_PTraverser marpa_ptrv_new(Marpa_Recognizer r,
 int marpa_ptrv_at_lim(Marpa_PTraverser ptrv)
 {
     @<Return |-2| on failure@>@;
-    @<Unpack traverser objects@>@;
+    @<Unpack PIM traverser objects@>@;
     PIM pim;
     @<Fail if fatal error@>@;
 
@@ -146,7 +146,7 @@ int marpa_ptrv_at_lim(Marpa_PTraverser ptrv)
 int marpa_ptrv_at_yim(Marpa_PTraverser ptrv)
 {
     @<Return |-2| on failure@>@;
-    @<Unpack traverser objects@>@;
+    @<Unpack PIM traverser objects@>@;
     PIM pim;
     @<Fail if fatal error@>@;
 
@@ -162,10 +162,10 @@ int marpa_ptrv_at_yim(Marpa_PTraverser ptrv)
 Rename |MARPA_ERR_NO_TRACE_PIM| and
 |MARPA_ERR_NO_TRACE_YIM|?
 @<Function definitions@> =
-Marpa_Traverser marpa_ptrv_yim_iter(Marpa_PTraverser ptrv)
+Marpa_Traverser marpa_ptrv_eim_iter(Marpa_PTraverser ptrv)
 {
     @<Return |NULL| on failure@>@;
-    @<Unpack traverser objects@>@;
+    @<Unpack PIM traverser objects@>@;
     PIM pim;
     YIM yim;
     @<Fail if fatal error@>@;
@@ -238,7 +238,7 @@ if the traverser was never initialized.
 PRIVATE void
 ptraverser_free (PTRAVERSER ptrv)
 {
-  @<Unpack traverser objects@>@;
+  @<Unpack PIM traverser objects@>@;
   if (ptrv)
     {
       @<Destroy PIM traverser elements@>;
@@ -249,7 +249,7 @@ ptraverser_free (PTRAVERSER ptrv)
 @*0 Traverser is trivial?.
 Is this traverser for a trivial parse?
 @d PTRV_is_Trivial(ptrv) ((ptrv)->t_is_trivial)
-@ @<Bit aligned traverser elements@> =
+@ @<Bit aligned PIM traverser elements@> =
 BITFIELD t_is_trivial:1;
 @ An uninitialized traverser acts like one
 with a trivial grammar.
@@ -260,7 +260,7 @@ and not a segment violation.
 int marpa_ptrv_is_trivial(Marpa_PTraverser ptrv)
 {
   @<Return |-2| on failure@>@;
-  @<Unpack traverser objects@>@;
+  @<Unpack PIM traverser objects@>@;
   @<Fail if fatal error@>@;
   return PTRV_is_Trivial(ptrv);
 }

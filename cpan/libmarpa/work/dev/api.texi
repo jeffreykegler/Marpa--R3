@@ -76,6 +76,7 @@ Published @value{UPDATED} by Jeffrey Kegler
 * Recognizer methods::
 * Progress reports::
 * Traverser methods::
+* PIM Traverser methods::
 * Bocage methods::
 * Ordering methods::
 * Tree methods::
@@ -163,7 +164,15 @@ Traverser methods
 * Traverser reference counting::
 * Traverser mutators::
 * Traverser link constructors::
+
+PIM Traverser methods
+
 * Traverser accessors::
+* PIM Traverser overview::
+* PIM Traverser constructor::
+* PIM Traverser reference counting::
+* PIM Traverser accessors::
+* PIM Traverser iterators::
 
 Bocage methods
 
@@ -3266,7 +3275,7 @@ or on other failure, @minus{}2.
 * Bocage accessor::
 @end menu
 
-@node Traverser methods, Bocage methods, Progress reports, Top
+@node Traverser methods, PIM Traverser methods, Progress reports, Top
 @chapter Traverser methods
 
 @menu
@@ -3275,7 +3284,6 @@ or on other failure, @minus{}2.
 * Traverser reference counting::
 * Traverser mutators::
 * Traverser link constructors::
-* Traverser accessors::
 @end menu
 
 @node Traverser overview, Traverser constructor, Traverser methods, Traverser methods
@@ -3353,7 +3361,7 @@ Return value on success: 1 if the token link was advanced,
 Return value on failure: @minus{}2.
 @end deftypefun
 
-@node Traverser link constructors, Traverser accessors, Traverser mutators, Traverser methods
+@node Traverser link constructors,  , Traverser mutators, Traverser methods
 @section Link constructors
 
 @deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
@@ -3374,7 +3382,19 @@ Sets the soft error flag to 1 if the error was ``soft'',
 and to 0 otherwise.
 @end deftypefun
 
-@node Traverser accessors,  , Traverser link constructors, Traverser methods
+@node PIM Traverser methods, Bocage methods, Traverser methods, Top
+@chapter PIM Traverser methods
+
+@menu
+* Traverser accessors::
+* PIM Traverser overview::
+* PIM Traverser constructor::
+* PIM Traverser reference counting::
+* PIM Traverser accessors::
+* PIM Traverser iterators::
+@end menu
+
+@node Traverser accessors, PIM Traverser overview, PIM Traverser methods, PIM Traverser methods
 @section Accessors
 
 @deftypefun int marpa_trv_at_completion(Marpa_Traverser @var{trv})
@@ -3453,7 +3473,126 @@ Return value on success: The ID of the NRL.
 Return value on failure: @minus{}2.
 @end deftypefun
 
-@node Bocage methods, Ordering methods, Traverser methods, Top
+@node PIM Traverser overview, PIM Traverser constructor, Traverser accessors, PIM Traverser methods
+@section Overview
+
+The PIM traverser is an object used in traversing the postdot
+data in the recognizer's Earley sets.
+
+To create a PIM traverser, use the @code{marpa_ptrv_new()} method.
+
+When a traverser is no longer in use, its memory can be freed
+using the 
+@code{marpa_ptrv_unref()} method.
+
+@node PIM Traverser constructor, PIM Traverser reference counting, PIM Traverser overview, PIM Traverser methods
+@section Creating a new PIM traverser
+
+@deftypefun Marpa_PTraverser marpa_ptrv_new(Marpa_Recognizer @var{r}, @
+    Marpa_Earley_Set_ID @var{es_arg}, @
+    Marpa_NSY_ID @var{nsyid})
+
+Creates a new PIM traverser object, with a reference count of 1.
+The reference count of its parent recognizer object, @var{r},
+is increased by 1.
+If @var{earley_set_ID} is @minus{}1,
+the Earley set at the current earleme is used,
+if there is one.
+
+Success: Returns the new traverser object on success.
+
+Soft failure: Returns @code{NULL} if the grammar for @var{r}
+is trivial, or if there are no postdot items for @var{es_arg}
+and @var{nsyid}.
+@end deftypefun
+
+@node PIM Traverser reference counting, PIM Traverser accessors, PIM Traverser constructor, PIM Traverser methods
+@section  Reference counting
+@deftypefun Marpa_PTraverser marpa_ptrv_ref (Marpa_PTraverser @var{ptrv})
+Increases the reference count by 1.
+Not needed by most applications.
+
+Return value:
+On success, @var{ptrv}.
+On failure, @code{NULL}.
+@end deftypefun
+
+@deftypefun void marpa_ptrv_unref (Marpa_PTraverser @var{ptrv})
+Decreases the reference count by 1,
+destroying @var{ptrv} once the reference count reaches
+zero.
+When @var{ptrv} is destroyed, the reference count
+of its parent recognizer is decreased by 1.
+If this takes the reference count of the parent recognizer
+to zero, it too is destroyed.
+If the parent recognizer is destroyed, the reference count
+of its base grammar is decreased by 1.
+If this takes the reference count of the base grammar
+to zero, it too is destroyed.
+
+@end deftypefun
+
+@node PIM Traverser accessors, PIM Traverser iterators, PIM Traverser reference counting, PIM Traverser methods
+@section Accessors
+
+@deftypefun int marpa_ptrv_at_eim(Marpa_PTraverser @var{ptrv})
+
+Return values on success:
+Returns 1 if the PIM traverser is positioned
+at an EIM.
+Returns 0 if the PIM traverser is positioned
+past the last postdot item, or if it is positioned at
+a LIM.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_ptrv_at_lim(Marpa_PTraverser @var{ptrv})
+
+Return values on success:
+Returns 1 if the PIM traverser is positioned
+at an EIM.
+Returns 0 if the PIM traverser is positioned
+past the last postdot item, or if it is positioned at
+a LIM.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@node PIM Traverser iterators,  , PIM Traverser accessors, PIM Traverser methods
+@section Link constructors
+
+@deftypefun Marpa_Traverser marpa_ptrv_eim_iter(Marpa_PTraverser @var{ptrv})
+
+On success,
+returns a traverser positioned at the Earley item which
+corresponds to the current postdot item,
+and advances the PIM traverset to the next postdot time.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
+@deftypefun int marpa_ptrv_is_trivial(Marpa_PTraverser @var{ptrv})
+
+Return value on success: 1 if @var{ptrv} is trivial, 0 otherwise.
+
+Return value on failure: @code{NULL}.
+@end deftypefun
+
+@deftypefun int marpa_ptrv_soft_error(Marpa_PTraverser @var{ptrv})
+
+Only certain method calls, all of them documented to do so,
+set the soft error flag.
+
+Return value on success: 1 if the soft error flag is on, 0 otherwise.
+
+Return value on failure: Never fails.  This is because, pedantically,
+the error (soft or hard) occurred in a previous method call.
+@end deftypefun
+
+@node Bocage methods, Ordering methods, PIM Traverser methods, Top
 @chapter Bocage methods
 
 @menu
