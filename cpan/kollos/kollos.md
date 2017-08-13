@@ -8068,8 +8068,8 @@ not a soft error.
       self = *(Marpa_Traverser*)marpa_lua_touserdata (L, -1);
       marpa_lua_pop(L, 1);
       result = (int)marpa_trv_dot(self);
-      if (1) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      if (1) fprintf (stderr, "dot=%ld\n", (long)result);
+      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (0) fprintf (stderr, "dot=%ld\n", (long)result);
       if (result < -1) {
        return libmarpa_error_handle(L, self_stack_ix, "wrap_trv_dot()");
       }
