@@ -207,46 +207,58 @@ sub earley_set_display {
           )
       end
 
-      -- io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
-      local result = { "=== Earley Set " .. earley_set_id .. "===" }
-      local items = {}
-      local max_eim = g1r:_earley_set_size(earley_set_id) - 1
-      for item_id = 0, max_eim do
-          -- IRL data for debugging only -- delete
-          local trv = _M.traverser_new(g1r, earley_set_id, item_id)
-          local irl_id = trv:rule_id()
-          if not irl_id then goto NEXT_ITEM end
-          local irl_dot = trv:dot()
-          -- io.stderr:write(string.format("item: %d R%d:%d@%d\n", earley_set_id,
-               -- irl_id, irl_dot, trv:origin()))
-          local xpr_id = slg:g1_rule_to_xprid(irl_id)
-          local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
-          local xpr_dot
-          local item_type = 1
-          -- item_type is 0 for prediction, 1 for medial, 2 for completed
-          if irl_dot == -1 then
-              xpr_dot = xpr_dots[#xpr_dots]
-              item_type = 2
-          else
-              xpr_dot = xpr_dots[irl_dot+1]
-          end
-          if xpr_dot == 0 then item_type = 0 end
-
+      local function progress(slr, earley_set_id)
+          local g1r = slr.g1
           local uniq_items = {}
-          for origin in origins(trv) do
-              local vlq = _M.to_vlq{ earley_set_id, item_type,
-                  xpr_id, xpr_dot, origin }
-              uniq_items[vlq] = true
+          local max_eim = g1r:_earley_set_size(earley_set_id) - 1
+          for item_id = 0, max_eim do
+              -- IRL data for debugging only -- delete
+              local trv = _M.traverser_new(g1r, earley_set_id, item_id)
+              local irl_id = trv:rule_id()
+              if not irl_id then goto NEXT_ITEM end
+              local irl_dot = trv:dot()
+              -- io.stderr:write(string.format("item: %d R%d:%d@%d\n", earley_set_id,
+                   -- irl_id, irl_dot, trv:origin()))
+              local xpr_id = slg:g1_rule_to_xprid(irl_id)
+              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
+              local xpr_dot
+              if irl_dot == -1 then
+                  xpr_dot = xpr_dots[#xpr_dots]
+              else
+                  xpr_dot = xpr_dots[irl_dot+1]
+              end
+              for origin in origins(trv) do
+                  local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
+                  uniq_items[vlq] = true
+              end
+              ::NEXT_ITEM::
           end
+          local items = {}
           for vlq, _ in  pairs(uniq_items) do
               items[#items+1] = _M.from_vlq(vlq)
           end
-          ::NEXT_ITEM::
+          return items
+      end
+
+      -- io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
+      local result = { "=== Earley Set " .. earley_set_id .. "===" }
+      local current_items = progress(slr, earley_set_id)
+      local items = {}
+      for ix = 1, #current_items do
+          local xpr_id, xpr_dot, origin = table.unpack(current_items[ix])
+          -- item_type is 0 for prediction, 1 for medial, 2 for completed
+          local item_type = 1
+          if xpr_dot == 0 then
+              item_type = 0
+          elseif xpr_dot == -1 then
+              xpr_dot = slg:xpr_length(rule_id)
+              item_type = 2
+          end
+          items[#items+1] = { earley_set_id, item_type, xpr_id, xpr_dot, origin }
       end
       local last_ordinal
       local lines = {}
       for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
-          print(inspect(origins))
           if this_ordinal ~= last_ordinal then
               local location = 'B0L0c0'
               if this_ordinal > 0 then
@@ -265,89 +277,100 @@ END_OF_LUA
     return $result;
 }
 
-TODO: {
-    local $TODO = "Problem with Earley Set 0";
-    Marpa::R3::Test::is( earley_set_display(0), <<'EOS', 'Earley Set 0' );
-=== Earley Set 0 ===
-Huh?
+Marpa::R3::Test::is( earley_set_display(0), <<'EOS', 'Earley Set 0' );
+=== Earley set 0 at B0L0c0 ===
+P1 B0L0c0 [:start:] ::= . S
+P2 B0L0c0 S ::= . A A A A A A A
+P4 B0L0c0 A ::= . 'a'
+R2:1 B0L0c0 S ::= A . A A A A A A
+R2:2 B0L0c0 S ::= A A . A A A A A
+R2:3 B0L0c0 S ::= A A A . A A A A
+R2:4 B0L0c0 S ::= A A A A . A A A
+R2:5 B0L0c0 S ::= A A A A A . A A
+R2:6 B0L0c0 S ::= A A A A A A . A
 EOS
-}
 
 Marpa::R3::Test::is( earley_set_display(1),
     <<'EOS', 'Earley Set 1' );
-=== Earley Set 1 ===
-S:1 @0-1 S ::= A . A A A A A A
-S:2 @0-1 S ::= A A . A A A A A
-S:3 @0-1 S ::= A A A . A A A A
-S:4 @0-1 S ::= A A A A . A A A
-S:5 @0-1 S ::= A A A A A . A A
-S:6 @0-1 S ::= A A A A A A . A
-S:-1 @0-1 S ::= A A A A A A A .
-S:-1 @0-1 A ::= 'a' .
-S:-1 @0-1 [:start:] ::= S .
+=== Earley set 1 at B1L1c2 ===
+P4 B1L1c2 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= A . A A A A A A
+R2:2 B1L1c1 S ::= A A . A A A A A
+R2:3 B1L1c1 S ::= A A A . A A A A
+R2:4 B1L1c1 S ::= A A A A . A A A
+R2:5 B1L1c1 S ::= A A A A A . A A
+R2:6 B1L1c1 S ::= A A A A A A . A
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c1 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(2),
     <<'EOS', 'Earley Set 2' );
-=== Earley Set 2 ===
-S:2 @0-2 S ::= A A . A A A A A
-S:3 @0-2 S ::= A A A . A A A A
-S:4 @0-2 S ::= A A A A . A A A
-S:5 @0-2 S ::= A A A A A . A A
-S:6 @0-2 S ::= A A A A A A . A
-S:-1 @0-2 S ::= A A A A A A A .
-S:-1 @1-2 A ::= 'a' .
-S:-1 @0-2 [:start:] ::= S .
+=== Earley set 2 at B1L1c3 ===
+P4 B1L1c3 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:2 B1L1c1 S ::= A A . A A A A A
+R2:3 B1L1c1 S ::= A A A . A A A A
+R2:4 B1L1c1 S ::= A A A A . A A A
+R2:5 B1L1c1 S ::= A A A A A . A A
+R2:6 B1L1c1 S ::= A A A A A A . A
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c2 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(3),
     <<'EOS', 'Earley Set 3' );
-=== Earley Set 3 ===
-S:3 @0-3 S ::= A A A . A A A A
-S:4 @0-3 S ::= A A A A . A A A
-S:5 @0-3 S ::= A A A A A . A A
-S:6 @0-3 S ::= A A A A A A . A
-S:-1 @0-3 S ::= A A A A A A A .
-S:-1 @2-3 A ::= 'a' .
-S:-1 @0-3 [:start:] ::= S .
+=== Earley set 3 at B1L1c4 ===
+P4 B1L1c4 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:3 B1L1c1 S ::= A A A . A A A A
+R2:4 B1L1c1 S ::= A A A A . A A A
+R2:5 B1L1c1 S ::= A A A A A . A A
+R2:6 B1L1c1 S ::= A A A A A A . A
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c3 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(4),
     <<'EOS', 'Earley Set 4' );
-=== Earley Set 4 ===
-S:4 @0-4 S ::= A A A A . A A A
-S:5 @0-4 S ::= A A A A A . A A
-S:6 @0-4 S ::= A A A A A A . A
-S:-1 @0-4 S ::= A A A A A A A .
-S:-1 @3-4 A ::= 'a' .
-S:-1 @0-4 [:start:] ::= S .
+=== Earley set 4 at B1L1c5 ===
+P4 B1L1c5 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:4 B1L1c1 S ::= A A A A . A A A
+R2:5 B1L1c1 S ::= A A A A A . A A
+R2:6 B1L1c1 S ::= A A A A A A . A
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c4 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(5),
     <<'EOS', 'Earley Set 5' );
-=== Earley Set 5 ===
-S:5 @0-5 S ::= A A A A A . A A
-S:6 @0-5 S ::= A A A A A A . A
-S:-1 @0-5 S ::= A A A A A A A .
-S:-1 @4-5 A ::= 'a' .
-S:-1 @0-5 [:start:] ::= S .
+=== Earley set 5 at B1L1c6 ===
+P4 B1L1c6 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:5 B1L1c1 S ::= A A A A A . A A
+R2:6 B1L1c1 S ::= A A A A A A . A
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c5 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(6),
     <<'EOS', 'Earley Set 6' );
-=== Earley Set 6 ===
-S:6 @0-6 S ::= A A A A A A . A
-S:-1 @0-6 S ::= A A A A A A A .
-S:-1 @5-6 A ::= 'a' .
-S:-1 @0-6 [:start:] ::= S .
+=== Earley set 6 at B1L1c7 ===
+P4 B1L1c7 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:6 B1L1c1 S ::= A A A A A A . A
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c6 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( earley_set_display(7),
     <<'EOS', 'Earley Set 7' );
-=== Earley Set 7 ===
-S:-1 @0-7 S ::= A A A A A A A .
-S:-1 @6-7 A ::= 'a' .
-S:-1 @0-7 [:start:] ::= S .
+=== Earley set 7 at B1L1c8 ===
+F1 B1L1c1 [:start:] ::= S .
+F2 B1L1c1 S ::= A A A A A A A .
+F4 B1L1c7 A ::= 'a' .
 EOS
 
 # vim: expandtab shiftwidth=4:
