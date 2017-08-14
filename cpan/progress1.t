@@ -171,69 +171,77 @@ sub earley_set_display {
       local function origins(traverser)
           local g1g = slg.g1
           local function origin_gen(base_trv, origin_trv)
-              print(string.format('Calling origin gen %s %s', base_trv, origin_trv))
+              -- print(string.format('Calling origin gen %s %s', base_trv, origin_trv))
+              -- print(string.format('Calling origin gen origin_trv = %s', inspect(origin_trv, {depth=2})))
               local nrl_id = origin_trv:nrl_id()
+              -- print(string.format('nrl_id %s', nrl_id))
               local irl_id = origin_trv:rule_id()
+              local origin = origin_trv:origin()
               if irl_id
                   and g1g:_nrl_semantic_equivalent(nrl_id)
                   and slg:g1_rule_is_xpr_top(irl_id)
               then
-                  coroutine.yield(base_trv:dot(), base_trv:rule_id(), origin_trv:origin())
+                  coroutine.yield(origin)
                   return
               end
+
               -- Do not recurse on sequence rules
-              print(inspect(g1g:sequence_min(irl_id)))
               if g1g:sequence_min(irl_id) then return end
+
               -- If here, we are at a CHAF rule
-              local at_link = origin_trv:at_completion()
-              print(string.format('origin gen at completion link %s', inspect(at_link)))
-              while at_link do
-                  local predecessor = origin_trv:completion_predecessor()
-                  print(string.format('origin gen completion predecessor %s', predecessor or 0))
-                  if predecessor then origin_gen(base_trv, predecessor) end
-                  at_link = origin_trv:completion_next()
-                  print(string.format('origin gen at completion link %s', inspect(at_link)))
+              local lhs = g1g:_nrl_lhs(nrl_id)
+              local ptrv = _M.ptraverser_new(g1r, origin, lhs)
+
+              -- Do not recurse if there are any LIMs
+              --    Note: LIM's are always first
+              if ptrv:at_lim() then return end
+              while true do
+                  local trv = ptrv:eim_iter()
+                  if not trv then break end
+                  origin_gen(base_trv, trv)
               end
-              at_link = origin_trv:at_token()
-              print(string.format('origin gen at token link %s', inspect(at_link)))
-              while at_link do
-                  local predecessor = origin_trv:token_predecessor()
-                  print(string.format('origin gen token predecessor %s', predecessor or 0))
-                  if predecessor then origin_gen(base_trv, predecessor) end
-                  at_link = origin_trv:token_next()
-                  print(string.format('origin gen at token link %s', inspect(at_link)))
-              end
+
           end
           return coroutine.wrap(
                   function () origin_gen(traverser, traverser) end
           )
       end
 
-      io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
+      -- io.stderr:write(string.format("earley_set_display(%d)\n", earley_set_id))
       local result = { "=== Earley Set " .. earley_set_id .. "===" }
       local items = {}
-      for item_id = 0, math.maxinteger do
+      local max_eim = g1r:_earley_set_size(earley_set_id) - 1
+      for item_id = 0, max_eim do
           -- IRL data for debugging only -- delete
           local trv = _M.traverser_new(g1r, earley_set_id, item_id)
-          if not trv:rule_id() then break end
-          for irl_dot, irl_id, origin in origins(trv) do
-              local xpr_id = slg:g1_rule_to_xprid(irl_id)
-              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
-              local irl_dot = trv:dot()
-              print('irl_dot', inspect(irl_dot))
-              local xpr_dot
-              local item_type = 1
-              -- item_type is 0 for prediction, 1 for medial, 2 for completed
-              if irl_dot == -1 then
-                  xpr_dot = xpr_dots[#xpr_dots]
-                  item_type = 2
-              else
-                  xpr_dot = xpr_dots[irl_dot+1]
-              end
-              if xpr_dot == 0 then item_type = 0 end
-              items[#items+1] = { earley_set_id, item_type,
-                  xpr_id, xpr_dot, origin }
+          local irl_id = trv:rule_id()
+          if not irl_id then goto NEXT_ITEM end
+          local irl_dot = trv:dot()
+          -- io.stderr:write(string.format("item: %d R%d:%d@%d\n", earley_set_id,
+               -- irl_id, irl_dot, trv:origin()))
+          local xpr_id = slg:g1_rule_to_xprid(irl_id)
+          local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
+          local xpr_dot
+          local item_type = 1
+          -- item_type is 0 for prediction, 1 for medial, 2 for completed
+          if irl_dot == -1 then
+              xpr_dot = xpr_dots[#xpr_dots]
+              item_type = 2
+          else
+              xpr_dot = xpr_dots[irl_dot+1]
           end
+          if xpr_dot == 0 then item_type = 0 end
+
+          local uniq_items = {}
+          for origin in origins(trv) do
+              local vlq = _M.to_vlq{ earley_set_id, item_type,
+                  xpr_id, xpr_dot, origin }
+              uniq_items[vlq] = true
+          end
+          for vlq, _ in  pairs(uniq_items) do
+              items[#items+1] = _M.from_vlq(vlq)
+          end
+          ::NEXT_ITEM::
       end
       local last_ordinal
       local lines = {}

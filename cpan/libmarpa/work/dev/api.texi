@@ -3473,6 +3473,13 @@ Return value on success: The ID of the NRL.
 Return value on failure: @minus{}2.
 @end deftypefun
 
+@deftypefun int marpa_trv_nrl_dot(Marpa_Traverser @var{trv})
+
+Return value on success: The NRL dot position.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
 @node PIM Traverser overview, PIM Traverser constructor, Traverser accessors, PIM Traverser methods
 @section Overview
 

@@ -11491,10 +11491,13 @@ int marpa_trv_dot(Marpa_Traverser trv)
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
     const int xrl_position = XRL_Position_of_AHM(ahm);
-    MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (ahm));
-    MARPA_OFF_DEBUG3("%s, nrl dot = %d", STRLOC, Position_of_AHM (ahm));
-    MARPA_OFF_DEBUG3("%s, ahm = %s", STRLOC, ahm_tag (ahm));
-    MARPA_OFF_DEBUG3("%s, yim = %s", STRLOC, yim_tag (g, yim));
+
+    MARPA_DEBUG3("%s, raw xrl dot = %d", STRLOC, Raw_XRL_Position_of_AHM (ahm));
+    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (ahm));
+    MARPA_DEBUG3("%s, nrl dot = %d", STRLOC, Position_of_AHM (ahm));
+    MARPA_DEBUG3("%s, ahm = %s", STRLOC, ahm_tag (ahm));
+    MARPA_DEBUG3("%s, yim = %s", STRLOC, yim_tag (g, yim));
+
     if (xrl_position < -1) {
         MARPA_ERROR (MARPA_ERR_NO_SUCH_RULE_ID);
         return failure_indicator;
@@ -11532,6 +11535,21 @@ Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
     if (nrl) return ID_of_IRL(nrl);
   }
   return -1;
+}
+
+@
+@<Function definitions@> =
+int marpa_trv_nrl_dot(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    const AHM ahm = AHM_of_YIM(yim);
+    return Position_of_AHM(ahm);
+  }
 }
 
 @** PIM traverser code (PTRV, PTRAVERSER).

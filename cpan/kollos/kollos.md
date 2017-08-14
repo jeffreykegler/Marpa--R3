@@ -6821,7 +6821,7 @@ but returns a EIM Traverser.
       traverser_stack_ix = marpa_lua_gettop(L);
       /* push "class_ptraverser" metatable */
       marpa_lua_getglobal(L, "_M");
-      marpa_lua_getfield(L, -1, "class_ptraverser");
+      marpa_lua_getfield(L, -1, "class_traverser");
       marpa_lua_setmetatable (L, traverser_stack_ix);
 
       {
@@ -8009,7 +8009,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         eim_id = (Marpa_Earley_Item_ID)marpa_luaL_checkinteger (L, 3);
         check_result = _marpa_r_yim_check(r, es_id, eim_id);
         if (check_result <= -2) {
-           return libmarpa_error_handle (L, recce_stack_ix, "recce:progress_item()");
+           return libmarpa_error_handle (L, recce_stack_ix, "recce:look_yim()");
         }
         if (check_result == 0) {
             marpa_lua_pushnil(L);
@@ -8221,7 +8221,7 @@ not a soft error.
       marpa_lua_getfield (L, -1, "_libmarpa");
       self = *(Marpa_Traverser*)marpa_lua_touserdata (L, -1);
       marpa_lua_pop(L, 1);
-      result = (int)marpa_trv_dot(self);
+      result = marpa_trv_dot(self);
       if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       if (0) fprintf (stderr, "dot=%ld\n", (long)result);
       if (result < -1) {
@@ -8232,15 +8232,42 @@ not a soft error.
     }
 ```
 
+For `trv_nrl_dot()`, -1 is a valid return value,
+not a soft error.
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int wrap_trv_nrl_dot(lua_State *L)
+    {
+      Marpa_Traverser self;
+      const int self_stack_ix = 1;
+      int result;
+
+      marpa_luaL_checktype(L, self_stack_ix, LUA_TTABLE);
+      marpa_lua_getfield (L, -1, "_libmarpa");
+      self = *(Marpa_Traverser*)marpa_lua_touserdata (L, -1);
+      marpa_lua_pop(L, 1);
+      result = marpa_trv_nrl_dot(self);
+      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (0) fprintf (stderr, "dot=%ld\n", (long)result);
+      if (result < -1) {
+       return libmarpa_error_handle(L, self_stack_ix, "wrap_trv_nrl_dot()");
+      }
+      marpa_lua_pushinteger(L, (lua_Integer)result);
+      return 1;
+    }
+```
+
 ```
 
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg traverser_methods[] = {
+      { "completion_predecessor", lca_trv_completion_predecessor },
       { "dot", wrap_trv_dot },
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
-      { "completion_predecessor", lca_trv_completion_predecessor },
+      { "nrl_dot", wrap_trv_nrl_dot },
       { "token_predecessor", lca_trv_token_predecessor },
       { NULL, NULL },
     };
