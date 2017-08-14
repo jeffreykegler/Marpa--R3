@@ -591,6 +591,28 @@ END_OF_LUA
 
 }
 
+sub Marpa::R3::Scanless::R::progress_show {
+    my ( $slr, $start_ordinal, $end_ordinal ) = @_;
+    my ($text) = $slr->call_by_tag(
+            ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'ii', $start_ordinal, $end_ordinal );
+    local slr, start_ordinal_arg, end_ordinal_arg = ...
+    return slr:progress_show(start_ordinal_arg, end_ordinal_arg )
+END_OF_LUA
+    return $text;
+}
+
+sub Marpa::R3::Scanless::R::progress {
+    my ( $slr, $ordinal_arg ) = @_;
+    my ($result) = $slr->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', 'i>0', ($ordinal_arg // -1));
+    local slr, ordinal_arg = ...
+    return slr:progress(ordinal_arg)
+END_OF_LUA
+    return $result;
+}
+
 sub Marpa::R3::Scanless::R::g1_progress_show {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my ($text) = $slr->call_by_tag(
