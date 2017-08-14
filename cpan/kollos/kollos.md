@@ -3962,6 +3962,131 @@ TODO: Make `collected_progress_items a local, after development.
       end
 ```
 
+```
+    -- miranda: section progress_line_do(), local function of slr:progress_show
+    local function progress_line_do(
+      current_ordinal, origins, production_id, position
+      )
+
+      -- For origins[0], we apply
+      --     -1 to convert earley set to G1, then
+        --     +1 because it is an origin and the character
+        --        doesn't begin until the next Earley set
+        -- In other words, they balance and we do nothing
+        local g1_first = origins[1]
+        local pcs = {}
+
+
+        local dotted_type
+        if position >= slg:xpr_length(production_id) then
+          dotted_type = 'F'
+          pcs[#pcs+1] = 'F' .. production_id
+          goto TAG_FOUND
+        end
+        if position > 0 then
+          dotted_type = 'R'
+          pcs[#pcs+1] = 'R' .. production_id .. ':' .. position
+          goto TAG_FOUND
+        end
+        dotted_type = 'P'
+        pcs[#pcs+1] = 'P' .. production_id
+        ::TAG_FOUND::
+
+        if #origins > 1 then
+          pcs[#pcs+1] = 'x' .. #origins
+        end
+
+        -- find the range
+        if current_ordinal <= 0 then
+          pcs[#pcs+1] = 'B0L0c0'
+          goto HAVE_RANGE
+        end
+        if dotted_type == 'P' then
+          local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
+          pcs[#pcs+1] = slr:lc_brief(pos, block)
+          goto HAVE_RANGE
+        end
+        do
+          if g1_first < 0 then g1_first = 0 end
+          local g1_last = origins[#origins]
+          local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+          local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
+          pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+          goto HAVE_RANGE
+        end
+        ::HAVE_RANGE::
+        pcs[#pcs+1] = slg:xpr_dotted_show(production_id, position)
+        return table.concat(pcs, ' ')
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.progress_show(slr, start_ordinal_arg, end_ordinal_arg)
+      local slg = slr.slg
+      local g1g = slg.g1
+      local g1r = slr.g1
+      local last_ordinal = g1r:latest_earley_set()
+      local start_ordinal = math.tointeger(start_ordinal_arg) or last_ordinal
+      if start_ordinal < 0 then start_ordinal = last_ordinal + 1 + start_ordinal end
+      if start_ordinal > last_ordinal or start_ordinal < 0 then
+        _M._internal_error(
+        "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+        must be in range 0-%d",
+        inspect(start_ordinal_arg, {depth=1}),
+        last_ordinal
+        )
+      end
+      local end_ordinal = math.tointeger(end_ordinal_arg) or start_ordinal
+      if end_ordinal < 0 then end_ordinal = last_ordinal + 1 + end_ordinal end
+      if end_ordinal > last_ordinal or end_ordinal < 0 then
+        _M._internal_error(
+        "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+        must be in range 0-%d",
+        inspect(end_ordinal_arg, {depth=1}),
+        last_ordinal
+        )
+      end
+
+      -- miranda: insert progress_line_do(), local function of slr:progress_show
+
+      local lines = {}
+      for current_ordinal = start_ordinal, end_ordinal do
+        -- io.stderr:write(string.format("earley_set_display(%d)\n", current_ordinal))
+        local result = { "=== Earley Set " .. current_ordinal .. "===" }
+        local current_items = slr:progress(current_ordinal)
+        local items = {}
+        for ix = 1, #current_items do
+          local xpr_id, xpr_dot, origin = table.unpack(current_items[ix])
+          -- item_type is 0 for prediction, 1 for medial, 2 for completed
+          local item_type = 1
+          if xpr_dot == 0 then
+            item_type = 0
+          elseif xpr_dot == -1 then
+            xpr_dot = slg:xpr_length(rule_id)
+            item_type = 2
+          end
+          items[#items+1] = { current_ordinal, item_type, xpr_id, xpr_dot, origin }
+        end
+        local last_ordinal
+        for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
+          if this_ordinal ~= last_ordinal then
+            local location = 'B0L0c0'
+            if this_ordinal > 0 then
+              local block, pos = slr:g1_pos_to_l0_first(this_ordinal)
+              location = slr:lc_brief(pos, block)
+            end
+            lines = { string.format('=== Earley set %d at %s ===', this_ordinal, location) }
+            last_ordinal = this_ordinal
+          end
+          lines[#lines+1] = progress_line_do(this_ordinal, origins, rule_id, position )
+        end
+      end
+      lines[#lines+1] = '' -- to get a final "\n"
+      return table.concat(lines, "\n")
+    end
+```
+
 TODO -- after development, this should be a local function.
 
 `throw_at_pos` appends a location description to `desc`
