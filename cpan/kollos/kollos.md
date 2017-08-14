@@ -3881,6 +3881,87 @@ TODO: Make `collected_progress_items a local, after development.
 
 ### SLR diagnostics
 
+
+```
+      -- miranda: section origins(), nested function of slr:progress()
+      local function origins(traverser)
+          local function origin_gen(base_trv, origin_trv)
+              -- print(string.format('Calling origin gen %s %s', base_trv, origin_trv))
+              -- print(string.format('Calling origin gen origin_trv = %s', inspect(origin_trv, {depth=2})))
+              local nrl_id = origin_trv:nrl_id()
+              -- print(string.format('nrl_id %s', nrl_id))
+              local irl_id = origin_trv:rule_id()
+              local origin = origin_trv:origin()
+              if irl_id
+                  and g1g:_nrl_semantic_equivalent(nrl_id)
+                  and slg:g1_rule_is_xpr_top(irl_id)
+              then
+                  coroutine.yield(origin)
+                  return
+              end
+
+              -- Do not recurse on sequence rules
+              if g1g:sequence_min(irl_id) then return end
+
+              -- If here, we are at a CHAF rule
+              local lhs = g1g:_nrl_lhs(nrl_id)
+              local ptrv = _M.ptraverser_new(g1r, origin, lhs)
+
+              -- Do not recurse if there are any LIMs
+              --    Note: LIM's are always first
+              if ptrv:at_lim() then return end
+              while true do
+                  local trv = ptrv:eim_iter()
+                  if not trv then break end
+                  origin_gen(base_trv, trv)
+              end
+
+          end
+          return coroutine.wrap(
+                  function () origin_gen(traverser, traverser) end
+          )
+      end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+      function _M.class_slr.progress(slr, earley_set_id)
+          local slg = slr.slg
+          local g1g = slg.g1
+          local g1r = slr.g1
+          -- miranda: insert origins(), nested function of slr:progress()
+          local uniq_items = {}
+          local max_eim = g1r:_earley_set_size(earley_set_id) - 1
+          for item_id = 0, max_eim do
+              -- IRL data for debugging only -- delete
+              local trv = _M.traverser_new(g1r, earley_set_id, item_id)
+              local irl_id = trv:rule_id()
+              if not irl_id then goto NEXT_ITEM end
+              local irl_dot = trv:dot()
+              -- io.stderr:write(string.format("item: %d R%d:%d@%d\n", earley_set_id,
+                   -- irl_id, irl_dot, trv:origin()))
+              local xpr_id = slg:g1_rule_to_xprid(irl_id)
+              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
+              local xpr_dot
+              if irl_dot == -1 then
+                  xpr_dot = xpr_dots[#xpr_dots]
+              else
+                  xpr_dot = xpr_dots[irl_dot+1]
+              end
+              for origin in origins(trv) do
+                  local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
+                  uniq_items[vlq] = true
+              end
+              ::NEXT_ITEM::
+          end
+          local items = {}
+          for vlq, _ in  pairs(uniq_items) do
+              items[#items+1] = _M.from_vlq(vlq)
+          end
+          return items
+      end
+```
+
 TODO -- after development, this should be a local function.
 
 `throw_at_pos` appends a location description to `desc`
