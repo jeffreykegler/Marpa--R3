@@ -3807,20 +3807,21 @@ TODO: Make `collected_progress_items a local, after development.
                     local this_item = items[ix]
                     local this_ordinal, _, this_rule_id, this_position, this_origin
                         = table.unpack(this_item)
-                    if work_ordinal == this_ordinal
-                       and this_rule_id == work_rule_id
-                       and this_position == work_position
+                    if work_ordinal ~= this_ordinal
+                       or this_rule_id ~= work_rule_id
+                       or this_position ~= work_position
                     then
-                        if origins[#origins] ~= this_origin then
-                            origins[#origins+1] = this_origin
-                        end
-                    else
                         coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
                         work_ordinal = this_ordinal
                         work_rule_id = this_rule_id
                         work_position = this_position
                         origins = { this_origin }
+                        goto NEXT_ITEM
                     end
+                    if origins[#origins] ~= this_origin then
+                        origins[#origins+1] = this_origin
+                    end
+                    ::NEXT_ITEM::
                 end
                 coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
             end)
