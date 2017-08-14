@@ -246,6 +246,7 @@ sub earley_set_display {
       local last_ordinal
       local lines = {}
       for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
+          print(inspect(origins))
           if this_ordinal ~= last_ordinal then
               local location = 'B0L0c0'
               if this_ordinal > 0 then

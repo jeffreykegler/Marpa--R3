@@ -3811,7 +3811,9 @@ TODO: Make `collected_progress_items a local, after development.
                        and this_rule_id == work_rule_id
                        and this_position == work_position
                     then
-                        origins[#origins+1] = this_origin
+                        if origins[#origins] ~= this_origin then
+                            origins[#origins+1] = this_origin
+                        end
                     else
                         coroutine.yield(work_ordinal, work_rule_id, work_position, origins)
                         work_ordinal = this_ordinal
