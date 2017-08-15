@@ -3858,12 +3858,10 @@ TODO: Make `collected_progress_items a local, after development.
                 -- item_type is 0 for prediction, 1 for medial, 2 for completed
                 local item_type = 1
                 local rule_id, position, origin = table.unpack(current_items[ix])
-                if position == 0 then
-                    item_type = 0
-                elseif position == -1 then
-                    position = g1g:rule_length(rule_id)
-                    item_type = 2
-                end
+                local rule_length = g1g:rule_length(rule_id)
+                if position == -1 then position = rule_length end
+                if position == 0 then item_type = 0
+                elseif position == rule_length then item_type = 2 end
                 items[#items+1] = { current_ordinal, item_type, rule_id, position, origin }
             end
         end
@@ -4064,12 +4062,10 @@ TODO: Make `collected_progress_items a local, after development.
           local xpr_id, xpr_dot, origin = table.unpack(current_items[ix])
           -- item_type is 0 for prediction, 1 for medial, 2 for completed
           local item_type = 1
-          if xpr_dot == 0 then
-            item_type = 0
-          elseif xpr_dot == -1 then
-            xpr_dot = slg:xpr_length(rule_id)
-            item_type = 2
-          end
+          local xpr_length = slg:xpr_length(xpr_id)
+          if xpr_dot == -1 then xpr_dot = rule_length end
+          if xpr_dot == 0 then item_type = 0
+          elseif xpr_dot == xpr_length then item_type = 2 end
           items[#items+1] = { current_ordinal, item_type, xpr_id, xpr_dot, origin }
         end
         local last_ordinal
@@ -4080,7 +4076,7 @@ TODO: Make `collected_progress_items a local, after development.
               local block, pos = slr:g1_pos_to_l0_first(this_ordinal)
               location = slr:lc_brief(pos, block)
             end
-            lines = { string.format('=== Earley set %d at %s ===', this_ordinal, location) }
+            lines[#lines+1] = string.format('=== Earley set %d at %s ===', this_ordinal, location)
             last_ordinal = this_ordinal
           end
           lines[#lines+1] = progress_line_do(this_ordinal, origins, rule_id, position )

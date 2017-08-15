@@ -103,10 +103,10 @@ Test::More::is( $value, 42, 'value' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'progress report' );
-P0 @0-0 B1L0c1 Expression ::= . Factor
-P2 @0-0 B1L0c1 Factor ::= . Number
-P4 @0-0 B1L0c1 Factor ::= . Factor Multiply Factor
-P5 @0-0 B1L0c1 [:start:] ::= . Expression
+P0 @0-0 B1L1c1 Expression ::= . Factor
+P2 @0-0 B1L1c1 Factor ::= . Number
+P4 @0-0 B1L1c1 Factor ::= . Factor Multiply Factor
+P5 @0-0 B1L1c1 [:start:] ::= . Expression
 R4:1 @0-1 B1L1c1-2 Factor ::= Factor . Multiply Factor
 F0 @0-1 B1L1c1-2 Expression ::= Factor .
 F2 @0-1 B1L1c1-2 Factor ::= Number .

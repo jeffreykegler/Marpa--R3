@@ -130,13 +130,13 @@ Marpa::R3::Test::is( earley_set_display(1),
     <<'EOS', 'Earley Set 1' );
 === Earley set 1 at B1L1c2 ===
 P4 B1L1c2 A ::= . 'a'
-F1 B1L1c1 [:start:] ::= S .
 R2:1 B1L1c1 S ::= A . A A A A A A
 R2:2 B1L1c1 S ::= A A . A A A A A
 R2:3 B1L1c1 S ::= A A A . A A A A
 R2:4 B1L1c1 S ::= A A A A . A A A
 R2:5 B1L1c1 S ::= A A A A A . A A
 R2:6 B1L1c1 S ::= A A A A A A . A
+F1 B1L1c1 [:start:] ::= S .
 F2 B1L1c1 S ::= A A A A A A A .
 F4 B1L1c1 A ::= 'a' .
 EOS
@@ -145,12 +145,12 @@ Marpa::R3::Test::is( earley_set_display(2),
     <<'EOS', 'Earley Set 2' );
 === Earley set 2 at B1L1c3 ===
 P4 B1L1c3 A ::= . 'a'
-F1 B1L1c1 [:start:] ::= S .
 R2:2 B1L1c1 S ::= A A . A A A A A
 R2:3 B1L1c1 S ::= A A A . A A A A
 R2:4 B1L1c1 S ::= A A A A . A A A
 R2:5 B1L1c1 S ::= A A A A A . A A
 R2:6 B1L1c1 S ::= A A A A A A . A
+F1 B1L1c1 [:start:] ::= S .
 F2 B1L1c1 S ::= A A A A A A A .
 F4 B1L1c2 A ::= 'a' .
 EOS
@@ -159,11 +159,11 @@ Marpa::R3::Test::is( earley_set_display(3),
     <<'EOS', 'Earley Set 3' );
 === Earley set 3 at B1L1c4 ===
 P4 B1L1c4 A ::= . 'a'
-F1 B1L1c1 [:start:] ::= S .
 R2:3 B1L1c1 S ::= A A A . A A A A
 R2:4 B1L1c1 S ::= A A A A . A A A
 R2:5 B1L1c1 S ::= A A A A A . A A
 R2:6 B1L1c1 S ::= A A A A A A . A
+F1 B1L1c1 [:start:] ::= S .
 F2 B1L1c1 S ::= A A A A A A A .
 F4 B1L1c3 A ::= 'a' .
 EOS
@@ -172,10 +172,10 @@ Marpa::R3::Test::is( earley_set_display(4),
     <<'EOS', 'Earley Set 4' );
 === Earley set 4 at B1L1c5 ===
 P4 B1L1c5 A ::= . 'a'
-F1 B1L1c1 [:start:] ::= S .
 R2:4 B1L1c1 S ::= A A A A . A A A
 R2:5 B1L1c1 S ::= A A A A A . A A
 R2:6 B1L1c1 S ::= A A A A A A . A
+F1 B1L1c1 [:start:] ::= S .
 F2 B1L1c1 S ::= A A A A A A A .
 F4 B1L1c4 A ::= 'a' .
 EOS
@@ -184,9 +184,9 @@ Marpa::R3::Test::is( earley_set_display(5),
     <<'EOS', 'Earley Set 5' );
 === Earley set 5 at B1L1c6 ===
 P4 B1L1c6 A ::= . 'a'
-F1 B1L1c1 [:start:] ::= S .
 R2:5 B1L1c1 S ::= A A A A A . A A
 R2:6 B1L1c1 S ::= A A A A A A . A
+F1 B1L1c1 [:start:] ::= S .
 F2 B1L1c1 S ::= A A A A A A A .
 F4 B1L1c5 A ::= 'a' .
 EOS
@@ -195,8 +195,8 @@ Marpa::R3::Test::is( earley_set_display(6),
     <<'EOS', 'Earley Set 6' );
 === Earley set 6 at B1L1c7 ===
 P4 B1L1c7 A ::= . 'a'
-F1 B1L1c1 [:start:] ::= S .
 R2:6 B1L1c1 S ::= A A A A A A . A
+F1 B1L1c1 [:start:] ::= S .
 F2 B1L1c1 S ::= A A A A A A A .
 F4 B1L1c6 A ::= 'a' .
 EOS
