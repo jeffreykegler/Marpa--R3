@@ -3931,6 +3931,9 @@ TODO: Make `collected_progress_items a local, after development.
           local g1r = slr.g1
           -- miranda: insert origins(), nested function of slr:progress()
           local uniq_items = {}
+          if earley_set_id < 0 then
+              earley_set_id = g1r:latest_earley_set() + earley_set_id + 1
+          end
           local max_eim = g1r:_earley_set_size(earley_set_id) - 1
           for item_id = 0, max_eim do
               -- IRL data for debugging only -- delete
@@ -3958,6 +3961,7 @@ TODO: Make `collected_progress_items a local, after development.
           for vlq, _ in  pairs(uniq_items) do
               items[#items+1] = _M.from_vlq(vlq)
           end
+          table.sort(items, _M.cmp_seq)
           return items
       end
 ```

@@ -99,7 +99,7 @@ my $recce = Marpa::R3::Scanless::R->new(
 my $test_input = 'a = 8675309 + 42 * 711';
 my $eval_error = $EVAL_ERROR if not eval { $recce->read( \$test_input ); 1 };
 
-$progress_report = $recce->g1_progress_show( 0, -1 );
+$progress_report = $recce->progress_show( 0, -1 );
 
 # Marpa::R3::Display::End
 
@@ -153,12 +153,12 @@ Test::More::is_deeply( $value_ref, $expected_output, 'Value before fix' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'progress report' );
-P0 @0-0 B0L0c0 statements ::= . statement *
-P1 @0-0 B0L0c0 statement ::= . assignment
-P2 @0-0 B0L0c0 statement ::= . <numeric assignment>
-P3 @0-0 B0L0c0 assignment ::= . 'set' variable 'to' expression
-P4 @0-0 B0L0c0 <numeric assignment> ::= . variable '=' expression
-P19 @0-0 B0L0c0 [:start:] ::= . statements
+P0 @0-0 B1L0c1 statements ::= . statement *
+P1 @0-0 B1L0c1 statement ::= . assignment
+P2 @0-0 B1L0c1 statement ::= . <numeric assignment>
+P3 @0-0 B1L0c1 assignment ::= . 'set' variable 'to' expression
+P4 @0-0 B1L0c1 <numeric assignment> ::= . variable '=' expression
+P19 @0-0 B1L0c1 [:start:] ::= . statements
 R4:1 @0-1 B1L1c1 <numeric assignment> ::= variable . '=' expression
 P5 @2-2 B1L1c5 expression ::= . expression
 P6 @2-2 B1L1c5 expression ::= . expression
@@ -207,34 +207,34 @@ $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse  = 1;
 
 # Marpa::R3::Display
-# name: SLIF g1_progress(0) example
+# name: SLIF progress(0) example
 
-my $report0 = $recce->g1_progress(0);
+my $report0 = $recce->progress(0);
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF g1_progress() output at location 0
+# name: SLIF progress() output at location 0
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_report0 = <<'END_PROGRESS_REPORT');
-[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[19,0,0]]
+[[1,0,0],[2,0,0],[3,0,0],[4,0,0],[12,0,0],[20,0,0]]
 END_PROGRESS_REPORT
 Test::More::is_deeply( Data::Dumper::Dumper($report0),
-    $expected_report0, 'g1_progress report at location 0' );
+    $expected_report0, 'progress report at location 0' );
 
 # Marpa::R3::Display::End
 
 # Try again with negative index
-$report0 = $recce->g1_progress(-6);
+$report0 = $recce->progress(-6);
 Test::More::is_deeply( Data::Dumper::Dumper($report0),
-    $expected_report0, 'g1_progress report at location -6' );
+    $expected_report0, 'progress report at location -6' );
 
-my $report1 = $recce->g1_progress(1);
+my $report1 = $recce->progress(1);
 
 # Marpa::R3::Display
-# name: SLIF g1_progress() output at location 1
+# name: SLIF progress() output at location 1
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
@@ -242,68 +242,68 @@ chomp( my $expected_report1 = <<'END_PROGRESS_REPORT');
 [[4,1,0]]
 END_PROGRESS_REPORT
 Test::More::is_deeply( Data::Dumper::Dumper($report1),
-    $expected_report1, 'g1_progress report at location 1' );
+    $expected_report1, 'progress report at location 1' );
 
 # Marpa::R3::Display::End
 
 # Try again with negative index
-$report1 = $recce->g1_progress(-5);
+$report1 = $recce->progress(-5);
 Test::More::is_deeply( Data::Dumper::Dumper($report1),
-    $expected_report1, 'g1_progress report at location -5' );
+    $expected_report1, 'progress report at location -5' );
 
-my $report2 = $recce->g1_progress(2);
+my $report2 = $recce->progress(2);
 
 # Marpa::R3::Display
-# name: SLIF g1_progress() output at location 2
+# name: SLIF progress() output at location 2
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_report2 = <<'END_PROGRESS_REPORT');
-[[5,0,2],[6,0,2],[7,0,2],[8,0,2],[9,0,2],[10,0,2],[11,0,2],[4,2,0]]
+[[4,2,0],[5,0,2],[6,0,2],[7,0,2],[8,0,2],[9,0,2],[10,0,2],[11,0,2]]
 END_PROGRESS_REPORT
 Test::More::is_deeply( Data::Dumper::Dumper($report2),
-    $expected_report2, 'g1_progress report at location 2' );
+    $expected_report2, 'progress report at location 2' );
 
 # Marpa::R3::Display::End
 
 # Try again with negative index
-$report2 = $recce->g1_progress(-4);
+$report2 = $recce->progress(-4);
 Test::More::is_deeply( Data::Dumper::Dumper($report2),
-    $expected_report2, 'g1_progress report at location -4' );
+    $expected_report2, 'progress report at location -4' );
 
 # Marpa::R3::Display
-# name: SLIF g1_progress() example
+# name: SLIF progress() example
 
-my $latest_report = $recce->g1_progress();
+my $latest_report = $recce->progress();
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF g1_progress() output at default location
+# name: SLIF progress() output at default location
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_default_report = <<'END_PROGRESS_REPORT');
-[[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[7,-1,4],[8,-1,4],[11,-1,2],[19,-1,0],[1,0,5],[2,0,5],[3,0,5],[4,0,5],[11,1,2]]
+[[1,1,0],[2,0,5],[2,1,0],[3,0,5],[4,0,5],[4,3,0],[5,1,2],[7,1,4],[8,1,4],[11,1,2],[11,3,2],[12,1,0],[20,0,5]]
 END_PROGRESS_REPORT
 Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
-    $expected_default_report, 'g1_progress report at default location' );
+    $expected_default_report, 'progress report at default location' );
 
 # Marpa::R3::Display::End
 
 chomp( my $expected_report3 = <<'END_PROGRESS_REPORT');
-[[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[6,-1,2],[7,-1,2],[8,-1,2],[19,-1,0],[1,0,3],[2,0,3],[3,0,3],[4,0,3],[11,1,2]]
+[[1,1,0],[2,0,3],[2,1,0],[3,0,3],[4,0,3],[4,3,0],[5,1,2],[6,1,2],[7,1,2],[8,1,2],[11,1,2],[12,1,0],[20,0,3]]
 END_PROGRESS_REPORT
 
 # Try latest report again with explicit index
-my $report3 = $recce->g1_progress(3);
+my $report3 = $recce->progress(3);
 Test::More::is_deeply( Data::Dumper::Dumper($report3),
-    $expected_report3, 'g1_progress report at location 3' );
+    $expected_report3, 'progress report at location 3' );
 
 # Try latest report again with negative index
-$latest_report = $recce->g1_progress(-3);
+$latest_report = $recce->progress(-3);
 Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
-    $expected_report3, 'g1_progress report at location -3' );
+    $expected_report3, 'progress report at location -3' );
 
 # Marpa::R3::Display
 # name: SLIF debug example trace output

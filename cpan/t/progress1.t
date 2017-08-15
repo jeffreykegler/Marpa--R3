@@ -114,16 +114,16 @@ END_OF_LUA
 }
 
 Marpa::R3::Test::is( earley_set_display(0), <<'EOS', 'Earley Set 0' );
-=== Earley set 0 at B0L0c0 ===
-P1 B0L0c0 [:start:] ::= . S
-P2 B0L0c0 S ::= . A A A A A A A
-P4 B0L0c0 A ::= . 'a'
-R2:1 B0L0c0 S ::= A . A A A A A A
-R2:2 B0L0c0 S ::= A A . A A A A A
-R2:3 B0L0c0 S ::= A A A . A A A A
-R2:4 B0L0c0 S ::= A A A A . A A A
-R2:5 B0L0c0 S ::= A A A A A . A A
-R2:6 B0L0c0 S ::= A A A A A A . A
+=== Earley set 0 at B1L1c1 ===
+P1 B1L1c1 [:start:] ::= . S
+P2 B1L1c1 S ::= . A A A A A A A
+P4 B1L1c1 A ::= . 'a'
+R2:1 B1L1c1 S ::= A . A A A A A A
+R2:2 B1L1c1 S ::= A A . A A A A A
+R2:3 B1L1c1 S ::= A A A . A A A A
+R2:4 B1L1c1 S ::= A A A A . A A A
+R2:5 B1L1c1 S ::= A A A A A . A A
+R2:6 B1L1c1 S ::= A A A A A A . A
 EOS
 
 Marpa::R3::Test::is( earley_set_display(1),
