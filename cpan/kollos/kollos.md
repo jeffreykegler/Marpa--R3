@@ -3998,7 +3998,7 @@ TODO: Make `collected_progress_items a local, after development.
 
         -- find the range
         if current_ordinal <= 0 then
-          pcs[#pcs+1] = 'B0L0c0'
+          pcs[#pcs+1] = 'B1L1c1'
           goto HAVE_RANGE
         end
         if dotted_type == 'P' then
@@ -4071,7 +4071,7 @@ TODO: Make `collected_progress_items a local, after development.
         local last_ordinal
         for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
           if this_ordinal ~= last_ordinal then
-            local location = 'B0L0c0'
+            local location = 'B1L1c1'
             if this_ordinal > 0 then
               local block, pos = slr:g1_pos_to_l0_first(this_ordinal)
               location = slr:lc_brief(pos, block)
@@ -4202,7 +4202,7 @@ part of a "Pure Lua" implementation.
 
         -- find the range
         if current_ordinal <= 0 then
-            pcs[#pcs+1] = 'B0L0c0'
+            pcs[#pcs+1] = 'B1L1c1'
             goto HAVE_RANGE
         end
         if dotted_type == 'P' then

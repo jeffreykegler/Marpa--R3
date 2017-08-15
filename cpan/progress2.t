@@ -109,321 +109,191 @@ my $input = ('a' x $input_length);
 $recce->read( \$input );
 
 Marpa::R3::Test::is( $recce->progress_show(0), <<'EOS', 'Earley Set 0' );
-=== Earley Set 0 ===
-S:0 @0-0 SS ::= . A A A A A A A
-S:1 @0-0 SS ::= A . A A A A A A
-S:2 @0-0 SS ::= A A . A A A A A
-S:3 @0-0 SS ::= A A A . A A A A
-S:4 @0-0 SS ::= A A A A . A A A
-S:5 @0-0 SS ::= A A A A A . A A
-S:6 @0-0 SS ::= A A A A A A . A
+=== Earley set 0 at B1L1c1 ===
+P1 B1L1c1 [:start:] ::= . S
+P2 B1L1c1 S ::= . SS SS
+P3 B1L1c1 SS ::= . A A A A A A A
+P5 B1L1c1 A ::= . 'a'
+R2:1 B1L1c1 S ::= SS . SS
+R3:1 B1L1c1 SS ::= A . A A A A A A
+R3:2 B1L1c1 SS ::= A A . A A A A A
+R3:3 B1L1c1 SS ::= A A A . A A A A
+R3:4 B1L1c1 SS ::= A A A A . A A A
+R3:5 B1L1c1 SS ::= A A A A A . A A
+R3:6 B1L1c1 SS ::= A A A A A A . A
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(1), <<'EOS', 'Earley Set 1' );
-=== Earley Set 1 ===
-S:0 @1-1 SS ::= . A A A A A A A
-S:1 @0-1 SS ::= A . A A A A A A
-S:1 @1-1 SS ::= A . A A A A A A
-S:2 @0-1 SS ::= A A . A A A A A
-S:2 @1-1 SS ::= A A . A A A A A
-S:3 @0-1 SS ::= A A A . A A A A
-S:3 @1-1 SS ::= A A A . A A A A
-S:4 @0-1 SS ::= A A A A . A A A
-S:4 @1-1 SS ::= A A A A . A A A
-S:5 @0-1 SS ::= A A A A A . A A
-S:5 @1-1 SS ::= A A A A A . A A
-S:6 @0-1 SS ::= A A A A A A . A
-S:6 @1-1 SS ::= A A A A A A . A
-S:-1 @0-1 SS ::= A A A A A A A .
+=== Earley set 1 at B1L1c2 ===
+P3 B1L1c2 SS ::= . A A A A A A A
+P5 B1L1c2 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c1-2 SS ::= A . A A A A A A
+R3:2 x2 B1L1c1-2 SS ::= A A . A A A A A
+R3:3 x2 B1L1c1-2 SS ::= A A A . A A A A
+R3:4 x2 B1L1c1-2 SS ::= A A A A . A A A
+R3:5 x2 B1L1c1-2 SS ::= A A A A A . A A
+R3:6 x2 B1L1c1-2 SS ::= A A A A A A . A
+F3 B1L1c1 SS ::= A A A A A A A .
+F5 B1L1c1 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(2), <<'EOS', 'Earley Set 2' );
-=== Earley Set 2 ===
-S:0 @2-2 SS ::= . A A A A A A A
-S:1 @1-2 SS ::= A . A A A A A A
-S:1 @2-2 SS ::= A . A A A A A A
-S:2 @0-2 SS ::= A A . A A A A A
-S:2 @1-2 SS ::= A A . A A A A A
-S:2 @2-2 SS ::= A A . A A A A A
-S:3 @0-2 SS ::= A A A . A A A A
-S:3 @1-2 SS ::= A A A . A A A A
-S:3 @2-2 SS ::= A A A . A A A A
-S:4 @0-2 SS ::= A A A A . A A A
-S:4 @1-2 SS ::= A A A A . A A A
-S:4 @2-2 SS ::= A A A A . A A A
-S:5 @0-2 SS ::= A A A A A . A A
-S:5 @1-2 SS ::= A A A A A . A A
-S:5 @2-2 SS ::= A A A A A . A A
-S:6 @0-2 SS ::= A A A A A A . A
-S:6 @1-2 SS ::= A A A A A A . A
-S:6 @2-2 SS ::= A A A A A A . A
-S:-1 @0-2 SS ::= A A A A A A A .
-S:-1 @1-2 SS ::= A A A A A A A .
+=== Earley set 2 at B1L1c3 ===
+P3 B1L1c3 SS ::= . A A A A A A A
+P5 B1L1c3 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c2-3 SS ::= A . A A A A A A
+R3:2 x3 B1L1c1-3 SS ::= A A . A A A A A
+R3:3 x3 B1L1c1-3 SS ::= A A A . A A A A
+R3:4 x3 B1L1c1-3 SS ::= A A A A . A A A
+R3:5 x3 B1L1c1-3 SS ::= A A A A A . A A
+R3:6 x3 B1L1c1-3 SS ::= A A A A A A . A
+F3 x2 B1L1c1-2 SS ::= A A A A A A A .
+F5 B1L1c2 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(3), <<'EOS', 'Earley Set 3' );
-=== Earley Set 3 ===
-S:0 @3-3 SS ::= . A A A A A A A
-S:1 @2-3 SS ::= A . A A A A A A
-S:1 @3-3 SS ::= A . A A A A A A
-S:2 @1-3 SS ::= A A . A A A A A
-S:2 @2-3 SS ::= A A . A A A A A
-S:2 @3-3 SS ::= A A . A A A A A
-S:3 @0-3 SS ::= A A A . A A A A
-S:3 @1-3 SS ::= A A A . A A A A
-S:3 @2-3 SS ::= A A A . A A A A
-S:3 @3-3 SS ::= A A A . A A A A
-S:4 @0-3 SS ::= A A A A . A A A
-S:4 @1-3 SS ::= A A A A . A A A
-S:4 @2-3 SS ::= A A A A . A A A
-S:4 @3-3 SS ::= A A A A . A A A
-S:5 @0-3 SS ::= A A A A A . A A
-S:5 @1-3 SS ::= A A A A A . A A
-S:5 @2-3 SS ::= A A A A A . A A
-S:5 @3-3 SS ::= A A A A A . A A
-S:6 @0-3 SS ::= A A A A A A . A
-S:6 @1-3 SS ::= A A A A A A . A
-S:6 @2-3 SS ::= A A A A A A . A
-S:6 @3-3 SS ::= A A A A A A . A
-S:-1 @0-3 SS ::= A A A A A A A .
-S:-1 @1-3 SS ::= A A A A A A A .
-S:-1 @2-3 SS ::= A A A A A A A .
+=== Earley set 3 at B1L1c4 ===
+P3 B1L1c4 SS ::= . A A A A A A A
+P5 B1L1c4 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c3-4 SS ::= A . A A A A A A
+R3:2 x3 B1L1c2-4 SS ::= A A . A A A A A
+R3:3 x4 B1L1c1-4 SS ::= A A A . A A A A
+R3:4 x4 B1L1c1-4 SS ::= A A A A . A A A
+R3:5 x4 B1L1c1-4 SS ::= A A A A A . A A
+R3:6 x4 B1L1c1-4 SS ::= A A A A A A . A
+F3 x3 B1L1c1-3 SS ::= A A A A A A A .
+F5 B1L1c3 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(4), <<'EOS', 'Earley Set 4' );
-=== Earley Set 4 ===
-S:0 @4-4 SS ::= . A A A A A A A
-S:1 @3-4 SS ::= A . A A A A A A
-S:1 @4-4 SS ::= A . A A A A A A
-S:2 @2-4 SS ::= A A . A A A A A
-S:2 @3-4 SS ::= A A . A A A A A
-S:2 @4-4 SS ::= A A . A A A A A
-S:3 @1-4 SS ::= A A A . A A A A
-S:3 @2-4 SS ::= A A A . A A A A
-S:3 @3-4 SS ::= A A A . A A A A
-S:3 @4-4 SS ::= A A A . A A A A
-S:4 @0-4 SS ::= A A A A . A A A
-S:4 @1-4 SS ::= A A A A . A A A
-S:4 @2-4 SS ::= A A A A . A A A
-S:4 @3-4 SS ::= A A A A . A A A
-S:4 @4-4 SS ::= A A A A . A A A
-S:5 @0-4 SS ::= A A A A A . A A
-S:5 @1-4 SS ::= A A A A A . A A
-S:5 @2-4 SS ::= A A A A A . A A
-S:5 @3-4 SS ::= A A A A A . A A
-S:5 @4-4 SS ::= A A A A A . A A
-S:6 @0-4 SS ::= A A A A A A . A
-S:6 @1-4 SS ::= A A A A A A . A
-S:6 @2-4 SS ::= A A A A A A . A
-S:6 @3-4 SS ::= A A A A A A . A
-S:6 @4-4 SS ::= A A A A A A . A
-S:-1 @0-4 SS ::= A A A A A A A .
-S:-1 @1-4 SS ::= A A A A A A A .
-S:-1 @2-4 SS ::= A A A A A A A .
-S:-1 @3-4 SS ::= A A A A A A A .
+=== Earley set 4 at B1L1c5 ===
+P3 B1L1c5 SS ::= . A A A A A A A
+P5 B1L1c5 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c4-5 SS ::= A . A A A A A A
+R3:2 x3 B1L1c3-5 SS ::= A A . A A A A A
+R3:3 x4 B1L1c2-5 SS ::= A A A . A A A A
+R3:4 x5 B1L1c1-5 SS ::= A A A A . A A A
+R3:5 x5 B1L1c1-5 SS ::= A A A A A . A A
+R3:6 x5 B1L1c1-5 SS ::= A A A A A A . A
+F3 x4 B1L1c1-4 SS ::= A A A A A A A .
+F5 B1L1c4 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(5), <<'EOS', 'Earley Set 5' );
-=== Earley Set 5 ===
-S:0 @5-5 SS ::= . A A A A A A A
-S:1 @4-5 SS ::= A . A A A A A A
-S:1 @5-5 SS ::= A . A A A A A A
-S:2 @3-5 SS ::= A A . A A A A A
-S:2 @4-5 SS ::= A A . A A A A A
-S:2 @5-5 SS ::= A A . A A A A A
-S:3 @2-5 SS ::= A A A . A A A A
-S:3 @3-5 SS ::= A A A . A A A A
-S:3 @4-5 SS ::= A A A . A A A A
-S:3 @5-5 SS ::= A A A . A A A A
-S:4 @1-5 SS ::= A A A A . A A A
-S:4 @2-5 SS ::= A A A A . A A A
-S:4 @3-5 SS ::= A A A A . A A A
-S:4 @4-5 SS ::= A A A A . A A A
-S:4 @5-5 SS ::= A A A A . A A A
-S:5 @0-5 SS ::= A A A A A . A A
-S:5 @1-5 SS ::= A A A A A . A A
-S:5 @2-5 SS ::= A A A A A . A A
-S:5 @3-5 SS ::= A A A A A . A A
-S:5 @4-5 SS ::= A A A A A . A A
-S:5 @5-5 SS ::= A A A A A . A A
-S:6 @0-5 SS ::= A A A A A A . A
-S:6 @1-5 SS ::= A A A A A A . A
-S:6 @2-5 SS ::= A A A A A A . A
-S:6 @3-5 SS ::= A A A A A A . A
-S:6 @4-5 SS ::= A A A A A A . A
-S:6 @5-5 SS ::= A A A A A A . A
-S:-1 @0-5 SS ::= A A A A A A A .
-S:-1 @1-5 SS ::= A A A A A A A .
-S:-1 @2-5 SS ::= A A A A A A A .
-S:-1 @3-5 SS ::= A A A A A A A .
-S:-1 @4-5 SS ::= A A A A A A A .
+=== Earley set 5 at B1L1c6 ===
+P3 B1L1c6 SS ::= . A A A A A A A
+P5 B1L1c6 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c5-6 SS ::= A . A A A A A A
+R3:2 x3 B1L1c4-6 SS ::= A A . A A A A A
+R3:3 x4 B1L1c3-6 SS ::= A A A . A A A A
+R3:4 x5 B1L1c2-6 SS ::= A A A A . A A A
+R3:5 x6 B1L1c1-6 SS ::= A A A A A . A A
+R3:6 x6 B1L1c1-6 SS ::= A A A A A A . A
+F3 x5 B1L1c1-5 SS ::= A A A A A A A .
+F5 B1L1c5 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(6), <<'EOS', 'Earley Set 6' );
-=== Earley Set 6 ===
-S:0 @6-6 SS ::= . A A A A A A A
-S:1 @5-6 SS ::= A . A A A A A A
-S:1 @6-6 SS ::= A . A A A A A A
-S:2 @4-6 SS ::= A A . A A A A A
-S:2 @5-6 SS ::= A A . A A A A A
-S:2 @6-6 SS ::= A A . A A A A A
-S:3 @3-6 SS ::= A A A . A A A A
-S:3 @4-6 SS ::= A A A . A A A A
-S:3 @5-6 SS ::= A A A . A A A A
-S:3 @6-6 SS ::= A A A . A A A A
-S:4 @2-6 SS ::= A A A A . A A A
-S:4 @3-6 SS ::= A A A A . A A A
-S:4 @4-6 SS ::= A A A A . A A A
-S:4 @5-6 SS ::= A A A A . A A A
-S:4 @6-6 SS ::= A A A A . A A A
-S:5 @1-6 SS ::= A A A A A . A A
-S:5 @2-6 SS ::= A A A A A . A A
-S:5 @3-6 SS ::= A A A A A . A A
-S:5 @4-6 SS ::= A A A A A . A A
-S:5 @5-6 SS ::= A A A A A . A A
-S:5 @6-6 SS ::= A A A A A . A A
-S:6 @0-6 SS ::= A A A A A A . A
-S:6 @1-6 SS ::= A A A A A A . A
-S:6 @2-6 SS ::= A A A A A A . A
-S:6 @3-6 SS ::= A A A A A A . A
-S:6 @4-6 SS ::= A A A A A A . A
-S:6 @5-6 SS ::= A A A A A A . A
-S:6 @6-6 SS ::= A A A A A A . A
-S:-1 @0-6 SS ::= A A A A A A A .
-S:-1 @1-6 SS ::= A A A A A A A .
-S:-1 @2-6 SS ::= A A A A A A A .
-S:-1 @3-6 SS ::= A A A A A A A .
-S:-1 @4-6 SS ::= A A A A A A A .
-S:-1 @5-6 SS ::= A A A A A A A .
+=== Earley set 6 at B1L1c7 ===
+P3 B1L1c7 SS ::= . A A A A A A A
+P5 B1L1c7 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c6-7 SS ::= A . A A A A A A
+R3:2 x3 B1L1c5-7 SS ::= A A . A A A A A
+R3:3 x4 B1L1c4-7 SS ::= A A A . A A A A
+R3:4 x5 B1L1c3-7 SS ::= A A A A . A A A
+R3:5 x6 B1L1c2-7 SS ::= A A A A A . A A
+R3:6 x7 B1L1c1-7 SS ::= A A A A A A . A
+F3 x6 B1L1c1-6 SS ::= A A A A A A A .
+F5 B1L1c6 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(7), <<'EOS', 'Earley Set 7' );
-=== Earley Set 7 ===
-S:0 @7-7 SS ::= . A A A A A A A
-S:1 @6-7 SS ::= A . A A A A A A
-S:1 @7-7 SS ::= A . A A A A A A
-S:2 @5-7 SS ::= A A . A A A A A
-S:2 @6-7 SS ::= A A . A A A A A
-S:2 @7-7 SS ::= A A . A A A A A
-S:3 @4-7 SS ::= A A A . A A A A
-S:3 @5-7 SS ::= A A A . A A A A
-S:3 @6-7 SS ::= A A A . A A A A
-S:3 @7-7 SS ::= A A A . A A A A
-S:4 @3-7 SS ::= A A A A . A A A
-S:4 @4-7 SS ::= A A A A . A A A
-S:4 @5-7 SS ::= A A A A . A A A
-S:4 @6-7 SS ::= A A A A . A A A
-S:4 @7-7 SS ::= A A A A . A A A
-S:5 @2-7 SS ::= A A A A A . A A
-S:5 @3-7 SS ::= A A A A A . A A
-S:5 @4-7 SS ::= A A A A A . A A
-S:5 @5-7 SS ::= A A A A A . A A
-S:5 @6-7 SS ::= A A A A A . A A
-S:5 @7-7 SS ::= A A A A A . A A
-S:6 @1-7 SS ::= A A A A A A . A
-S:6 @2-7 SS ::= A A A A A A . A
-S:6 @3-7 SS ::= A A A A A A . A
-S:6 @4-7 SS ::= A A A A A A . A
-S:6 @5-7 SS ::= A A A A A A . A
-S:6 @6-7 SS ::= A A A A A A . A
-S:6 @7-7 SS ::= A A A A A A . A
-S:-1 @0-7 SS ::= A A A A A A A .
-S:-1 @1-7 SS ::= A A A A A A A .
-S:-1 @2-7 SS ::= A A A A A A A .
-S:-1 @3-7 SS ::= A A A A A A A .
-S:-1 @4-7 SS ::= A A A A A A A .
-S:-1 @5-7 SS ::= A A A A A A A .
-S:-1 @6-7 SS ::= A A A A A A A .
+=== Earley set 7 at B1L1c8 ===
+P3 B1L1c8 SS ::= . A A A A A A A
+P5 B1L1c8 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+R2:1 B1L1c1 S ::= SS . SS
+F2 B1L1c1 S ::= SS SS .
+R3:1 x2 B1L1c7-8 SS ::= A . A A A A A A
+R3:2 x3 B1L1c6-8 SS ::= A A . A A A A A
+R3:3 x4 B1L1c5-8 SS ::= A A A . A A A A
+R3:4 x5 B1L1c4-8 SS ::= A A A A . A A A
+R3:5 x6 B1L1c3-8 SS ::= A A A A A . A A
+R3:6 x7 B1L1c2-8 SS ::= A A A A A A . A
+F3 x7 B1L1c1-7 SS ::= A A A A A A A .
+F5 B1L1c7 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(8), <<'EOS', 'Earley Set 8' );
-=== Earley Set 8 ===
-S:1 @7-8 SS ::= A . A A A A A A
-S:2 @6-8 SS ::= A A . A A A A A
-S:2 @7-8 SS ::= A A . A A A A A
-S:3 @5-8 SS ::= A A A . A A A A
-S:3 @6-8 SS ::= A A A . A A A A
-S:3 @7-8 SS ::= A A A . A A A A
-S:4 @4-8 SS ::= A A A A . A A A
-S:4 @5-8 SS ::= A A A A . A A A
-S:4 @6-8 SS ::= A A A A . A A A
-S:4 @7-8 SS ::= A A A A . A A A
-S:5 @3-8 SS ::= A A A A A . A A
-S:5 @4-8 SS ::= A A A A A . A A
-S:5 @5-8 SS ::= A A A A A . A A
-S:5 @6-8 SS ::= A A A A A . A A
-S:5 @7-8 SS ::= A A A A A . A A
-S:6 @2-8 SS ::= A A A A A A . A
-S:6 @3-8 SS ::= A A A A A A . A
-S:6 @4-8 SS ::= A A A A A A . A
-S:6 @5-8 SS ::= A A A A A A . A
-S:6 @6-8 SS ::= A A A A A A . A
-S:6 @7-8 SS ::= A A A A A A . A
-S:-1 @1-8 SS ::= A A A A A A A .
-S:-1 @2-8 SS ::= A A A A A A A .
-S:-1 @3-8 SS ::= A A A A A A A .
-S:-1 @4-8 SS ::= A A A A A A A .
-S:-1 @5-8 SS ::= A A A A A A A .
-S:-1 @6-8 SS ::= A A A A A A A .
-S:-1 @7-8 SS ::= A A A A A A A .
+=== Earley set 8 at B1L1c9 ===
+P5 B1L1c9 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+F2 B1L1c1 S ::= SS SS .
+R3:1 B1L1c8 SS ::= A . A A A A A A
+R3:2 x2 B1L1c7-8 SS ::= A A . A A A A A
+R3:3 x3 B1L1c6-8 SS ::= A A A . A A A A
+R3:4 x4 B1L1c5-8 SS ::= A A A A . A A A
+R3:5 x5 B1L1c4-8 SS ::= A A A A A . A A
+R3:6 x6 B1L1c3-8 SS ::= A A A A A A . A
+F3 x7 B1L1c2-8 SS ::= A A A A A A A .
+F5 B1L1c8 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(9), <<'EOS', 'Earley Set 9' );
-=== Earley Set 9 ===
-S:2 @7-9 SS ::= A A . A A A A A
-S:3 @6-9 SS ::= A A A . A A A A
-S:3 @7-9 SS ::= A A A . A A A A
-S:4 @5-9 SS ::= A A A A . A A A
-S:4 @6-9 SS ::= A A A A . A A A
-S:4 @7-9 SS ::= A A A A . A A A
-S:5 @4-9 SS ::= A A A A A . A A
-S:5 @5-9 SS ::= A A A A A . A A
-S:5 @6-9 SS ::= A A A A A . A A
-S:5 @7-9 SS ::= A A A A A . A A
-S:6 @3-9 SS ::= A A A A A A . A
-S:6 @4-9 SS ::= A A A A A A . A
-S:6 @5-9 SS ::= A A A A A A . A
-S:6 @6-9 SS ::= A A A A A A . A
-S:6 @7-9 SS ::= A A A A A A . A
-S:-1 @2-9 SS ::= A A A A A A A .
-S:-1 @3-9 SS ::= A A A A A A A .
-S:-1 @4-9 SS ::= A A A A A A A .
-S:-1 @5-9 SS ::= A A A A A A A .
-S:-1 @6-9 SS ::= A A A A A A A .
-S:-1 @7-9 SS ::= A A A A A A A .
+=== Earley set 9 at B1L1c10 ===
+P5 B1L1c10 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+F2 B1L1c1 S ::= SS SS .
+R3:2 B1L1c8 SS ::= A A . A A A A A
+R3:3 x2 B1L1c7-8 SS ::= A A A . A A A A
+R3:4 x3 B1L1c6-8 SS ::= A A A A . A A A
+R3:5 x4 B1L1c5-8 SS ::= A A A A A . A A
+R3:6 x5 B1L1c4-8 SS ::= A A A A A A . A
+F3 x6 B1L1c3-8 SS ::= A A A A A A A .
+F5 B1L1c9 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(10), <<'EOS', 'Earley Set 10' );
-=== Earley Set 10 ===
-S:3 @7-10 SS ::= A A A . A A A A
-S:4 @6-10 SS ::= A A A A . A A A
-S:4 @7-10 SS ::= A A A A . A A A
-S:5 @5-10 SS ::= A A A A A . A A
-S:5 @6-10 SS ::= A A A A A . A A
-S:5 @7-10 SS ::= A A A A A . A A
-S:6 @4-10 SS ::= A A A A A A . A
-S:6 @5-10 SS ::= A A A A A A . A
-S:6 @6-10 SS ::= A A A A A A . A
-S:6 @7-10 SS ::= A A A A A A . A
-S:-1 @3-10 SS ::= A A A A A A A .
-S:-1 @4-10 SS ::= A A A A A A A .
-S:-1 @5-10 SS ::= A A A A A A A .
-S:-1 @6-10 SS ::= A A A A A A A .
-S:-1 @7-10 SS ::= A A A A A A A .
+=== Earley set 10 at B1L1c11 ===
+P5 B1L1c11 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+F2 B1L1c1 S ::= SS SS .
+R3:3 B1L1c8 SS ::= A A A . A A A A
+R3:4 x2 B1L1c7-8 SS ::= A A A A . A A A
+R3:5 x3 B1L1c6-8 SS ::= A A A A A . A A
+R3:6 x4 B1L1c5-8 SS ::= A A A A A A . A
+F3 x5 B1L1c4-8 SS ::= A A A A A A A .
+F5 B1L1c10 A ::= 'a' .
 EOS
 
 Marpa::R3::Test::is( $recce->progress_show(11), <<'EOS', 'Earley Set 11' );
-=== Earley Set 11 ===
-S:4 @7-11 SS ::= A A A A . A A A
-S:5 @6-11 SS ::= A A A A A . A A
-S:5 @7-11 SS ::= A A A A A . A A
-S:6 @5-11 SS ::= A A A A A A . A
-S:6 @6-11 SS ::= A A A A A A . A
-S:6 @7-11 SS ::= A A A A A A . A
-S:-1 @4-11 SS ::= A A A A A A A .
-S:-1 @5-11 SS ::= A A A A A A A .
-S:-1 @6-11 SS ::= A A A A A A A .
-S:-1 @7-11 SS ::= A A A A A A A .
+=== Earley set 11 at B1L1c12 ===
+P5 B1L1c12 A ::= . 'a'
+F1 B1L1c1 [:start:] ::= S .
+F2 B1L1c1 S ::= SS SS .
+R3:4 B1L1c8 SS ::= A A A A . A A A
+R3:5 x2 B1L1c7-8 SS ::= A A A A A . A A
+R3:6 x3 B1L1c6-8 SS ::= A A A A A A . A
+F3 x4 B1L1c5-8 SS ::= A A A A A A A .
+F5 B1L1c11 A ::= 'a' .
 EOS
 
 # vim: expandtab shiftwidth=4:
