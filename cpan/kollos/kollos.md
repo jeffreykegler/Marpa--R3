@@ -4052,12 +4052,19 @@ TODO: Make `collected_progress_items a local, after development.
 
       -- miranda: insert progress_line_do(), local function of slr:progress_show
 
-      local lines = {}
+      local function earley_set_header(earley_set_id)
+        local location = 'B1L1c1'
+        if earley_set_id > 0 then
+          local block, pos = slr:g1_pos_to_l0_first(earley_set_id)
+          location = slr:lc_brief(pos, block)
+        end
+        return string.format('=== Earley set %d at %s ===', earley_set_id, location)
+      end
+
+      local items = {}
       for current_ordinal = start_ordinal, end_ordinal do
         -- io.stderr:write(string.format("earley_set_display(%d)\n", current_ordinal))
-        local result = { "=== Earley Set " .. current_ordinal .. "===" }
         local current_items = slr:progress(current_ordinal)
-        local items = {}
         for ix = 1, #current_items do
           local xpr_id, xpr_dot, origin = table.unpack(current_items[ix])
           -- item_type is 0 for prediction, 1 for medial, 2 for completed
@@ -4068,19 +4075,17 @@ TODO: Make `collected_progress_items a local, after development.
           elseif xpr_dot == xpr_length then item_type = 2 end
           items[#items+1] = { current_ordinal, item_type, xpr_id, xpr_dot, origin }
         end
-        local last_ordinal
-        for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
-          if this_ordinal ~= last_ordinal then
-            local location = 'B1L1c1'
-            if this_ordinal > 0 then
-              local block, pos = slr:g1_pos_to_l0_first(this_ordinal)
-              location = slr:lc_brief(pos, block)
-            end
-            lines[#lines+1] = string.format('=== Earley set %d at %s ===', this_ordinal, location)
-            last_ordinal = this_ordinal
-          end
-          lines[#lines+1] = progress_line_do(this_ordinal, origins, rule_id, position )
+      end
+
+      if #items == 0 then return earley_set_header(start_ordinal) .. '\n' end
+      local lines = {}
+      local last_ordinal
+      for this_ordinal, rule_id, position, origins in _M.collected_progress_items(items) do
+        if this_ordinal ~= last_ordinal then
+          lines[#lines+1] = earley_set_header(this_ordinal)
+          last_ordinal = this_ordinal
         end
+        lines[#lines+1] = progress_line_do(this_ordinal, origins, rule_id, position )
       end
       lines[#lines+1] = '' -- to get a final "\n"
       return table.concat(lines, "\n")
