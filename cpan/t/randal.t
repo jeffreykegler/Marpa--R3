@@ -12,8 +12,6 @@
 
 # Note: Converted to SLIF from randal.t
 
-# MITOSIS: PROGRESS
-
 use 5.010001;
 use strict;
 use warnings;
@@ -100,12 +98,12 @@ my @test_data = (
     [
         'sin',
         q{sin  / 25 ; # / ; die "this dies!"},
-        [ 'division:0-9, comment:12-34', 'sin0-15, die:18-34' ],
+        [ 'division@B1L1c1-9, comment@B1L1c13-34', 'sin@B1L1c1-15, die@B1L1c19-34' ],
     ],
     [
         'time',
         q{time  / 25 ; # / ; die "this dies!"},
-        ['division:0-10, comment:13-35']
+        ['division@B1L1c1-10, comment@B1L1c14-35']
     ]
 );
 
@@ -123,8 +121,6 @@ TEST: for my $test_data (@test_data) {
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $g, } );
 
     $recce->read( \$test_input );
-
-    # say STDERR $recce->g1_progress_show(0, -1) if $test_name eq 'sin';
 
     my @parses;
     while ( defined( my $value_ref = $recce->value() ) ) {
@@ -161,7 +157,7 @@ sub flatten {
 }
 
 sub show_comment {
-    return 'comment:' . join q{-}, Marpa::R3::Context::g1_range();
+    return 'comment@' . Marpa::R3::Context::lc_range();
 }
 
 sub show_statements {
@@ -170,16 +166,16 @@ sub show_statements {
 }
 
 sub show_die {
-    return 'die:' . join q{-}, Marpa::R3::Context::g1_range();
+    return 'die@' . Marpa::R3::Context::lc_range();
 }
 
 sub show_division {
-    return 'division:' . join q{-}, Marpa::R3::Context::g1_range();
+    return 'division@' . Marpa::R3::Context::lc_range();
 }
 
 sub show_function_call {
     my (undef, $values) = @_;
-    return $values->[0] . join q{-}, Marpa::R3::Context::g1_range();
+    return $values->[0] . '@' . Marpa::R3::Context::lc_range();
 }
 
 # vim: expandtab shiftwidth=4:

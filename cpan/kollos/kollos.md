@@ -3235,7 +3235,7 @@ and returns the current L0 position.
         local this_sweep = per_es[g1_pos+1]
         if not this_sweep then
             error(string.format(
-                "slr:g1_pos_to_l0_range(%d): bad argument\n\z
+                "slr:g1_pos_to_l0_first(%d): bad argument\n\z
                 \u{20}   Allowed values are %d-%d\n",
                 g1_pos, 0, #per_es-1
             ))
@@ -3261,7 +3261,7 @@ contains more than one L0 span.
         local this_sweep = per_es[g1_pos+1]
         if not this_sweep then
             error(string.format(
-                "slr:g1_pos_to_l0_range(%d): bad argument\n\z
+                "slr:g1_pos_to_l0_last(%d): bad argument\n\z
                 \u{20}   Allowed values are %d-%d\n",
                 g1_pos, 0, #per_es-1
             ))
@@ -4999,41 +4999,6 @@ to set and discover various Lua values.
     function _M.class_slr.stack_set(slr, ix, v)
         local stack = slr.lmw_v.stack
         stack[ix+0] = v
-    end
-
-```
-
-#### Convert current, origin Earley set to L0 span
-
-Given a current Earley set and an origin Earley set,
-return a span in L0 terms.
-The purpose is assumed to be a find a literal
-equivalent.
-All zero length literals are alike,
-so the logic is careless about the l0_start when l0_length
-is zero.
-
-```
-    -- miranda: section+ Utilities for semantics
-    function _M.class_slr.earley_sets_to_L0_span(slr, start_earley_set, end_earley_set)
-      start_earley_set = start_earley_set + 1
-      -- normalize start_earley_set
-      if start_earley_set < 1 then start_earley_set = 1 end
-      if end_earley_set < start_earley_set then
-          return 0, 0
-      end
-      local per_es = slr.per_es
-      local start_entry = per_es[start_earley_set]
-      if not start_entry then
-          return 0, 0
-      end
-      local end_entry = per_es[end_earley_set]
-      if not end_entry then
-          end_entry = per_es[#per_es]
-      end
-      local l0_start = start_entry[2]
-      local l0_length = end_entry[2] + end_entry[3] - l0_start
-      return l0_start, l0_length
     end
 
 ```

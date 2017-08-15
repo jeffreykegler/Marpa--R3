@@ -172,6 +172,20 @@ END_OF_LUA
     return $start, $end;
 } ## end sub Marpa::R3::Context::g1_range
 
+sub Marpa::R3::Context::lc_range {
+    my $slr = $Marpa::R3::Context::slr;
+    my ( $lc_range ) =
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+local slr = ...
+local g1_first = slr.this_step.start_es_id
+local g1_last = slr.this_step.es_id - 1
+local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
+return slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+END_OF_LUA
+    return $lc_range;
+}
+
 sub Marpa::R3::Context::g1_span {
     my $slr = $Marpa::R3::Context::slr;
     my ( $start, $length ) =
