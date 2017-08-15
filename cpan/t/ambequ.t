@@ -14,8 +14,6 @@
 
 # An ambiguous equation
 
-# MITOSIS: PROGRESS
-
 use 5.010001;
 use strict;
 use warnings;
@@ -318,15 +316,16 @@ restore_stdout();
 
 $actual_ref = save_stdout();
 
-print $recce->g1_progress_show()
+print $recce->progress_show()
     or die "print failed: $ERRNO";
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'END_OF_PROGRESS_REPORT', 'Ambiguous Equation Progress Report' );
-R0:1 x4 @0...6-7 B1L1c1-7 E ::= E . Op E
-F0 x3 @0,2,4-7 B1L1c1-7 E ::= E Op E .
-F1 @6-7 B1L1c7 E ::= Number .
-F2 @0-7 B1L1c1-7 [:start:] ::= E .
+=== Earley set 7 at B1L1c8 ===
+R2:1 x4 B1L1c1-7 E ::= E . Op E
+F1 B1L1c1 [:start:] ::= E .
+F2 x3 B1L1c1-5 E ::= E Op E .
+F3 B1L1c7 E ::= Number .
 END_OF_PROGRESS_REPORT
 
 restore_stdout();
