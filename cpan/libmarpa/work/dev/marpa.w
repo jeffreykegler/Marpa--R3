@@ -11110,14 +11110,12 @@ typedef struct marpa_traverser TRAVERSER_Object;
 @d LEO_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
 @d TOKEN_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
 @d COMPLETION_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
-@d LIM_of_TRV(trv) ((trv)->t_trv_lim)
 
 @<Widely aligned traverser elements@> =
 YIM t_trv_yim;
 SRCL t_trv_leo_srcl;
 SRCL t_trv_token_srcl;
 SRCL t_trv_completion_srcl;
-LIM t_trv_lim;
 
 @ No need to clear traverser elements during
 destruction.
@@ -11170,11 +11168,7 @@ trv_new(RECCE r, YIM yim)
     YIM_of_TRV(trv) = yim;
     TOKEN_SRCL_of_TRV (trv) = First_Token_SRCL_of_YIM (yim);
     COMPLETION_SRCL_of_TRV (trv) = First_Completion_SRCL_of_YIM (yim);
-    {
-	const SRCL leo_srcl = First_Leo_SRCL_of_YIM (yim);
-	LEO_SRCL_of_TRV (trv) = leo_srcl;
-	LIM_of_TRV (trv) = leo_srcl ? LIM_of_SRCL (leo_srcl) : NULL;
-    }
+    LEO_SRCL_of_TRV (trv) = First_Leo_SRCL_of_YIM (yim);
     return trv;
 }
 
@@ -11280,6 +11274,20 @@ int marpa_trv_at_token(Marpa_Traverser trv)
 }
 
 @
+@<Function definitions@> =
+int marpa_trv_at_leo(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+
+    if (G_is_Trivial(g)) return 0;
+    srcl = LEO_SRCL_of_TRV (trv);
+    return srcl ? 1 : 0;
+}
+
+@
 {\bf To Do}: @^To Do@> Should the error code for no completion SRCL
 be |MARPA_ERR_NOT_TRACING_COMPLETION_LINKS|, or something new?
 
@@ -11360,6 +11368,24 @@ int marpa_trv_completion_next(Marpa_Traverser trv)
     srcl = COMPLETION_SRCL_of_TRV (trv);
     if (!srcl) return 0;
     srcl = COMPLETION_SRCL_of_TRV (trv) = Next_SRCL_of_SRCL(srcl);
+    if (!srcl) return 0;
+    return 1;
+}
+
+@
+@<Function definitions@> =
+int marpa_trv_leo_next(Marpa_Traverser trv)
+{
+    @<Return |-2| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    @<Fail if fatal error@>@;
+    if (G_is_Trivial(g)) {
+       return 0;
+    }
+    srcl = LEO_SRCL_of_TRV (trv);
+    if (!srcl) return 0;
+    srcl = LEO_SRCL_of_TRV (trv) = Next_SRCL_of_SRCL(srcl);
     if (!srcl) return 0;
     return 1;
 }

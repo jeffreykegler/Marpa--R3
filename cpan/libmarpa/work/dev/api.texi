@@ -3353,6 +3353,14 @@ Return value on success: 1 if the completion link was advanced,
 Return value on failure: @minus{}2.
 @end deftypefun
 
+@deftypefun int marpa_trv_leo_next(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the Leo link was advanced,
+0 if that was not possible.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
 @deftypefun int marpa_trv_token_next(Marpa_Traverser @var{trv})
 
 Return value on success: 1 if the token link was advanced,
@@ -3400,6 +3408,14 @@ and to 0 otherwise.
 @deftypefun int marpa_trv_at_completion(Marpa_Traverser @var{trv})
 
 Return value on success: 1 if the traverser is at a valid completion link,
+0 otherwise.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_at_leo(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the traverser is at a valid Leo link,
 0 otherwise.
 
 Return value on failure: @minus{}2.
