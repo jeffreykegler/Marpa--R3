@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Tue Aug 15 21:01:45 2017
+; Wed Aug 16 14:50:44 2017
 EXPORTS
    marpa_check_version
    marpa_version
@@ -83,11 +83,6 @@ EXPORTS
    marpa_trv_new
    marpa_trv_ref
    marpa_trv_unref
-   marpa_trv_completion_next
-   marpa_trv_leo_next
-   marpa_trv_token_next
-   marpa_trv_completion_predecessor
-   marpa_trv_token_predecessor
    marpa_trv_at_completion
    marpa_trv_at_leo
    marpa_trv_at_token
@@ -98,6 +93,15 @@ EXPORTS
    marpa_trv_origin
    marpa_trv_nrl_id
    marpa_trv_nrl_dot
+   marpa_trv_completion_next
+   marpa_trv_leo_next
+   marpa_trv_token_next
+   marpa_trv_completion_predecessor
+   marpa_trv_token_predecessor
+   marpa_ltrv_ref
+   marpa_ltrv_unref
+   marpa_ltrv_soft_error
+   marpa_ltrv_predecessor
    marpa_ptrv_new
    marpa_ptrv_ref
    marpa_ptrv_unref

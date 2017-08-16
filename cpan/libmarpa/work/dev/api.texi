@@ -76,6 +76,7 @@ Published @value{UPDATED} by Jeffrey Kegler
 * Recognizer methods::
 * Progress reports::
 * Traverser methods::
+* LIM Traverser methods::
 * PIM Traverser methods::
 * Bocage methods::
 * Ordering methods::
@@ -162,12 +163,19 @@ Traverser methods
 * Traverser overview::
 * Traverser constructor::
 * Traverser reference counting::
+* Traverser accessors::
 * Traverser mutators::
 * Traverser link constructors::
 
+LIM Traverser methods
+
+* LIM Traverser overview::
+* LIM Traverser reference counting::
+* LIM Traverser accessors::
+* LIM Traverser link constructors::
+
 PIM Traverser methods
 
-* Traverser accessors::
 * PIM Traverser overview::
 * PIM Traverser constructor::
 * PIM Traverser reference counting::
@@ -3275,13 +3283,14 @@ or on other failure, @minus{}2.
 * Bocage accessor::
 @end menu
 
-@node Traverser methods, PIM Traverser methods, Progress reports, Top
+@node Traverser methods, LIM Traverser methods, Progress reports, Top
 @chapter Traverser methods
 
 @menu
 * Traverser overview::
 * Traverser constructor::
 * Traverser reference counting::
+* Traverser accessors::
 * Traverser mutators::
 * Traverser link constructors::
 @end menu
@@ -3316,7 +3325,7 @@ Success return value: On success, the new traverser object.
 On failure, @code{NULL}.
 @end deftypefun
 
-@node Traverser reference counting, Traverser mutators, Traverser constructor, Traverser methods
+@node Traverser reference counting, Traverser accessors, Traverser constructor, Traverser methods
 @section  Reference counting
 @deftypefun Marpa_Traverser marpa_trv_ref (Marpa_Traverser @var{trv})
 Increases the reference count by 1.
@@ -3342,67 +3351,7 @@ to zero, it too is destroyed.
 
 @end deftypefun
 
-@node Traverser mutators, Traverser link constructors, Traverser reference counting, Traverser methods
-@section Mutators
-
-@deftypefun int marpa_trv_completion_next(Marpa_Traverser @var{trv})
-
-Return value on success: 1 if the completion link was advanced,
-0 if that was not possible.
-
-Return value on failure: @minus{}2.
-@end deftypefun
-
-@deftypefun int marpa_trv_leo_next(Marpa_Traverser @var{trv})
-
-Return value on success: 1 if the Leo link was advanced,
-0 if that was not possible.
-
-Return value on failure: @minus{}2.
-@end deftypefun
-
-@deftypefun int marpa_trv_token_next(Marpa_Traverser @var{trv})
-
-Return value on success: 1 if the token link was advanced,
-0 if that was not possible.
-
-Return value on failure: @minus{}2.
-@end deftypefun
-
-@node Traverser link constructors,  , Traverser mutators, Traverser methods
-@section Link constructors
-
-@deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
-
-Return value on success: A traverser for the completion predecessor.
-
-Return value on failure: NULL.
-Sets the soft error flag to 1 if the error was ``soft'',
-and to 0 otherwise.
-@end deftypefun
-
-@deftypefun Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser @var{trv})
-
-Return value on success: A traverser for the token predecessor.
-
-Return value on failure: NULL.
-Sets the soft error flag to 1 if the error was ``soft'',
-and to 0 otherwise.
-@end deftypefun
-
-@node PIM Traverser methods, Bocage methods, Traverser methods, Top
-@chapter PIM Traverser methods
-
-@menu
-* Traverser accessors::
-* PIM Traverser overview::
-* PIM Traverser constructor::
-* PIM Traverser reference counting::
-* PIM Traverser accessors::
-* PIM Traverser iterators::
-@end menu
-
-@node Traverser accessors, PIM Traverser overview, PIM Traverser methods, PIM Traverser methods
+@node Traverser accessors, Traverser mutators, Traverser reference counting, Traverser methods
 @section Accessors
 
 @deftypefun int marpa_trv_at_completion(Marpa_Traverser @var{trv})
@@ -3496,7 +3445,139 @@ Return value on success: The NRL dot position.
 Return value on failure: @minus{}2.
 @end deftypefun
 
-@node PIM Traverser overview, PIM Traverser constructor, Traverser accessors, PIM Traverser methods
+@node Traverser mutators, Traverser link constructors, Traverser accessors, Traverser methods
+@section Mutators
+
+@deftypefun int marpa_trv_completion_next(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the completion link was advanced,
+0 if that was not possible.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_leo_next(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the Leo link was advanced,
+0 if that was not possible.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@deftypefun int marpa_trv_token_next(Marpa_Traverser @var{trv})
+
+Return value on success: 1 if the token link was advanced,
+0 if that was not possible.
+
+Return value on failure: @minus{}2.
+@end deftypefun
+
+@node Traverser link constructors,  , Traverser mutators, Traverser methods
+@section Link constructors
+
+@deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the completion predecessor.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
+@deftypefun Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the token predecessor.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
+@node LIM Traverser methods, PIM Traverser methods, Traverser methods, Top
+@chapter LIM Traverser methods
+
+@menu
+* LIM Traverser overview::
+* LIM Traverser reference counting::
+* LIM Traverser accessors::
+* LIM Traverser link constructors::
+@end menu
+
+@node LIM Traverser overview, LIM Traverser reference counting, LIM Traverser methods, LIM Traverser methods
+@section Overview
+
+The LIM traverser is an object used in traversing Leo data items.
+
+To create a traverser, use the @code{marpa_ptrv_ltrv()} method
+of the PIM Traverser.
+
+When a traverser is no longer in use, its memory can be freed
+using the 
+@code{marpa_ltrv_unref()} method.
+
+@node LIM Traverser reference counting, LIM Traverser accessors, LIM Traverser overview, LIM Traverser methods
+@section  Reference counting
+@deftypefun Marpa_LTraverser marpa_ltrv_ref (Marpa_LTraverser @var{ltrv})
+Increases the reference count by 1.
+Not needed by most applications.
+
+Return value:
+On success, @var{ltrv}.
+On failure, @code{NULL}.
+@end deftypefun
+
+@deftypefun void marpa_ltrv_unref (Marpa_LTraverser @var{ltrv})
+Decreases the reference count by 1,
+destroying @var{ltrv} once the reference count reaches
+zero.
+When @var{ltrv} is destroyed, the reference count
+of its parent recognizer is decreased by 1.
+If this takes the reference count of the parent recognizer
+to zero, it too is destroyed.
+If the parent recognizer is destroyed, the reference count
+of its base grammar is decreased by 1.
+If this takes the reference count of the base grammar
+to zero, it too is destroyed.
+
+@end deftypefun
+
+@node LIM Traverser accessors, LIM Traverser link constructors, LIM Traverser reference counting, LIM Traverser methods
+@section Accessors
+
+@deftypefun int marpa_ltrv_soft_error(Marpa_LTraverser @var{ltrv})
+
+Only certain method calls, all of them documented to do so,
+set the soft error flag.
+
+Return value on success: 1 if the soft error flag is on, 0 otherwise.
+
+Return value on failure: Never fails.  This is because, pedantically,
+the error (soft or hard) occurred in a previous method call.
+@end deftypefun
+
+@node LIM Traverser link constructors,  , LIM Traverser accessors, LIM Traverser methods
+@section Link constructors
+
+@deftypefun Marpa_LTraverser marpa_ltrv_predecessor(Marpa_LTraverser @var{ltrv})
+
+Return value on success: A LIM traverser for the predecessor of @var{ltrv}.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+@node PIM Traverser methods, Bocage methods, LIM Traverser methods, Top
+@chapter PIM Traverser methods
+
+@menu
+* PIM Traverser overview::
+* PIM Traverser constructor::
+* PIM Traverser reference counting::
+* PIM Traverser accessors::
+* PIM Traverser iterators::
+@end menu
+
+@node PIM Traverser overview, PIM Traverser constructor, PIM Traverser methods, PIM Traverser methods
 @section Overview
 
 The PIM traverser is an object used in traversing the postdot

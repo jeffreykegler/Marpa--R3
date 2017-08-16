@@ -11578,6 +11578,146 @@ int marpa_trv_nrl_dot(Marpa_Traverser trv)
   }
 }
 
+@** LIM traverser code (LTRV, LTRAVERSER).
+@ 
+@s Marpa_LTraverser int
+@<Public incomplete structures@> =
+struct marpa_ltraverser;
+typedef struct marpa_ltraverser* Marpa_LTraverser;
+@ @<Private incomplete structures@> =
+typedef struct marpa_ltraverser* LTRAVERSER;
+@ @s LTRAVERSER_Object int
+@<LIM traverser structure@> =
+struct marpa_ltraverser {
+    @<Widely aligned LIM traverser elements@>@;
+    @<Int aligned LIM traverser elements@>@;
+    @<Bit aligned LIM traverser elements@>@;
+};
+typedef struct marpa_ltraverser LTRAVERSER_Object;
+
+@
+@d LIM_of_LTRV(ltrv) ((ltrv)->t_ltrv_lim)
+@d YS_of_LTRV(ltrv) (YS_of_YIM(LIM_of_LTRV(ltrv))
+
+@<Widely aligned LIM traverser elements@> =
+LIM t_ltrv_lim;
+
+@ No need to clear traverser elements during
+destruction.
+@<Destroy LIM traverser elements@> =
+{
+  recce_unref (R_of_LTRV(ltrv));
+}
+
+@ @<Bit aligned LIM traverser elements@> =
+    int t_ltrv_soft_error;
+@ @d LTRV_has_Soft_Error(ltrv) ((ltrv)->t_ltrv_soft_error)
+@ @<Initialize LIM traverser |ltrv|@> =
+    LTRV_has_Soft_Error(ltrv) = 0;
+@ @<Function definitions@> =
+int marpa_ltrv_soft_error(Marpa_LTraverser ltrv)
+{
+    return LTRV_has_Soft_Error(ltrv);
+}
+
+@ @d R_of_LTRV(ltrv) ((ltrv)->t_ltrv_recce)
+@<Widely aligned LIM traverser elements@> =
+    RECCE t_ltrv_recce;
+@ @<Initialize LIM traverser |ltrv|@> =
+    R_of_LTRV(ltrv) = r;
+
+@ @<Unpack LIM traverser objects@> =
+    const RECCE r @,@, UNUSED = R_of_LTRV(ltrv);
+    const GRAMMAR g @,@, UNUSED = G_of_R(r);
+
+@*0 LIM traverser constructors.
+@
+@<Function definitions@> =
+PRIVATE Marpa_LTraverser
+ltrv_new(RECCE r, LIM lim)
+{
+    const GRAMMAR g = G_of_R(r);
+    LTRAVERSER ltrv;
+
+    ltrv = my_malloc (sizeof (*ltrv));
+    @<Initialize LIM  traverser |ltrv|@>
+    recce_ref(r);
+    LIM_of_LTRV(ltrv) = lim;
+    return ltrv;
+}
+
+@
+@<Function definitions@> =
+Marpa_LTraverser marpa_ltrv_predecessor(Marpa_LTraverser ltrv)
+{
+    @<Return |NULL| on failure@>@;
+    @<Unpack LIM traverser objects@>@;
+    LIM predecessor;
+    @<Fail if fatal error@>@;
+    LTRV_has_Soft_Error(ltrv) = 0;
+    predecessor = Predecessor_LIM_of_LIM(LIM_of_LTRV(ltrv));
+    if (!predecessor) {
+        LTRV_has_Soft_Error(ltrv) = 1;
+        return NULL;
+    }
+    return ltrv_new(r, predecessor);
+}
+
+@*0 LIM traverser mutators.
+
+@*0 Reference counting and destructors.
+@ @<Int aligned LIM traverser elements@>=
+  int t_ref_count;
+@ @<Initialize LIM traverser |ltrv|@> =
+    ltrv->t_ref_count = 1;
+@ Decrement the LIM traverser reference count.
+@<Function definitions@> =
+PRIVATE void
+ltraverser_unref (LTRAVERSER ltrv)
+{
+  MARPA_ASSERT (ltrv->t_ref_count > 0)
+  ltrv->t_ref_count--;
+  if (ltrv->t_ref_count <= 0)
+    {
+      ltraverser_free(ltrv);
+    }
+}
+void
+marpa_ltrv_unref (Marpa_LTraverser ltrv)
+{
+   ltraverser_unref(ltrv);
+}
+
+@ Increment the LIM traverser reference count.
+@<Function definitions@> =
+PRIVATE LTRAVERSER
+ltraverser_ref (LTRAVERSER ltrv)
+{
+  MARPA_ASSERT(ltrv->t_ref_count > 0)
+  ltrv->t_ref_count++;
+  return ltrv;
+}
+Marpa_LTraverser
+marpa_ltrv_ref (Marpa_LTraverser ltrv)
+{
+   return ltraverser_ref(ltrv);
+}
+
+@*0 LIM traverser destruction.
+
+@
+@<Function definitions@> =
+PRIVATE void
+ltraverser_free (LTRAVERSER ltrv)
+{
+  @<Unpack LIM traverser objects@>@;
+  if (ltrv)
+    {
+      @<Destroy LIM traverser elements@>;
+    }
+  my_free(ltrv);
+}
+
 @** PIM traverser code (PTRV, PTRAVERSER).
 @ Pre-initialization is making the elements safe for the deallocation logic
 to be called.  Often it is setting the value to zero, so that the deallocation
@@ -17138,6 +17278,7 @@ or used strictly for debugging.
 @<Source object structure@>@;
 @<Earley item structure@>@;
 @<Traverser structure@>@;
+@<LIM traverser structure@>@;
 @<PIM traverser structure@>@;
 @<Bocage structure@>@;
 
