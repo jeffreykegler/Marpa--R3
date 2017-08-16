@@ -26,8 +26,8 @@
  * It is not intended to be modified directly
  */
 
-/*1437:*/
-#line 17374 "./marpa.w"
+/*1422:*/
+#line 17111 "./marpa.w"
 
 
 #include "config.h"
@@ -588,7 +588,7 @@ FSTACK_INDEX((tree) ->t_nook_stack,NOOK_Object,nook_id)
 #define MARPA_ERROR(code) (set_error(g,(code) ,NULL,0u) ) 
 #define MARPA_FATAL(code) (set_error(g,(code) ,NULL,FATAL_FLAG) ) 
 
-#line 17384 "./marpa.w"
+#line 17121 "./marpa.w"
 
 #include "marpa_obs.h"
 #include "marpa_avl.h"
@@ -725,7 +725,7 @@ typedef struct s_per_earley_set_list*PSL;
 struct s_per_earley_set_arena;
 typedef struct s_per_earley_set_arena*PSAR;
 /*:1263*/
-#line 17387 "./marpa.w"
+#line 17124 "./marpa.w"
 
 /*49:*/
 #line 666 "./marpa.w"
@@ -850,7 +850,7 @@ typedef int*CIL;
 
 typedef struct s_cil_arena*CILAR;
 /*:1242*/
-#line 17388 "./marpa.w"
+#line 17125 "./marpa.w"
 
 /*1240:*/
 #line 14857 "./marpa.w"
@@ -863,7 +863,7 @@ MARPA_DSTACK_DECLARE(t_buffer);
 typedef struct s_cil_arena CILAR_Object;
 
 /*:1240*/
-#line 17389 "./marpa.w"
+#line 17126 "./marpa.w"
 
 /*48:*/
 #line 660 "./marpa.w"
@@ -1779,7 +1779,7 @@ PSL t_first_free_psl;
 };
 typedef struct s_per_earley_set_arena PSAR_Object;
 /*:1264*/
-#line 17390 "./marpa.w"
+#line 17127 "./marpa.w"
 
 /*669:*/
 #line 7175 "./marpa.w"
@@ -1789,11 +1789,11 @@ LIM_Object t_leo;
 YIX_Object t_earley;
 };
 /*:669*/
-#line 17391 "./marpa.w"
+#line 17128 "./marpa.w"
 
 
-/*:1437*//*1438:*/
-#line 17396 "./marpa.w"
+/*:1422*//*1423:*/
+#line 17133 "./marpa.w"
 
 /*40:*/
 #line 570 "./marpa.w"
@@ -1823,11 +1823,11 @@ static const unsigned int bv_lsb= lbv_lsb;
 static const unsigned int bv_msb= lbv_msb;
 
 /*:1181*/
-#line 17397 "./marpa.w"
+#line 17134 "./marpa.w"
 
 
-/*:1438*//*1439:*/
-#line 17399 "./marpa.w"
+/*:1423*//*1424:*/
+#line 17136 "./marpa.w"
 
 /*550:*/
 #line 6015 "./marpa.w"
@@ -1977,7 +1977,7 @@ BITFIELD t_trace_source_type:3;
 };
 
 /*:550*/
-#line 17400 "./marpa.w"
+#line 17137 "./marpa.w"
 
 /*680:*/
 #line 7264 "./marpa.w"
@@ -2028,7 +2028,7 @@ struct marpa_source_link_s t_unique;
 };
 
 /*:686*/
-#line 17401 "./marpa.w"
+#line 17138 "./marpa.w"
 
 /*651:*/
 #line 6944 "./marpa.w"
@@ -2052,7 +2052,7 @@ BITFIELD t_was_fusion:1;
 typedef struct s_earley_item YIM_Object;
 
 /*:651*/
-#line 17402 "./marpa.w"
+#line 17139 "./marpa.w"
 
 /*932:*/
 #line 11099 "./marpa.w"
@@ -2095,7 +2095,7 @@ BITFIELD t_is_trivial:1;
 typedef struct marpa_traverser TRAVERSER_Object;
 
 /*:932*/
-#line 17403 "./marpa.w"
+#line 17140 "./marpa.w"
 
 /*975:*/
 #line 11592 "./marpa.w"
@@ -2136,7 +2136,7 @@ BITFIELD t_is_trivial:1;
 typedef struct marpa_ptraverser PTRAVERSER_Object;
 
 /*:975*/
-#line 17404 "./marpa.w"
+#line 17141 "./marpa.w"
 
 /*1007:*/
 #line 11871 "./marpa.w"
@@ -2192,10 +2192,10 @@ BITFIELD t_is_nulling:1;
 };
 
 /*:1007*/
-#line 17405 "./marpa.w"
+#line 17142 "./marpa.w"
 
 
-/*:1439*/
+/*:1424*/
 
 #line 1 "./marpa.c.p40"
 static RULE rule_new(GRAMMAR g,
@@ -2472,54 +2472,52 @@ static inline Marpa_Error_Code
 clear_error (GRAMMAR g);
 static inline void trace_earley_item_clear(RECCE r);
 static inline void trace_source_link_clear(RECCE r);
-static inline int look_yim(Marpa_Earley_Item_Look* look,
-  YS earley_set, Marpa_Earley_Item_ID eim_id);
 
-/*1440:*/
-#line 17407 "./marpa.w"
+/*1425:*/
+#line 17144 "./marpa.w"
 
 /*1314:*/
 #line 15683 "./marpa.w"
 
 extern void*(*const marpa__out_of_memory)(void);
 
-/*:1314*//*1420:*/
-#line 17220 "./marpa.w"
+/*:1314*//*1405:*/
+#line 16957 "./marpa.w"
 
 extern int marpa__default_debug_handler(const char*format,...);
 extern int(*marpa__debug_handler)(const char*,...);
 extern int marpa__debug_level;
 
-/*:1420*/
-#line 17408 "./marpa.w"
+/*:1405*/
+#line 17145 "./marpa.w"
 
 #if MARPA_DEBUG
-/*1425:*/
-#line 17252 "./marpa.w"
+/*1410:*/
+#line 16989 "./marpa.w"
 
 static const char*yim_tag_safe(
 char*buffer,GRAMMAR g,YIM yim)UNUSED;
 static const char*yim_tag(GRAMMAR g,YIM yim)UNUSED;
-/*:1425*//*1427:*/
-#line 17278 "./marpa.w"
+/*:1410*//*1412:*/
+#line 17015 "./marpa.w"
 
 static char*lim_tag_safe(char*buffer,LIM lim)UNUSED;
 static char*lim_tag(LIM lim)UNUSED;
-/*:1427*//*1429:*/
-#line 17304 "./marpa.w"
+/*:1412*//*1414:*/
+#line 17041 "./marpa.w"
 
 static const char*or_tag_safe(char*buffer,OR or)UNUSED;
 static const char*or_tag(OR or)UNUSED;
-/*:1429*//*1431:*/
-#line 17336 "./marpa.w"
+/*:1414*//*1416:*/
+#line 17073 "./marpa.w"
 
 static const char*ahm_tag_safe(char*buffer,AHM ahm)UNUSED;
 static const char*ahm_tag(AHM ahm)UNUSED;
-/*:1431*/
-#line 17410 "./marpa.w"
+/*:1416*/
+#line 17147 "./marpa.w"
 
-/*1426:*/
-#line 17257 "./marpa.w"
+/*1411:*/
+#line 16994 "./marpa.w"
 
 static const char*
 yim_tag_safe(char*buffer,GRAMMAR g,YIM yim)
@@ -2538,8 +2536,8 @@ yim_tag(GRAMMAR g,YIM yim)
 return yim_tag_safe(DEBUG_yim_tag_buffer,g,yim);
 }
 
-/*:1426*//*1428:*/
-#line 17283 "./marpa.w"
+/*:1411*//*1413:*/
+#line 17020 "./marpa.w"
 
 static char*
 lim_tag_safe(char*buffer,LIM lim)
@@ -2556,8 +2554,8 @@ lim_tag(LIM lim)
 return lim_tag_safe(DEBUG_lim_tag_buffer,lim);
 }
 
-/*:1428*//*1430:*/
-#line 17308 "./marpa.w"
+/*:1413*//*1415:*/
+#line 17045 "./marpa.w"
 
 static const char*
 or_tag_safe(char*buffer,OR or)
@@ -2579,8 +2577,8 @@ or_tag(OR or)
 return or_tag_safe(DEBUG_or_tag_buffer,or);
 }
 
-/*:1430*//*1432:*/
-#line 17339 "./marpa.w"
+/*:1415*//*1417:*/
+#line 17076 "./marpa.w"
 
 static const char*
 ahm_tag_safe(char*buffer,AHM ahm)
@@ -2602,19 +2600,19 @@ ahm_tag(AHM ahm)
 return ahm_tag_safe(DEBUG_ahm_tag_buffer,ahm);
 }
 
-/*:1432*/
-#line 17411 "./marpa.w"
+/*:1417*/
+#line 17148 "./marpa.w"
 
 #endif
-/*1424:*/
-#line 17244 "./marpa.w"
+/*1409:*/
+#line 16981 "./marpa.w"
 
 int(*marpa__debug_handler)(const char*,...)= 
 marpa__default_debug_handler;
 int marpa__debug_level= 0;
 
-/*:1424*/
-#line 17413 "./marpa.w"
+/*:1409*/
+#line 17150 "./marpa.w"
 
 /*41:*/
 #line 581 "./marpa.w"
@@ -24208,150 +24206,16 @@ nook= base_nook+nook_id;
 return NOOK_is_Predecessor(nook);
 }
 
-/*:1404*//*1407:*/
-#line 17025 "./marpa.w"
-
-PRIVATE int look_yim(Marpa_Earley_Item_Look*look,
-YS earley_set,Marpa_Earley_Item_ID eim_id)
-{
-int xrl_position;
-int raw_xrl_position;
-YIM*earley_items= YIMs_of_YS(earley_set);
-YIM earley_item= earley_items[eim_id];
-AHM ahm= AHM_of_YIM(earley_item);
-XRL xrl= XRL_of_AHM(ahm);
-if(xrl){
-marpa_eim_look_rule_id(look)= ID_of_XRL(xrl);
-xrl_position= XRL_Position_of_AHM(ahm);
-raw_xrl_position= Raw_XRL_Position_of_AHM(ahm);
-}else{
-marpa_eim_look_rule_id(look)= -1;
-raw_xrl_position= xrl_position= -1;
-}
-marpa_eim_look_dot(look)= xrl_position;
-marpa_eim_look_origin(look)= Origin_Ord_of_YIM(earley_item);
-marpa_eim_look_irl_id(look)= IRLID_of_AHM(ahm);
-marpa_eim_look_irl_dot(look)= Position_of_AHM(ahm);
-
-look->t_yim_look_leo_srcl= 0;
-marpa_eim_look_token_predecessor_esid(look)= -1;
-marpa_eim_look_token_predecessor_eimid(look)= -1;
-marpa_eim_look_token_nsyid(look)= -1;
-marpa_eim_look_token_value(look)= -1;
-
-look->t_yim_look_token_srcl= 0;
-
-look->t_yim_look_completion_srcl= 0;
-
-return raw_xrl_position;
-}
-
-/*:1407*//*1409:*/
-#line 17067 "./marpa.w"
-
-int
-_marpa_r_look_yim(Marpa_Recognizer r,Marpa_Earley_Item_Look*look,
-Marpa_Earley_Set_ID es_id,Marpa_Earley_Item_ID eim_id)
-{
-const YS earley_set= YS_of_R_by_Ord(r,es_id);
-return look_yim(look,earley_set,eim_id);
-}
-
-/*:1409*//*1411:*/
-#line 17087 "./marpa.w"
-
-int
-_marpa_r_yim_check(Marpa_Recognizer r,
-Marpa_Earley_Set_ID es_id,Marpa_Earley_Item_ID eim_id)
-{
-YS earley_set;
-/*560:*/
-#line 6102 "./marpa.w"
-
-const GRAMMAR g= G_of_R(r);
-/*:560*/
-#line 17093 "./marpa.w"
-
-/*1285:*/
-#line 15431 "./marpa.w"
-const int failure_indicator= -2;
-
-/*:1285*/
-#line 17094 "./marpa.w"
-
-
-if(es_id<0)
-{
-MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
-return failure_indicator;
-}
-if(eim_id<0)
-{
-MARPA_ERROR(MARPA_ERR_YIM_ID_INVALID);
-return failure_indicator;
-}
-r_update_earley_sets(r);
-earley_set= YS_of_R_by_Ord(r,es_id);
-if(es_id>=MARPA_DSTACK_LENGTH(r->t_earley_set_stack))
-{
-MARPA_ERROR(MARPA_ERR_INVALID_LOCATION);
-return-1;
-}
-if(eim_id>=YIM_Count_of_YS(earley_set))
-{
-return 0;
-}
-return 1;
-}
-
-/*:1411*//*1417:*/
-#line 17161 "./marpa.w"
-
-int
-_marpa_r_look_pim_eim_first(Marpa_Recognizer r,Marpa_Postdot_Item_Look*look,
-Marpa_Earley_Set_ID es_id,Marpa_Symbol_ID nsy_id)
-{
-int earley_item_ix= -1;
-const YS earley_set= YS_of_R_by_Ord(r,es_id);
-YIM earley_item= NULL;
-PIM pim= First_PIM_of_YS_by_NSYID(earley_set,nsy_id);
-if(!pim)return-1;
-earley_item= YIM_of_PIM(pim);
-if(!earley_item)return-1;
-look->t_pim_look_current= pim;
-earley_item_ix= Ord_of_YIM(earley_item);
-marpa_pim_look_eim(look)= earley_item_ix;
-return earley_item_ix;
-}
-
-/*:1417*//*1419:*/
-#line 17198 "./marpa.w"
-
-int
-_marpa_r_look_pim_eim_next(Marpa_Postdot_Item_Look*look)
-{
-int earley_item_ix= -1;
-YIM earley_item= NULL;
-PIM pim= Next_PIM_of_PIM(look->t_pim_look_current);
-if(!pim)return-1;
-earley_item= YIM_of_PIM(pim);
-if(!earley_item)return-1;
-look->t_pim_look_current= pim;
-earley_item_ix= Ord_of_YIM(earley_item);
-marpa_pim_look_eim(look)= earley_item_ix;
-return earley_item_ix;
-}
-
-/*:1419*//*1421:*/
-#line 17225 "./marpa.w"
+/*:1404*//*1406:*/
+#line 16962 "./marpa.w"
 
 void marpa_debug_handler_set(int(*debug_handler)(const char*,...))
 {
 marpa__debug_handler= debug_handler;
 }
 
-/*:1421*//*1422:*/
-#line 17231 "./marpa.w"
+/*:1406*//*1407:*/
+#line 16968 "./marpa.w"
 
 int marpa_debug_level_set(int new_level)
 {
@@ -24361,8 +24225,8 @@ return old_level;
 }
 
 
-/*:1422*/
-#line 17414 "./marpa.w"
+/*:1407*/
+#line 17151 "./marpa.w"
 
 
-/*:1440*/
+/*:1425*/
