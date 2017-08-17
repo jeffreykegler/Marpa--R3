@@ -6202,6 +6202,7 @@ It should free all memory associated with the valuation.
     libmarpa_class_type = {
       g = "Marpa_Grammar",
       r = "Marpa_Recognizer",
+      ltrv = "Marpa_LTraverser",
       ptrv = "Marpa_PTraverser",
       trv = "Marpa_Traverser",
       b = "Marpa_Bocage",
@@ -6213,6 +6214,7 @@ It should free all memory associated with the valuation.
     libmarpa_class_name = {
       g = "grammar",
       r = "recce",
+      ltrv = "ltraverser",
       ptrv = "ptraverser",
       trv = "traverser",
       b = "bocage",
@@ -6998,7 +7000,7 @@ but returns a EIM Traverser.
 
       marpa_lua_newtable(L);
       traverser_stack_ix = marpa_lua_gettop(L);
-      /* push "class_ptraverser" metatable */
+      /* push "class_traverser" metatable */
       marpa_lua_getglobal(L, "_M");
       marpa_lua_getfield(L, -1, "class_traverser");
       marpa_lua_setmetatable (L, traverser_stack_ix);
@@ -7030,6 +7032,67 @@ but returns a EIM Traverser.
       if (0)
         printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       marpa_lua_settop(L, traverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
+`lca_trv_lim()` is tricky -- it's called on an EIM
+traverser, but returns a LIM traverser
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int
+    lca_trv_lim (lua_State * L)
+    {
+      const int base_traverser_stack_ix = 1;
+      int ltraverser_stack_ix;
+      Marpa_Traverser *base_traverser_ud;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, base_traverser_stack_ix, LUA_TTABLE);
+        }
+      marpa_lua_getfield (L, base_traverser_stack_ix, "_libmarpa");
+      base_traverser_ud = marpa_lua_touserdata(L, -1);
+
+      marpa_lua_newtable(L);
+      ltraverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_ltraverser" metatable */
+      marpa_lua_getglobal(L, "_M");
+      marpa_lua_getfield(L, -1, "class_ltraverser");
+      marpa_lua_setmetatable (L, ltraverser_stack_ix);
+
+      {
+        Marpa_LTraverser *ltraverser_ud =
+          (Marpa_LTraverser *) marpa_lua_newuserdata (L, sizeof (Marpa_LTraverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_ltrv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, ltraverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, ltraverser_stack_ix, "lmw_g");
+
+        *ltraverser_ud = marpa_trv_lim (*base_traverser_ud);
+        if (!*ltraverser_ud)
+          {
+            if (marpa_trv_soft_error(*base_traverser_ud)) {
+                marpa_lua_pushnil(L);
+                return 1;
+            }
+            return libmarpa_error_handle (L, base_traverser_stack_ix, "marpa_trv_lim()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, ltraverser_stack_ix );
       /* [ base_table, class_table ] */
       return 1;
     }
@@ -7532,12 +7595,13 @@ Luacheck declarations
     */
     static char kollos_g_ud_mt_key;
     static char kollos_r_ud_mt_key;
-    static char kollos_ptrv_ud_mt_key;
-    static char kollos_trv_ud_mt_key;
     static char kollos_b_ud_mt_key;
     static char kollos_o_ud_mt_key;
     static char kollos_t_ud_mt_key;
     static char kollos_v_ud_mt_key;
+    static char kollos_ltrv_ud_mt_key;
+    static char kollos_ptrv_ud_mt_key;
+    static char kollos_trv_ud_mt_key;
 
 ```
 
@@ -8323,8 +8387,16 @@ not a soft error.
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
+      { "lim", lca_trv_lim },
       { "nrl_dot", wrap_trv_nrl_dot },
       { "token_predecessor", lca_trv_token_predecessor },
+      { NULL, NULL },
+    };
+
+    static const struct luaL_Reg ltraverser_methods[] = {
+      { "error", lca_libmarpa_error },
+      { "error_code", lca_libmarpa_error_code },
+      { "error_description", lca_libmarpa_error_description },
       { NULL, NULL },
     };
 
@@ -8707,7 +8779,18 @@ Marpa::R3.
         marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
         /* [ kollos ] */
 
-        /* Set up Kollos traverser userdata metatable */
+        /* Set up Kollos LIM traverser userdata metatable */
+        marpa_lua_newtable (L);
+        /* [ kollos, mt_ud_traverser ] */
+        marpa_lua_pushvalue (L, upvalue_stack_ix);
+        marpa_lua_pushcclosure (L, l_ltraverser_ud_mt_gc, 1);
+        /* [ kollos, mt_trv_ud, gc_function ] */
+        marpa_lua_setfield (L, -2, "__gc");
+        /* [ kollos, mt_trv_ud ] */
+        marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_ltrv_ud_mt_key);
+        /* [ kollos ] */
+
+        /* Set up Kollos PIM traverser userdata metatable */
         marpa_lua_newtable (L);
         /* [ kollos, mt_ud_traverser ] */
         marpa_lua_pushvalue (L, upvalue_stack_ix);
