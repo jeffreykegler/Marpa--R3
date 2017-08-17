@@ -11321,6 +11321,39 @@ Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser trv)
 }
 
 @
+{\bf To Do}: @^To Do@> Should the error code for no Leo SRCL
+be |MARPA_ERR_NOT_TRACING_COMPLETION_LINKS|, or something new?
+
+@<Function definitions@> =
+Marpa_LTraverser marpa_trv_lim(Marpa_Traverser trv)
+{
+    @<Return |NULL| on failure@>@;
+    @<Unpack traverser objects@>@;
+    SRCL srcl;
+    LIM predecessor;
+    @<Fail if fatal error@>@;
+    TRV_has_Soft_Error(trv) = 0;
+
+    if (G_is_Trivial(g)) {
+        TRV_has_Soft_Error(trv) = 1;
+        MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
+        return NULL;
+    }
+    srcl = LEO_SRCL_of_TRV (trv);
+    if (!srcl) {
+        MARPA_ERROR (MARPA_ERR_DEVELOPMENT);
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    predecessor = LIM_of_SRCL(srcl);
+    if (!predecessor) {
+        TRV_has_Soft_Error(trv) = 1;
+        return NULL;
+    }
+    return ltrv_new(r, predecessor);
+}
+
+@
 {\bf To Do}: @^To Do@> Should the error code for no token SRCL
 be |MARPA_ERR_NOT_TRACING_TOKEN_LINKS|, or something new?
 

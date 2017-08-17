@@ -3484,6 +3484,16 @@ Sets the soft error flag to 1 if the error was ``soft'',
 and to 0 otherwise.
 @end deftypefun
 
+@deftypefun Marpa_LTraverser marpa_trv_lim(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the current Leo predecessor,
+which is a LIM.
+
+Return value on error: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
 @deftypefun Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser @var{trv})
 
 Return value on success: A traverser for the token predecessor.
