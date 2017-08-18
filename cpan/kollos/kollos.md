@@ -3953,6 +3953,13 @@ TODO: Make `collected_progress_items a local, after development.
                   local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
                   uniq_items[vlq] = true
               end
+              -- No rewrite creates a right-recursion, so every
+              -- Leo EIM is top-level
+              local at_leo = trv:at_leo()
+              while at_leo do
+                  local ltrv = trv:lim()
+                  at_leo = trv:leo_next()
+              end
               ::NEXT_ITEM::
           end
           local items = {}
@@ -6517,9 +6524,11 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_ptrv_at_lim", return_type='boolean'},
     {"marpa_ptrv_is_trivial"},
     {"marpa_trv_at_completion", return_type='boolean'},
+    {"marpa_trv_at_leo", return_type='boolean'},
     {"marpa_trv_at_token", return_type='boolean'},
     {"marpa_trv_completion_next", return_type='boolean'},
     {"marpa_trv_is_trivial"},
+    {"marpa_trv_leo_next", return_type='boolean'},
     {"marpa_trv_nrl_id"},
     {"marpa_trv_origin"},
     {"marpa_trv_rule_id"},
