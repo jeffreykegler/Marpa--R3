@@ -3958,6 +3958,9 @@ TODO: Make `collected_progress_items a local, after development.
               local at_leo = trv:at_leo()
               while at_leo do
                   local ltrv = trv:lim()
+                  while ltrv do
+                      ltrv = ltrv:predecessor()
+                  end
                   at_leo = trv:leo_next()
               end
               ::NEXT_ITEM::
