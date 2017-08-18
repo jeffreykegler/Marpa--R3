@@ -11700,7 +11700,7 @@ Marpa_LTraverser marpa_ltrv_predecessor(Marpa_LTraverser ltrv)
 @
 @<Function definitions@> =
 Marpa_Rule_ID
-marpa_ltrv_eim (Marpa_LTraverser ltrv, int* p_origin, int*p_dot)
+marpa_ltrv_trailhead_eim (Marpa_LTraverser ltrv, int*p_dot, int* p_origin)
 {
   @<Return |-2| on failure@>@;
   @<Unpack LIM traverser objects@>@;

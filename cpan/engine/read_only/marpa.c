@@ -15739,7 +15739,7 @@ return ltrv_new(r,predecessor);
 #line 11701 "./marpa.w"
 
 Marpa_Rule_ID
-marpa_ltrv_eim(Marpa_LTraverser ltrv,int*p_origin,int*p_dot)
+marpa_ltrv_trailhead_eim(Marpa_LTraverser ltrv,int*p_dot,int*p_origin)
 {
 /*1312:*/
 #line 15629 "./marpa.w"

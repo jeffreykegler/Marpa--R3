@@ -3933,6 +3933,17 @@ TODO: Make `collected_progress_items a local, after development.
               earley_set_id = g1r:latest_earley_set() + earley_set_id + 1
           end
           local max_eim = g1r:_earley_set_size(earley_set_id) - 1
+
+          local function irl_to_xpr_dotted(irl_id, irl_dot)
+              local xpr_id = slg:g1_rule_to_xprid(irl_id)
+              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
+              local xpr_dot
+              if irl_dot == -1 then
+                  return xpr_id, xpr_dots[#xpr_dots]
+              end
+              return xpr_id, xpr_dots[irl_dot+1]
+          end
+
           for item_id = 0, max_eim do
               -- IRL data for debugging only -- delete
               local trv = _M.traverser_new(g1r, earley_set_id, item_id)
@@ -3941,14 +3952,7 @@ TODO: Make `collected_progress_items a local, after development.
               local irl_dot = trv:dot()
               -- io.stderr:write(string.format("item: %d R%d:%d@%d\n", earley_set_id,
                    -- irl_id, irl_dot, trv:origin()))
-              local xpr_id = slg:g1_rule_to_xprid(irl_id)
-              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
-              local xpr_dot
-              if irl_dot == -1 then
-                  xpr_dot = xpr_dots[#xpr_dots]
-              else
-                  xpr_dot = xpr_dots[irl_dot+1]
-              end
+              local xpr_id, xpr_dot = irl_to_xpr_dotted(irl_id, irl_dot)
               for origin in origins(trv) do
                   local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
                   uniq_items[vlq] = true
@@ -3959,6 +3963,10 @@ TODO: Make `collected_progress_items a local, after development.
               while at_leo do
                   local ltrv = trv:lim()
                   while ltrv do
+                      local irl_id, irl_dot, origin = ltrv:trailhead_eim()
+                      local xpr_id, xpr_dot = irl_to_xpr_dotted(irl_id, irl_dot)
+                      local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
+                      uniq_items[vlq] = true
                       ltrv = ltrv:predecessor()
                   end
                   at_leo = trv:leo_next()
@@ -6903,6 +6911,36 @@ traversers are not a "main sequence" class.
 ```
 
 ```
+    -- miranda: section+ non-standard wrappers
+    static int lca_ltrv_trailhead_eim(lua_State *L)
+    {
+      /* [ recce_object ] */
+      const int ltraverser_stack_ix = 1;
+      Marpa_LTraverser ltrv;
+      Marpa_Earley_Set_ID origin;
+      int position;
+      Marpa_Rule_ID rule_id;
+
+      marpa_lua_getfield (L, ltraverser_stack_ix, "_libmarpa");
+      /* [ recce_object, recce_ud ] */
+      ltrv = *(Marpa_LTraverser *) marpa_lua_touserdata (L, -1);
+      rule_id = marpa_ltrv_trailhead_eim (ltrv, &position, &origin);
+      if (rule_id < -1)
+        {
+          return libmarpa_error_handle (L, ltraverser_stack_ix, "ltrv:trailhead_eim()");
+        }
+      if (rule_id == -1)
+        {
+          return 0;
+        }
+      marpa_lua_pushinteger (L, (lua_Integer) rule_id);
+      marpa_lua_pushinteger (L, (lua_Integer) position);
+      marpa_lua_pushinteger (L, (lua_Integer) origin);
+      return 3;
+    }
+```
+
+```
     -- miranda: section+ object constructors
     static int
     wrap_ptraverser_new (lua_State * L)
@@ -8409,6 +8447,7 @@ not a soft error.
       { "error", lca_libmarpa_error },
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
+      { "trailhead_eim", lca_ltrv_trailhead_eim },
       { NULL, NULL },
     };
 
