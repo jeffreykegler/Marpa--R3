@@ -11696,6 +11696,31 @@ Marpa_LTraverser marpa_ltrv_predecessor(Marpa_LTraverser ltrv)
     return ltrv_new(r, predecessor);
 }
 
+@*0 LIM traverser accessors.
+@
+@<Function definitions@> =
+Marpa_Rule_ID
+marpa_ltrv_eim (Marpa_LTraverser ltrv, int* origin, int*dot)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack LIM traverser objects@>@;
+  @<Fail if fatal error@>@;
+  {
+      const LIM lim = LIM_of_LTRV (ltrv);
+      const AHM ahm = Trailhead_AHM_of_LIM (lim);
+      const YIM yim = Trailhead_YIM_of_LIM (lim);
+      const XRL xrl = XRL_of_AHM (ahm);
+      if (xrl) {
+          if (*dot)
+              *dot = XRL_Position_of_AHM (ahm);
+          if (*origin)
+              *origin = Origin_of_YIM (yim);
+          return ID_of_XRL (xrl);
+      }
+  }
+  return -1;
+}
+
 @*0 LIM traverser mutators.
 
 @*0 Reference counting and destructors.

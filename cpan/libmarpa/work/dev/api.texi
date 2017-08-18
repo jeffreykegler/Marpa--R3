@@ -3554,6 +3554,21 @@ to zero, it too is destroyed.
 @node LIM Traverser accessors, LIM Traverser link constructors, LIM Traverser reference counting, LIM Traverser methods
 @section Accessors
 
+
+@deftypefun Marpa_Rule_ID marpa_ltrv_eim (Marpa_LTraverser @var{ltrv}, @
+    int* @var{p_origin}, @
+    int* @var{p_dot})
+
+On success:
+Returns the IRL ID of the trailhead EIM.
+If @var{p_origin} is not @code{NULL}, sets
+@var{p_origin} to point to the origin of the trailhead EIM.
+If @var{p_dot} is not @code{NULL}, sets
+@var{p_dot} to point to the IRL dot position of the trailhead EIM.
+
+On failure: returns @minus{}1.
+@end deftypefun
+
 @deftypefun int marpa_ltrv_soft_error(Marpa_LTraverser @var{ltrv})
 
 Only certain method calls, all of them documented to do so,
