@@ -15739,7 +15739,7 @@ return ltrv_new(r,predecessor);
 #line 11701 "./marpa.w"
 
 Marpa_Rule_ID
-marpa_ltrv_trailhead_eim(Marpa_LTraverser ltrv,int*p_dot,int*p_origin)
+marpa_ltrv_trailhead_eim(Marpa_LTraverser ltrv,int*p_dot,Marpa_Earley_Set_ID*p_origin)
 {
 /*1312:*/
 #line 15629 "./marpa.w"
@@ -15781,7 +15781,7 @@ if(xrl){
 if(*p_dot)
 *p_dot= XRL_Position_of_AHM(ahm);
 if(*p_origin)
-*p_origin= Origin_of_YIM(yim);
+*p_origin= Origin_Ord_of_YIM(yim);
 return ID_of_XRL(xrl);
 }
 }

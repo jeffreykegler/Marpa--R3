@@ -3558,7 +3558,7 @@ to zero, it too is destroyed.
 @deftypefun Marpa_Rule_ID marpa_ltrv_trailhead_eim ( @
     Marpa_LTraverser @var{ltrv}, @
     int* @var{p_dot}, @
-    int* @var{p_origin})
+    Marpa_Earley_Set_ID* @var{p_origin})
 
 On success:
 Returns the IRL ID of the trailhead EIM.

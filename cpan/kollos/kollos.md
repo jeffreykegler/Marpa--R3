@@ -6941,6 +6941,64 @@ traversers are not a "main sequence" class.
 ```
 
 ```
+    -- miranda: section+ non-standard wrappers
+    static int
+    lca_ltrv_predecessor (lua_State * L)
+    {
+      const int base_ltraverser_stack_ix = 1;
+      int ltraverser_stack_ix;
+      Marpa_LTraverser *base_ltraverser_ud;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, base_ltraverser_stack_ix, LUA_TTABLE);
+        }
+      marpa_lua_getfield (L, base_ltraverser_stack_ix, "_libmarpa");
+      base_ltraverser_ud = marpa_lua_touserdata(L, -1);
+
+      marpa_lua_newtable(L);
+      ltraverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_ltraverser" metatable */
+      marpa_lua_getglobal(L, "_M");
+      marpa_lua_getfield(L, -1, "class_ltraverser");
+      marpa_lua_setmetatable (L, ltraverser_stack_ix);
+
+      {
+        Marpa_LTraverser *ltraverser_ud =
+          (Marpa_LTraverser *) marpa_lua_newuserdata (L, sizeof (Marpa_LTraverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_ltrv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, ltraverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, base_ltraverser_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, ltraverser_stack_ix, "lmw_g");
+
+        *ltraverser_ud = marpa_ltrv_predecessor (*base_ltraverser_ud);
+        if (!*ltraverser_ud)
+          {
+            if (marpa_ltrv_soft_error(*base_ltraverser_ud)) {
+                marpa_lua_pushnil(L);
+                return 1;
+            }
+            return libmarpa_error_handle (L, base_ltraverser_stack_ix, "marpa_ltrv_predecessor()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, ltraverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
+```
     -- miranda: section+ object constructors
     static int
     wrap_ptraverser_new (lua_State * L)
@@ -8448,6 +8506,7 @@ not a soft error.
       { "error_code", lca_libmarpa_error_code },
       { "error_description", lca_libmarpa_error_description },
       { "trailhead_eim", lca_ltrv_trailhead_eim },
+      { "predecessor", lca_ltrv_predecessor },
       { NULL, NULL },
     };
 

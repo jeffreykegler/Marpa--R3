@@ -524,7 +524,7 @@ Marpa_LTraverser marpa_trv_lim(Marpa_Traverser trv);
 Marpa_Traverser marpa_trv_token_predecessor(Marpa_Traverser trv);
 Marpa_LTraverser marpa_ltrv_ref (Marpa_LTraverser ltrv);
 void marpa_ltrv_unref (Marpa_LTraverser ltrv);
-Marpa_Rule_ID marpa_ltrv_trailhead_eim ( Marpa_LTraverser ltrv, int* p_dot, int* p_origin);
+Marpa_Rule_ID marpa_ltrv_trailhead_eim ( Marpa_LTraverser ltrv, int* p_dot, Marpa_Earley_Set_ID* p_origin);
 int marpa_ltrv_soft_error(Marpa_LTraverser ltrv);
 Marpa_LTraverser marpa_ltrv_predecessor(Marpa_LTraverser ltrv);
 Marpa_PTraverser marpa_ptrv_new(Marpa_Recognizer r, Marpa_Earley_Set_ID es_arg, Marpa_NSY_ID nsyid);
