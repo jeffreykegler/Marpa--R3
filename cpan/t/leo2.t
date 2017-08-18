@@ -12,8 +12,6 @@
 
 # Test of events and right recursion
 
-# MITOSIS: PROGRESS
-
 use 5.010001;
 use strict;
 use warnings;
@@ -117,40 +115,41 @@ add divide multiply plain subtract
 END_OF_HISTORY
 );
 
-my $g1_progress_show_output = $test_slr->g1_progress_show();
+my $progress_show_output = $test_slr->progress_show();
 
 # Marpa::R3::Display
-# name: SLIF Leo g1_progress_show() example
+# name: SLIF Leo progress_show() example
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
 
-my $expected_g1_progress_show_output = <<'END_OF_OUTPUT';
-R7:1 @40-41 B1L2c40 <divide assignment> ::= 'x' . '/=' expression
-R8:1 @40-41 B1L2c40 <multiply assignment> ::= 'x' . '*=' expression
-R9:1 @40-41 B1L2c40 <add assignment> ::= 'x' . '+=' expression
-R10:1 @40-41 B1L2c40 <subtract assignment> ::= 'x' . '-=' expression
-R11:1 @40-41 B1L2c40 <plain assignment> ::= 'x' . '=' expression
-F0 @40-41 B1L2c40 expression ::= 'x' .
-F1 x20 @0...38-41 B1L1c1-L2c40 expression ::= assignment .
-F2 x2 @8,18-41 B1L1c20-L2c40 assignment ::= <divide assignment> .
-F3 x2 @6,16-41 B1L1c15-L2c40 assignment ::= <multiply assignment> .
-F4 x2 @2,12-41 B1L1c5-L2c40 assignment ::= <add assignment> .
-F5 x2 @4,14-41 B1L1c10-L2c40 assignment ::= <subtract assignment> .
-F6 x12 @0...38-41 B1L1c1-L2c40 assignment ::= <plain assignment> .
-F7 x2 @8,18-41 B1L1c20-L2c40 <divide assignment> ::= 'x' '/=' expression .
-F8 x2 @6,16-41 B1L1c15-L2c40 <multiply assignment> ::= 'x' '*=' expression .
-F9 x2 @2,12-41 B1L1c5-L2c40 <add assignment> ::= 'x' '+=' expression .
-F10 x2 @4,14-41 B1L1c10-L2c40 <subtract assignment> ::= 'x' '-=' expression .
-F11 x12 @0...38-41 B1L1c1-L2c40 <plain assignment> ::= 'x' '=' expression .
-F12 @0-41 B1L1c1-L2c40 [:start:] ::= expression .
+my $expected_progress_show_output = <<'END_OF_OUTPUT';
+=== Earley set 41 at B1L2c41 ===
+R7:1 B1L2c40 <divide assignment> ::= 'x' . '/=' expression
+R8:1 B1L2c40 <multiply assignment> ::= 'x' . '*=' expression
+R9:1 B1L2c40 <add assignment> ::= 'x' . '+=' expression
+R10:1 B1L2c40 <subtract assignment> ::= 'x' . '-=' expression
+R11:1 B1L2c40 <plain assignment> ::= 'x' . '=' expression
+F1 B1L1c1 [:start:] ::= expression .
+F2 x2 B1L1c20-44 assignment ::= <divide assignment> .
+F3 x2 B1L1c15-39 assignment ::= <multiply assignment> .
+F4 x2 B1L1c5-29 assignment ::= <add assignment> .
+F5 x2 B1L1c10-34 assignment ::= <subtract assignment> .
+F6 x12 B1L1c1-L2c36 assignment ::= <plain assignment> .
+F7 x2 B1L1c20-44 <divide assignment> ::= 'x' '/=' expression .
+F8 x2 B1L1c15-39 <multiply assignment> ::= 'x' '*=' expression .
+F9 x2 B1L1c5-29 <add assignment> ::= 'x' '+=' expression .
+F10 x2 B1L1c10-34 <subtract assignment> ::= 'x' '-=' expression .
+F11 x12 B1L1c1-L2c36 <plain assignment> ::= 'x' '=' expression .
+F12 B1L2c40 expression ::= 'x' .
+F13 x20 B1L1c1-L2c36 expression ::= assignment .
 END_OF_OUTPUT
 
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
-    $g1_progress_show_output,
-    $expected_g1_progress_show_output,
-    "SLIF Leo g1_progress_show() example"
+    $progress_show_output,
+    $expected_progress_show_output,
+    "SLIF Leo progress_show() example"
 );
 
 # Never reaches closure

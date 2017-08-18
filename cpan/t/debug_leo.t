@@ -10,8 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# MITOSIS: PROGRESS
-
 use 5.010001;
 use strict;
 use warnings;
@@ -50,21 +48,22 @@ Test::More::ok( $value_ref, 'Parse ok?' );
 
 Marpa::R3::Test::is( $progress_report,
     <<'END_PROGRESS_REPORT', 'sorted progress report' );
-P1 @20-20 B1L1c21 Top_sequence ::= . Top Top_sequence
-P2 @20-20 B1L1c21 Top_sequence ::= . Top
-P3 @20-20 B1L1c21 Top ::= . Upper_Middle
-P4 @20-20 B1L1c21 Upper_Middle ::= . Lower_Middle
-P5 @20-20 B1L1c21 Lower_Middle ::= . Bottom
-P6 @20-20 B1L1c21 Bottom ::= . T
-R1:1 @19-20 B1L1c20 Top_sequence ::= Top . Top_sequence
-F0 @0-20 B1L1c1-20 S ::= Top_sequence .
-F1 x19 @0...18-20 B1L1c1-20 Top_sequence ::= Top Top_sequence .
-F2 @19-20 B1L1c20 Top_sequence ::= Top .
-F3 @19-20 B1L1c20 Top ::= Upper_Middle .
-F4 @19-20 B1L1c20 Upper_Middle ::= Lower_Middle .
-F5 @19-20 B1L1c20 Lower_Middle ::= Bottom .
-F6 @19-20 B1L1c20 Bottom ::= T .
-F7 @0-20 B1L1c1-20 [:start:] ::= S .
+=== Earley set 20 at B1L1c21 ===
+P3 B1L1c21 Lower_Middle ::= . Bottom
+P4 B1L1c21 Bottom ::= . T
+P5 B1L1c21 Top_sequence ::= . Top Top_sequence
+P6 B1L1c21 Top_sequence ::= . Top
+P7 B1L1c21 Top ::= . Upper_Middle
+P8 B1L1c21 Upper_Middle ::= . Lower_Middle
+R5:1 B1L1c20 Top_sequence ::= Top . Top_sequence
+F1 B1L1c1 [:start:] ::= S .
+F2 B1L1c1 S ::= Top_sequence .
+F3 B1L1c20 Lower_Middle ::= Bottom .
+F4 B1L1c20 Bottom ::= T .
+F5 x19 B1L1c1-19 Top_sequence ::= Top Top_sequence .
+F6 B1L1c20 Top_sequence ::= Top .
+F7 B1L1c20 Top ::= Upper_Middle .
+F8 B1L1c20 Upper_Middle ::= Lower_Middle .
 END_PROGRESS_REPORT
 
 # vim: expandtab shiftwidth=4:
