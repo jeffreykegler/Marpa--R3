@@ -133,31 +133,26 @@ will find Marpa's approach familiar.
 =head1 Instances
 
 At the start of evaluation, semantics is associated with instances
-of rule alternatives or of lexemes.
+of productions or of lexemes.
 An B<instance> is an occurrence in terms of G1 locations.
 Every instance has two locations: a start location and
 an end location.
 
-A rule alternative is the LHS of a rule, together with one of its
+A production is the LHS of a rule, together with one of its
 RHS alternatives.
-Unless a rule is a prioritized rule, it has exactly one rule alternative.
+It corresponds to a BNF production.
+Unless a rule is a prioritized rule, it has exactly one production.
 
-Prioritized rules very often only have one rule alternative,
+Prioritized rules very often only have one production,
 in which case they are called trivial prioritized rules.
-But prioritized rules may have many rule alternatives.
-
-When a rule has only one rule alternative,
-or when context makes it clear what is meant,
-a rule alternative is often simply called a rule.
-In particular, a B<rule alternative instance> is almost always
-called simply a B<rule instance>.
+But prioritized rules may have many productions.
 
 =head1 Nodes
 
 In a parse tree, nodes are points where the tree branches or terminates.
 Tree terminations are also called terminals or "leaves".
 
-Every rule instance in a Marpa parse is represented by a branch point (or "node")
+Every production instance in a Marpa parse is represented by a branch point (or "node")
 in the tree.
 The topmost node of a tree is its "root node".
 (Trees are easiest to draw upside down, so traditionally in programming,
@@ -168,9 +163,9 @@ The node just above a child node,
 the one from which the child node branches out,
 is called its parent node.
 
-If the node is for a non-quantified rule instance,
-the parent node is the LHS of the rule,
-and the child nodes are the RHS of the rule alternative.
+If the node is for a non-quantified production instance,
+the parent node is the LHS of the production,
+and the child nodes are the RHS of the production.
 If the node is for a quantified rule,
 the parent node is the LHS of the quantified rule,
 and the child nodes are the items of the sequence of symbols on the
@@ -180,17 +175,17 @@ the node represents the lexeme's symbol
 and there will be no child nodes.
 
 A parent node can have zero or more children.
-Rule instances with zero children are nulled rule instances,
+Productions with zero children are nulled production instances,
 and are "leaf nodes".
 Leaf nodes are also called B<terminals>.
 In Marpa's parse trees, every terminal is either
-a lexeme or a nulled rule instance.
+a lexeme or a nulled production instance.
 
 In Marpa,
 evaluation only takes place within the structural (G1) subgrammar,
-and the descriptions of the behaviors of rule and lexeme instances below
+and the descriptions of the behaviors of production and lexeme instances below
 applies only to the G1 subgrammar.
-L0 rule alternatives and terminal symbols do not become nodes
+L0 productions and terminal symbols do not become nodes
 in the parse tree,
 and are never evaluated.
 
@@ -261,19 +256,19 @@ A lexeme action cannot be a Perl closure action --
 it must be one of the built-in actions that are
 appropriate for lexemes.
 
-=head2 Rule actions
+=head2 Production actions
 
-The implicit action for a rule instance is
+The implicit action for a production instance is
 that specified by the action descriptor
 C<[name,values]>.
 Array descriptors are described in detail
 L<below|"Array descriptor actions">.
-Peeking ahead, when a rule's array descriptor is
+Peeking ahead, when a production's array descriptor is
 C<[name,values]>,
-that rule returns a Perl array of I<n>+1 elements,
+that production returns a Perl array of I<n>+1 elements,
 where I<n> is the length of the RHS alternative.
-The first element is the "name" of the rule.
-The remaining I<n> elements are the values of the rule's
+The first element is the "name" of the production.
+The remaining I<n> elements are the values of the production's
 RHS children, in lexical order.
 
 An explicit action for a RHS alternative can be specified using
@@ -285,26 +280,26 @@ L<default pseudo-rule|Marpa::R3::Scanless::DSL/"Default pseudo-rule">.
 =head2 Nulled symbol actions
 
 As mentioned, nulled subtrees are pruned back to their topmost symbol.
-Lexemes are never nulled, so a nulled symbol is always the LHS of a rule instance,
-and the action is determined from the rule alternative,
-as L<just described|/"Rule actions">.
+Lexemes are never nulled, so a nulled symbol is always the LHS of a production,
+and the action is determined from the production,
+as L<just described|/"Production actions">.
 
 A complication arises if the symbol appears on the LHS of more than one
-nullable rule alternative.  Because the symbol is nulled, the input is no help in determining
-which rule alternative to use.  The rule alternative whose semantics are used for a nulled symbol
+nullable production.  Because the symbol is nulled, the input is no help in determining
+which production to use.  The production whose semantics are used for a nulled symbol
 is determined as follows:
 
 =over 4
 
-=item * If all nullable rule alternatives have the same semantics, that semantics is used.
+=item * If all nullable productions have the same semantics, that semantics is used.
 
-=item * If one of the nullable rule alternatives
+=item * If one of the nullable productions
 is empty (that is, has a zero-length RHS),
-then the empty alternative's semantics are used.
+then the empty production's semantics are used.
 
 =item *
 In the remaining case,
-two or more of the rule alternatives have different action names,
+two or more of the productions have different action names,
 but none of the alternatives has a zero-length RHS.
 When this happens, Marpa throws an exception.
 One easy way
@@ -313,25 +308,25 @@ is to add an empty rule with the intended semantics.
 
 =back
 
-In determining whether the semantics of two nullable rule alternatives
+In determining whether the semantics of two nullable productions
 are "the same",
 the blessing is taken into account.
-Two rule alternatives are considered to have different semantics if
+Two productions are considered to have different semantics if
 they are blessed differently.
 The SLIF's null semantics are described in more detail
 L<in a separate document|Marpa::R3::Semantics::Null>.
 
 =head1 Blessings
 
-Part of a rule alternative's or lexeme's action may be a blessing.
+Part of a production's or lexeme's action may be a blessing.
 A blessing is the name of a Perl package.
-In the case of a rule evaluation closure,
+In the case of a production evaluation closure,
 the argument containing its child values will be blessed
 into that package.
 
-Not all actions are rule evaluation closures.
+Not all actions are production evaluation closures.
 An action may be, for example, an array descriptor action.
-In cases where the action is not a rule evaluation closure,
+In cases where the action is not a production evaluation closure,
 the value
 of the action will be blessed into that package.
 
@@ -400,7 +395,7 @@ changed to an underscore.
 (As a reminder, the whitespace in symbol names will have been normalized,
 with leading and trailing whitespace removed,
 and all other whitespace sequences changed to a single ASCII space.)
-When a C<::lhs> blessing value applies to a rule alternative, it is a fatal
+When a C<::lhs> blessing value applies to a production, it is a fatal
 error if the LHS contains anything other than alphanumerics
 and whitespace.
 In particular, the LHS cannot already contain an underscore ("C<_>").
@@ -416,13 +411,13 @@ The C<::name> blessing is not allowed for a RHS alternative.
 The class is derived from the symbol name in the same way,
 and subject to the same restrictions,
 as described above for deriving a class name from the LHS
-of a rule alternative.
+of a production.
 The C<::name> reserved blessing is most useful in
 the lexeme default statement.
 
 =back
 
-If any rule alternative or lexeme of a SLIF grammar has
+If any production or lexeme of a SLIF grammar has
 a blessing other than C<::undef>,
 a C<bless_package> is required,
 and failure to specify one results in
@@ -463,7 +458,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 If an action is enclosed in square brackets, it is an B<array descriptor>,
-and the value of the lexeme or rule alternative will be an array.
+and the value of the lexeme or production will be an array.
 Inside the array descriptor is a comma separated list of zero or more array item
 descriptors.
 The B<array item descriptors> are keywords that describe how the array is to be filled
@@ -482,7 +477,7 @@ array.
 
 The C<g1length> array item descriptor puts
 a single-element list into the array.
-That one element will be the length of the rule or lexeme instance,
+That one element will be the length of the production or lexeme instance,
 in G1 locations.
 
 =item C<g1start>
@@ -490,7 +485,7 @@ in G1 locations.
 The C<g1start> array item descriptor puts
 a single-element list into the array.
 That one element will be
-the G1 start location of the rule or lexeme instance.
+the G1 start location of the production or lexeme instance.
 Together
 the C<g1length> and C<g1start> array item descriptors
 describe a G1 location
@@ -512,7 +507,7 @@ L<in another document|Marpa::R3::Scanless::R/"G1 locations">.
 
 The C<length> array item descriptor puts
 a single-element list into the array.
-That one element will be the length of the rule or lexeme instance.
+That one element will be the length of the production or lexeme instance.
 Length is in characters.
 
 =item C<lhs>
@@ -520,7 +515,7 @@ Length is in characters.
 The C<lhs> array item descriptor puts
 a single-element list into the array.
 That one element will be the LHS symbol ID of
-the rule.
+the production.
 Because of historical reasons,
 for a lexeme instance,
 it will the symbol ID,
@@ -531,21 +526,21 @@ but for a nulling symbol it will be a Perl C<undef>.
 The C<name> array item descriptor puts
 a single-element list into the array.
 This will always be a string.
-For a rule whose name is defined,
-that one element will be the rule name.
-For an unnamed rule,
+For a production whose name is defined,
+that one element will be the production name.
+For an unnamed production,
 it will be the name of the LHS symbol.
 For a lexeme,
 it will be the symbol name of the lexeme.
 For a nulling symbol
 it will be the name of that symbol.
 
-=item C<rule>
+=item C<production_id>
 
-The C<rule> array item descriptor puts
+The C<production_id> array item descriptor puts
 a single-element list into the array.
-For a rule,
-that one element will be the rule ID.
+For a production,
+that one element will be the production ID.
 In other cases, that one element will be a Perl C<undef>.
 
 =item C<start>
@@ -553,7 +548,7 @@ In other cases, that one element will be a Perl C<undef>.
 The C<start> array item descriptor puts
 a single-element list into the array.
 That one element will be
-the start location of the rule or lexeme instance.
+the start location of the production or lexeme instance.
 The start location is an offset in the input string.
 The elements of the C<length> and C<start> item descriptors are defined
 such that the end location
@@ -564,7 +559,7 @@ is always start location plus length.
 The C<symbol> array item descriptor puts
 a single-element list into the array.
 This will always be the name of a symbol.
-For a rule,
+For a production,
 it will be the name of the LHS symbol.
 For a lexeme,
 it will be the symbol name of the lexeme.
@@ -573,12 +568,12 @@ it will be the name of that symbol.
 
 =item C<value>
 
-For a rule alternative,
+For a production,
 the C<value> array item descriptor puts
 a list of zero or more elements into the array.
 The list will contain
 the values of
-the rule instance's children, in left-to-right order.
+the production's children, in left-to-right order.
 
 For a lexeme,
 the C<value> array item descriptor puts
@@ -591,7 +586,7 @@ the token value of the lexeme.
 =item C<values>
 
 The C<value> and C<values> array item descriptors are synonyms,
-and may be used interchangeably for both rule alternatives and lexemes.
+and may be used interchangeably for both productions alternatives and lexemes.
 
 =back
 
@@ -599,18 +594,18 @@ and may be used interchangeably for both rule alternatives and lexemes.
 
 The array item descriptors fill out the array in
 the order in which they appear in the array descriptor.
-For example, if we are dealing with a rule,
+For example, if we are dealing with a production,
 and the array descriptor is "C<[ start, length, value ]>",
 then the return value is an reference to an array,
 whose length will vary, but which will contain at least
 two elements.
 The first element will be the start location in the
-input string of this rule instance,
+input string of this production,
 and the second will be its length.
 The remaining elements will be
-the values of the rule instance's RHS children,
+the values of the production instance's RHS children,
 in lexical order.
-If the rule instance is nulled, the array will contain only two elements:
+If the production instance is nulled, the array will contain only two elements:
 start location and length.
 
 =head1 Reserved action names
@@ -624,13 +619,13 @@ The following are recognized:
 =item * C<::array>
 
 C<::array> is equivalent to C<[values]>.
-This means that, for both lexeme and rule instances,
+This means that, for both lexeme and production instances,
 the actions C<[values]>, C<[value]> and C<::array>
 will do exactly the same thing.
 
 =item * C<::first>
 
-The value of the rule instance is that of the rule instance's first child.
+The value of the production instance is that of the production instance's first child.
 If there is no such child, the value is a Perl C<undef>.
 It is a fatal error if a
 RHS alternative with a C<::first> action
@@ -640,7 +635,7 @@ with a lexeme.
 
 =item * C<::undef>
 
-The value of the rule or lexeme instance will be
+The value of the production or lexeme instance will be
 a Perl C<undef>.
 It is a fatal error if a
 RHS alternative with an C<::undef> action
@@ -713,13 +708,13 @@ Once Marpa has a fully qualified Perl name, it looks in Perl's symbol tables for
 a Perl subroutine with that name.
 If Marpa finds a Perl subroutine with that fully qualified Perl name,
 the action name is resolved to that subroutine,
-which then becomes a B<rule evaluation closure>.
+which then becomes a B<production evaluation closure>.
 
-=head1 Executing rule evaluation closures
+=head1 Executing production evaluation closures
 
-A rule evaluation closure action is always called in scalar context,
+A production evaluation closure action is always called in scalar context,
 and its return value will be used as the value of its node.
-A rule evaluation closure always has exactly two arguments:
+A production evaluation closure always has exactly two arguments:
 
 =over 4
 
@@ -730,27 +725,27 @@ The first argument is the per-parse object.
 =item *
 
 The second argument is a reference to an array containing
-the values of the rule's child nodes, in lexical order.
-If the rule is nulled, the array will contain zero elements.
+the values of the production's child nodes, in lexical order.
+If the production is nulled, the array will contain zero elements.
 
 =back
 
-=head1 Quantified rule nodes
+=head1 Quantified production nodes
 
-Everything just said about rule nodes
+Everything just said about production nodes
 applies to nodes for
 L<quantified
-rules|Marpa::R3::Scanless::DSL/"Quantified rule">.
-But there is a difference between quantified rules
-and others, and it a big one if you are writing a rule
+productions|Marpa::R3::Scanless::DSL/"Quantified production">.
+But there is a difference between quantified productions
+and others, and it a big one if you are writing a production
 evaluation closure.
 
-In other rules, the right hand side
+In other productions, the right hand side
 is fixed in length,
 and therefore the number of child nodes is known in advance.
-This is not the case with a quantified rule.
-The rule evaluation closure
-for a quantified rule
+This is not the case with a quantified production.
+The production evaluation closure
+for a quantified production
 must be capable of
 dealing with
 a variable number of child nodes.
@@ -763,12 +758,12 @@ normalize-whitespace: 1
 
     sub do_S {
         my ($per_parse_object) = @_;
-        my $rule_id         = $Marpa::R3::Context::rule;
+        my $production_id         = $Marpa::R3::Context::production_id;
         my $slg             = $Marpa::R3::Context::slg;
         my ( $lhs, @rhs ) =
-            map { $slg->symbol_display_form($_) } $slg->rule_expand($rule_id);
+            map { $slg->symbol_display_form($_) } $slg->production_expand($production_id);
         $per_parse_object->{text} =
-              "rule $rule_id: $lhs ::= "
+              "production $production_id: $lhs ::= "
             . ( join q{ }, @rhs ) . "\n"
             . "locations: "
             . ( join q{-}, Marpa::R3::Context::g1_range() ) . "\n";
@@ -779,7 +774,7 @@ normalize-whitespace: 1
 
 In addition to the per-parse argument
 and their child values,
-rule evaluation closures also have access
+production evaluation closures also have access
 to B<context variables>.
 
 =over
@@ -787,17 +782,17 @@ to B<context variables>.
 =item * C<$Marpa::R3::Context::slg> is set to
 L<the SLIF grammar|Marpa::R3::Scanless::G> being parsed.
 
-=item * C<$Marpa::R3::Context::rule> is the ID of the
-current rule alternative.
-Given the rule alternative ID, an application can find
+=item * C<$Marpa::R3::Context::production_id> is the ID of the
+current production.
+Given the production ID, an application can find
 its LHS and RHS symbols using
-L<the SLIF grammar's C<rule_expand()> method|Marpa::R3::Scanless::G/"rule_expand()">.
+L<the SLIF grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
 
 =item * C<Marpa::R3::Context::g1_range()> returns the start
-and end G1 locations of the current rule instance.
+and end G1 locations of the current production instance.
 
 =item * C<Marpa::R3::Context::g1_span()> returns the start
-and length of the current rule instance.
+and length of the current production instance.
 The start is a G1 location,
 and the length is in G1 locations.
 
@@ -854,7 +849,7 @@ L<a separate document|Marpa::R3::Semantics::Phases>.
 
 =head1 The per-parse argument
 
-The first argument of every rule evaluation closure is
+The first argument of every production evaluation closure is
 the B<per-parse> argument.
 This is initialized
 

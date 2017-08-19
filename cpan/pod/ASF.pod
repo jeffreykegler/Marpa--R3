@@ -156,6 +156,11 @@ remove-blank-last-line: 1
 
 =for Marpa::R3::Display::End
 
+=head1 This interface is EXPERIMENTAL
+
+This interface uses Marpa::R3's undocumented G1 level calls.
+It is experimental and will probably be replaced.
+
 =head1 About this document
 
 This document describes the abstract syntax forests (ASF's) of
