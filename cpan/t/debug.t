@@ -52,8 +52,6 @@ expression ::=
        variable | string
     || 'string' '(' <numeric expression> ')'
     || expression '+' expression
-# TODO -- The POD uses this with '+' and '*' reversed from
-# this, and the traditional, order.  Fix the POD!
 <numeric expression> ::=
        variable | number
     || <numeric expression> '*' <numeric expression>
