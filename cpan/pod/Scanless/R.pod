@@ -1769,14 +1769,14 @@ of the SLIF grammar|Marpa::R3::Scanless::G/"rule()">.
 Details on progress reports can be found in
 L<their own document|Marpa::R3::Progress>.
 
-=head2 show_progress()
+=head2 progress_show()
 
 =for Marpa::R3::Display
-name: Scanless show_progress() synopsis
+name: Scanless progress_show() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $show_progress_output = $recce->show_progress();
+    my $progress_show_output = $recce->progress_show();
 
 =for Marpa::R3::Display::End
 
@@ -1789,7 +1789,7 @@ the string contains reports for
 the current location.
 
 Locations can be specified as arguments to
-C<show_progress()>.
+C<progress_show()>.
 With a single integer argument I<N>,
 the string contains reports for G1 location I<N>.
 Two numeric arguments are interpreted as a
@@ -1797,7 +1797,7 @@ L<span|/"Spans"> of G1 locations,
 and the returned string contains
 reports for all locations in the span.
 For example,
-the method call C<< $recce->show_progress(0, -1) >>
+the method call C<< $recce->progress_show(0, -1) >>
 will print progress reports for the entire parse.
 
 The arguments are G1 locations instead of physical input stream locations,

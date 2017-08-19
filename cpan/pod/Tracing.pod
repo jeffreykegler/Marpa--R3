@@ -54,7 +54,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $eval_error = $EVAL_ERROR if not eval { $recce->read( \$test_input ); 1 };
-    $progress_report = $recce->show_progress( 0, -1 );
+    $progress_report = $recce->progress_show( 0, -1 );
 
 =for Marpa::R3::Display::End
 
@@ -72,17 +72,17 @@ tracing terminals can tell you a lot.
 
 Tracing the recognizer's progress
 with
-C<show_progress>
+C<progress_show>
 is the most powerful tool available
 in the basic toolkit.
-C<show_progress>
+C<progress_show>
 should provide all the
 information necessary to
 debug an application's grammar.
 L<A separate document|Marpa::R3::Progress>
 explains how to interpret the progress reports.
 That document includes an
-example of the use of C<show_progress>
+example of the use of C<progress_show>
 to debug an error in a grammar.
 
 =head2 Double check rules and symbols
@@ -128,7 +128,7 @@ L<C<show_symbols>|Marpa::R3::Scanless::G/"show_symbols()">
 on the SLIF grammar.
 
 =item * Run
-L<C<show_progress()>|Marpa::R3::Progress>
+L<C<progress_show()>|Marpa::R3::Progress>
 on the SLIF recognizer.
 
 =back
@@ -137,7 +137,7 @@ When considering how much tracing to turn on,
 remember that if the input text to the grammar is large,
 the outputs from
 C<trace_terminals>,
-C<show_progress>,
+C<progress_show>,
 and C<trace_values>,
 and the dump of the parse value,
 can be very lengthy.
