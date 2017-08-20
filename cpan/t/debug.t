@@ -154,7 +154,7 @@ P1 B1L1c1 [:start:] ::= . statements
 P2 B1L1c1 statement ::= . <numeric assignment>
 P3 B1L1c1 assignment ::= . 'set' variable 'to' expression
 P4 B1L1c1 <numeric assignment> ::= . variable '=' expression
-P12 B1L1c1 statements ::= . statement *
+P18 B1L1c1 statements ::= . statement *
 P20 B1L1c1 statement ::= . assignment
 === Earley set 1 at B1L1c3 ===
 R4:1 B1L1c1 <numeric assignment> ::= variable . '=' expression
@@ -180,7 +180,7 @@ F5 B1L1c5-11 expression ::= expression .; prec=-1
 F6 B1L1c5-11 expression ::= expression .; prec=0
 F7 B1L1c5-11 expression ::= expression .; prec=1
 F8 B1L1c5-11 expression ::= variable .; prec=2
-F12 B1L1c1 statements ::= statement . *
+F18 B1L1c1 statements ::= statement . *
 === Earley set 4 at B1L1c15 ===
 P7 B1L1c15 expression ::= . expression; prec=1
 P8 B1L1c15 expression ::= . variable; prec=2
@@ -200,7 +200,7 @@ F5 B1L1c5-11 expression ::= expression .; prec=-1
 F7 B1L1c15-16 expression ::= expression .; prec=1
 F8 B1L1c15-16 expression ::= variable .; prec=2
 F11 B1L1c5-11 expression ::= expression '+' expression .; prec=0
-F12 B1L1c1 statements ::= statement . *
+F18 B1L1c1 statements ::= statement . *
 END_PROGRESS_REPORT
 
 # Marpa::R3::Display::End
@@ -221,7 +221,7 @@ my $report0 = $recce->progress(0);
 # end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_report0 = <<'END_PROGRESS_REPORT');
-[[1,0,0],[2,0,0],[3,0,0],[4,0,0],[12,0,0],[20,0,0]]
+[[1,0,0],[2,0,0],[3,0,0],[4,0,0],[18,0,0],[20,0,0]]
 END_PROGRESS_REPORT
 Test::More::is_deeply( Data::Dumper::Dumper($report0),
     $expected_report0, 'progress report at location 0' );
@@ -286,7 +286,7 @@ my $latest_report = $recce->progress();
 # end-before-line: '^END_PROGRESS_REPORT$'
 
 chomp( my $expected_default_report = <<'END_PROGRESS_REPORT');
-[[1,1,0],[2,0,5],[2,1,0],[3,0,5],[4,0,5],[4,3,0],[5,1,2],[7,1,4],[8,1,4],[11,1,2],[11,3,2],[12,1,0],[20,0,5]]
+[[1,1,0],[2,0,5],[2,1,0],[3,0,5],[4,0,5],[4,3,0],[5,1,2],[7,1,4],[8,1,4],[11,1,2],[11,3,2],[18,1,0],[20,0,5]]
 END_PROGRESS_REPORT
 Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
     $expected_default_report, 'progress report at default location' );
@@ -294,7 +294,7 @@ Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
 # Marpa::R3::Display::End
 
 chomp( my $expected_report3 = <<'END_PROGRESS_REPORT');
-[[1,1,0],[2,0,3],[2,1,0],[3,0,3],[4,0,3],[4,3,0],[5,1,2],[6,1,2],[7,1,2],[8,1,2],[11,1,2],[12,1,0],[20,0,3]]
+[[1,1,0],[2,0,3],[2,1,0],[3,0,3],[4,0,3],[4,3,0],[5,1,2],[6,1,2],[7,1,2],[8,1,2],[11,1,2],[18,1,0],[20,0,3]]
 END_PROGRESS_REPORT
 
 # Try latest report again with explicit index
@@ -511,13 +511,13 @@ R8 expression ::= variable; prec=2
 R9 expression ::= string; prec=2
 R10 expression ::= 'string' '(' <numeric expression> ')'; prec=1
 R11 expression ::= expression '+' expression; prec=0
-R12 statements ::= statement *
-R13 <numeric expression> ::= <numeric expression>; prec=-1
-R14 <numeric expression> ::= <numeric expression>; prec=0
-R15 <numeric expression> ::= <numeric expression>; prec=1
-R16 <numeric expression> ::= variable; prec=2
-R17 <numeric expression> ::= number; prec=2
-R18 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+R12 <numeric expression> ::= <numeric expression>; prec=-1
+R13 <numeric expression> ::= <numeric expression>; prec=0
+R14 <numeric expression> ::= <numeric expression>; prec=1
+R15 <numeric expression> ::= variable; prec=2
+R16 <numeric expression> ::= number; prec=2
+R17 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+R18 statements ::= statement *
 R19 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 R20 statement ::= assignment
 R21 [:lex_start:] ~ [:discard:]
@@ -532,20 +532,20 @@ R29 [:lex_start:] ~ '*'
 R30 [:lex_start:] ~ number
 R31 [:lex_start:] ~ string
 R32 [:lex_start:] ~ variable
-R33 whitespace ~ [\s] +
-R34 'set' ~ [s] [e] [t]
-R35 'to' ~ [t] [o]
-R36 '=' ~ [\=]
-R37 'string' ~ [s] [t] [r] [i] [n] [g]
-R38 '(' ~ [\(]
-R39 ')' ~ [\)]
-R40 '+' ~ [\+]
-R41 '*' ~ [\*]
-R42 variable ~ [\w] +
-R43 number ~ [\d] +
-R44 string ~ ['] <string contents> [']
-R45 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
-R46 [:discard:] ~ whitespace
+R33 'set' ~ [s] [e] [t]
+R34 'to' ~ [t] [o]
+R35 '=' ~ [\=]
+R36 'string' ~ [s] [t] [r] [i] [n] [g]
+R37 '(' ~ [\(]
+R38 ')' ~ [\)]
+R39 '+' ~ [\+]
+R40 '*' ~ [\*]
+R41 variable ~ [\w] +
+R42 number ~ [\d] +
+R43 string ~ ['] <string contents> [']
+R44 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R45 [:discard:] ~ whitespace
+R46 whitespace ~ [\s] +
 END_OF_OUTPUT
 
 # Marpa::R3::Display::End
@@ -746,13 +746,13 @@ R8 expression ::= variable; prec=2
 R9 expression ::= string; prec=2
 R10 expression ::= [Lex-3] [Lex-4] <numeric expression> [Lex-5]; prec=1
 R11 expression ::= expression [Lex-6] expression; prec=0
-R12 statements ::= statement *
-R13 <numeric expression> ::= <numeric expression>; prec=-1
-R14 <numeric expression> ::= <numeric expression>; prec=0
-R15 <numeric expression> ::= <numeric expression>; prec=1
-R16 <numeric expression> ::= variable; prec=2
-R17 <numeric expression> ::= number; prec=2
-R18 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
+R12 <numeric expression> ::= <numeric expression>; prec=-1
+R13 <numeric expression> ::= <numeric expression>; prec=0
+R14 <numeric expression> ::= <numeric expression>; prec=1
+R15 <numeric expression> ::= variable; prec=2
+R16 <numeric expression> ::= number; prec=2
+R17 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
+R18 statements ::= statement *
 R19 <numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 R20 statement ::= assignment
 R21 [:lex_start:] ~ [:discard:]
@@ -767,20 +767,20 @@ R29 [:lex_start:] ~ [Lex-7]
 R30 [:lex_start:] ~ number
 R31 [:lex_start:] ~ string
 R32 [:lex_start:] ~ variable
-R33 whitespace ~ [[\s]] +
-R34 [Lex-0] ~ [[s]] [[e]] [[t]]
-R35 [Lex-1] ~ [[t]] [[o]]
-R36 [Lex-2] ~ [[\=]]
-R37 [Lex-3] ~ [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
-R38 [Lex-4] ~ [[\(]]
-R39 [Lex-5] ~ [[\)]]
-R40 [Lex-6] ~ [[\+]]
-R41 [Lex-7] ~ [[\*]]
-R42 variable ~ [[\w]] +
-R43 number ~ [[\d]] +
-R44 string ~ [[']] <string contents> [[']]
-R45 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
-R46 [:discard:] ~ whitespace
+R33 [Lex-0] ~ [[s]] [[e]] [[t]]
+R34 [Lex-1] ~ [[t]] [[o]]
+R35 [Lex-2] ~ [[\=]]
+R36 [Lex-3] ~ [[s]] [[t]] [[r]] [[i]] [[n]] [[g]]
+R37 [Lex-4] ~ [[\(]]
+R38 [Lex-5] ~ [[\)]]
+R39 [Lex-6] ~ [[\+]]
+R40 [Lex-7] ~ [[\*]]
+R41 variable ~ [[\w]] +
+R42 number ~ [[\d]] +
+R43 string ~ [[']] <string contents> [[']]
+R44 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
+R45 [:discard:] ~ whitespace
+R46 whitespace ~ [[\s]] +
 END_OF_OUTPUT
 
 my $rules_diag_output;
@@ -1835,13 +1835,13 @@ expression ::= variable; prec=2
 expression ::= string; prec=2
 expression ::= 'string' '(' <numeric expression> ')'; prec=1
 expression ::= expression '+' expression; prec=0
-statements ::= statement *
 <numeric expression> ::= <numeric expression>; prec=-1
 <numeric expression> ::= <numeric expression>; prec=0
 <numeric expression> ::= <numeric expression>; prec=1
 <numeric expression> ::= variable; prec=2
 <numeric expression> ::= number; prec=2
 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+statements ::= statement *
 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
 statement ::= assignment
 [:lex_start:] ~ [:discard:]
@@ -1856,7 +1856,6 @@ statement ::= assignment
 [:lex_start:] ~ number
 [:lex_start:] ~ string
 [:lex_start:] ~ variable
-whitespace ~ [\s] +
 'set' ~ [s] [e] [t]
 'to' ~ [t] [o]
 '=' ~ [\=]
@@ -1870,6 +1869,7 @@ number ~ [\d] +
 string ~ ['] <string contents> [']
 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
 [:discard:] ~ whitespace
+whitespace ~ [\s] +
 END_OF_TEXT
 
 $text = q{};
@@ -2006,13 +2006,13 @@ expression ::= variable; prec=2
 expression ::= string; prec=2
 expression ::= [Lex-3] [Lex-4] <numeric expression> [Lex-5]; prec=1
 expression ::= expression [Lex-6] expression; prec=0
-statements ::= statement *
 <numeric expression> ::= <numeric expression>; prec=-1
 <numeric expression> ::= <numeric expression>; prec=0
 <numeric expression> ::= <numeric expression>; prec=1
 <numeric expression> ::= variable; prec=2
 <numeric expression> ::= number; prec=2
 <numeric expression> ::= <numeric expression> [Lex-7] <numeric expression>; prec=1
+statements ::= statement *
 <numeric expression> ::= <numeric expression> [Lex-6] <numeric expression>; prec=0
 statement ::= assignment
 [:lex_start:] ~ [:discard:]
@@ -2027,7 +2027,6 @@ statement ::= assignment
 [:lex_start:] ~ number
 [:lex_start:] ~ string
 [:lex_start:] ~ variable
-whitespace ~ [[\s]] +
 [Lex-0] ~ [[s]] [[e]] [[t]]
 [Lex-1] ~ [[t]] [[o]]
 [Lex-2] ~ [[\=]]
@@ -2041,6 +2040,7 @@ number ~ [[\d]] +
 string ~ [[']] <string contents> [[']]
 <string contents> ~ [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]] +
 [:discard:] ~ whitespace
+whitespace ~ [[\s]] +
 END_OF_TEXT
 
 $text = q{};
@@ -2234,13 +2234,13 @@ Production #8: 31 ::= 39
 Production #9: 31 ::= 37
 Production #10: 31 ::= 7 8 34 9
 Production #11: 31 ::= 31 10 31
-Production #12: 36 ::= 35
+Production #12: 34 ::= 34
 Production #13: 34 ::= 34
 Production #14: 34 ::= 34
-Production #15: 34 ::= 34
-Production #16: 34 ::= 39
-Production #17: 34 ::= 32
-Production #18: 34 ::= 34 11 34
+Production #15: 34 ::= 39
+Production #16: 34 ::= 32
+Production #17: 34 ::= 34 11 34
+Production #18: 36 ::= 35
 Production #19: 34 ::= 34 10 34
 Production #20: 35 ::= 30
 Production #21: 2 ::= 1
@@ -2255,20 +2255,20 @@ Production #29: 2 ::= 11
 Production #30: 2 ::= 32
 Production #31: 2 ::= 37
 Production #32: 2 ::= 39
-Production #33: 40 ::= 19
-Production #34: 4 ::= 28 22 29
-Production #35: 5 ::= 29 26
-Production #36: 6 ::= 17
-Production #37: 7 ::= 28 29 27 24 25 23
-Production #38: 8 ::= 13
-Production #39: 9 ::= 14
-Production #40: 10 ::= 16
-Production #41: 11 ::= 15
-Production #42: 39 ::= 20
-Production #43: 32 ::= 18
-Production #44: 37 ::= 12 38 12
-Production #45: 38 ::= 21
-Production #46: 1 ::= 40
+Production #33: 4 ::= 28 22 29
+Production #34: 5 ::= 29 26
+Production #35: 6 ::= 17
+Production #36: 7 ::= 28 29 27 24 25 23
+Production #37: 8 ::= 13
+Production #38: 9 ::= 14
+Production #39: 10 ::= 16
+Production #40: 11 ::= 15
+Production #41: 39 ::= 20
+Production #42: 32 ::= 18
+Production #43: 37 ::= 12 38 12
+Production #44: 38 ::= 21
+Production #45: 1 ::= 40
+Production #46: 40 ::= 19
 END_OF_TEXT
 
 $text = q{};

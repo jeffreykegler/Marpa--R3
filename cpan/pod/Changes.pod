@@ -179,6 +179,9 @@ removed in Marpa::R3.
 
 =head2 New Marpa::R3::Scanless::G methods
 
+TODO -- this section needs to be rewritten for
+the mitosis.
+
 New methods have been added as accessors for
 G1 and L0 grammars:
 

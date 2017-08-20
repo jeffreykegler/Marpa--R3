@@ -405,7 +405,7 @@ normalize-whitespace: 1
     F7 B1L1c15-16 expression ::= expression .; prec=1
     F8 B1L1c15-16 expression ::= variable .; prec=2
     F11 B1L1c5-11 expression ::= expression '+' expression .; prec=0
-    F12 B1L1c1 statements ::= statement . *
+    F18 B1L1c1 statements ::= statement . *
 
 =for Marpa::R3::Display::End
 
@@ -558,12 +558,13 @@ name: SLIF debug example progress report
 partial: 1
 normalize-whitespace: 1
 
-    P0 @0-0 B0L0c0 statements -> . statement *
-    P1 @0-0 B0L0c0 statement -> . assignment
-    P2 @0-0 B0L0c0 statement -> . <numeric assignment>
-    P3 @0-0 B0L0c0 assignment -> . 'set' variable 'to' expression
-    P4 @0-0 B0L0c0 <numeric assignment> -> . variable '=' expression
-    P19 @0-0 B0L0c0 [:start:] -> . statements
+    === Earley set 0 at B1L1c1 ===
+    P1 B1L1c1 [:start:] ::= . statements
+    P2 B1L1c1 statement ::= . <numeric assignment>
+    P3 B1L1c1 assignment ::= . 'set' variable 'to' expression
+    P4 B1L1c1 <numeric assignment> ::= . variable '=' expression
+    P18 B1L1c1 statements ::= . statement *
+    P20 B1L1c1 statement ::= . assignment
 
 =for Marpa::R3::Display::End
 
@@ -590,7 +591,7 @@ name: SLIF debug example progress report
 partial: 1
 normalize-whitespace: 1
 
-    P10 @2-2 B1L1c5 expression -> . 'string' '(' <numeric expression> ')'
+    P10 B1L1c5 expression ::= . 'string' '(' <numeric expression> ')'; prec=1
 
 =for Marpa::R3::Display::End
 
@@ -599,7 +600,7 @@ name: SLIF debug example progress report
 partial: 1
 normalize-whitespace: 1
 
-    P10 @4-4 B1L1c15 expression -> . 'string' '(' <numeric expression> ')'
+    P10 B1L1c15 expression ::= . 'string' '(' <numeric expression> ')'; prec=1
 
 =for Marpa::R3::Display::End
 
@@ -725,7 +726,7 @@ name: SLIF Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
-    F11 x12 @0...38-41 B1L1c1-L2c40 <plain assignment> -> 'x' '=' expression .
+    F11 x12 B1L1c1-L2c36 <plain assignment> ::= 'x' '=' expression .
 
 =for Marpa::R3::Display::End
 
@@ -734,7 +735,7 @@ name: SLIF Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
-    F1 x20 @0...38-41 B1L1c1-L2c40 expression -> assignment .
+    F13 x20 B1L1c1-L2c36 expression ::= assignment .
 
 =for Marpa::R3::Display::End
 
@@ -743,7 +744,7 @@ name: SLIF Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
-    F6 x12 @0...38-41 B1L1c1-L2c40 assignment -> <plain assignment> .
+    F6 x12 B1L1c1-L2c36 assignment ::= <plain assignment> .
 
 =for Marpa::R3::Display::End
 
@@ -809,7 +810,7 @@ name: SLIF Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
-    F2 x2 @8,18-41 B1L1c20-L2c40 assignment -> <divide assignment> .
+    F2 x2 B1L1c20-44 assignment ::= <divide assignment> .
 
 =for Marpa::R3::Display::End
 
@@ -1180,7 +1181,7 @@ remove-blank-last-line: 1
     P2 B1L1c1 statement ::= . <numeric assignment>
     P3 B1L1c1 assignment ::= . 'set' variable 'to' expression
     P4 B1L1c1 <numeric assignment> ::= . variable '=' expression
-    P12 B1L1c1 statements ::= . statement *
+    P18 B1L1c1 statements ::= . statement *
     P20 B1L1c1 statement ::= . assignment
     === Earley set 1 at B1L1c3 ===
     R4:1 B1L1c1 <numeric assignment> ::= variable . '=' expression
@@ -1206,7 +1207,7 @@ remove-blank-last-line: 1
     F6 B1L1c5-11 expression ::= expression .; prec=0
     F7 B1L1c5-11 expression ::= expression .; prec=1
     F8 B1L1c5-11 expression ::= variable .; prec=2
-    F12 B1L1c1 statements ::= statement . *
+    F18 B1L1c1 statements ::= statement . *
     === Earley set 4 at B1L1c15 ===
     P7 B1L1c15 expression ::= . expression; prec=1
     P8 B1L1c15 expression ::= . variable; prec=2
@@ -1226,7 +1227,7 @@ remove-blank-last-line: 1
     F7 B1L1c15-16 expression ::= expression .; prec=1
     F8 B1L1c15-16 expression ::= variable .; prec=2
     F11 B1L1c5-11 expression ::= expression '+' expression .; prec=0
-    F12 B1L1c1 statements ::= statement . *
+    F18 B1L1c1 statements ::= statement . *
 
 =for Marpa::R3::Display::End
 
@@ -1391,220 +1392,134 @@ partial: 1
 
 =for Marpa::R3::Display::End
 
-=head2 show_symbols() output
+=head2 symbols_show() output
 
 =for Marpa::R3::Display
-name: SLIF debug example show_symbols() output
+name: SLIF debug example symbols_show() output
 remove-display-indent: 1
 remove-blank-last-line: 1
 partial: 1
 
-    G1 Symbols:
-    G1 S0 [:start:]
-      Internal name: <[:start:]>
-    G1 S1 'set'
-      /* terminal */
-      Internal name: <[Lex-0]>
-      SLIF name: 'set'
-    G1 S2 'to'
-      /* terminal */
-      Internal name: <[Lex-1]>
-      SLIF name: 'to'
-    G1 S3 '='
-      /* terminal */
-      Internal name: <[Lex-2]>
-      SLIF name: '='
-    G1 S4 'string'
-      /* terminal */
-      Internal name: <[Lex-3]>
-      SLIF name: 'string'
-    G1 S5 '('
-      /* terminal */
-      Internal name: <[Lex-4]>
-      SLIF name: '('
-    G1 S6 ')'
-      /* terminal */
-      Internal name: <[Lex-5]>
-      SLIF name: ')'
-    G1 S7 '+'
-      /* terminal */
-      Internal name: <[Lex-6]>
-      SLIF name: '+'
-    G1 S8 '+'
-      /* terminal */
-      Internal name: <[Lex-7]>
-      SLIF name: '+'
-    G1 S9 '*'
-      /* terminal */
-      Internal name: <[Lex-8]>
-      SLIF name: '*'
-    G1 S10 assignment
-      Internal name: <assignment>
-      SLIF name: assignment
-    G1 S11 expression
-      Internal name: <expression>
-      SLIF name: expression
-    G1 S12 expression
-      Internal name: <expression[0]>
-      SLIF name: expression
-    G1 S13 expression
-      Internal name: <expression[1]>
-      SLIF name: expression
-    G1 S14 expression
-      Internal name: <expression[2]>
-      SLIF name: expression
-    G1 S15 number
-      /* terminal */
-      Internal name: <number>
-      SLIF name: number
-    G1 S16 <numeric assignment>
-      Internal name: <numeric assignment>
-      SLIF name: numeric assignment
-    G1 S17 <numeric expression>
-      Internal name: <numeric expression>
-      SLIF name: numeric expression
-    G1 S18 <numeric expression>
-      Internal name: <numeric expression[0]>
-      SLIF name: numeric expression
-    G1 S19 <numeric expression>
-      Internal name: <numeric expression[1]>
-      SLIF name: numeric expression
-    G1 S20 <numeric expression>
-      Internal name: <numeric expression[2]>
-      SLIF name: numeric expression
-    G1 S21 statement
-      Internal name: <statement>
-      SLIF name: statement
-    G1 S22 statements
-      Internal name: <statements>
-      SLIF name: statements
-    G1 S23 string
-      /* terminal */
-      Internal name: <string>
-      SLIF name: string
-    G1 S24 variable
-      /* terminal */
-      Internal name: <variable>
-      SLIF name: variable
-    Lex (L0) Symbols:
-    L0 S0 [:discard:]
-      Internal name: <[:discard:]>
-    L0 S1 'set'
-      Internal name: <[Lex-0]>
-      SLIF name: 'set'
-    L0 S2 'to'
-      Internal name: <[Lex-1]>
-      SLIF name: 'to'
-    L0 S3 '='
-      Internal name: <[Lex-2]>
-      SLIF name: '='
-    L0 S4 'string'
-      Internal name: <[Lex-3]>
-      SLIF name: 'string'
-    L0 S5 '('
-      Internal name: <[Lex-4]>
-      SLIF name: '('
-    L0 S6 ')'
-      Internal name: <[Lex-5]>
-      SLIF name: ')'
-    L0 S7 '+'
-      Internal name: <[Lex-6]>
-      SLIF name: '+'
-    L0 S8 '+'
-      Internal name: <[Lex-7]>
-      SLIF name: '+'
-    L0 S9 '*'
-      Internal name: <[Lex-8]>
-      SLIF name: '*'
-    L0 S10 [']
-      /* terminal */
-      Internal name: <[[']]>
-      SLIF name: [']
-    L0 S11 [\(]
-      /* terminal */
-      Internal name: <[[\(]]>
-      SLIF name: [\(]
-    L0 S12 [\)]
-      /* terminal */
-      Internal name: <[[\)]]>
-      SLIF name: [\)]
-    L0 S13 [\*]
-      /* terminal */
-      Internal name: <[[\*]]>
-      SLIF name: [\*]
-    L0 S14 [\+]
-      /* terminal */
-      Internal name: <[[\+]]>
-      SLIF name: [\+]
-    L0 S15 [\=]
-      /* terminal */
-      Internal name: <[[\=]]>
-      SLIF name: [\=]
-    L0 S16 [\d]
-      /* terminal */
-      Internal name: <[[\d]]>
-      SLIF name: [\d]
-    L0 S17 [\s]
-      /* terminal */
-      Internal name: <[[\s]]>
-      SLIF name: [\s]
-    L0 S18 [\w]
-      /* terminal */
-      Internal name: <[[\w]]>
-      SLIF name: [\w]
-    L0 S19 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-      /* terminal */
-      Internal name: <[[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]>
-      SLIF name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-    L0 S20 [e]
-      /* terminal */
-      Internal name: <[[e]]>
-      SLIF name: [e]
-    L0 S21 [g]
-      /* terminal */
-      Internal name: <[[g]]>
-      SLIF name: [g]
-    L0 S22 [i]
-      /* terminal */
-      Internal name: <[[i]]>
-      SLIF name: [i]
-    L0 S23 [n]
-      /* terminal */
-      Internal name: <[[n]]>
-      SLIF name: [n]
-    L0 S24 [o]
-      /* terminal */
-      Internal name: <[[o]]>
-      SLIF name: [o]
-    L0 S25 [r]
-      /* terminal */
-      Internal name: <[[r]]>
-      SLIF name: [r]
-    L0 S26 [s]
-      /* terminal */
-      Internal name: <[[s]]>
-      SLIF name: [s]
-    L0 S27 [t]
-      /* terminal */
-      Internal name: <[[t]]>
-      SLIF name: [t]
-    L0 S28 number
-      Internal name: <number>
-      SLIF name: number
-    L0 S29 string
-      Internal name: <string>
-      SLIF name: string
-    L0 S30 <string contents>
-      Internal name: <string contents>
-      SLIF name: string contents
-    L0 S31 variable
-      Internal name: <variable>
-      SLIF name: variable
-    L0 S32 whitespace
-      Internal name: <whitespace>
-      SLIF name: whitespace
-    L0 S33 [:lex_start:]
-      Internal name: <[:lex_start:]>
+    S1 [:discard:]
+      Canonical name: [:discard:]
+      DSL name: [:discard:]
+    S2 [:lex_start:]
+      Canonical name: [:lex_start:]
+      DSL name: [:lex_start:]
+    S3 [:start:]
+      Canonical name: [:start:]
+      DSL name: [:start:]
+    S4 'set'
+      Canonical name: [Lex-0]
+      DSL name: 'set'
+    S5 'to'
+      Canonical name: [Lex-1]
+      DSL name: 'to'
+    S6 '='
+      Canonical name: [Lex-2]
+      DSL name: '='
+    S7 'string'
+      Canonical name: [Lex-3]
+      DSL name: 'string'
+    S8 '('
+      Canonical name: [Lex-4]
+      DSL name: '('
+    S9 ')'
+      Canonical name: [Lex-5]
+      DSL name: ')'
+    S10 '+'
+      Canonical name: [Lex-6]
+      DSL name: '+'
+    S11 '*'
+      Canonical name: [Lex-7]
+      DSL name: '*'
+    S12 [']
+      Canonical name: [[']]
+      DSL name: [']
+    S13 [\(]
+      Canonical name: [[\(]]
+      DSL name: [\(]
+    S14 [\)]
+      Canonical name: [[\)]]
+      DSL name: [\)]
+    S15 [\*]
+      Canonical name: [[\*]]
+      DSL name: [\*]
+    S16 [\+]
+      Canonical name: [[\+]]
+      DSL name: [\+]
+    S17 [\=]
+      Canonical name: [[\=]]
+      DSL name: [\=]
+    S18 [\d]
+      Canonical name: [[\d]]
+      DSL name: [\d]
+    S19 [\s]
+      Canonical name: [[\s]]
+      DSL name: [\s]
+    S20 [\w]
+      Canonical name: [[\w]]
+      DSL name: [\w]
+    S21 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+      Canonical name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
+      DSL name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+    S22 [e]
+      Canonical name: [[e]]
+      DSL name: [e]
+    S23 [g]
+      Canonical name: [[g]]
+      DSL name: [g]
+    S24 [i]
+      Canonical name: [[i]]
+      DSL name: [i]
+    S25 [n]
+      Canonical name: [[n]]
+      DSL name: [n]
+    S26 [o]
+      Canonical name: [[o]]
+      DSL name: [o]
+    S27 [r]
+      Canonical name: [[r]]
+      DSL name: [r]
+    S28 [s]
+      Canonical name: [[s]]
+      DSL name: [s]
+    S29 [t]
+      Canonical name: [[t]]
+      DSL name: [t]
+    S30 assignment
+      Canonical name: assignment
+      DSL name: assignment
+    S31 expression
+      Canonical name: expression
+      DSL name: expression
+    S32 number
+      Canonical name: number
+      DSL name: number
+    S33 <numeric assignment>
+      Canonical name: <numeric assignment>
+      DSL name: numeric assignment
+    S34 <numeric expression>
+      Canonical name: <numeric expression>
+      DSL name: numeric expression
+    S35 statement
+      Canonical name: statement
+      DSL name: statement
+    S36 statements
+      Canonical name: statements
+      DSL name: statements
+    S37 string
+      Canonical name: string
+      DSL name: string
+    S38 <string contents>
+      Canonical name: <string contents>
+      DSL name: string contents
+    S39 variable
+      Canonical name: variable
+      DSL name: variable
+    S40 whitespace
+      Canonical name: whitespace
+      DSL name: whitespace
 
 =for Marpa::R3::Display::End
 
@@ -1624,7 +1539,7 @@ name: SLIF progress() output at location 0
 remove-display-indent: 1
 remove-blank-last-line: 1
 
-    [[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[19,0,0]]
+    [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[18,0,0],[20,0,0]]
 
 =for Marpa::R3::Display::End
 
@@ -1646,7 +1561,7 @@ name: SLIF progress() output at location 2
 remove-display-indent: 1
 remove-blank-last-line: 1
 
-    [[5,0,2],[6,0,2],[7,0,2],[8,0,2],[9,0,2],[10,0,2],[11,0,2],[4,2,0]]
+    [[4,2,0],[5,0,2],[6,0,2],[7,0,2],[8,0,2],[9,0,2],[10,0,2],[11,0,2]]
 
 =for Marpa::R3::Display::End
 
@@ -1658,7 +1573,7 @@ name: SLIF progress() output at default location
 remove-display-indent: 1
 remove-blank-last-line: 1
 
-    [[0,-1,0],[2,-1,0],[4,-1,0],[5,-1,2],[7,-1,4],[8,-1,4],[11,-1,2],[19,-1,0],[1,0,5],[2,0,5],[3,0,5],[4,0,5],[11,1,2]]
+    [[1,1,0],[2,0,5],[2,1,0],[3,0,5],[4,0,5],[4,3,0],[5,1,2],[7,1,4],[8,1,4],[11,1,2],[11,3,2],[18,1,0],[20,0,5]]
 
 =for Marpa::R3::Display::End
 

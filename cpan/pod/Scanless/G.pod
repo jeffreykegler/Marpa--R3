@@ -559,14 +559,14 @@ for those new to SLIF tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
 
-=head2 show_symbols()
+=head2 symbols_show()
 
 =for Marpa::R3::Display
-name: SLIF show_symbols() synopsis
+name: SLIF symbols_show() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    $show_symbols_output .= $grammar->show_symbols(3);
+    $symbols_show_output .= $grammar->symbols_show(3);
 
 =for Marpa::R3::Display::End
 
@@ -578,35 +578,7 @@ the symbols for the G1 grammar.
 It is useful for understanding the symbols as they
 appear in trace and debugging outputs.
 To allow for improvements in Marpa::R3,
-the output of C<show_symbols()> is subject to change.
-
-The default verbosity is 1, which is adequate for
-most purposes.
-A verbosity of 2 prints additional information useful
-for those new to SLIF tracing and debugging.
-A verbosity of 3 prints additional information for
-experts.
-
-=head2 l0_show_symbols()
-
-=for Marpa::R3::Display
-name: SLIF show_symbols() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    $show_symbols_output .= $grammar->l0_show_symbols(3);
-
-=for Marpa::R3::Display::End
-
-The first and only argument,
-which is optional,
-is a numeric verbosity level.
-The return value is a descripton of
-the symbols for the L0 grammar.
-It is useful for understanding the symbols as they
-appear in trace and debugging outputs.
-To allow for improvements in Marpa::R3,
-the output of C<show_symbols()> is subject to change.
+the output of C<symbols_show()> is subject to change.
 
 The default verbosity is 1, which is adequate for
 most purposes.
