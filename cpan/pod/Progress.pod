@@ -356,7 +356,7 @@ In Marpa, a lexeme is "acceptable" if it fits the grammar
 and the input so far.
 A lexeme is rejected if it is not acceptable.
 
-The last two lines of the C<trace_terminals> output are:
+The last few lines of the C<trace_terminals> output are:
 
 =for Marpa::R3::Display
 name: SLIF debug example trace output
