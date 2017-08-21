@@ -1980,7 +1980,7 @@ together.
                     coroutine.yield('trace', string.format(
                         "Expected lexeme %s at %s; assertion ID = %d",
                         display_form,
-                        slr:lc_brief(l0_pos),
+                        slr:lc_brief(nil, l0_pos),
                         assertion
                     ))
                 end
@@ -2166,7 +2166,7 @@ if there is some way to continue it),
                 if slr.trace_terminals >= 1 then
                     coroutine.yield('trace', string.format(
                         'Restarted recognizer at %s',
-                        slr:lc_brief(l0_pos)
+                        slr:lc_brief(nil, l0_pos)
                     ))
                 end
             end
@@ -2233,7 +2233,7 @@ which will be 1 or 0.
                     utf8.char(codepoint),
                     codepoint,
                     l0g:symbol_display_form(symbol_id),
-                    slr:lc_brief(l0_pos)
+                    slr:lc_brief(nil, l0_pos)
                 ))
             end
             return 0
@@ -2245,7 +2245,7 @@ which will be 1 or 0.
                     utf8.char(codepoint),
                     codepoint,
                     l0g:symbol_display_form(symbol_id),
-                    slr:lc_brief(l0_pos)
+                    slr:lc_brief(nil, l0_pos)
                 ))
             end
             return 1
@@ -2286,7 +2286,7 @@ Otherwise returns `false` and a status string.
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
                codepoint,
-               slr:lc_brief(l0_pos)
+               slr:lc_brief(nil, l0_pos)
            ))
         end
         local tokens_accepted = 0
@@ -2394,7 +2394,7 @@ not find an acceptable lexeme.
        end
        return slr:throw_at_pos(string.format(
             "No lexeme found at %s",
-            slr:lc_brief(slr.start_of_lexeme))
+            slr:lc_brief(nil, slr.start_of_lexeme))
             )
     end
 ```
@@ -2411,7 +2411,7 @@ not find an acceptable lexeme.
            end
            return slr:throw_at_pos(string.format(
                 "Parse exhausted, but lexemes remain, at %s",
-                slr:lc_brief(slr.start_of_lexeme))
+                slr:lc_brief(nil, slr.start_of_lexeme))
                 )
         end
         local start_of_lexeme = slr.start_of_lexeme
@@ -3279,7 +3279,7 @@ contains more than one L0 span.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lc_brief(slr, l0_pos, block)
+    function _M.class_slr.lc_brief(slr, block, l0_pos)
         if not block then block = slr.current_block.index end
         local _, line_no, column_no = slr:per_pos(block, l0_pos)
         return string.format("B%dL%dc%d",
@@ -3994,7 +3994,6 @@ TODO: Make `collected_progress_items a local, after development.
         --     +1 because it is an origin and the character
         --        doesn't begin until the next Earley set
         -- In other words, they balance and we do nothing
-        local g1_first = origins[1]
         local pcs = {}
 
 
@@ -4018,24 +4017,24 @@ TODO: Make `collected_progress_items a local, after development.
         end
 
         -- find the range
-        if current_ordinal <= 0 then
-          pcs[#pcs+1] = 'B1L1c1'
-          goto HAVE_RANGE
-        end
-        if dotted_type == 'P' then
-          local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
-          pcs[#pcs+1] = slr:lc_brief(pos, block)
-          goto HAVE_RANGE
-        end
         do
-          if g1_first < 0 then g1_first = 0 end
-          local g1_last = origins[#origins]
-          local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
-          local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
-          pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
-          goto HAVE_RANGE
+            if current_ordinal <= 0 then
+              pcs[#pcs+1] = 'B1L1c1'
+              goto ORIGINS_FOUND
+            end
+            local g1_first = origins[1]
+            if g1_first < 0 then g1_first = 0 end
+            local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
+            if #origins == 1 then
+              pcs[#pcs+1] = slr:lc_brief(l0_first_b, l0_first_p)
+              goto ORIGINS_FOUND
+            end
+            local g1_last = origins[#origins]
+            local l0_last_b, l0_last_p = slr:g1_pos_to_l0_first(g1_last)
+            pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
         end
-        ::HAVE_RANGE::
+        ::ORIGINS_FOUND::
+
         pcs[#pcs+1] = slg:xpr_dotted_show(production_id, position)
         return table.concat(pcs, ' ')
     end
@@ -4075,7 +4074,7 @@ TODO: Make `collected_progress_items a local, after development.
         local location = 'B1L1c1'
         if earley_set_id > 0 then
           local block, pos = slr:g1_pos_to_l0_first(earley_set_id)
-          location = slr:lc_brief(pos, block)
+          location = slr:lc_brief(block, pos)
         end
         return string.format('=== Earley set %d at %s ===', earley_set_id, location)
       end
@@ -4132,7 +4131,7 @@ It is designed to be convenient for use as a tail call.
               * here: %s\n",
               desc,
               slr:reversed_input_escape(block_ix, pos, 50),
-              slr:lc_brief(pos, block_ix),
+              slr:lc_brief(block_ix, pos),
               slr:character_describe(codepoint),
               slr:input_escape(block_ix, pos, 50)
           )
@@ -4231,7 +4230,7 @@ part of a "Pure Lua" implementation.
         end
         if dotted_type == 'P' then
             local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
-            pcs[#pcs+1] = slr:lc_brief(pos, block)
+            pcs[#pcs+1] = slr:lc_brief(block, pos)
             goto HAVE_RANGE
         end
         do

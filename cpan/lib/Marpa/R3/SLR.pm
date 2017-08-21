@@ -573,7 +573,7 @@ sub lc_brief {
     <<'END_OF_LUA', 'ii', $pos, ($block // -1));
         local slr, pos, block = ...
         if block < 0 then block = nil end
-        return slr:lc_brief(pos, block)
+        return slr:lc_brief(block, pos)
 END_OF_LUA
      return $result;
 }

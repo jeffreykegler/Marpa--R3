@@ -172,34 +172,34 @@ P2 B1L1c13 statement ::= . <numeric assignment>
 P3 B1L1c13 assignment ::= . 'set' variable 'to' expression
 P4 B1L1c13 <numeric assignment> ::= . variable '=' expression
 P20 B1L1c13 statement ::= . assignment
-R11:1 B1L1c5-11 expression ::= expression . '+' expression; prec=0
+R11:1 B1L1c5 expression ::= expression . '+' expression; prec=0
 F1 B1L1c1 [:start:] ::= statements .
 F2 B1L1c1 statement ::= <numeric assignment> .
 F4 B1L1c1 <numeric assignment> ::= variable '=' expression .
-F5 B1L1c5-11 expression ::= expression .; prec=-1
-F6 B1L1c5-11 expression ::= expression .; prec=0
-F7 B1L1c5-11 expression ::= expression .; prec=1
-F8 B1L1c5-11 expression ::= variable .; prec=2
+F5 B1L1c5 expression ::= expression .; prec=-1
+F6 B1L1c5 expression ::= expression .; prec=0
+F7 B1L1c5 expression ::= expression .; prec=1
+F8 B1L1c5 expression ::= variable .; prec=2
 F18 B1L1c1 statements ::= statement . *
 === Earley set 4 at B1L1c15 ===
 P7 B1L1c15 expression ::= . expression; prec=1
 P8 B1L1c15 expression ::= . variable; prec=2
 P9 B1L1c15 expression ::= . string; prec=2
 P10 B1L1c15 expression ::= . 'string' '(' <numeric expression> ')'; prec=1
-R11:2 B1L1c5-11 expression ::= expression '+' . expression; prec=0
+R11:2 B1L1c5 expression ::= expression '+' . expression; prec=0
 === Earley set 5 at B1L1c17 ===
 P2 B1L1c17 statement ::= . <numeric assignment>
 P3 B1L1c17 assignment ::= . 'set' variable 'to' expression
 P4 B1L1c17 <numeric assignment> ::= . variable '=' expression
 P20 B1L1c17 statement ::= . assignment
-R11:1 B1L1c5-11 expression ::= expression . '+' expression; prec=0
+R11:1 B1L1c5 expression ::= expression . '+' expression; prec=0
 F1 B1L1c1 [:start:] ::= statements .
 F2 B1L1c1 statement ::= <numeric assignment> .
 F4 B1L1c1 <numeric assignment> ::= variable '=' expression .
-F5 B1L1c5-11 expression ::= expression .; prec=-1
-F7 B1L1c15-16 expression ::= expression .; prec=1
-F8 B1L1c15-16 expression ::= variable .; prec=2
-F11 B1L1c5-11 expression ::= expression '+' expression .; prec=0
+F5 B1L1c5 expression ::= expression .; prec=-1
+F7 B1L1c15 expression ::= expression .; prec=1
+F8 B1L1c15 expression ::= variable .; prec=2
+F11 B1L1c5 expression ::= expression '+' expression .; prec=0
 F18 B1L1c1 statements ::= statement . *
 END_PROGRESS_REPORT
 

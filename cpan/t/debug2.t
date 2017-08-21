@@ -107,20 +107,20 @@ P2 B1L1c1 Expression ::= . Factor
 P4 B1L1c1 Factor ::= . Number
 P6 B1L1c1 Factor ::= . Factor Multiply Factor
 === Earley set 1 at B1L1c3 ===
-R6:1 B1L1c1-2 Factor ::= Factor . Multiply Factor
-F1 B1L1c1-2 [:start:] ::= Expression .
-F2 B1L1c1-2 Expression ::= Factor .
-F4 B1L1c1-2 Factor ::= Number .
+R6:1 B1L1c1 Factor ::= Factor . Multiply Factor
+F1 B1L1c1 [:start:] ::= Expression .
+F2 B1L1c1 Expression ::= Factor .
+F4 B1L1c1 Factor ::= Number .
 === Earley set 2 at B1L1c4 ===
 P4 B1L1c4 Factor ::= . Number
 P6 B1L1c4 Factor ::= . Factor Multiply Factor
-R6:2 B1L1c1-2 Factor ::= Factor Multiply . Factor
+R6:2 B1L1c1 Factor ::= Factor Multiply . Factor
 === Earley set 3 at B1L1c5 ===
 R6:1 x2 B1L1c1-4 Factor ::= Factor . Multiply Factor
-F1 B1L1c1-2 [:start:] ::= Expression .
-F2 B1L1c1-2 Expression ::= Factor .
+F1 B1L1c1 [:start:] ::= Expression .
+F2 B1L1c1 Expression ::= Factor .
 F4 B1L1c4 Factor ::= Number .
-F6 B1L1c1-2 Factor ::= Factor Multiply Factor .
+F6 B1L1c1 Factor ::= Factor Multiply Factor .
 END_PROGRESS_REPORT
 
 $Data::Dumper::Indent = 0;
