@@ -689,13 +689,14 @@ Display any XPR
 
             local lhsid
             local rhsids = {}
-            local xpr_length
+            local rhs_length
             if verbose >= 2 then
                 lhsid = xpr.lhs.id
                 rhsids = {}
-                xpr_length = #xpr.rhs
+                local rhs = xpr.rhs
+                rhs_length = #rhs
                 local comments = {}
-                if xpr_length == 0 then
+                if rhs_length == 0 then
                     comments[#comments+1] = 'empty'
                 end
                 if xpr.discard_separation then
@@ -711,12 +712,12 @@ Display any XPR
                 end
                 pcs2 = {}
                 pcs2[#pcs2+1] = '  Symbol IDs:'
-                for ix = 0, xpr_length - 1 do
+                for ix = 1, rhs_length - 1 do
                    rhsids[ix] = xpr.rhs[ix].id
                 end
                 pcs2[#pcs2+1] = '<' .. lhsid .. '>'
                 pcs2[#pcs2+1] = '::='
-                for ix = 0, xpr_length - 1 do
+                for ix = 1, rhs_length - 1 do
                     pcs2[#pcs2+1] = '<' .. rhsids[ix] .. '>'
                 end
                 pcs[#pcs+1] = table.concat(pcs2, ' ')
@@ -727,7 +728,7 @@ Display any XPR
                 pcs2[#pcs2+1] = '  Canonical names:'
                 pcs2[#pcs2+1] = slg:symbol_diag_form(lhsid)
                 pcs2[#pcs2+1] = '::='
-                for ix = 0, xpr_length - 1 do
+                for ix = 1, rhs_length - 1 do
                     pcs2[#pcs2+1] = slg:symbol_diag_form(rhsids[ix])
                 end
                 pcs[#pcs+1] = table.concat(pcs2, ' ')

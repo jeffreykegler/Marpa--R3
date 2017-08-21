@@ -489,80 +489,160 @@ Test::More::is_deeply($value_ref, $expected_value_after_fix, 'Value after fix');
 # Marpa::R3::Display
 # name: SLG productions_show() synopsis
 
-my $productions_show_output = $grammar->productions_show();
+my $productions_show_output = $grammar->productions_show( { verbose => 3 } );
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLIF debug example productions_show() output
-# start-after-line: END_OF_SHOW_RULES_OUTPUT
-# end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
+# start-after-line: END_OF_OUTPUT
+# end-before-line: '^END_OF_OUTPUT$'
 
 Marpa::R3::Test::is( $productions_show_output,
     <<'END_OF_OUTPUT', 'SLIF productions_show()' );
 R1 [:start:] ::= statements
+  Symbol IDs: <3> ::=
+  Canonical names: [:start:] ::=
 R2 statement ::= <numeric assignment>
+  Symbol IDs: <35> ::=
+  Canonical names: statement ::=
 R3 assignment ::= 'set' variable 'to' expression
+  Symbol IDs: <30> ::= <4> <39> <5>
+  Canonical names: assignment ::= [Lex-0] variable [Lex-1]
 R4 <numeric assignment> ::= variable '=' <numeric expression>
+  Symbol IDs: <33> ::= <39> <6>
+  Canonical names: <numeric assignment> ::= variable [Lex-2]
 R5 expression ::= expression; prec=-1
+  Symbol IDs: <31> ::=
+  Canonical names: expression ::=
 R6 expression ::= expression; prec=0
+  Symbol IDs: <31> ::=
+  Canonical names: expression ::=
 R7 expression ::= expression; prec=1
+  Symbol IDs: <31> ::=
+  Canonical names: expression ::=
 R8 expression ::= variable; prec=2
+  Symbol IDs: <31> ::=
+  Canonical names: expression ::=
 R9 expression ::= string; prec=2
+  Symbol IDs: <31> ::=
+  Canonical names: expression ::=
 R10 expression ::= 'string' '(' <numeric expression> ')'; prec=1
+  Symbol IDs: <31> ::= <7> <8> <34>
+  Canonical names: expression ::= [Lex-3] [Lex-4] <numeric expression>
 R11 expression ::= expression '+' expression; prec=0
+  Symbol IDs: <31> ::= <31> <10>
+  Canonical names: expression ::= expression [Lex-6]
 R12 <numeric expression> ::= <numeric expression>; prec=-1
+  Symbol IDs: <34> ::=
+  Canonical names: <numeric expression> ::=
 R13 <numeric expression> ::= <numeric expression>; prec=0
+  Symbol IDs: <34> ::=
+  Canonical names: <numeric expression> ::=
 R14 <numeric expression> ::= <numeric expression>; prec=1
+  Symbol IDs: <34> ::=
+  Canonical names: <numeric expression> ::=
 R15 <numeric expression> ::= variable; prec=2
+  Symbol IDs: <34> ::=
+  Canonical names: <numeric expression> ::=
 R16 <numeric expression> ::= number; prec=2
+  Symbol IDs: <34> ::=
+  Canonical names: <numeric expression> ::=
 R17 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+  Symbol IDs: <34> ::= <34> <11>
+  Canonical names: <numeric expression> ::= <numeric expression> [Lex-7]
 R18 statements ::= statement *
+  Symbol IDs: <36> ::=
+  Canonical names: statements ::=
 R19 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
+  Symbol IDs: <34> ::= <34> <10>
+  Canonical names: <numeric expression> ::= <numeric expression> [Lex-6]
 R20 statement ::= assignment
+  Symbol IDs: <35> ::=
+  Canonical names: statement ::=
 R21 [:lex_start:] ~ [:discard:]
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R22 [:lex_start:] ~ 'set'
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R23 [:lex_start:] ~ 'to'
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R24 [:lex_start:] ~ '='
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R25 [:lex_start:] ~ 'string'
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R26 [:lex_start:] ~ '('
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R27 [:lex_start:] ~ ')'
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R28 [:lex_start:] ~ '+'
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R29 [:lex_start:] ~ '*'
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R30 [:lex_start:] ~ number
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R31 [:lex_start:] ~ string
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R32 [:lex_start:] ~ variable
+  Symbol IDs: <2> ::=
+  Canonical names: [:lex_start:] ::=
 R33 'set' ~ [s] [e] [t]
+  Symbol IDs: <4> ::= <28> <22>
+  Canonical names: [Lex-0] ::= [[s]] [[e]]
 R34 'to' ~ [t] [o]
+  Symbol IDs: <5> ::= <29>
+  Canonical names: [Lex-1] ::= [[t]]
 R35 '=' ~ [\=]
+  Symbol IDs: <6> ::=
+  Canonical names: [Lex-2] ::=
 R36 'string' ~ [s] [t] [r] [i] [n] [g]
+  Symbol IDs: <7> ::= <28> <29> <27> <24> <25>
+  Canonical names: [Lex-3] ::= [[s]] [[t]] [[r]] [[i]] [[n]]
 R37 '(' ~ [\(]
+  Symbol IDs: <8> ::=
+  Canonical names: [Lex-4] ::=
 R38 ')' ~ [\)]
+  Symbol IDs: <9> ::=
+  Canonical names: [Lex-5] ::=
 R39 '+' ~ [\+]
+  Symbol IDs: <10> ::=
+  Canonical names: [Lex-6] ::=
 R40 '*' ~ [\*]
+  Symbol IDs: <11> ::=
+  Canonical names: [Lex-7] ::=
 R41 variable ~ [\w] +
+  Symbol IDs: <39> ::=
+  Canonical names: variable ::=
 R42 number ~ [\d] +
+  Symbol IDs: <32> ::=
+  Canonical names: number ::=
 R43 string ~ ['] <string contents> [']
+  Symbol IDs: <37> ::= <12> <38>
+  Canonical names: string ::= [[']] <string contents>
 R44 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+  Symbol IDs: <38> ::=
+  Canonical names: <string contents> ::=
 R45 [:discard:] ~ whitespace
+  Symbol IDs: <1> ::=
+  Canonical names: [:discard:] ::=
 R46 whitespace ~ [\s] +
+  Symbol IDs: <40> ::=
+  Canonical names: whitespace ::=
 END_OF_OUTPUT
 
 # Marpa::R3::Display::End
 
-my $rules_show_output;
-
-# Marpa::R3::Display
-# name: SLIF g1_rules_show() synopsis
-
-$rules_show_output = $grammar->g1_rules_show( { verbose => 3 } );
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLIF debug example g1_rules_show() output
-# start-after-line: END_OF_SHOW_RULES_OUTPUT
-# end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
+my $rules_show_output = $grammar->g1_rules_show( { verbose => 3 } );
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show()' );
@@ -628,19 +708,7 @@ R19 [:start:] ::= statements
   Canonical symbols: [:start:] ::= statements
 END_OF_SHOW_RULES_OUTPUT
 
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLG l0_rules_show() synopsis
-
 $rules_show_output = $grammar->l0_rules_show( { verbose => 3 });
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLIF debug example l0_rules_show() output
-# start-after-line: END_OF_SHOW_RULES_OUTPUT
-# end-before-line: '^END_OF_SHOW_RULES_OUTPUT$'
 
 Marpa::R3::Test::is( $rules_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show()' );
@@ -723,8 +791,6 @@ R25 [:lex_start:] ~ variable
   Symbol IDs: <1> ::= <31>
   Canonical symbols: [:lex_start:] ::= variable
 END_OF_SHOW_RULES_OUTPUT
-
-# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLG productions_show() diag form synopsis

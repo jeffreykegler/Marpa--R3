@@ -61,11 +61,7 @@ END_OF_SOURCE
     }
 );
 
-my $productions_show_output;
-# Marpa::R3::Display
-# name: SLG productions_show() synopsis
-
-$productions_show_output = $grammar->productions_show();
+my $productions_show_output = $grammar->productions_show();
 
 Marpa::R3::Test::is( $productions_show_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'Scanless productions_show()' );
@@ -112,8 +108,6 @@ R40 <hash comment body> ~ <hash comment char> *
 R41 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 R42 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_SHOW_RULES_OUTPUT
-
-# Marpa::R3::Display::End
 
 my $rules_show_output;
 

@@ -507,49 +507,23 @@ which is subject to change in future versions of Marpa::R3.
 
 =head1 Trace methods
 
-=head2 show_rules()
+=head2 productions_show()
 
 =for Marpa::R3::Display
-name: SLG show_rules() synopsis
+name: SLG productions_show() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $show_rules_output = $grammar->show_rules();
+    my $productions_show_output = $grammar->productions_show();
 
 =for Marpa::R3::Display::End
 
-The C<show_rules()> method returns a description of
-the rules for the G1 grammar.
+The C<productions_show()> method returns a description of
+the external rules.
 It is useful for understanding the rules as they
 appear in trace and debugging outputs.
 To allow for improvements in Marpa::R3,
-the output of C<show_rules()> is subject to change.
-
-The first optional argument can be a numeric verbosity level.
-The default verbosity is 1, which is adequate for
-most purposes.
-A verbosity of 2 prints additional information useful
-for those new to SLIF tracing and debugging.
-A verbosity of 3 prints additional information for
-experts.
-
-=head2 l0_show_rules()
-
-=for Marpa::R3::Display
-name: SLG l0_show_rules() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    $show_rules_output .= $grammar->l0_show_rules(3);
-
-=for Marpa::R3::Display::End
-
-The C<show_rules()> method returns a description of
-the rules for the L0 grammar.
-It is useful for understanding the rules as they
-appear in trace and debugging outputs.
-To allow for improvements in Marpa::R3,
-the output of C<show_rules()> is subject to change.
+the output of C<productions_show()> is subject to change.
 
 The first optional argument can be a numeric verbosity level.
 The default verbosity is 1, which is adequate for
