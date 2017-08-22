@@ -142,14 +142,14 @@ follow from the way in which origin and current location are defined.
 
 =over 4
 
-=item
-First,
-if a dotted rule is a prediction,
+=item 1.
+
+If a dotted rule is a prediction,
 then origin and current location will always be the same.
 
-=item
-Second,
-the input stream location where a production ends is not tracked unless the
+=item 2.
+
+The input stream location where a production ends is not tracked unless the
 dotted rule is a completion.
 In other cases,
 an Earley item does not tell us
@@ -456,14 +456,15 @@ This dotted rule has only one origin, and it is at line 1, column 1
 of block 1.
 
 As an aside, notice that
-the left hand side symbol is C<:start>.
+the left hand side symbol is C<[:start]>.
 That is the start pseudo-symbol.
 The presence of a completed start rule in our
-progress report indicates that if our input had ended at location 5,
+progress report indicates that if our input had ended at Earley set 5,
 it would be a valid sentence
 in the language of our grammar.
-(And it is because the input at G1 location 5 was a valid sentence of the grammar,
-that we were able to look at the value
+(And lucky for us -- because the input at G1 location 5
+was a valid sentence of the grammar,
+we are able to look at the value
 of the parse at location 5 for debugging purposes.)
 
 Let's look at another progress report line:
@@ -485,6 +486,11 @@ ordinal of the symbol just before the position.
 Symbols are numbered starting with 1, and
 symbol position 2 is the position immediately after
 symbol 2.
+
+Note the "C<prec=0>" at the end of the above line.
+The production C<expression ::= expression '+' . expression>
+is one of the productions in a precedenced rule,
+and "C<prec=0>" indicates that its precedence is 0.
 
 Predicted rules also appear in progress reports:
 
