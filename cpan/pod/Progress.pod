@@ -142,11 +142,13 @@ follow from the way in which origin and current location are defined.
 
 =over 4
 
-=item First,
+=item
+First,
 if a dotted rule is a prediction,
 then origin and current location will always be the same.
 
-=item Second,
+=item
+Second,
 the input stream location where a production ends is not tracked unless the
 dotted rule is a completion.
 In other cases,
@@ -440,33 +442,18 @@ The last field of
 each progress report line shows,
 in fully expanded form,
 the dotted rule we were working on.
-Prefixed to the dotted rule are three fields.
-In the example just above they are "C<F0 @0-5 B1L1c1-16>".
-The "C<F0>" says that this is a completed or B<final> rule,
-and that it is rule number 0.
+Prefixed to the dotted rule are two or three fields
+of location information.
+In the example just above they are "C<F1 B1L1c1>".
+The "C<F1>" says that this is a completed or B<final> rule,
+and that it is rule number 1.
 The rule number is a convenient way to refer to a rule
 and is used when displaying the whole rule would take too much space.
 
-The "C<@0-5>" describes the G1 locations of the dotted rule in
-the parse.  In its simplest form, the location field is two
-G1 location numbers, separated by a hyphen.
-The first G1 location number is the origin, the place where Marpa
-first started recognizing the rule.
-The last G1 location number is the dot location, the G1 location
-of the dot in a dotted rule.
-"C<@0-3>" says that this rule began at G1 location 0, and that the
-dot is at G1 location 3.
-
-Following the G1 location is the range of positions in the input string:
-"C<L1c1-16>".
-This indicates that the origin of dotted rule is at line 1, column 1,
-and that its dot position is after line 1, column 16.
-
-The current location is also just after line 1, column 16, and at G1 location 5,
-and this is no coincidence.
-Whenever we are displaying the progress report for a G1 location,
-all the progress report lines will have their dot location at
-that G1 location.
+"C<B1L1c1>" describes the L0 location of origin of the dotted rule in
+the parse.
+This dotted rule has only one origin, and it is at line 1, column 1
+of block 1.
 
 As an aside, notice that
 the left hand side symbol is C<:start>.
