@@ -446,10 +446,9 @@ a "type code" followed by the rule number.
 In this case the "C<F1>" indicates
 that this is a completed or B<final> rule,
 and that it is rule number 1.
-The rule number is a convenient way to refer to a rule
-and is used when displaying the whole rule would take too much space.
+The rule number is a convenient and very brief way to refer to a rule.
 
-After the rule tag,
+After the rule tag
 will be one or two fields
 of location information.
 If there are multiple origins for the dotted rule,
@@ -457,7 +456,8 @@ there will be two fields of location information.
 In the example just above there is only one field
 of location information: "C<B1L1c1>".
 This indicates that
-the dotted rule has only one origin, and it is at line 1, column 1
+the dotted rule has only one origin,
+and that that origin is at line 1, column 1
 of block 1.
 Examples of report lines with multiple origins will be given below.
 
@@ -517,9 +517,6 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Here the "C<P>" in the summary field means "predicted".
-Notice that in the predicted rule,
-the origin is the same as the dot location.
-This will always be the case with predicted rules.
 
 =head2 OK!  Now to find the bug
 
