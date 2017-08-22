@@ -396,13 +396,15 @@ The progress report that is usually of most interest is
 the one for the Earley set
 that you were working on when the error occurred.
 This is called the B<current location>.
-In our example the current location is G1 location 5.
+In our example the current location is
+B1L1c17 (L0 location block 1 line 1 column 17),
+which is also G1 location 5.
 By default,
 L<C<progress_show>|Marpa::R3::Scanless::R/"progress_show()">
 prints out only the progress reports for the current location.
 
-Here are the progress reports for the current location,
-location 5,
+Here are the progress reports for B1L1c17.
+Earley set 5,
 from our example.
 
 =for Marpa::R3::Display
