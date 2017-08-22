@@ -403,8 +403,9 @@ By default,
 L<C<progress_show>|Marpa::R3::Scanless::R/"progress_show()">
 prints out only the progress reports for the current location.
 
-Here are the progress reports for B1L1c17.
-Earley set 5,
+Here are the progress reports for
+Earley set 5
+(B1L1c17),
 from our example.
 
 =for Marpa::R3::Display
@@ -444,11 +445,20 @@ The last field of
 each progress report line shows,
 in fully expanded form,
 the dotted rule we were working on.
-Prefixed to the dotted rule are two or three fields
-of location information.
-In the example just above they are "C<F1 B1L1c1>".
-The "C<F1>" says that this is a completed or B<final> rule,
+The first field (in this case "C<F1>") is a rule tag --
+a "type code" followed by the rule number.
+In this case the "C<F1>" indicates
+that this is a completed or B<final> rule,
 and that it is rule number 1.
+
+Between the rule tag and the expanded dotted rule,
+are one or two fields
+of location information.
+If there are multiple origins for the dotted rule,
+there will be two fields of location information.
+
+In the example just above the rule has only
+one origin, and the second field is "C<B1L1c1>".
 The rule number is a convenient way to refer to a rule
 and is used when displaying the whole rule would take too much space.
 
