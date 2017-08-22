@@ -441,33 +441,34 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The last field of
-each progress report line shows,
-in fully expanded form,
-the dotted rule we were working on.
 The first field (in this case "C<F1>") is a rule tag --
 a "type code" followed by the rule number.
 In this case the "C<F1>" indicates
 that this is a completed or B<final> rule,
 and that it is rule number 1.
-
-Between the rule tag and the expanded dotted rule,
-are one or two fields
-of location information.
-If there are multiple origins for the dotted rule,
-there will be two fields of location information.
-
-In the example just above the rule has only
-one origin, and the second field is "C<B1L1c1>".
 The rule number is a convenient way to refer to a rule
 and is used when displaying the whole rule would take too much space.
 
-"C<B1L1c1>" describes the L0 location of origin of the dotted rule in
-the parse.
-This dotted rule has only one origin, and it is at line 1, column 1
+After the rule tag,
+will be one or two fields
+of location information.
+If there are multiple origins for the dotted rule,
+there will be two fields of location information.
+In the example just above there is only one field
+of location information: "C<B1L1c1>".
+This indicates that
+the dotted rule has only one origin, and it is at line 1, column 1
 of block 1.
+Examples of report lines with multiple origins will be given below.
 
-As an aside, notice that
+The last field of
+each progress report line shows,
+in fully expanded form,
+the dotted rule we were working on.
+In the line just above, the fully expanded dotted rule
+is "C<[:start:] ::= statements .>".
+
+Notice that
 the left hand side symbol is C<[:start]>.
 That is the start pseudo-symbol.
 The presence of a completed start rule in our
