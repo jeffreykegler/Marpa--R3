@@ -527,7 +527,7 @@ we see that we have completed rules for
 C<E<lt>expressionE<gt>>,
 C<E<lt>numeric assignmentE<gt>>,
 C<E<lt>statementE<gt>>,
-C<E<lt>statementsE<gt>>,
+and C<E<lt>statementsE<gt>>
 as expected.
 We also see two Earley items that show
 that we are in the process of building another C<E<lt>expressionE<gt>>,
