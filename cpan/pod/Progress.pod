@@ -592,7 +592,9 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 No R17 predicted at G1 location 0.
-Next we look through the the entire progress report, at all G1 locations,
+Next we look
+through the entire progress report,
+at all G1 locations,
 to see if R17 is predicted anywhere.
 No R17.  Not anywhere.
 
