@@ -521,8 +521,8 @@ Here the "C<P>" in the summary field means "predicted".
 =head2 OK!  Now to find the bug
 
 If we look again are progress reports
-at the location 5, the location where things went wrong:
-We see that we have completed rules for
+at Earley set 5, the G1 location where things went wrong,
+we see that we have completed rules for
 C<E<lt>expressionE<gt>>,
 C<E<lt>numeric assignmentE<gt>>,
 C<E<lt>statementE<gt>>,
@@ -532,8 +532,9 @@ We also see two Earley items that show
 that we are in the process of building another C<E<lt>expressionE<gt>>,
 and that it is expecting a 'C<+>' symbol.
 
-What we want to know is,
-why is the recognizer B<not> expecting an 'C<*>' symbol?
+=head2 Why is "C<*>" not expected?
+
+Why is the recognizer <not expecting an 'C<*>' symbol?
 Looking back at the grammar, we see that only one rule uses
 the 'C<*>' symbol.
 Here it is as part of a prioritized rule in the DSL:
