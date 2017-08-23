@@ -820,7 +820,7 @@ For example, above,
 where the first four fields were
 "C<F7 x12 @0...38-41 B1L1c1-L2c40>",
 that tells us
-that the dotted rule is rule 7, which has 12 instances.
+that the dotted rule is production 7, which has 12 instances.
 All 12 instances have their dot location at G1 location 41,
 but their origins are in the range from G1 location 0
 to G1 location 38.
@@ -837,7 +837,7 @@ all of the input string positions visited by any of the dotted rule instances.
 If there are only a few origins,
 Marpa may explicitly list them all.
 In the follow example, there are only 2 instances
-of this rule, both with a dot location of 41.
+of this dotted rule, both with a dot location of 41.
 Their origins are at G1 locations 8 and 18.
 The range of input string positions is from line 1, column 17
 to line 2, column 40.
@@ -894,18 +894,18 @@ the latest one, etc.
 
 Each report item is a triple: an array of three elements.
 The three elements are, in order,
-rule ID, dot position, and origin.
+production ID, dot position, and origin.
 The data returned by the two displays above,
 as well as the data for the other G1 locations
 in our example,
 are shown L<below|"progress() outputs">.
 
-The rule ID is the same number that Marpa uses
-to identify rules
+The production ID is the same number that Marpa uses
+to identify productions
 in tracing and debugging output.
-Given a rule ID, an application can expand it into
+Given a production ID, an application can expand it into
 its LHS and RHS symbols using
-L<the SLIF grammar's C<rule_expand()> method|Marpa::R3::Scanless::G/"rule_expand()">.
+L<the SLIF grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
 Given a symbol ID,
 its name and other information can be found using
 L<other SLIF grammar
@@ -920,7 +920,7 @@ successfully recognized at the G1 location of
 the progress report.
 
 Origin is the G1 location (Earley set ID)
-at which the rule application reported by
+at which the dotted rule instance reported by
 the report item began.
 For a prediction, origin will always be
 the same as the G1 location of the parse report.
