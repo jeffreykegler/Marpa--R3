@@ -459,7 +459,8 @@ This indicates that
 the dotted rule has only one origin,
 and that that origin is at line 1, column 1
 of block 1.
-Examples of report lines with multiple origins will be given below.
+Examples of report lines with multiple origins will be given
+L<below|/"Multiple instances of dotted rules">.
 
 The last field of
 each progress report line shows,
@@ -596,7 +597,7 @@ No R17.  Not anywhere.
 
 =head2 What is happening with C<E<lt>numeric expressionE<gt>>?
 
-The LHS of R18 is C<E<lt>numeric expressionE<gt>>.
+The LHS of R17 is C<E<lt>numeric expressionE<gt>>.
 We look in the progress report for dotted rules where
 C<E<lt>numeric expressionE<gt>> is expected -- that is,
 dotted rules where C<E<lt>numeric expressionE<gt>> is the post-dot symbol.
