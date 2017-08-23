@@ -523,11 +523,11 @@ Here the "C<P>" in the summary field means "predicted".
 
 If we look again are progress reports
 at Earley set 5, the G1 location where things went wrong,
-we see that we have completed rules for
-C<E<lt>expressionE<gt>>,
-C<E<lt>numeric assignmentE<gt>>,
-C<E<lt>statementE<gt>>,
-and C<E<lt>statementsE<gt>>
+we see that we have completed rules
+for C<E<lt>expressionE<gt>>,
+for C<E<lt>numeric assignmentE<gt>>,
+for C<E<lt>statementE<gt>>,
+and for C<E<lt>statementsE<gt>>,
 as expected.
 We also see two Earley items that show
 that we are in the process of building another C<E<lt>expressionE<gt>>,
