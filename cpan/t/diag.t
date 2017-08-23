@@ -153,11 +153,11 @@ P1 @11-11 B1L1c20 Calculation ::= . Expression
 P2 @11-11 B1L1c20 Calculation ::= . 'say' Expression
 P3 @11-11 B1L1c20 Expression ::= . Number
 P4 @11-11 B1L1c20 Expression ::= . '+' Expression Expression
-F0 @0-11 B1L1c1-19 Script ::= Calculation * .
-F1 @0-11 B1L1c1-19 Calculation ::= Expression .
+F0 @0-11 B1L1c1 Script ::= Calculation * .
+F1 @0-11 B1L1c1 Calculation ::= Expression .
 F3 @10-11 B1L1c19 Expression ::= Number .
-F4 x2 @0,6-11 B1L1c1-19 Expression ::= '+' Expression Expression .
-F5 @0-11 B1L1c1-19 [:start:] ::= Script .
+F4 x2 @0,6-11 B1L1c1-11 Expression ::= '+' Expression Expression .
+F5 @0-11 B1L1c1 [:start:] ::= Script .
 END_OF_EXPECTED_OUTPUT
 
     Marpa::R3::Test::is( $actual_value, $expected_value,
