@@ -642,7 +642,7 @@ That's fine, but why no other, more relevant, occurrences of C<E<lt>numeric expr
 We look back at the grammar.
 Aside for the rule for the 'C<string>' operator,
 C<E<lt>numeric expressionE<gt>> occurs on a RHS in two places.
-One is in the prioritized rule which defines
+One is in the precedenced rule which defines
 C<E<lt>numeric expressionE<gt>>.
 
 =for Marpa::R3::Display
@@ -662,8 +662,9 @@ will never put
 C<E<lt>numeric expressionE<gt>> into the Earley items
 unless there is
 a C<E<lt>numeric expressionE<gt>> already there.
-But that is not its job.
-This rule is just fine and does not need fixing.
+Nonetheless this rule is OK -- it has a job and
+it's doing it.
+This rule does not need fixing.
 
 That leaves one rule to look at.
 
