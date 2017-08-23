@@ -570,7 +570,7 @@ The next step is to look at the Earley items for rule 17.
 But there is a problem.
 We don't find any.
 
-Next, we ask ourselves, what is the earliest place R17
+What is the earliest place R17
 should be appearing?
 The answer is that
 there should be a prediction of R17 at location 0.
