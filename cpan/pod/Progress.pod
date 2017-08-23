@@ -536,9 +536,10 @@ and that it is expecting a 'C<+>' symbol.
 =head2 Why is "C<*>" not expected?
 
 Why is the recognizer not expecting an 'C<*>' symbol?
-Looking back at the grammar, we see that only one rule uses
+Looking back at the grammar, we see that only one production uses
 the 'C<*>' symbol.
-Here it is as part of a prioritized rule in the DSL:
+That production is part of a precedenced rule in the DSL.
+Here it is:
 
 =for Marpa::R3::Display
 name: SLIF debug example, part 1
