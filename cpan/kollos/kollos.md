@@ -3313,6 +3313,16 @@ an L0 range
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lc_table_brief(slr, locations)
+        table.sort(locations, _M.cmp_seq)
+        local block1, l0_pos1 = table.unpack(locations[1])
+        local block2, l0_pos2 = table.unpack(locations[#locations])
+        return slr:lc_range_brief(block1, l0_pos1, block2, l0_pos2)
+    end
+```
+
 `block_new` must be called in a coroutine which handles
 the `codepoint` command.
 
@@ -4017,23 +4027,15 @@ TODO: Make `collected_progress_items a local, after development.
         end
 
         -- find the range
-        do
-            if current_ordinal <= 0 then
-              pcs[#pcs+1] = 'B1L1c1'
-              goto ORIGINS_FOUND
+        if current_ordinal <= 0 then
+          pcs[#pcs+1] = 'B1L1c1'
+        else
+            local l0_locations = {}
+            for _, g1_location in pairs(origins) do
+                l0_locations[#l0_locations+1] = { slr:g1_pos_to_l0_first(g1_location) }
             end
-            local g1_first = origins[1]
-            if g1_first < 0 then g1_first = 0 end
-            local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
-            if #origins == 1 then
-              pcs[#pcs+1] = slr:lc_brief(l0_first_b, l0_first_p)
-              goto ORIGINS_FOUND
-            end
-            local g1_last = origins[#origins]
-            local l0_last_b, l0_last_p = slr:g1_pos_to_l0_first(g1_last)
-            pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+            pcs[#pcs+1] = slr:lc_table_brief(l0_locations)
         end
-        ::ORIGINS_FOUND::
 
         pcs[#pcs+1] = slg:xpr_dotted_show(production_id, position)
         return table.concat(pcs, ' ')
@@ -4191,7 +4193,6 @@ part of a "Pure Lua" implementation.
         --     +1 because it is an origin and the character
         --        doesn't begin until the next Earley set
         -- In other words, they balance and we do nothing
-        local g1_first = origins[1]
 
         local slg = slr.slg
         local g1g = slg.g1
@@ -4234,11 +4235,11 @@ part of a "Pure Lua" implementation.
             goto HAVE_RANGE
         end
         do
-            if g1_first < 0 then g1_first = 0 end
-            local g1_last = current_ordinal - 1
-            local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
-            local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
-            pcs[#pcs+1] = slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
+            local l0_locations = {}
+            for _, g1_location in pairs(origins) do
+                l0_locations[#l0_locations+1] = { slr:g1_pos_to_l0_first(g1_location) }
+            end
+            pcs[#pcs+1] = slr:lc_table_brief(l0_locations)
             goto HAVE_RANGE
         end
         ::HAVE_RANGE::
