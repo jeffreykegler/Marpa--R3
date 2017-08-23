@@ -521,8 +521,8 @@ Here the "C<P>" in the summary field means "predicted".
 
 =head2 OK!  Now to find the bug
 
-If we look again are progress reports
-at Earley set 5, the G1 location where things went wrong,
+If we look again at the progress reports
+for Earley set 5, the G1 location where things went wrong,
 we see that we have completed rules
 for C<E<lt>expressionE<gt>>,
 for C<E<lt>numeric assignmentE<gt>>,
