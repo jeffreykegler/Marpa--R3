@@ -595,7 +595,7 @@ Next we look through the the entire progress report, at all G1 locations,
 to see if R17 is predicted anywhere.
 No R17.  Not anywhere.
 
-=head2 What is happening with C<E<lt>numeric expressionE<gt>>?
+=head2 Where is C<E<lt>numeric expressionE<gt>> expected?
 
 The LHS of R17 is C<E<lt>numeric expressionE<gt>>.
 We look in the progress report for dotted rules where
@@ -633,6 +633,8 @@ use for converting numerics to strings.
 They are just predictions, predictions which go no further because there is no
 'C<string>' operator in our input.
 That's fine, but why no other, more relevant, occurrences of C<E<lt>numeric expressionE<gt>>?
+
+=head2 Rules with C<E<lt>numeric expressionE<gt>> on the RHS
 
 We look back at the grammar.
 Aside for the rule for the 'C<string>' operator,
@@ -674,6 +676,9 @@ normalize-whitespace: 1
 This rule is one that
 should lead to the prediction of a new
 C<E<lt>numeric expressionE<gt>> in our example.
+
+=head2 Problem solved
+
 And now we see our problem.
 This rule is never leading to the prediction of a new
 C<E<lt>numeric expressionE<gt>>,
