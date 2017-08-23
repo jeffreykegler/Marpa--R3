@@ -534,7 +534,7 @@ and that it is expecting a 'C<+>' symbol.
 
 =head2 Why is "C<*>" not expected?
 
-Why is the recognizer <not expecting an 'C<*>' symbol?
+Why is the recognizer not expecting an 'C<*>' symbol?
 Looking back at the grammar, we see that only one rule uses
 the 'C<*>' symbol.
 Here it is as part of a prioritized rule in the DSL:
@@ -562,14 +562,16 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The next step is to look at the Earley items for this rule.
+=head2 What is happening with rule 17?
+
+The next step is to look at the Earley items for rule 17.
 But there is a problem.
 We don't find any.
 
-Next, we ask ourselves, what is the earliest place R18
+Next, we ask ourselves, what is the earliest place R17
 should be appearing?
 The answer is that
-there should be a prediction of R18 at location 0.
+there should be a prediction of R17 at location 0.
 So we look at the predictions at location 0.
 
 =for Marpa::R3::Display
@@ -587,10 +589,12 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-No R18 predicted at G1 location 0.
+No R17 predicted at G1 location 0.
 Next we look through the the entire progress report, at all G1 locations,
-to see if R18 is predicted anywhere.
-No R18.  Not anywhere.
+to see if R17 is predicted anywhere.
+No R17.  Not anywhere.
+
+=head2 What is happening with C<E<lt>numeric expressionE<gt>>?
 
 The LHS of R18 is C<E<lt>numeric expressionE<gt>>.
 We look in the progress report for dotted rules where
