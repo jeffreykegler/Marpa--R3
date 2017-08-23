@@ -553,7 +553,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Here it is from the C<productions_show()> listing:
+And here is that production as shown in the C<productions_show()> listing:
 
 =for Marpa::R3::Display
 name: SLIF debug example productions_show() output
