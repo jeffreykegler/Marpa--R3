@@ -719,13 +719,27 @@ of parses with nulled sub-trees should kept this in mind.
 
 =head2 Input string ranges
 
-G1 locations run in a monotonic sequence, starting with 0.
+Marpa allows you to move around arbitrarily in its input.
+You can back up, overlap previous input, or anything else you choose.
+
+But, by default,
+your applications moves forward continuously in the input string.
+Unless your app is specifically programmed to use Marpa's
+ability to move around arbitrarily in the input,
+you can ignore the considerations in this section.
+
+In terms of Earley sets (G1 locations) there is no problem
+if an application backtracks in the physcial input.
+G1 locations do not reflect the physical input.
+They always run in a monotonic sequence, starting with 0.
 G1 locations never run backwards, they are never visited twice,
 and they leave no gaps.
 
-Input string positions, on the other hand, can do all of these things.
-An application is allowed to jump around in the input.
-An input string position may be encountered more than once.
+L0 location ranges are more problematic.
+Specifically, when a G1 range is converted to an L0 range,
+Marpa will report the L0 locations for the first and last
+Earleys sets, ignoring what happens in between.
+
 It is quite possible to write your application so that it
 encounters, for example,
 line 42 before line 7.
@@ -734,21 +748,14 @@ line 41 to line 43.
 For that matter,
 an application does not ever have to visit any position in its input.
 
-How does Marpa deal with this when reporting input string ranges?
-Marpa always reports the minimum range that includes all the input string positions
-visited in the dotted rule.
-The range is always reported in increasing numeric order,
-even when the position at
-the end of the range was visited before the input string position
-at the beginning of the range.
-And, if necessary to include all visited input string positions, the range
-may include input string positions which were not visited.
-
-Most applications move forward continuously in the input string,
-and if yours is one of them, you don't have to worry about these issues.
-But if you do unusual things when reading the input,
-it helps to be aware of how input string ranges are reported by Marpa
-when tracing and debugging.
+Intuitively,
+this means that the range will be interpreting as the
+start and end points in the input.
+It is quite possible that, in between the start and end L0
+locations, Marpa will have traversed L0 locations before the
+start L0 location and after the end L0 location.
+The L0 range, as reported, will give no indication that this has
+happened.
 
 =head2 Multiple instances of dotted rules
 
