@@ -604,7 +604,7 @@ dotted rules where C<E<lt>numeric expressionE<gt>> is the post-dot symbol.
 There are none.
 
 Next we look for places in the progress reports where
-C<E<lt>numeric expressionE<gt>> occurs at all,
+C<E<lt>numeric expressionE<gt>> occurs anywhere on the RHS,
 whether post-dot or not.
 In the progress reports,
 C<E<lt>numeric expressionE<gt>> occurs in only two dotted rule instances.
