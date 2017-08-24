@@ -913,13 +913,11 @@ its name and other information can be found using
 L<other SLIF grammar
 methods|Marpa::R3::Scanless::G/"Accessors">.
 
-Dot position is -1 for completions,
-and 0 for predictions.
-Where the report item is not for a completion or
-a prediction, dot position is I<N>,
+Dot position is I<N>,
 where I<N> is the number of RHS symbols
 successfully recognized at the G1 location of
 the progress report.
+Dot position is 0 for predictions.
 
 Origin is the G1 location (Earley set ID)
 at which the dotted rule instance reported by
