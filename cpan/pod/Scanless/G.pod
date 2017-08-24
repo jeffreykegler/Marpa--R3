@@ -240,45 +240,57 @@ Currently, the only argument that may be changed in L<C<trace_file_handle>|/"tra
 
 =head1 Accessors
 
-=head2 rule_expand()
+TODO: Ensure all these accessors are documented:
+
+    production_dotted_show
+    production_ids_gen
+    production_length
+    production_name
+    production_show
+    symbol_ids_gen
+    symbol_name
+
+=head2 highest_production_id()
 
 =for Marpa::R3::Display
-name: SLG rule_expand() synopsis
+name: SLG highest_production_id() synopsis
 
-    my ($lhs_id, @rhs_ids) = $grammar->rule_expand($rule_id);
+    TODO
+
+=for Marpa::R3::Display::End
+
+TODO
+
+=head2 highest_symbol_id()
+
+=for Marpa::R3::Display
+name: SLG highest_symbol_id() synopsis
+
+    TODO
+
+=for Marpa::R3::Display::End
+
+TODO
+
+=head2 production_expand()
+
+=for Marpa::R3::Display
+name: SLG production_expand() synopsis
+
+    my ($lhs_id, @rhs_ids) = $grammar->production_expand($rule_id);
     $text .= "Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
 
 =for Marpa::R3::Display::End
 
-"Expands" a G1 grammar
-rule ID into symbol ID's.
+"Expands" a
+production ID into XSY ID's.
 The first and only argument,
-which is required, is the ID of the rule to be "expanded".
-An array of symbol ID's is returned.
-The ID of the LHS symbol is the first element,
-and the remaining elements are the ID's of the RHS symbols,
+which is required, is the ID of the production to be "expanded".
+An array of XSY ID's is returned.
+The ID of the LHS XSY is the first element,
+and the remaining elements are the ID's of the RHS XSYs,
 in order.
-Returns an empty array if the G1 grammar rule does not exist.
-
-=head2 l0_rule_expand()
-
-=for Marpa::R3::Display
-name: SLG l0_rule_expand() synopsis
-
-    my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
-    $text .= "L0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
-
-=for Marpa::R3::Display::End
-
-"Expands" a L0 grammar
-rule ID into symbol ID's.
-The first and only argument,
-which is required, is the ID of the rule to be "expanded".
-An array of symbol ID's is returned.
-The ID of the LHS symbol is the first element,
-and the remaining elements are the ID's of the RHS symbols,
-in order.
-Returns an empty array if the L0 grammar rule does not exist.
+Returns an empty array if the production does not exist.
 
 =head2 rule_ids()
 
@@ -291,18 +303,6 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Returns a list of the G1 grammar rule ID's as an array.
-
-=head2 l0_rule_ids()
-
-=for Marpa::R3::Display
-name: SLG l0_rule_ids() synopsis
-normalize-whitespace: 1
-
-    do_something($_) for $grammar->l0_rule_ids();
-
-=for Marpa::R3::Display::End
-
-Returns a list of the L0 grammar rule ID's as an array.
 
 =head2 rule_name()
 
@@ -334,21 +334,6 @@ Returns a string describing that rule in a form which is useful for tracing and 
 but subject to change.
 Returns a Perl undef if the rule does not exist.
 
-=head2 SLG l0_rule_show()
-
-=for Marpa::R3::Display
-name: SLG l0_rule_show() synopsis
-
-    my $rule_description = $grammar->l0_rule_show($rule_id);
-
-=for Marpa::R3::Display::End
-
-The first argument, which is required,
-is the ID of a L0 grammar rule.
-Returns a string describing that rule in a form which is useful for tracing and debugging,
-but subject to change.
-Returns a Perl undef if the rule does not exist.
-
 =head2 start_symbol_id()
 
 =for Marpa::R3::Display
@@ -373,27 +358,7 @@ name: SLG symbol_display_form() synopsis
 
 =for Marpa::R3::Display::End
 
-The first, required, argument is a G1 grammar symbol ID.
-Returns the "display form" of the symbol.
-This is the symbol in a form thought most suitable for display in messages, etc.
-Returns a Perl C<undef> if the symbol does not exist.
-
-The display form of a symbol is always defined.
-The display form of a symbol is not useable as a name -- it is not necessarily unique,
-and is subject to change.
-
-=head2 l0_symbol_display_form()
-
-=for Marpa::R3::Display
-name: SLG l0_symbol_display_form() synopsis
-
-    my $display_form = $grammar->l0_symbol_display_form( $symbol_id );
-    $text
-        .= "L0 symbol number: $symbol_id  name in display form: $display_form\n";
-
-=for Marpa::R3::Display::End
-
-The first, required, argument is an L0 grammar symbol ID.
+The first, required, argument is a symbol ID.
 Returns the "display form" of the symbol.
 This is the symbol in a form thought most suitable for display in messages, etc.
 Returns a Perl C<undef> if the symbol does not exist.
@@ -413,54 +378,12 @@ name: SLG symbol_dsl_form() synopsis
 
 =for Marpa::R3::Display::End
 
-Takes one, required, argument: a symbol ID in the G1 grammar.
+Takes one, required, argument: a symbol ID.
 The return value is the "DSL form" of the symbol.
 This is the symbol exactly as it was
 specified by the user in the SLIF DSL.
 The return value is a Perl C<undef> if the symbol does not exist,
 or if it has no DSL form.
-
-=head2 l0_symbol_dsl_form()
-
-=for Marpa::R3::Display
-name: SLG l0_symbol_dsl_form() synopsis
-
-    my $dsl_form = $grammar->l0_symbol_dsl_form( $symbol_id )
-        // '[No name in DSL form]';
-    $text .= "L0 symbol number: $symbol_id  DSL form: $dsl_form\n";
-
-=for Marpa::R3::Display::End
-
-Takes one, required, argument: a symbol ID in the L0 grammar.
-The return value is the "DSL form" of the symbol.
-This is the symbol exactly as it was
-specified by the user in the SLIF DSL.
-The return value is a Perl C<undef> if the symbol does not exist,
-or if it has no DSL form.
-
-=head2 g1_symbol_ids()
-
-=for Marpa::R3::Display
-name: SLG g1_symbol_ids() synopsis
-normalize-whitespace: 1
-
-    do_something($_) for $grammar->g1_symbol_ids();
-
-=for Marpa::R3::Display::End
-
-Returns a list of the G1 grammar symbol ID's as an array.
-
-=head2 l0_symbol_ids()
-
-=for Marpa::R3::Display
-name: SLG l0_symbol_ids() synopsis
-normalize-whitespace: 1
-
-    do_something($_) for $grammar->l0_symbol_ids();
-
-=for Marpa::R3::Display::End
-
-Returns a list of the L0 grammar symbol ID's as an array.
 
 =head2 symbol_name()
 
@@ -480,29 +403,6 @@ and a Perl C<undef> if the symbol does not exist.
 For every ISY ID, this method's return value will be defined
 and will be unique to that symbol ID.
 The return value may be an internal name,
-which is subject to change in future versions of Marpa::R3.
-
-=head2 l0_symbol_name()
-
-=for Marpa::R3::Display
-name: SLG l0_symbol_name() synopsis
-
-    my $name = $grammar->l0_symbol_name( $symbol_id );
-    $text .= "L0 symbol number: $symbol_id  name: $name\n";
-
-=for Marpa::R3::Display::End
-
-The first and only argument, which is required, is an L0 grammar
-symbol ID.
-The return value is the name of the symbol, if the symbol exists,
-and a Perl C<undef> if the symbol does not exist.
-
-For every symbol ID, this method's return value will be defined
-and will be unique to that symbol ID,
-so that it is suitable for use as a symbol name.
-If the SLIF DSL explicitly specifies a name,
-the return value is that explicitly specified name.
-Otherwise, the return value is an internal name,
 which is subject to change in future versions of Marpa::R3.
 
 =head1 Trace methods
