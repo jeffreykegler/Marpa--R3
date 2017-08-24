@@ -140,19 +140,25 @@ for my $test_data (@tests_data) {
         qq{SLIF terminals_expected()}
     );
 
-    my $g1_progress_show_output = $recce->g1_progress_show();
+# Marpa::R3::Display
+# name: Scanless progress_show() synopsis
 
-    Marpa::R3::Test::is( $g1_progress_show_output,
+    my $progress_show_output = $recce->progress_show();
+
+# Marpa::R3::Display::End
+
+    Marpa::R3::Test::is( $progress_show_output,
         <<'END_OF_EXPECTED_OUTPUT', qq{Scanless progress_show()} );
-P1 @11-11 B1L1c20 Calculation ::= . Expression
-P2 @11-11 B1L1c20 Calculation ::= . 'say' Expression
-P3 @11-11 B1L1c20 Expression ::= . Number
-P4 @11-11 B1L1c20 Expression ::= . '+' Expression Expression
-F0 @0-11 B1L1c1 Script ::= Calculation * .
-F1 @0-11 B1L1c1 Calculation ::= Expression .
-F3 @10-11 B1L1c19 Expression ::= Number .
-F4 x2 @0,6-11 B1L1c1-11 Expression ::= '+' Expression Expression .
-F5 @0-11 B1L1c1 [:start:] ::= Script .
+=== Earley set 11 at B1L1c20 ===
+P2 B1L1c20 Calculation ::= . Expression
+P3 B1L1c20 Calculation ::= . 'say' Expression
+P4 B1L1c20 Expression ::= . Number
+P5 B1L1c20 Expression ::= . '+' Expression Expression
+F1 B1L1c1 [:start:] ::= Script .
+F2 B1L1c1 Calculation ::= Expression .
+F4 B1L1c19 Expression ::= Number .
+F5 x2 B1L1c1-11 Expression ::= '+' Expression Expression .
+F6 B1L1c1 Script ::= Calculation . *
 END_OF_EXPECTED_OUTPUT
 
     Marpa::R3::Test::is( $actual_value, $expected_value,
