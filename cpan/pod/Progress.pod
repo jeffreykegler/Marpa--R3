@@ -948,8 +948,8 @@ However, to create a progress report every potential right recursion must
 be fully unfolded, and at each G1 location the number of these grows linearly with the length
 of the recursion.
 If you are creating progress reports for more than a limited number of G1 locations,
-this means processing that can be quadratic in the length of the recursion.
-When a right recursion is lengthy, the impact on speed can be be very serious.
+this means processing that can become quadratic in the length of the recursion.
+When a right recursion is lengthy, the cost in processing time can be serious.
 
 If lengthy right recursions are being expanded,
 this will be evident
@@ -958,7 +958,7 @@ which will contain one report item
 for every completion in the right-recursive
 chain of completions.
 Note that the efficiency consideration just mentioned
-for following right recursions
+for expanding right recursions
 is never an issue for left recursions.
 Left recursions only produce at most two report
 items per G1 location
