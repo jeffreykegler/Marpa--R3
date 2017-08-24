@@ -740,15 +740,13 @@ In Marpa, it is always true that
 
 =item *
 
-It is always true that
-the first location in an input string range is the first character in L0 location
+The first location in an input string range is the first character in L0 location
 order.
 (L0 location order is intrablock location within block number.)
 
 =item *
 
-It is always true that
-the last location in an input string range is the last character in L0 location
+The last location in an input string range is the last character in L0 location
 order.
 
 =back
