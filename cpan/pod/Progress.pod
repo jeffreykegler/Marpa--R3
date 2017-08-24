@@ -719,47 +719,50 @@ of parses with nulled sub-trees should kept this in mind.
 
 =head2 Input string ranges
 
-Marpa allows you to move around arbitrarily in its input.
-You can back up, overlap previous input, or anything else you choose.
+By default,
+Marpa moves forward continuously in the input string.
+But Marpa applications
+have the option
+to move around arbitrarily in the input.
+Those using the default behavior
+can ignore the considerations in the rest of this section.
 
-But, by default,
-your application moves forward continuously in the input string.
-Unless your app is specifically programmed to use Marpa's
-ability to move around arbitrarily in the input,
-you can ignore the considerations in the rest of this section.
+For the others,
+Marpa allow apps to move around arbitrarily in its input.
+Apps can organize the input into blocks,
+which they can visit in any order or not at all.
+Within blocks apps are free to jump around arbitarily
+in the input.
 
-In terms of Earley sets (G1 locations) there is no problem
-if an application backtracks in the physical input.
-G1 locations do not reflect the physical input.
-They always run in a monotonic sequence, starting with 0.
-G1 locations never run backwards, they are never visited twice,
-and they leave no gaps.
+When using the default behavior,
 
-L0 location ranges are more problematic.
-It is quite possible to write your application so that it
-encounters, for example,
-line 42 before line 7.
-And your application does not have to visit line 42 on its way from
-line 41 to line 43.
-For that matter,
-an application does not ever have to visit any position in its input.
+=over 4
 
-The rule is as follows:
-The start of an L0 range is the first location
-traversed.
-The end of an L0 range is the last location
-traversed.
+=item 1)
+The first location in an input string range is the first character in L0 location
+order.
+(L0 location order is intrablock location within block number.)
 
-This means that an L0 range is all about the end points.
-In reporting an L0 range,
-Marpa ignores whatever happens in between the first and last
-L0 locations.
+=item 2)
+The last location in an input string range is the last character in L0 location
+order.
 
-It is quite possible that, in between the start and end L0
-locations, Marpa will have traversed L0 locations before the
-start L0 location and after the end L0 location.
-The L0 range, as reported, will give no indication that this has
-happened.
+=item 3)
+The first character in an input string range is the first one traversed,
+
+=item 4)
+The last character in an input string range is the last one traversed, and
+
+=item 5)
+Every character in an input string range is traversed in L0 location order.
+
+=item 6)
+Every character traversed is traversed in L0 location order.
+
+=back
+
+If you are not using the default behavior, you can only rely on
+1) and 2) being true.
 
 =head2 Multiple instances of dotted rules
 
