@@ -798,7 +798,7 @@ name: SLIF Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
-    F11 x12 B1L1c1-L2c36 <plain assignment> ::= 'x' '=' expression .
+    F6 x12 B1L1c1-L2c36 assignment ::= <plain assignment> .
 
 =for Marpa::R3::Display::End
 
@@ -807,7 +807,7 @@ name: SLIF Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
-    F6 x12 B1L1c1-L2c36 assignment ::= <plain assignment> .
+    F11 x12 B1L1c1-L2c36 <plain assignment> ::= 'x' '=' expression .
 
 =for Marpa::R3::Display::End
 
