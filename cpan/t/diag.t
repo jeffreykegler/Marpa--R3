@@ -140,12 +140,7 @@ for my $test_data (@tests_data) {
         qq{SLIF terminals_expected()}
     );
 
-# Marpa::R3::Display
-# name: Scanless g1_progress_show() synopsis
-
     my $g1_progress_show_output = $recce->g1_progress_show();
-
-# Marpa::R3::Display::End
 
     Marpa::R3::Test::is( $g1_progress_show_output,
         <<'END_OF_EXPECTED_OUTPUT', qq{Scanless progress_show()} );
@@ -367,22 +362,22 @@ Accepted lexeme B1L1c19 e11: Number; value="4"
 END_OF_OUTPUT
 
     my $expected_progress_output = [
-        [ 0, -1, 0 ],
-        [ 1, -1, 0 ],
-        [ 3, -1, 10 ],
-        [ 4, -1, 0 ],
-        [ 4, -1, 6 ],
-        [ 5, -1, 0 ],
-        [ 1, 0,  11 ],
-        [ 2, 0,  11 ],
-        [ 3, 0,  11 ],
-        [ 4, 0,  11 ],
+        [ 1, 1, 0 ],
+        [ 2, 0, 11 ],
+        [ 2, 1, 0 ],
+        [ 3, 0, 11 ],
+        [ 4, 0, 11 ],
+        [ 4, 1, 10 ],
+        [ 5, 0, 11 ],
+        [ 5, 3, 0 ],
+        [ 5, 3, 6 ],
+        [ 6, 1, 0 ]
     ];
 
 # Marpa::R3::Display
 # name: Scanless progress() synopsis
 
-    my $progress_output = $recce->g1_progress();
+    my $progress_output = $recce->progress();
 
 # Marpa::R3::Display::End
 

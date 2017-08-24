@@ -1992,12 +1992,7 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG l0_rule_show() synopsis
-
     my $rule_description = $grammar->l0_rule_show($rule_id);
-
-# Marpa::R3::Display::End
 
     if (not defined $rule_description) {
         $text .= "[No such rule, ID #$rule_id]\n";
@@ -2163,12 +2158,7 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG l0_rule_show() diag form synopsis
-
     my $rule_description = $grammar->l0_rule_show( $rule_id, { diag => 1 } );
-
-# Marpa::R3::Display::End
 
     if (not defined $rule_description) {
         $text .= "[No such rule, ID #$rule_id]\n";
