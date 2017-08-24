@@ -1270,9 +1270,10 @@ remove-blank-last-line: 1
 
 =head2 productions_show() output
 
-This is the G1 portion of the C<productions_show()> output at verbosity level 3.
-In ordinary work, you'd use verbosity level 1 (the default),
-but the more verbose output is included here to illustrate the example.
+This is the C<productions_show()> output at verbosity level 3.
+Usually you would use verbosity level 1 (the default),
+particularly at first.
+But the more verbose output is included here for illustration.
 
 =for Marpa::R3::Display
 name: SLIF debug example productions_show() output
