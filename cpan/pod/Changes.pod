@@ -182,34 +182,29 @@ removed in Marpa::R3.
 TODO -- this section needs to be rewritten for
 the mitosis.
 
-New methods have been added as accessors for
-G1 and L0 grammars:
+Current R3 SLG methods to be documented:
 
-=over 4
-
-=item * C<Marpa::R2::Scanless::G::g1_symbol_name()>
-
-=item * C<Marpa::R2::Scanless::G::l0_symbol_dsl_form()>
-
-=item * C<Marpa::R2::Scanless::G::l0_rule_expand()>
-
-=item * C<Marpa::R2::Scanless::G::l0_rule_ids()>
-
-=item * C<Marpa::R2::Scanless::G::l0_rule_show()>
-
-=item * C<Marpa::R2::Scanless::G::l0_symbol_display_form()>
-
-=item * C<Marpa::R2::Scanless::G::l0_symbol_ids()>
-
-=item * C<Marpa::R2::Scanless::G::l0_symbol_name()>
-
-=item * C<Marpa::R2::Scanless::G::l0_show_rules()>
-
-=item * C<Marpa::R2::Scanless::G::l0_show_symbols()>
-
-=back
+    highest_production_id
+    highest_symbol_id
+    new
+    production_dotted_show
+    production_expand
+    production_ids_gen
+    production_length
+    production_name
+    production_show
+    productions_show
+    set
+    start_symbol_id
+    symbol_display_form
+    symbol_dsl_form
+    symbol_ids_gen
+    symbol_name
+    symbols_show
 
 =head2 Marpa::R2::Scanless::G methods removed in Marpa::R3
+
+TODO: Update this based on difference between R2 and R3.
 
 The
 C<Marpa::R2::Scanless::G::g0_rule()> method,
@@ -225,6 +220,8 @@ C<Marpa::R2::Scanless::G::symbol_description()> method
 has been removed.
 
 =head2 Marpa::R2::Scanless::G methods changed in Marpa::R3
+
+TODO: Update this.
 
 The following methods have been changed:
 
