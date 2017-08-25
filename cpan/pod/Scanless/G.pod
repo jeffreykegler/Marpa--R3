@@ -244,7 +244,6 @@ TODO: Ensure all these accessors are documented:
 
     production_length
     symbol_ids_gen
-    symbol_name
 
 =head2 highest_production_id()
 
@@ -330,13 +329,13 @@ instead of a Perl false, because a numeric 0 is a Perl false.
 
 =head2 production_name()
 
-# Marpa::R3::Display
-# name: SLG production_name() example
+=for Marpa::R3::Display
+name: SLG production_name() example
 
     push @production_names, $grammar->production_name($_)
       for 1 .. $grammar->highest_production_id();
 
-# Marpa::R3::Display::End
+=for Marpa::R3::Display::End
 
 Given a production ID, returns the production name.
 A production name is as defined by
@@ -348,20 +347,20 @@ Production names are not necessarily unique.
 
 =head2 production_show()
 
-# Marpa::R3::Display
-# name: SLG production_show() synopsis
+=for Marpa::R3::Display
+name: SLG production_show() synopsis
 
     my $production_description = $grammar->production_show($prid);
 
-# Marpa::R3::Display::End
+=for Marpa::R3::Display::End
 
-# Marpa::R3::Display
-# name: SLG production_show() diag form synopsis
+=for Marpa::R3::Display
+name: SLG production_show() diag form synopsis
 
     my $production_description =
       $grammar->production_show( $prid, { diag => 1 } );
 
-# Marpa::R3::Display::End
+=for Marpa::R3::Display::End
 
 The first argument, which is required,
 is the ID of a production.
@@ -423,10 +422,10 @@ or if it has no DSL form.
 =head2 symbol_name()
 
 =for Marpa::R3::Display
-name: SLG g1_symbol_name() synopsis
+name: SLG symbol_name() synopsis
 
-    my $name = $grammar->g1_symbol_name($symbol_id);
-    $text .= "symbol number: $symbol_id  name: $name\n";
+    my $name = $grammar->symbol_name($symbol_id);
+    $text .= "symbol number: $symbol_id; name: $name\n";
 
 =for Marpa::R3::Display::End
 
