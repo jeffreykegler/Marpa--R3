@@ -242,11 +242,7 @@ Currently, the only argument that may be changed in L<C<trace_file_handle>|/"tra
 
 TODO: Ensure all these accessors are documented:
 
-    production_dotted_show
-    production_ids_gen
     production_length
-    production_name
-    production_show
     symbol_ids_gen
     symbol_name
 
@@ -265,6 +261,17 @@ TODO
 
 =for Marpa::R3::Display
 name: SLG highest_symbol_id() synopsis
+
+    TODO
+
+=for Marpa::R3::Display::End
+
+TODO
+
+=head2 production_dotted_show()
+
+=for Marpa::R3::Display
+name: SLG production_dotted_show() synopsis
 
     TODO
 
@@ -292,47 +299,75 @@ and the remaining elements are the ID's of the RHS XSYs,
 in order.
 Returns an empty array if the production does not exist.
 
-=head2 rule_ids()
+=head2 production_ids_gen()
 
 =for Marpa::R3::Display
-name: SLG rule_ids() synopsis
+name: SLG production_ids_gen() synopsis
 normalize-whitespace: 1
 
-    do_something($_) for $grammar->rule_ids();
+    for (
+        my $iter = $grammar->production_ids_gen() ;
+        defined( my $prid = $iter->() ) ;
+      )
+    {
+        do_something($prid);
+    }
+
 
 =for Marpa::R3::Display::End
 
-Returns a list of the G1 grammar rule ID's as an array.
+Returns an iterator function for the production IDs,
+suitable for looping through them.
+More specifically,
+every call of C<production_ids_gen()> returns
+either a valid production ID or a Perl C<undef>.
+An iterator never returns the same production ID twice.
+Once an iterator has returned every possible production ID,
+it returns a Perl C<undef>.
 
-=head2 rule_name()
+Note that applications should test specifically for Perl C<undef>
+instead of a Perl false, because a numeric 0 is a Perl false.
 
-=for Marpa::R3::Display
-name: $grammar->rule_name() example
+=head2 production_name()
 
-    push @rule_names, $grammar->rule_name($_) for $grammar->rule_ids();
+# Marpa::R3::Display
+# name: SLG production_name() example
 
-=for Marpa::R3::Display::End
+    push @production_names, $grammar->production_name($_)
+      for 1 .. $grammar->highest_production_id();
 
-Given a G1 rule ID, returns the rule name.
-A rule name is as defined by
+# Marpa::R3::Display::End
+
+Given a production ID, returns the production name.
+A production name is as defined by
 L<the C<name> adverb|Marpa::R3::Scanless::DSL/"name">.
-If no rule name was defined, the rule name is the name of
+If no production name was defined,
+the production name is the name of
 the LHS symbol.
+Production names are not necessarily unique.
 
-=head2 rule_show()
+=head2 production_show()
 
-=for Marpa::R3::Display
-name: SLG rule_show() synopsis
+# Marpa::R3::Display
+# name: SLG production_show() synopsis
 
-    my $rule_description = $grammar->rule_show($rule_id);
+    my $production_description = $grammar->production_show($prid);
 
-=for Marpa::R3::Display::End
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLG production_show() diag form synopsis
+
+    my $production_description =
+      $grammar->production_show( $prid, { diag => 1 } );
+
+# Marpa::R3::Display::End
 
 The first argument, which is required,
-is the ID of a G1 grammar rule.
-Returns a string describing that rule in a form which is useful for tracing and debugging,
+is the ID of a production.
+Returns a string describing that production in a form which is useful for tracing and debugging,
 but subject to change.
-Returns a Perl undef if the rule does not exist.
+Returns a Perl C<undef> if the production does not exist.
 
 =head2 start_symbol_id()
 

@@ -693,7 +693,7 @@ my $start_id;
     my @production_names = ();
 
 # Marpa::R3::Display
-# name: $grammar->production_name() example
+# name: SLG production_name() example
 
     push @production_names, $grammar->production_name($_)
       for 1 .. $grammar->highest_production_id();
