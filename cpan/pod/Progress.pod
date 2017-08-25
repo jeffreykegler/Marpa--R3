@@ -47,7 +47,7 @@ and of what the information in them means.
 Everything that the user needs to know
 is explained in this section.
 
-=head2 Dotted rules
+=head2 Dotted productions
 
 Marpa is based on Jay Earley's algorithm for parsing.
 The idea behind Earley's algorithm is that you can
@@ -74,34 +74,34 @@ three symbols.
 Within a production, position relative to the symbols of the production
 is traditionally indicated with a dot.  In fact, the symbol-relative
 production position is very often called the B<dot location>.  Taken as
-a pair, a production and a dot location are called a B<dotted rule>.
+a pair, a production and a dot location are called a B<dotted production>.
 
 Here's our rule with a dot location indicated:
 
 S<C<E<nbsp>E<nbsp>E<nbsp>E<nbsp>termbinop -E<gt> E<middot> term ASSIGNOP term>>
 
-The dot location in this dotted rule is at the beginning.
-A dot location at the beginning of a dotted rule means
+The dot location in this dotted production is at the beginning.
+A dot location at the beginning of a dotted production means
 that we have not recognized any symbols in the rule yet.
 All we are doing is predicting that the production will occur.
-A dotted rule with the dot before all of its symbols is called a B<prediction>
+A dotted production with the dot before all of its symbols is called a B<prediction>
 a B<predicted production>,
 or a B<predicted rule>,
 .
 
-Here's another dotted rule:
+Here's another dotted production:
 
 S<C<E<nbsp>E<nbsp>E<nbsp>E<nbsp>termbinop -E<gt> term E<middot> ASSIGNOP term>>
 
-In this dotted rule,
+In this dotted production,
 we are saying we have seen a C<term>, but have not yet recognized
 an C<ASSIGNOP>.
 
-There's another special kind of dotted rule, a completion.
+There's another special kind of dotted production, a completion.
 A B<completion> (also called a B<completed rule>
 or a B<completed production>
 )
-is a dotted rule with the dot after all of the symbols.
+is a dotted production with the dot after all of the symbols.
 Here is the completion for the production that we have been using as an example:
 
 S<C<E<nbsp>E<nbsp>E<nbsp>E<nbsp>termbinop -E<gt> term ASSIGNOP term E<middot>>>
@@ -110,16 +110,16 @@ A completion indicates that a production has been fully recognized.
 
 =head2 Earley items
 
-The dotted rules contain
+The dotted productions contain
 all but one piece of the information
 that Marpa
 needs to track.
 The missing piece is the second of the two "wheres": where in the input stream.
-To associate input stream location and dotted rules, Marpa uses what are now called Earley items.
+To associate input stream location and dotted productions, Marpa uses what are now called Earley items.
 
 A convenient way to think of an B<Earley item> is as a triple, or 3-tuple,
-consisting of dotted rule, origin and current location.
-The B<origin> is the location in the input stream where the dotted rule starts.
+consisting of dotted production, origin and current location.
+The B<origin> is the location in the input stream where the dotted production starts.
 The B<current location> (also called the B<dot location>)
 is the location in the input stream which corresponds to the
 dot position.
@@ -144,13 +144,13 @@ follow from the way in which origin and current location are defined.
 
 =item 1.
 
-If a dotted rule is a prediction,
+If a dotted production is a prediction,
 then origin and current location will always be the same.
 
 =item 2.
 
 The input stream location where a production ends is not tracked unless the
-dotted rule is a completion.
+dotted production is a completion.
 In other cases,
 an Earley item does not tell us
 if a production will
@@ -451,22 +451,22 @@ The rule number is a convenient and very brief way to refer to a rule.
 After the rule tag
 will be one or two fields
 of location information.
-If there are multiple origins for the dotted rule,
+If there are multiple origins for the dotted production,
 there will be two fields of location information.
 In the example just above there is only one field
 of location information: "C<B1L1c1>".
 This indicates that
-the dotted rule has only one origin,
+the dotted production has only one origin,
 and that that origin is at line 1, column 1
 of block 1.
 Examples of report lines with multiple origins will be given
-L<below|/"Multiple instances of dotted rules">.
+L<below|/"Multiple instances of dotted productions">.
 
 The last field of
 each progress report line shows,
 in fully expanded form,
-the dotted rule we were working on.
-In the line just above, the fully expanded dotted rule
+the dotted production we were working on.
+In the line just above, the fully expanded dotted production
 is "C<[:start:] ::= statements .>".
 
 Notice that
@@ -601,16 +601,16 @@ No R17.  Not anywhere.
 =head2 Where is C<E<lt>numeric expressionE<gt>> expected?
 
 The LHS of R17 is C<E<lt>numeric expressionE<gt>>.
-We look in the progress report for dotted rules where
+We look in the progress report for dotted productions where
 C<E<lt>numeric expressionE<gt>> is expected -- that is,
-dotted rules where C<E<lt>numeric expressionE<gt>> is the post-dot symbol.
+dotted productions where C<E<lt>numeric expressionE<gt>> is the post-dot symbol.
 There are none.
 
 Next we look for places in the progress reports where
 C<E<lt>numeric expressionE<gt>> occurs anywhere on the RHS,
 whether post-dot or not.
 In the progress reports,
-C<E<lt>numeric expressionE<gt>> occurs in only two dotted rule instances.
+C<E<lt>numeric expressionE<gt>> occurs in only two dotted production instances.
 Here they are:
 
 =for Marpa::R3::Display
@@ -776,10 +776,10 @@ Every character traversed is traversed in L0 location order.
 
 =back
 
-=head2 Multiple instances of dotted rules
+=head2 Multiple instances of dotted productions
 
 It does not happen in our main example for this document,
-but a dotted rule can appear in the same Earley set
+but a dotted production can appear in the same Earley set
 more than once.
 In fact, this happens frequently.
 When it does happen, the lines in the progress report will look like these
@@ -821,7 +821,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 All of these report lines are for a single Earley set.
-They report dotted rules from
+They report dotted productions from
 an indirect right recursion, one that recurses from
 a C<E<lt>plain assignmentE<gt>> symbol to
 an  C<E<lt>expressionE<gt>> symbol, and then to
@@ -834,22 +834,22 @@ In these examples,
 the second field is variously
 "C<x2>", "C<x12>" or "C<x20>".
 These fields are counts,
-indicating the number of instances of that dotted rule in
+indicating the number of instances of that dotted production in
 its Earley set -- in this case, that there are, respectively,
-2, 12 and 20 instances of the reported dotted rule.
+2, 12 and 20 instances of the reported dotted production.
 
-Every dotted rule instance is in the same Earley set,
+Every dotted production instance is in the same Earley set,
 that is, has the same G1 location.
-Within an Earley set, an instance of the same dotted rule differs
-for another instance of the same dotted rule
+Within an Earley set, an instance of the same dotted production differs
+for another instance of the same dotted production
 only in its origin.
 
-The origin of a dotted rule instance is the location where it begins.
+The origin of a dotted production instance is the location where it begins.
 Within an Earley set
-the instances of a single dotted rule may have many different origins --
+the instances of a single dotted production may have many different origins --
 hundreds or even more.
 
-Each instance of a dotted rule
+Each instance of a dotted production
 will have its own origin in the input string.
 The input string range will include them all.
 
@@ -920,7 +920,7 @@ the progress report.
 Dot position is 0 for predictions.
 
 Origin is the G1 location (Earley set ID)
-at which the dotted rule instance reported by
+at which the dotted production instance reported by
 the report item began.
 For a prediction, origin will always be
 the same as the G1 location of the parse report.
