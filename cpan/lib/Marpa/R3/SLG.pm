@@ -1520,6 +1520,21 @@ END_OF_CODE
     return $retour;
 }
 
+sub Marpa::R3::Scanless::G::symbol_show {
+    my ($slg, $xsyid, $options) = @_;
+    my $verbose = $options->{verbose} or 0;
+    my $diag = $options->{diag} ? 1 : 0;
+    my $tag = '@' . __FILE__ . ':' .  __LINE__;
+    my $code = <<'END_OF_CODE';
+    local slg, xsyid, verbose, diag = ...
+    diag = diag ~= 0 -- convert diag to a boolean
+    return slg:symbol_show(xsyid, { verbose = verbose, diag = diag })
+END_OF_CODE
+    my ($retour) = $slg->call_by_tag($tag, $code, 'iii',
+        $xsyid, $verbose, $diag);
+    return $retour;
+}
+
 sub Marpa::R3::Scanless::G::lmg_rule_show {
     my ($slg, $subg, $irlid, $options) = @_;
     my $verbose = $options->{verbose} or 0;

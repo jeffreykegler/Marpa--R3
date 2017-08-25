@@ -990,26 +990,39 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.symbol_show(slg, symbol_id, verbose)
+        local symbol_id = math.tointeger(symbol_id)
+        local max_symbol_id = #slg.xsys
+        if not symbol_id or symbol_id < 1 or symbol_id > max_symbol_id then
+            error(string.format('slg:symbol_show(): symbol_id is %s; must be an integer from 1 to %d',
+                inspect(symbol_id, {depth = 1}),
+                max_symbol_id
+            ))
+        end
+        local pieces = { }
+        pieces[#pieces+1] = table.concat (
+            { 'S' .. symbol_id, slg:symbol_display_form( symbol_id ) },
+            " ")
+        pieces[#pieces+1] = "\n"
+        if verbose >= 2 then
+            pieces[#pieces+1] =  "  Canonical name: "
+            pieces[#pieces+1] =  symbol_diag_form(slg:symbol_name(symbol_id))
+            pieces[#pieces+1] =  "\n"
+        end
+        if verbose >= 3 then
+            local dsl_form =  slg:symbol_dsl_form( symbol_id )
+            if dsl_form then
+                pieces[#pieces+1] =  '  DSL name: '
+                pieces[#pieces+1] =  dsl_form
+                pieces[#pieces+1] =  "\n"
+            end
+        end
+        return table.concat(pieces)
+    end
     function _M.class_slg.symbols_show(slg, verbose)
         local pieces = { }
         for symbol_id = 1, slg:highest_symbol_id() do
-            pieces[#pieces+1] = table.concat (
-                { 'S' .. symbol_id, slg:symbol_display_form( symbol_id ) },
-                " ")
-            pieces[#pieces+1] = "\n"
-            if verbose >= 2 then
-                pieces[#pieces+1] =  "  Canonical name: "
-                pieces[#pieces+1] =  symbol_diag_form(slg:symbol_name(symbol_id))
-                pieces[#pieces+1] =  "\n"
-            end
-            if verbose >= 3 then
-                local dsl_form =  slg:symbol_dsl_form( symbol_id )
-                if dsl_form then
-                    pieces[#pieces+1] =  '  DSL name: '
-                    pieces[#pieces+1] =  dsl_form
-                    pieces[#pieces+1] =  "\n"
-                end
-            end
+            pieces[#pieces+1] = slg:symbol_show(symbol_id, verbose)
         end
         return table.concat(pieces)
     end
