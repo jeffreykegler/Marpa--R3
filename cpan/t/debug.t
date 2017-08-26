@@ -545,7 +545,12 @@ R45 [:discard:] ~ whitespace
 R46 whitespace ~ [\s] +
 END_OF_OUTPUT
 
+# Marpa::R3::Display
+# name: SLG productions_show() verbose synopsis
+
 $productions_show_output = $grammar->productions_show( { verbose => 3 } );
+
+# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLIF debug example productions_show() output
@@ -1103,7 +1108,12 @@ S39 variable
 S40 whitespace
 END_OF_SHOW_SYMBOLS_OUTPUT
 
-$symbols_show_output = $grammar->symbols_show({ verbose => 3 });
+# Marpa::R3::Display
+# name: SLG symbols_show() verbose synopsis
+
+$symbols_show_output = $grammar->symbols_show( { verbose => 3 } );
+
+# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLIF debug example symbols_show() output

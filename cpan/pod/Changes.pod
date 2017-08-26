@@ -38,25 +38,6 @@ C<< $slr->events() >> method is severely deprecated
 as of the writing.
 and will soon be eliminated.
 
-=head2 External and internal symbols
-
-In Marpa::R3, there is greater use of grammar rewriting,
-and therefore a division between external (pre-rewrite)
-symbols and internal (post-rewrite) symbols.  In R2, these
-were essentially the same, but in R3 they will be quite
-different.
-
-In R3, the user will, most of the time, work in terms
-of external symbols (XSYs),
-and will not need to deal with internal symbols (ISYs).
-But there will be exceptions.
-
-At the point the C<< $grammar->symbol_name() >> method
-is in terms of XSYs.
-A C<< $grammar->g1_symbol_name() >> is
-equivalent to Marpa::R2's 
-C<< $grammar->symbol_name() >> method.
-
 =head2 Multiple C<< slr->read() >> calls allowed
 
 The C<< slr->read() >> method may now called multiple
@@ -177,82 +158,16 @@ of Marpa::R2::Scanless::G named arguments
 have been
 removed in Marpa::R3.
 
-=head2 New Marpa::R3::Scanless::G methods
+=head2 Marpa::R3::Scanless::G Accessors completely different
 
-TODO -- this section needs to be rewritten for
-the mitosis.
-
-Current R3 SLG methods to be documented:
-
-    highest_production_id
-    highest_symbol_id
-    new
-    production_dotted_show
-    production_expand
-    production_ids_gen
-    production_length
-    production_name
-    production_show
-    productions_show
-    set
-    start_symbol_id
-    symbol_display_form
-    symbol_dsl_form
-    symbol_ids_gen
-    symbol_name
-    symbols_show
-
-=head2 Marpa::R2::Scanless::G methods removed in Marpa::R3
-
-TODO: Update this based on difference between R2 and R3.
-
-The
-C<Marpa::R2::Scanless::G::g0_rule()> method,
-the C<Marpa::R2::Scanless::G::g0_rule_ids()> method,
-the C<Marpa::R2::Scanless::G::g1_rule_ids()> method,
-and
-the C<Marpa::R2::Scanless::G::rule()> method,
-discouraged in Marpa::R2,
-have been eliminated in Marpa::R3.
-
-The
-C<Marpa::R2::Scanless::G::symbol_description()> method
-has been removed.
-
-=head2 Marpa::R2::Scanless::G methods changed in Marpa::R3
-
-TODO: Update this.
-
-The following methods have been changed:
-
-=over 4
-
-=item * C<Marpa::R2::Scanless::G::symbol_dsl_form()>
-
-=item * C<Marpa::R2::Scanless::G::rule_expand()>
-
-=item * C<Marpa::R2::Scanless::G::rule_ids()>
-
-=item * C<Marpa::R2::Scanless::G::rule_show()>
-
-=item * C<Marpa::R2::Scanless::G::symbol_display_form()>
-
-=item * C<Marpa::R2::Scanless::G::symbol_ids()>
-
-=item * C<Marpa::R2::Scanless::G::symbol_name()>
-
-=item * C<Marpa::R2::Scanless::G::show_rules()>
-
-=item * C<Marpa::R2::Scanless::G::show_symbols()>
-
-=back
-
-They no longer take an argument indicating the subgrammar --
-instead they always return the results for the G1 grammar.
-New methods have been added to return the results for the L0
-grammar.
-For these, see
-L</"New Marpa::R3::Scanless::G methods">.
+The grammar accessors changed between Marpa::R2
+and Marpa::R3.
+The changes are so massive that
+any summary of the changes
+to the SLG accessors
+would be essentially be a repetition of
+L<their
+documentation|Marpa::R3::Scanless::G/"Accessors">.
 
 =head2 Marpa::R2::Scanless::R methods renamed in Marpa::R3
 

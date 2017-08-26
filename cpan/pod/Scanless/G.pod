@@ -426,20 +426,38 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=for Marpa::R3::Display
+name: SLG productions_show() verbose synopsis
+partial: 1
+normalize-whitespace: 1
+
+    $productions_show_output = $grammar->productions_show( { verbose => 3 } );
+
+=for Marpa::R3::Display::End
+
 The C<productions_show()> method returns a description of
-the external rules.
+the grammar's productions.
 It is useful for understanding the rules as they
 appear in trace and debugging outputs.
-To allow for improvements in Marpa::R3,
-the output of C<productions_show()> is subject to change.
 
-The first optional argument can be a numeric verbosity level.
+Argument 1 (optional):
+The only argument is a hash whose keys are
+named arguments and whose values are the values
+of the corresponding named argument.
+Currently there is only one named argument,
+C<verbose>, whose value is a verbosity level.
+Verbosity level must be an integer.
+
 The default verbosity is 1, which is adequate for
 most purposes.
 A verbosity of 2 prints additional information useful
 for those new to SLIF tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
+
+Return value: A description of the grammar's productions.
+To allow for improvements in Marpa::R3,
+the output of C<productions_show()> is subject to change.
 
 =head2 start_symbol_id()
 
@@ -563,15 +581,27 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The first and only argument,
-which is optional,
-is a numeric verbosity level.
-The return value is a descripton of
-the symbols for the G1 grammar.
+=for Marpa::R3::Display
+name: SLG symbols_show() verbose synopsis
+partial: 1
+normalize-whitespace: 1
+
+    $symbols_show_output = $grammar->symbols_show( { verbose => 3 } );
+
+=for Marpa::R3::Display::End
+
+The C<symbols_show()> method returns a description of
+the grammar's symbols.
 It is useful for understanding the symbols as they
 appear in trace and debugging outputs.
-To allow for improvements in Marpa::R3,
-the output of C<symbols_show()> is subject to change.
+
+Argument 1 (optional):
+The only argument is a hash whose keys are
+named arguments and whose values are the values
+of the corresponding named argument.
+Currently there is only one named argument,
+C<verbose>, whose value is a verbosity level.
+Verbosity level must be an integer.
 
 The default verbosity is 1, which is adequate for
 most purposes.
@@ -579,6 +609,10 @@ A verbosity of 2 prints additional information useful
 for those new to SLIF tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
+
+Return value: A description of the grammar's symbols.
+To allow for improvements in Marpa::R3,
+the output of C<symbols_show()> is subject to change.
 
 =head1 COPYRIGHT AND LICENSE
 
