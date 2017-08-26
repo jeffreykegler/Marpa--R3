@@ -129,8 +129,7 @@ on parse order|Marpa::R3::Semantics::Order>.
 =head2 rejection
 
 The C<rejection> grammar setting
-determines what happens when all tokens are rejected by the
-G1 parser.
+determines what happens when all tokens are rejected.
 The value must be either "C<fatal>"
 or "C<event>".
 "C<fatal>" is the default.
@@ -263,8 +262,7 @@ numerically, the highest.
 For the purpose of writing loops over
 all of the production IDs, you
 will usually prefer
-L<production_ids_gen()|
-/"production_ids_gen()">.
+L<production_ids_gen()|/"production_ids_gen()">.
 
 If you do write your own loop,
 remember that the lowest possible production ID 
@@ -291,8 +289,7 @@ numerically, the highest.
 For the purpose of writing loops over
 all of the symbol IDs, you
 will usually prefer
-L<symbol_ids_gen()|
-/"symbol_ids_gen()">.
+L<symbol_ids_gen()|/"symbol_ids_gen()">.
 
 If you do write your own loop,
 remember that the lowest possible symbol ID 
@@ -310,6 +307,9 @@ name: SLG production_dotted_show() synopsis
       $grammar->production_dotted_show( $production_id, $dot_position ) . "\n";
 
 =for Marpa::R3::Display::End
+
+Returns a string showing the dotted production 
+which for C<$production_id> and C<$dot_position>.
 
 Argument 1 (reguired): A production ID.
 
