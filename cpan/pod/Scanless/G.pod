@@ -266,9 +266,8 @@ Returns the production ID that is,
 numerically, the highest.
 For the purpose of writing loops over
 all of the production IDs, you
-will usually prefer
+may prefer
 L<production_ids_gen()|/"production_ids_gen()">.
-
 The lowest production ID 
 is always 1.
 Any production ID between the lowest and the highest production ID,
@@ -292,7 +291,7 @@ Returns the symbol ID that is,
 numerically, the highest.
 For the purpose of writing loops over
 all of the symbol IDs, you
-will usually prefer
+may prefer
 L<symbol_ids_gen()|/"symbol_ids_gen()">.
 The lowest symbol ID 
 is always 1.
@@ -337,7 +336,7 @@ name: SLG production_expand() synopsis
 production ID into symbol ID's.
 
 Argument 1 (required):
-The only argument is the ID of the production to be "expanded".
+The only argument is the ID of the production to be expanded.
 
 Return value: An array of symbol ID's is returned.
 The ID of the LHS symbol is the first element,
@@ -363,10 +362,10 @@ normalize-whitespace: 1
 
 Returns an iterator function for the production IDs,
 suitable for looping through them.
-More specifically,
-every call of C<production_ids_gen()> returns
-either a valid production ID or a Perl C<undef>.
-An iterator never returns the same production ID twice.
+The first call of the iterator returns the first production ID.
+Successive calls return the other production IDs,
+in numberic order.
+The iterator never returns the same production ID twice.
 Once an iterator has returned every possible production ID,
 it returns a Perl C<undef>.
 
@@ -529,10 +528,10 @@ normalize-whitespace: 1
 
 Returns an iterator function for the symbol IDs,
 suitable for looping through them.
-More specifically,
-every call of C<symbol_ids_gen()> returns
-either a valid symbol ID or a Perl C<undef>.
-An iterator never returns the same symbol ID twice.
+The first call of the iterator returns the first symbol ID.
+Successive calls return the other symbol IDs,
+in numberic order.
+The iterator never returns the same symbol ID twice.
 Once an iterator has returned every possible symbol ID,
 it returns a Perl C<undef>.
 
