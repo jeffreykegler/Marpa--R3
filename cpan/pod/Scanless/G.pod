@@ -364,7 +364,7 @@ Returns an iterator function for the production IDs,
 suitable for looping through them.
 The first call of the iterator returns the first production ID.
 Successive calls return the other production IDs,
-in numberic order.
+in numeric order.
 The iterator never returns the same production ID twice.
 Once an iterator has returned every possible production ID,
 it returns a Perl C<undef>.
@@ -530,7 +530,7 @@ Returns an iterator function for the symbol IDs,
 suitable for looping through them.
 The first call of the iterator returns the first symbol ID.
 Successive calls return the other symbol IDs,
-in numberic order.
+in numeric order.
 The iterator never returns the same symbol ID twice.
 Once an iterator has returned every possible symbol ID,
 it returns a Perl C<undef>.
