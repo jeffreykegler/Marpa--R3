@@ -302,7 +302,8 @@ invalid symbol IDs.
 =for Marpa::R3::Display
 name: SLG production_dotted_show() synopsis
 
-    $production_dotted_results .= $grammar->production_dotted_show($production_id);
+    $production_dotted_results .=
+      $grammar->production_dotted_show( $production_id, $dot_position ) . "\n";
 
 =for Marpa::R3::Display::End
 
@@ -370,7 +371,7 @@ instead of a Perl false, because a numeric 0 is a Perl false.
 =head2 production_length()
 
 =for Marpa::R3::Display
-name: SLG production_length() example
+name: SLG production_length() synopsis
 
     my $length = $grammar->production_length($production_id);
     $production_length_results .= "Production #$production_id: length=$length\n";
@@ -383,7 +384,7 @@ Returns a Perl C<undef> if the production does not exist.
 =head2 production_name()
 
 =for Marpa::R3::Display
-name: SLG production_name() example
+name: SLG production_name() synopsis
 
     my $name = $grammar->production_name($production_id);
     $production_name_results .= "Production #$production_id: $name\n";
@@ -442,7 +443,7 @@ experts.
 =head2 start_symbol_id()
 
 =for Marpa::R3::Display
-name: $grammar->start_symbol_id() example
+name: SLG start_symbol_id() synopsis
 
     $start_id = $grammar->start_symbol_id();
 

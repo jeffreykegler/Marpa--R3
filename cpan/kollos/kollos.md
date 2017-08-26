@@ -990,7 +990,8 @@ Lowest ISYID is 0.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.symbol_show(slg, symbol_id, verbose)
+    function _M.class_slg.symbol_show(slg, symbol_id, options)
+        local verbose = options.verbose or 0
         local symbol_id = math.tointeger(symbol_id)
         local max_symbol_id = #slg.xsys
         if not symbol_id or symbol_id < 1 or symbol_id > max_symbol_id then
@@ -1019,10 +1020,10 @@ Lowest ISYID is 0.
         end
         return table.concat(pieces)
     end
-    function _M.class_slg.symbols_show(slg, verbose)
+    function _M.class_slg.symbols_show(slg, options)
         local pieces = { }
         for symbol_id = 1, slg:highest_symbol_id() do
-            pieces[#pieces+1] = slg:symbol_show(symbol_id, verbose)
+            pieces[#pieces+1] = slg:symbol_show(symbol_id, options)
         end
         return table.concat(pieces)
     end

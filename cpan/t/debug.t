@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 45;
+use Test::More tests => 46;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -1073,9 +1073,9 @@ END_OF_SHOW_RULES_OUTPUT
 my $symbols_show_output;
 
 # Marpa::R3::Display
-# name: SLIF symbols_show() synopsis
+# name: SLIF symbols_show() verbose synopsis
 
-$symbols_show_output = $grammar->symbols_show(3);
+$symbols_show_output = $grammar->symbols_show({ verbose => 3 });
 
 # Marpa::R3::Display::End
 
@@ -1468,6 +1468,80 @@ for (
 
 # Marpa::R3::Display::End
 
+my $symbol_show_results = q{};
+
+sub symbol_faire_des_choses {
+    my ($symbol_id) = @_;
+    my $dot_position = 0;
+
+# Marpa::R3::Display
+# name: SLG symbol_show() synopsis
+
+    $symbol_show_results .=
+      $grammar->symbol_show( $symbol_id );
+
+# Marpa::R3::Display::End
+
+}
+
+# Marpa::R3::Display
+# name: SLG highest_symbol_id() synopsis
+
+my $max_symbol_id = $grammar->highest_symbol_id();
+for (
+    my $symbol_id = 1 ;
+    $symbol_id <= $max_symbol_id ;
+    $symbol_id++
+  )
+{
+    symbol_faire_des_choses($symbol_id);
+}
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $symbol_show_results, <<'END_OF_TEXT', 'symbol_show() by id');
+S1 [:discard:]
+S2 [:lex_start:]
+S3 [:start:]
+S4 'set'
+S5 'to'
+S6 '='
+S7 'string'
+S8 '('
+S9 ')'
+S10 '+'
+S11 '*'
+S12 [']
+S13 [\(]
+S14 [\)]
+S15 [\*]
+S16 [\+]
+S17 [\=]
+S18 [\d]
+S19 [\s]
+S20 [\w]
+S21 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+S22 [e]
+S23 [g]
+S24 [i]
+S25 [n]
+S26 [o]
+S27 [r]
+S28 [s]
+S29 [t]
+S30 assignment
+S31 expression
+S32 number
+S33 <numeric assignment>
+S34 <numeric expression>
+S35 statement
+S36 statements
+S37 string
+S38 <string contents>
+S39 variable
+S40 whitespace
+END_OF_TEXT
+
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY ),
     ( join "\n", 1 .. 40 ),
@@ -1476,9 +1550,6 @@ Marpa::R3::Test::is(
 
 @TEST_ARRAY = ();
 
-# Marpa::R3::Display
-# name: SLG g1_symbol_ids_gen() synopsis
-
 for (
     my $iter = $grammar->g1_symbol_ids_gen() ;
     defined( my $symbol_id = $iter->() ) ;
@@ -1486,8 +1557,6 @@ for (
 {
     do_something($symbol_id);
 }
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY ),
@@ -2331,7 +2400,8 @@ sub production_faire_des_choses {
 # Marpa::R3::Display
 # name: SLG production_dotted_show() synopsis
 
-    $production_dotted_results .= $grammar->production_dotted_show($production_id, $dot_position) . "\n";
+    $production_dotted_results .=
+      $grammar->production_dotted_show( $production_id, $dot_position ) . "\n";
 
 # Marpa::R3::Display::End
 

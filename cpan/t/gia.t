@@ -664,7 +664,7 @@ END_OF_SOURCE
 my $start_id;
 
 # Marpa::R3::Display
-# name: $grammar->start_symbol_id() example
+# name: SLG start_symbol_id() synopsis
 
     $start_id = $grammar->start_symbol_id();
 
