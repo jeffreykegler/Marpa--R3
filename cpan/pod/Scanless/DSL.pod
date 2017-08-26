@@ -542,6 +542,16 @@ If there is only one RHS alternative, as in this case, the prioritization
 is B<trivial> --
 there is only one priority.
 
+=head2 Rules, alternatives and productions
+
+A B<production> is a LHS associated with a RHS alternative.
+Semantics are associated with productions and tracing
+and L<the progress
+mechanism|Marpa::R3::Progress> track parses by production.
+You can determine what the productions are for a grammar
+using the L<productions_show() grammar
+method|Marpa::R3::Scanless::G/"productions_show()">.
+
 =head2 Start rule
 
 =for Marpa::R3::Display

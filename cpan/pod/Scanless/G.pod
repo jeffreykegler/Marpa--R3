@@ -60,6 +60,11 @@ normalize-whitespace: 1
 This page is the reference for the grammar objects
 of Marpa's Scanless interface.
 
+=head1 Errors
+
+All errors in these methods are thrown, unless specifically
+documented otherwise.
+
 =head1 Constructor
 
 The C<new()> method is the constructor for Scanless grammars.
