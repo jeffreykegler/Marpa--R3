@@ -277,8 +277,12 @@ invalid production IDs.
 
 =for Marpa::R3::Display
 name: SLG highest_symbol_id() synopsis
+normalize-whitespace: 1
 
-    TODO
+    my $max_symbol_id = $grammar->highest_symbol_id();
+    for ( my $symbol_id = 1 ; $symbol_id <= $max_symbol_id ; $symbol_id++ ) {
+        symbol_faire_des_choses($symbol_id);
+    }
 
 =for Marpa::R3::Display::End
 
@@ -542,11 +546,11 @@ which is subject to change in future versions of Marpa::R3.
 =head2 symbols_show()
 
 =for Marpa::R3::Display
-name: SLIF symbols_show() synopsis
+name: SLG symbols_show() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    $symbols_show_output = $grammar->symbols_show(3);
+    $symbols_show_output = $grammar->symbols_show();
 
 =for Marpa::R3::Display::End
 
@@ -572,7 +576,7 @@ experts.
 =for Marpa::R3::Display
 name: SLG symbol_show() synopsis
 
-    my $symbol_description = $grammar->symbol_show($prid);
+    $symbol_show_results .= $grammar->symbol_show($symbol_id);
 
 =for Marpa::R3::Display::End
 

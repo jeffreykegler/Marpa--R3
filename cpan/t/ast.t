@@ -111,9 +111,6 @@ END_OF_SHOW_RULES_OUTPUT
 
 my $rules_show_output;
 
-# Marpa::R3::Display
-# name: SLG g1_rules_show() synopsis
-
 $rules_show_output = $grammar->g1_rules_show();
 
 Marpa::R3::Test::is( $rules_show_output,
@@ -132,11 +129,6 @@ R10 Expression ::= Expression '+' Expression
 R11 Expression ::= Expression '-' Expression
 R12 [:start:] ::= Script
 END_OF_SHOW_RULES_OUTPUT
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLG l0_rules_show() synopsis
 
 $rules_show_output = $grammar->l0_rules_show( { verbose => 1 } );
 
@@ -172,8 +164,6 @@ R26 [:lex_start:] ~ '+'
 R27 [:lex_start:] ~ '-'
 R28 [:lex_start:] ~ comma
 END_OF_SHOW_RULES_OUTPUT
-
-# Marpa::R3::Display::End
 
 sub my_parser {
     my ( $grammar, $p_input_string ) = @_;

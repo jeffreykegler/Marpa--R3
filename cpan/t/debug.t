@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 46;
+use Test::More tests => 47;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -545,12 +545,7 @@ R45 [:discard:] ~ whitespace
 R46 whitespace ~ [\s] +
 END_OF_OUTPUT
 
-# Marpa::R3::Display
-# name: SLG productions_show() verbose synopsis
-
 $productions_show_output = $grammar->productions_show( { verbose => 3 } );
-
-# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLIF debug example productions_show() output
@@ -851,12 +846,7 @@ R25 [:lex_start:] ~ variable
   Canonical symbols: [:lex_start:] ::= variable
 END_OF_SHOW_RULES_OUTPUT
 
-# Marpa::R3::Display
-# name: SLG productions_show() diag form synopsis
-
 my $productions_diag_output = $grammar->productions_show( { diag => 1 } );
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $productions_diag_output,
     <<'END_OF_OUTPUT', 'SLIF productions_show() diag form' );
@@ -910,12 +900,7 @@ END_OF_OUTPUT
 
 my $rules_diag_output;
 
-# Marpa::R3::Display
-# name: SLIF g1_rules_show() diag form synopsis
-
 $rules_diag_output = $grammar->g1_rules_show( { verbose => 3, diag => 1 } );
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $rules_diag_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show() diag form' );
@@ -981,12 +966,7 @@ R19 [:start:] ::= statements
   Canonical symbols: [:start:] ::= statements
 END_OF_SHOW_RULES_OUTPUT
 
-# Marpa::R3::Display
-# name: SLG l0_rules_show() diag form synopsis
-
 $rules_diag_output = $grammar->l0_rules_show( { verbose => 3, diag => 1 } );
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $rules_diag_output,
     <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show() diag form' );
@@ -1073,11 +1053,57 @@ END_OF_SHOW_RULES_OUTPUT
 my $symbols_show_output;
 
 # Marpa::R3::Display
-# name: SLIF symbols_show() verbose synopsis
+# name: SLG symbols_show() synopsis
 
-$symbols_show_output = $grammar->symbols_show({ verbose => 3 });
+$symbols_show_output = $grammar->symbols_show();
 
 # Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $symbols_show_output,
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show()' );
+S1 [:discard:]
+S2 [:lex_start:]
+S3 [:start:]
+S4 'set'
+S5 'to'
+S6 '='
+S7 'string'
+S8 '('
+S9 ')'
+S10 '+'
+S11 '*'
+S12 [']
+S13 [\(]
+S14 [\)]
+S15 [\*]
+S16 [\+]
+S17 [\=]
+S18 [\d]
+S19 [\s]
+S20 [\w]
+S21 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
+S22 [e]
+S23 [g]
+S24 [i]
+S25 [n]
+S26 [o]
+S27 [r]
+S28 [s]
+S29 [t]
+S30 assignment
+S31 expression
+S32 number
+S33 <numeric assignment>
+S34 <numeric expression>
+S35 statement
+S36 statements
+S37 string
+S38 <string contents>
+S39 variable
+S40 whitespace
+END_OF_SHOW_SYMBOLS_OUTPUT
+
+$symbols_show_output = $grammar->symbols_show({ verbose => 3 });
 
 # Marpa::R3::Display
 # name: SLIF debug example symbols_show() output
@@ -1085,7 +1111,7 @@ $symbols_show_output = $grammar->symbols_show({ verbose => 3 });
 # end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
 
 Marpa::R3::Test::is( $symbols_show_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show()' );
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show() verbose' );
 S1 [:discard:]
   Canonical name: [:discard:]
   DSL name: [:discard:]
@@ -1210,18 +1236,8 @@ END_OF_SHOW_SYMBOLS_OUTPUT
 
 # Marpa::R3::Display::End
 
-# Marpa::R3::Display
-# name: SLIF g1_symbols_show() synopsis
-
 $symbols_show_output = "G1 Symbols:\n";
 $symbols_show_output .= $grammar->g1_symbols_show(3);
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLIF debug example g1_symbols_show() output
-# start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
-# end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
 
 Marpa::R3::Test::is( $symbols_show_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_symbols_show()' );
@@ -1311,20 +1327,8 @@ g1 S23 variable
   DSL name: variable
 END_OF_SHOW_SYMBOLS_OUTPUT
 
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLIF l0_symbols_show() synopsis
-
 $symbols_show_output = "L0 Symbols:\n";
 $symbols_show_output .= $grammar->l0_symbols_show(3);
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLIF debug example l0_symbols_show() output
-# start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
-# end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
 
 Marpa::R3::Test::is( $symbols_show_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF l0_symbols_show()' );
@@ -1448,8 +1452,6 @@ l0 S32 whitespace
   DSL name: whitespace
 END_OF_SHOW_SYMBOLS_OUTPUT
 
-# Marpa::R3::Display::End
-
 our @TEST_ARRAY;
 sub do_something { push @TEST_ARRAY, $_[0] }
 
@@ -1477,8 +1479,7 @@ sub symbol_faire_des_choses {
 # Marpa::R3::Display
 # name: SLG symbol_show() synopsis
 
-    $symbol_show_results .=
-      $grammar->symbol_show( $symbol_id );
+    $symbol_show_results .= $grammar->symbol_show($symbol_id);
 
 # Marpa::R3::Display::End
 
@@ -1488,12 +1489,7 @@ sub symbol_faire_des_choses {
 # name: SLG highest_symbol_id() synopsis
 
 my $max_symbol_id = $grammar->highest_symbol_id();
-for (
-    my $symbol_id = 1 ;
-    $symbol_id <= $max_symbol_id ;
-    $symbol_id++
-  )
-{
+for ( my $symbol_id = 1 ; $symbol_id <= $max_symbol_id ; $symbol_id++ ) {
     symbol_faire_des_choses($symbol_id);
 }
 
@@ -1748,31 +1744,16 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG g1_symbol_name() synopsis
-
     my $name = $grammar->g1_symbol_name($symbol_id);
     $text .= "symbol number: $symbol_id  name: $name\n";
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLG g1_symbol_display_form() synopsis
 
     my $display_form = $grammar->g1_symbol_display_form($symbol_id);
     $text
         .= "symbol number: $symbol_id  name in display form: $display_form\n";
 
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLG g1_symbol_dsl_form() synopsis
-
     my $dsl_form = $grammar->g1_symbol_dsl_form($symbol_id)
         // '[No name in DSL form]';
     $text .= "symbol number: $symbol_id  DSL form: $dsl_form\n";
-
-# Marpa::R3::Display::End
 
 }
 
@@ -1859,31 +1840,16 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG l0_symbol_name() synopsis
-
     my $name = $grammar->l0_symbol_name( $symbol_id );
     $text .= "l0 symbol number: $symbol_id  name: $name\n";
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLG l0_symbol_display_form() synopsis
 
     my $display_form = $grammar->l0_symbol_display_form( $symbol_id );
     $text
         .= "l0 symbol number: $symbol_id  name in display form: $display_form\n";
 
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLG l0_symbol_dsl_form() synopsis
-
     my $dsl_form = $grammar->l0_symbol_dsl_form( $symbol_id )
         // '[No name in DSL form]';
     $text .= "l0 symbol number: $symbol_id  DSL form: $dsl_form\n";
-
-# Marpa::R3::Display::End
 
 }
 
@@ -2072,12 +2038,7 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG g1_rule_show() synopsis
-
     my $rule_description = $grammar->g1_rule_show($rule_id);
-
-# Marpa::R3::Display::End
 
     if (not defined $rule_description) {
         $text .= "[No such rule, ID #$rule_id]\n";
@@ -2165,13 +2126,8 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG production_show() diag form synopsis
-
     my $production_description =
       $grammar->production_show( $prid, { diag => 1 } );
-
-# Marpa::R3::Display::End
 
     if (not defined $production_description) {
         $text .= "[No such production, ID #$prid]\n";
@@ -2238,12 +2194,7 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG g1_rule_show() diag form synopsis
-
     my $rule_description = $grammar->g1_rule_show( $rule_id, { diag => 1 } );
-
-# Marpa::R3::Display::End
 
     if (not defined $rule_description) {
         $text .= "[No such rule, ID #$rule_id]\n";
@@ -2346,9 +2297,6 @@ Marpa::R3::Test::is(
 
 @TEST_ARRAY = ();
 
-# Marpa::R3::Display
-# name: SLG g1_rule_ids_gen() synopsis
-
 for (
     my $iter = $grammar->g1_rule_ids_gen() ;
     defined( my $rule_id = $iter->() ) ;
@@ -2356,8 +2304,6 @@ for (
 {
     do_something($rule_id);
 }
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY, '' ),
@@ -2367,9 +2313,6 @@ Marpa::R3::Test::is(
 
 @TEST_ARRAY = ();
 
-# Marpa::R3::Display
-# name: SLG l0_rule_ids_gen() synopsis
-
 for (
     my $iter = $grammar->l0_rule_ids_gen() ;
     defined( my $rule_id = $iter->() ) ;
@@ -2377,8 +2320,6 @@ for (
 {
     do_something($rule_id);
 }
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY, ''),
@@ -2650,13 +2591,8 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG g1_rule_expand() synopsis
-
     my ($lhs_id, @rhs_ids) = $grammar->g1_rule_expand($rule_id);
     $text .= "Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
-
-# Marpa::R3::Display::End
 
 }
 
@@ -2691,13 +2627,8 @@ for (
   )
 {
 
-# Marpa::R3::Display
-# name: SLG l0_rule_expand() synopsis
-
     my ($lhs_id, @rhs_ids) = $grammar->l0_rule_expand($rule_id);
     $text .= "l0 Rule #$rule_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
-
-# Marpa::R3::Display::End
 
 }
 
