@@ -123,7 +123,7 @@ This is the default.
 
 The "C<rule>"
 and "C<high_rule_only>" ranking methods
-allows the user
+allow the user
 to control the order
 in which parse results are returned by
 the C<value> method,
@@ -269,12 +269,11 @@ all of the production IDs, you
 will usually prefer
 L<production_ids_gen()|/"production_ids_gen()">.
 
-If you do write your own loop,
-remember that the lowest possible production ID 
-is 1,
-and that there may be gaps in the valid
-ids -- it is up to the app to check for
-invalid production IDs.
+The lowest production ID 
+is always 1.
+Any production ID between the lowest and the highest production ID,
+inclusive,
+is guaranteed to be valid.
 
 =head2 highest_symbol_id()
 
@@ -295,13 +294,11 @@ For the purpose of writing loops over
 all of the symbol IDs, you
 will usually prefer
 L<symbol_ids_gen()|/"symbol_ids_gen()">.
-
-If you do write your own loop,
-remember that the lowest possible symbol ID 
-is 1,
-and that there may be gaps in the valid
-ids -- it is up to the app to check for
-invalid symbol IDs.
+The lowest symbol ID 
+is always 1.
+Any symbol ID between the lowest and the highest symbol ID,
+inclusive,
+is guaranteed to be valid.
 
 =head2 production_dotted_show()
 
@@ -322,11 +319,9 @@ Argument 2 (reguired): A valid dot position in the production.
 Valid dot positions are from 0 to I<N>, where I<N> is the length
 of the RHS of the production.
 
-Return on success: A string describing that production in a form which is useful for tracing and debugging,
-but subject to change.
-
-Return on error:
-A Perl C<undef> if the production does not exist.
+Return on success: A string describing that production in a form which is useful for tracing and debugging.
+To allow for improvements in Marpa::R3,
+the output of C<production_dotted_show()> is subject to change.
 
 =head2 production_expand()
 
@@ -340,13 +335,14 @@ name: SLG production_expand() synopsis
 
 "Expands" a
 production ID into symbol ID's.
-The first and only argument,
-which is required, is the ID of the production to be "expanded".
-An array of symbol ID's is returned.
+
+Argument 1 (required):
+The only argument is the ID of the production to be "expanded".
+
+Return value: An array of symbol ID's is returned.
 The ID of the LHS symbol is the first element,
 and the remaining elements are the ID's of the RHS symbols,
 in order.
-Returns an empty array if the production does not exist.
 
 =head2 production_ids_gen()
 
@@ -385,7 +381,6 @@ name: SLG production_length() synopsis
 =for Marpa::R3::Display::End
 
 Given a production ID, returns the length of its RHS.
-Returns a Perl C<undef> if the production does not exist.
 
 =head2 production_name()
 
@@ -414,11 +409,12 @@ name: SLG production_show() synopsis
 
 =for Marpa::R3::Display::End
 
-The first argument, which is required,
+Argument 1 (required): The first argument
 is the ID of a production.
-Returns a string describing that production in a form which is useful for tracing and debugging,
-but subject to change.
-Returns a Perl C<undef> if the production does not exist.
+
+Return value: a string describing that production in a form which is useful for tracing and debugging.
+To allow for improvements in Marpa::R3,
+the output of C<productions_show()> is subject to change.
 
 =head2 productions_show()
 
@@ -491,11 +487,11 @@ name: SLG symbol_display_form() synopsis
 The first, required, argument is a symbol ID.
 Returns the "display form" of the symbol.
 This is the symbol in a form thought most suitable for display in messages, etc.
-Returns a Perl C<undef> if the symbol does not exist.
 
 The display form of a symbol is always defined.
-The display form of a symbol is not useable as a name -- it is not necessarily unique,
-and is subject to change.
+The display form of a symbol is not suitable for use as a name:
+it is not necessarily unique,
+and it is subject to change.
 
 =head2 symbol_dsl_form()
 
@@ -550,12 +546,11 @@ name: SLG symbol_name() synopsis
 
 =for Marpa::R3::Display::End
 
-The first and only argument, which is required, is a G1 grammar
-ISY ID.
-The return value is the name of the symbol, if the symbol exists,
-and a Perl C<undef> if the symbol does not exist.
+Argument 1 (required): The only argument is a symbol ID.
 
-For every ISY ID, this method's return value will be defined
+Return value: The return value is the name of the symbol.
+For every valid symbol ID,
+this method's return value will be defined
 and will be unique to that symbol ID.
 The return value may be an internal name,
 which is subject to change in future versions of Marpa::R3.
@@ -572,8 +567,7 @@ name: SLG symbol_show() synopsis
 The first argument, which is required,
 is the ID of a symbol.
 Returns a string describing that symbol in a form which is useful for tracing and debugging,
-but subject to change.
-Returns a Perl C<undef> if the symbol does not exist.
+but which is subject to change in future versions of Marpa::R3.
 
 =head2 symbols_show()
 

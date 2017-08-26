@@ -5792,8 +5792,8 @@ TODO: Perhaps `isy_key` should also allow isy tables.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_grammar.symbol_dsl_form(grammar, isyid)
-        local xsy = grammar.xsys[isyid]
+    function _M.class_grammar.symbol_dsl_form(grammar, xsyid)
+        local xsy = grammar.xsys[xsyid]
         if xsy then return xsy.dsl_form end
         return
     end
