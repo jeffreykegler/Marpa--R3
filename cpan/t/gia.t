@@ -672,33 +672,18 @@ my $start_id;
 
     Test::More::is( $start_id, 4, q{Test of $grammar->start_symbol_id()} );
 
-# Marpa::R3::Display
-# name: $grammar->g1_start_symbol_id() example
-
     $start_id = $grammar->g1_start_symbol_id();
-
-# Marpa::R3::Display::End
 
     Test::More::is( $start_id, 2, q{Test of $grammar->g1_start_symbol_id()} );
 
-# Marpa::R3::Display
-# name: $grammar->l0_start_symbol_id() example
-
     $start_id = $grammar->l0_start_symbol_id();
-
-# Marpa::R3::Display::End
 
     Test::More::is( $start_id, 2, q{Test of $grammar->l0_start_symbol_id()} );
 
     my @production_names = ();
 
-# Marpa::R3::Display
-# name: SLG production_name() example
-
     push @production_names, $grammar->production_name($_)
       for 1 .. $grammar->highest_production_id();
-
-# Marpa::R3::Display::End
 
     my $production_names = join q{:}, @production_names;
     Test::More::is(

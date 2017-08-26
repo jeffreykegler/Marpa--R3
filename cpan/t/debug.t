@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 41;
+use Test::More tests => 43;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -486,10 +486,69 @@ my $expected_value_after_fix = \bless(
 
 Test::More::is_deeply($value_ref, $expected_value_after_fix, 'Value after fix');
 
+my $productions_show_output = q{};
+
 # Marpa::R3::Display
 # name: SLG productions_show() synopsis
 
-my $productions_show_output = $grammar->productions_show( { verbose => 3 } );
+$productions_show_output = $grammar->productions_show();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $productions_show_output,
+    <<'END_OF_OUTPUT', 'SLIF productions_show()' );
+R1 [:start:] ::= statements
+R2 statement ::= <numeric assignment>
+R3 assignment ::= 'set' variable 'to' expression
+R4 <numeric assignment> ::= variable '=' <numeric expression>
+R5 expression ::= expression; prec=-1
+R6 expression ::= expression; prec=0
+R7 expression ::= expression; prec=1
+R8 expression ::= variable; prec=2
+R9 expression ::= string; prec=2
+R10 expression ::= 'string' '(' <numeric expression> ')'; prec=1
+R11 expression ::= expression '+' expression; prec=0
+R12 <numeric expression> ::= <numeric expression>; prec=-1
+R13 <numeric expression> ::= <numeric expression>; prec=0
+R14 <numeric expression> ::= <numeric expression>; prec=1
+R15 <numeric expression> ::= variable; prec=2
+R16 <numeric expression> ::= number; prec=2
+R17 <numeric expression> ::= <numeric expression> '*' <numeric expression>; prec=1
+R18 statements ::= statement *
+R19 <numeric expression> ::= <numeric expression> '+' <numeric expression>; prec=0
+R20 statement ::= assignment
+R21 [:lex_start:] ~ [:discard:]
+R22 [:lex_start:] ~ 'set'
+R23 [:lex_start:] ~ 'to'
+R24 [:lex_start:] ~ '='
+R25 [:lex_start:] ~ 'string'
+R26 [:lex_start:] ~ '('
+R27 [:lex_start:] ~ ')'
+R28 [:lex_start:] ~ '+'
+R29 [:lex_start:] ~ '*'
+R30 [:lex_start:] ~ number
+R31 [:lex_start:] ~ string
+R32 [:lex_start:] ~ variable
+R33 'set' ~ [s] [e] [t]
+R34 'to' ~ [t] [o]
+R35 '=' ~ [\=]
+R36 'string' ~ [s] [t] [r] [i] [n] [g]
+R37 '(' ~ [\(]
+R38 ')' ~ [\)]
+R39 '+' ~ [\+]
+R40 '*' ~ [\*]
+R41 variable ~ [\w] +
+R42 number ~ [\d] +
+R43 string ~ ['] <string contents> [']
+R44 <string contents> ~ [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+R45 [:discard:] ~ whitespace
+R46 whitespace ~ [\s] +
+END_OF_OUTPUT
+
+# Marpa::R3::Display
+# name: SLG productions_show() verbose synopsis
+
+$productions_show_output = $grammar->productions_show( { verbose => 3 } );
 
 # Marpa::R3::Display::End
 
@@ -1438,9 +1497,6 @@ Marpa::R3::Test::is(
 
 @TEST_ARRAY = ();
 
-# Marpa::R3::Display
-# name: SLG l0_symbol_ids_gen() synopsis
-
 for (
     my $iter = $grammar->l0_symbol_ids_gen() ;
     defined( my $symbol_id = $iter->() ) ;
@@ -1448,8 +1504,6 @@ for (
 {
     do_something($symbol_id);
 }
-
-# Marpa::R3::Display::End
 
 Marpa::R3::Test::is(
     ( join "\n", @TEST_ARRAY ),
@@ -1868,6 +1922,9 @@ END_OF_TEXT
 
 $text = q{};
 
+sub do_production_things {
+}
+
 for (
     my $iter = $grammar->production_ids_gen() ;
     defined( my $prid = $iter->() ) ;
@@ -2262,23 +2319,46 @@ Marpa::R3::Test::is(
 
 $text = q{};
 
-for (
-    my $iter = $grammar->production_ids_gen() ;
-    defined( my $production_id = $iter->() ) ;
-  )
-{
+my $production_expand_results = q{};
+my $production_name_results = q{};
+
+sub production_faire_des_choses {
+    my ($production_id) = @_;
 
 # Marpa::R3::Display
 # name: SLG production_expand() synopsis
 
     my ($lhs_id, @rhs_ids) = $grammar->production_expand($production_id);
-    $text .= "Production #$production_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+    $production_expand_results .= "Production #$production_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLG production_name() synopsis
+
+    my $name = $grammar->production_name($production_id);
+    $production_name_results .= "Production #$production_id: $name\n";
 
 # Marpa::R3::Display::End
 
 }
 
-Marpa::R3::Test::is( $text, <<'END_OF_TEXT', 'symbol ids by production id');
+# Marpa::R3::Display
+# name: SLG highest_production_id() synopsis
+
+my $max_production_id = $grammar->highest_production_id();
+for (
+    my $production_id = 1 ;
+    $production_id <= $max_production_id ;
+    $production_id++
+  )
+{
+    production_faire_des_choses($production_id);
+}
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $production_expand_results, <<'END_OF_TEXT', 'symbol ids by production id');
 Production #1: 3 ::= 36
 Production #2: 35 ::= 33
 Production #3: 30 ::= 4 39 5 31
@@ -2325,6 +2405,55 @@ Production #43: 37 ::= 12 38 12
 Production #44: 38 ::= 21
 Production #45: 1 ::= 40
 Production #46: 40 ::= 19
+END_OF_TEXT
+
+Marpa::R3::Test::is( $production_name_results, <<'END_OF_TEXT', 'name by production id');
+Production #1: [:start:]
+Production #2: statement
+Production #3: assignment
+Production #4: numeric assignment
+Production #5: expression
+Production #6: expression
+Production #7: expression
+Production #8: expression
+Production #9: expression
+Production #10: expression
+Production #11: expression
+Production #12: numeric expression
+Production #13: numeric expression
+Production #14: numeric expression
+Production #15: numeric expression
+Production #16: numeric expression
+Production #17: numeric expression
+Production #18: statements
+Production #19: numeric expression
+Production #20: statement
+Production #21: [:lex_start:]
+Production #22: [:lex_start:]
+Production #23: [:lex_start:]
+Production #24: [:lex_start:]
+Production #25: [:lex_start:]
+Production #26: [:lex_start:]
+Production #27: [:lex_start:]
+Production #28: [:lex_start:]
+Production #29: [:lex_start:]
+Production #30: [:lex_start:]
+Production #31: [:lex_start:]
+Production #32: [:lex_start:]
+Production #33: [Lex-0]
+Production #34: [Lex-1]
+Production #35: [Lex-2]
+Production #36: [Lex-3]
+Production #37: [Lex-4]
+Production #38: [Lex-5]
+Production #39: [Lex-6]
+Production #40: [Lex-7]
+Production #41: variable
+Production #42: number
+Production #43: string
+Production #44: string contents
+Production #45: [:discard:]
+Production #46: whitespace
 END_OF_TEXT
 
 $text = q{};

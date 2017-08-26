@@ -283,6 +283,17 @@ C<Marpa::R2::Scanless::R::range_to_string()> method,
 discouraged in Marpa::R2,
 have been eliminated in Marpa::R3.
 
+=head2 Marpa::R2::Scanless::R::progress() changed
+
+C<Marpa::R2::Scanless::R::progress()> reported
+the dot position of completions as -1.
+In Marpa::R3,
+C<< $slr->progress() >> reports
+the dot position of completions as a non-negative integer,
+consistent with other dot positions.
+As a reminder, the dot position of a completed production is always
+the same as its RHS length.
+
 =head2 The per-parse constructor has been elminated
 
 In Marpa::R2, if the semantics package has a C<new()>

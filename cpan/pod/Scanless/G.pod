@@ -245,7 +245,15 @@ Currently, the only argument that may be changed in L<C<trace_file_handle>|/"tra
 =for Marpa::R3::Display
 name: SLG highest_production_id() synopsis
 
-    TODO
+    my $max_production_id = $grammar->highest_production_id();
+    for (
+        my $production_id = 1 ;
+        $production_id <= $max_production_id ;
+        $production_id++
+      )
+    {
+        production_faire_des_choses($production_id);
+    }
 
 =for Marpa::R3::Display::End
 
@@ -375,8 +383,8 @@ Returns a Perl C<undef> if the production does not exist.
 =for Marpa::R3::Display
 name: SLG production_name() example
 
-    push @production_names, $grammar->production_name($_)
-      for 1 .. $grammar->highest_production_id();
+    my $name = $grammar->production_name($production_id);
+    $production_name_results .= "Production #$production_id: $name\n";
 
 =for Marpa::R3::Display::End
 
@@ -410,7 +418,7 @@ name: SLG productions_show() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $productions_show_output = $grammar->productions_show();
+    $productions_show_output = $grammar->productions_show();
 
 =for Marpa::R3::Display::End
 
@@ -449,7 +457,7 @@ name: SLG symbol_display_form() synopsis
 
     my $display_form = $grammar->symbol_display_form($symbol_id);
     $text
-        .= "symbol number: $symbol_id  name in display form: $display_form\n";
+        .= "symbol number: $symbol_id; name in display form: $display_form\n";
 
 =for Marpa::R3::Display::End
 
@@ -535,7 +543,7 @@ name: SLIF symbols_show() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    $symbols_show_output .= $grammar->symbols_show(3);
+    $symbols_show_output = $grammar->symbols_show(3);
 
 =for Marpa::R3::Display::End
 
