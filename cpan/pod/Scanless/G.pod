@@ -309,7 +309,7 @@ name: SLG production_dotted_show() synopsis
 =for Marpa::R3::Display::End
 
 Returns a string showing the dotted production 
-which for C<$production_id> and C<$dot_position>.
+for C<$production_id> and C<$dot_position>.
 
 Argument 1 (reguired): A production ID.
 
@@ -334,12 +334,12 @@ name: SLG production_expand() synopsis
 =for Marpa::R3::Display::End
 
 "Expands" a
-production ID into XSY ID's.
+production ID into symbol ID's.
 The first and only argument,
 which is required, is the ID of the production to be "expanded".
-An array of XSY ID's is returned.
-The ID of the LHS XSY is the first element,
-and the remaining elements are the ID's of the RHS XSYs,
+An array of symbol ID's is returned.
+The ID of the LHS symbol is the first element,
+and the remaining elements are the ID's of the RHS symbols,
 in order.
 Returns an empty array if the production does not exist.
 
