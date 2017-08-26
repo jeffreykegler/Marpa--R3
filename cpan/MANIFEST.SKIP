@@ -23,6 +23,7 @@
 /errs$
 /junk$
 /junk2$
+^doit[.]out$
 ^test[.]out$
 [.]DS_Store$
 [.]a$

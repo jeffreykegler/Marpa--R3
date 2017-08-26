@@ -45,6 +45,7 @@ engine/SHARED
 engine/STATIC
 engine/cf/INSTALL.SKIP
 engine/cf/perl_ac_makefile.PL
+engine/read_only.time-stamp
 engine/read_only/AUTHORS
 engine/read_only/COPYING
 engine/read_only/COPYING.LESSER
@@ -88,7 +89,6 @@ engine/read_only/marpa_obs.h
 engine/read_only/marpa_tavl.c
 engine/read_only/marpa_tavl.h
 engine/read_only/missing
-engine/read_only.time-stamp
 engine/read_only/steps.table
 engine/read_only/win32/do_config_h.pl
 engine/read_only/win32/marpa.def
@@ -264,6 +264,9 @@ t/final_nn.t
 t/flies.t
 t/flies_ast.t
 t/fullsyn.t
+t/g1_progress1.t
+t/g1_progress2.t
+t/g1_progress3.t
 t/gabend.t
 t/gia.t
 t/gia_err.t
@@ -295,9 +298,9 @@ t/panda.t
 t/panda1.t
 t/pascal.t
 t/prefix.t
-t/g1_progress1.t
-t/g1_progress2.t
-t/g1_progress3.t
+t/progress1.t
+t/progress2.t
+t/progress3.t
 t/rabend.t
 t/randal.t
 t/rank.t
