@@ -369,9 +369,6 @@ An iterator never returns the same production ID twice.
 Once an iterator has returned every possible production ID,
 it returns a Perl C<undef>.
 
-Note that applications should test specifically for Perl C<undef>
-instead of a Perl false, because a numeric 0 is a Perl false.
-
 =head2 production_length()
 
 =for Marpa::R3::Display
@@ -520,9 +517,6 @@ An iterator never returns the same symbol ID twice.
 Once an iterator has returned every possible symbol ID,
 it returns a Perl C<undef>.
 
-Note that applications should test specifically for Perl C<undef>
-instead of a Perl false, because a numeric 0 is a Perl false.
-
 =head2 symbol_name()
 
 =for Marpa::R3::Display
@@ -542,6 +536,21 @@ For every ISY ID, this method's return value will be defined
 and will be unique to that symbol ID.
 The return value may be an internal name,
 which is subject to change in future versions of Marpa::R3.
+
+=head2 symbol_show()
+
+=for Marpa::R3::Display
+name: SLG symbol_show() synopsis
+
+    $symbol_show_results .= $grammar->symbol_show($symbol_id);
+
+=for Marpa::R3::Display::End
+
+The first argument, which is required,
+is the ID of a symbol.
+Returns a string describing that symbol in a form which is useful for tracing and debugging,
+but subject to change.
+Returns a Perl C<undef> if the symbol does not exist.
 
 =head2 symbols_show()
 
@@ -570,21 +579,6 @@ A verbosity of 2 prints additional information useful
 for those new to SLIF tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
-
-=head2 symbol_show()
-
-=for Marpa::R3::Display
-name: SLG symbol_show() synopsis
-
-    $symbol_show_results .= $grammar->symbol_show($symbol_id);
-
-=for Marpa::R3::Display::End
-
-The first argument, which is required,
-is the ID of a symbol.
-Returns a string describing that symbol in a form which is useful for tracing and debugging,
-but subject to change.
-Returns a Perl C<undef> if the symbol does not exist.
 
 =head1 COPYRIGHT AND LICENSE
 
