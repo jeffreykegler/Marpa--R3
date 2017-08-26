@@ -9300,6 +9300,20 @@ in every other sequence.
     end
 ```
 
+Combines `print` and `inspect`.
+
+```
+    -- miranda: section+ internal utilities
+    function _M.iprint(...)
+        local args = {...}
+        local results = {}
+        for ix = 1, #args do
+            results[#results+1] = inspect(args[ix], { depth=2 } )
+        end
+        io.stderr:write( table.concat(results, '    ') .. "\n")
+    end
+```
+
 Given a symbol name, convert it to a form
 suitable for diagnostic messages.
 

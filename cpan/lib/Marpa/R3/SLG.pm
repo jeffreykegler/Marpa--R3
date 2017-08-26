@@ -1710,7 +1710,7 @@ kwgen_arr(__LINE__, qw(lmg_rule_expand lmg_irl_isyids si));
 kwgen_arr(__LINE__, qw(g1_rule_expand g1_irl_isyids i));
 kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
 
-kwgen_arr(__LINE__, qw(production_length xpr_length i));
+kwgen(__LINE__, qw(production_length xpr_length i));
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;

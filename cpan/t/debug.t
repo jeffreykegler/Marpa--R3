@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 45;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
@@ -2319,17 +2319,35 @@ Marpa::R3::Test::is(
 
 $text = q{};
 
+my $production_dotted_results = q{};
 my $production_expand_results = q{};
+my $production_length_results = q{};
 my $production_name_results = q{};
 
 sub production_faire_des_choses {
     my ($production_id) = @_;
+    my $dot_position = 0;
+
+# Marpa::R3::Display
+# name: SLG production_dotted_show() synopsis
+
+    $production_dotted_results .= $grammar->production_dotted_show($production_id, $dot_position) . "\n";
+
+# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: SLG production_expand() synopsis
 
     my ($lhs_id, @rhs_ids) = $grammar->production_expand($production_id);
     $production_expand_results .= "Production #$production_id: $lhs_id ::= " . (join q{ }, @rhs_ids) . "\n";
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: SLG production_length() synopsis
+
+    my $length = $grammar->production_length($production_id);
+    $production_length_results .= "Production #$production_id: length=$length\n";
 
 # Marpa::R3::Display::End
 
@@ -2357,6 +2375,55 @@ for (
 }
 
 # Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $production_dotted_results, <<'END_OF_TEXT', 'predictions by production id');
+[:start:] ::= . statements
+statement ::= . <numeric assignment>
+assignment ::= . 'set' variable 'to' expression
+<numeric assignment> ::= . variable '=' <numeric expression>
+expression ::= . expression; prec=-1
+expression ::= . expression; prec=0
+expression ::= . expression; prec=1
+expression ::= . variable; prec=2
+expression ::= . string; prec=2
+expression ::= . 'string' '(' <numeric expression> ')'; prec=1
+expression ::= . expression '+' expression; prec=0
+<numeric expression> ::= . <numeric expression>; prec=-1
+<numeric expression> ::= . <numeric expression>; prec=0
+<numeric expression> ::= . <numeric expression>; prec=1
+<numeric expression> ::= . variable; prec=2
+<numeric expression> ::= . number; prec=2
+<numeric expression> ::= . <numeric expression> '*' <numeric expression>; prec=1
+statements ::= . statement *
+<numeric expression> ::= . <numeric expression> '+' <numeric expression>; prec=0
+statement ::= . assignment
+[:lex_start:] ~ . [:discard:]
+[:lex_start:] ~ . 'set'
+[:lex_start:] ~ . 'to'
+[:lex_start:] ~ . '='
+[:lex_start:] ~ . 'string'
+[:lex_start:] ~ . '('
+[:lex_start:] ~ . ')'
+[:lex_start:] ~ . '+'
+[:lex_start:] ~ . '*'
+[:lex_start:] ~ . number
+[:lex_start:] ~ . string
+[:lex_start:] ~ . variable
+'set' ~ . [s] [e] [t]
+'to' ~ . [t] [o]
+'=' ~ . [\=]
+'string' ~ . [s] [t] [r] [i] [n] [g]
+'(' ~ . [\(]
+')' ~ . [\)]
+'+' ~ . [\+]
+'*' ~ . [\*]
+variable ~ . [\w] +
+number ~ . [\d] +
+string ~ . ['] <string contents> [']
+<string contents> ~ . [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] +
+[:discard:] ~ . whitespace
+whitespace ~ . [\s] +
+END_OF_TEXT
 
 Marpa::R3::Test::is( $production_expand_results, <<'END_OF_TEXT', 'symbol ids by production id');
 Production #1: 3 ::= 36
@@ -2405,6 +2472,55 @@ Production #43: 37 ::= 12 38 12
 Production #44: 38 ::= 21
 Production #45: 1 ::= 40
 Production #46: 40 ::= 19
+END_OF_TEXT
+
+Marpa::R3::Test::is( $production_length_results, <<'END_OF_TEXT', 'lengths by production id');
+Production #1: length=1
+Production #2: length=1
+Production #3: length=4
+Production #4: length=3
+Production #5: length=1
+Production #6: length=1
+Production #7: length=1
+Production #8: length=1
+Production #9: length=1
+Production #10: length=4
+Production #11: length=3
+Production #12: length=1
+Production #13: length=1
+Production #14: length=1
+Production #15: length=1
+Production #16: length=1
+Production #17: length=3
+Production #18: length=1
+Production #19: length=3
+Production #20: length=1
+Production #21: length=1
+Production #22: length=1
+Production #23: length=1
+Production #24: length=1
+Production #25: length=1
+Production #26: length=1
+Production #27: length=1
+Production #28: length=1
+Production #29: length=1
+Production #30: length=1
+Production #31: length=1
+Production #32: length=1
+Production #33: length=3
+Production #34: length=2
+Production #35: length=1
+Production #36: length=6
+Production #37: length=1
+Production #38: length=1
+Production #39: length=1
+Production #40: length=1
+Production #41: length=1
+Production #42: length=1
+Production #43: length=3
+Production #44: length=1
+Production #45: length=1
+Production #46: length=1
 END_OF_TEXT
 
 Marpa::R3::Test::is( $production_name_results, <<'END_OF_TEXT', 'name by production id');
