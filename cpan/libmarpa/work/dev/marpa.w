@@ -622,7 +622,7 @@ successfully turned on.
 @<Function definitions@> =
 int marpa_c_init (Marpa_Config *config)
 {
-    MARPA_DEBUG3("Debugging at level %ld is on: %s\n",
+    MARPA_OFF_DEBUG3("Debugging at level %ld is on: %s\n",
       marpa__debug_level, STRLOC);
     config->t_is_ok = I_AM_OK;
     config->t_error = MARPA_ERR_NONE;
@@ -11154,7 +11154,6 @@ new traversers.
 PRIVATE Marpa_Traverser
 trv_new(RECCE r, YIM yim)
 {
-    const GRAMMAR g = G_of_R(r);
     TRAVERSER trv;
 
     trv = my_malloc (sizeof (*trv));
@@ -11550,13 +11549,6 @@ int marpa_trv_dot(Marpa_Traverser trv)
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
     const int xrl_position = XRL_Position_of_AHM(ahm);
-
-    MARPA_DEBUG3("%s, raw xrl dot = %d", STRLOC, Raw_XRL_Position_of_AHM (ahm));
-    MARPA_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (ahm));
-    MARPA_DEBUG3("%s, nrl dot = %d", STRLOC, Position_of_AHM (ahm));
-    MARPA_DEBUG3("%s, ahm = %s", STRLOC, ahm_tag (ahm));
-    MARPA_DEBUG3("%s, yim = %s", STRLOC, yim_tag (g, yim));
-
     if (xrl_position < -1) {
         MARPA_ERROR (MARPA_ERR_NO_SUCH_RULE_ID);
         return failure_indicator;
@@ -11669,7 +11661,6 @@ int marpa_ltrv_soft_error(Marpa_LTraverser ltrv)
 PRIVATE Marpa_LTraverser
 ltrv_new(RECCE r, LIM lim)
 {
-    const GRAMMAR g = G_of_R(r);
     LTRAVERSER ltrv;
 
     ltrv = my_malloc (sizeof (*ltrv));
@@ -11711,9 +11702,9 @@ marpa_ltrv_trailhead_eim (Marpa_LTraverser ltrv, int*p_dot, Marpa_Earley_Set_ID*
       const YIM yim = Trailhead_YIM_of_LIM (lim);
       const XRL xrl = XRL_of_AHM (ahm);
       if (xrl) {
-          if (*p_dot)
+          if (p_dot)
               *p_dot = XRL_Position_of_AHM (ahm);
-          if (*p_origin)
+          if (p_origin)
               *p_origin = Origin_Ord_of_YIM (yim);
           return ID_of_XRL (xrl);
       }
@@ -11840,7 +11831,6 @@ new traversers.
 PRIVATE Marpa_PTraverser
 ptrv_new(RECCE r, YS ys, NSYID nsyid)
 {
-    const GRAMMAR g = G_of_R(r);
     PTRAVERSER ptrv;
     const PIM pim = First_PIM_of_YS_by_NSYID (ys, nsyid);
 
