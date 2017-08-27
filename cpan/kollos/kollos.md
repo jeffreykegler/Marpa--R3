@@ -1408,7 +1408,7 @@ Populate the `xsys` table.
         for xsy_name, _ in pairs(hash_xsy_data) do
              xsy_names[#xsy_names+1] = xsy_name
         end
-        table.sort(xsy_names)
+        table.sort(xsy_names, _M.memcmp)
         for xsy_id = 1, #xsy_names do
             local xsy_name = xsy_names[xsy_id]
 

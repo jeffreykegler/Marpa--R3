@@ -44,11 +44,11 @@ my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
 
 Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo166 Symbols' );
-S1 a
-S2 [a]
-S3 [:lex_start:]
-S4 S
-S5 [:start:]
+S1 S
+S2 [:lex_start:]
+S3 [:start:]
+S4 [a]
+S5 a
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->productions_show(), <<'END_OF_STRING', 'Leo166 Productions' );
