@@ -154,7 +154,7 @@ sub marked_line {
     my $nl_pos = index $output_line, "\n";
     $output_line = substr $output_line, 0, $nl_pos;
     my $pointer_line = ( q{ } x $column1 ) . q{^};
-    if ( defined $column2 ) {
+    if ( defined $column2 and $column2 > $column1 ) {
         my $further_offset = $column2 - $column1;
         $pointer_line .= ( q{ } x ( $further_offset - 1 ) ) . q{^};
     }
