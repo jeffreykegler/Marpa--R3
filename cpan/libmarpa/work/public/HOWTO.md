@@ -1,3 +1,7 @@
+= How to's
+
+== New error codes
+
 New error codes must be
 
 1.) in dev/api.texi
