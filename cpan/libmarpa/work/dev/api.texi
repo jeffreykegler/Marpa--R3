@@ -5719,6 +5719,16 @@ Numeric value: 4.
 @deftypevr Macro int MARPA_ERR_ANDIX_NEGATIVE
 Numeric value: 5.
 @end deftypevr
+
+@deftypevr Macro int MARPA_ERR_BASE_GENERATION_MISMATCH
+The error is reported for an object which tracks its
+base object by "generation".
+The error occurs when the base object generation should
+match, but does not.
+Numeric value: 101.
+Suggested message: "Base object generation does not match."
+@end deftypevr
+
 @deftypevr Macro int MARPA_ERR_BOCAGE_ITERATION_EXHAUSTED
 Numeric value: 7.
 @end deftypevr

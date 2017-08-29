@@ -138,6 +138,7 @@ const struct marpa_error_description_s marpa_error_description[] = {
   { 98, "MARPA_ERR_HEADERS_DO_NOT_MATCH", "Internal error: Libmarpa was built incorrectly" },
   { 99, "MARPA_ERR_NOT_A_SEQUENCE", "Rule is not a sequence" },
   { 100, "MARPA_ERR_GRAMMAR_IS_TRIVIAL", "Grammar is trivial" },
+  { 101, "MARPA_ERR_BASE_GENERATION_MISMATCH", "Base object generation does not match." },
 };
 
 
