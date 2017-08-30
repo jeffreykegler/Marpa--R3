@@ -13089,6 +13089,16 @@ PRIVATE void tree_free(TREE t)
     my_free( t);
 }
 
+@*0 Tree generations.
+Trees referenced by an active |VALUE| object
+cannot be iterated for the lifetime of that
+|VALUE| object.
+This is enforced by tracking the
+``generations'' of a tree.
+@d T_Generation(t) ((t)->t_generation)
+@<Int aligned tree elements@> = unsigned int t_generation;
+@ @<Initialize tree elements@> = t->t_generation = 0;
+
 @*0 Tree pause counting.
 Trees referenced by an active |VALUE| object
 cannot be iterated for the lifetime of that
@@ -13144,7 +13154,8 @@ tree_unpause (TREE t)
     tree_unref(t);
 }
 
-@ @<Function definitions@> =
+@
+@<Function definitions@> =
 int marpa_t_next(Marpa_Tree t)
 {
     @<Return |-2| on failure@>@;
@@ -13155,6 +13166,15 @@ int marpa_t_next(Marpa_Tree t)
     if (T_is_Paused(t)) {
           MARPA_ERROR (MARPA_ERR_TREE_PAUSED);
           return failure_indicator;
+    }
+    {
+        const unsigned int next_generation = T_Generation(t)+1;
+        if (next_generation > UINT_MAX - 42)
+        {
+          MARPA_ERROR (MARPA_ERR_DEVELOPMENT);
+          return termination_indicator;
+        }
+        T_Generation(t) = next_generation;
     }
 
     if (T_is_Exhausted (t))
@@ -13620,6 +13640,7 @@ Marpa_Value marpa_v_new(Marpa_Tree t)
         const VALUE v = marpa_obs_new (obstack, struct s_value, 1);
         v->t_obs = obstack;
         Step_Type_of_V (v) = Next_Value_Type_of_V (v) = MARPA_STEP_INITIAL;
+        V_T_Generation(v) = T_Generation(t);
         @<Initialize value elements@>@;
         tree_pause (t);
         T_of_V(v) = t;
@@ -13671,9 +13692,14 @@ value_ref (VALUE v)
   return v;
 }
 Marpa_Value
-marpa_v_ref (Marpa_Value v)
+marpa_v_ref (Marpa_Value public_v)
 {
-   return (Marpa_Value)value_ref((VALUE)v);
+   @<Return |NULL| on failure@>@;
+   const VALUE v = (VALUE)public_v;
+   @<Unpack value objects@>@;
+   @<Fail if fatal error@>@;
+   @<Fail if generation mismatch@>@;
+   return (Marpa_Value)value_ref(v);
 }
 
 @ @<Function definitions@> =
@@ -13687,6 +13713,20 @@ PRIVATE void value_free(VALUE v)
 @ @<Unpack value objects@> =
     TREE t = T_of_V(v);
     @<Unpack tree objects@>@;
+
+@*0 Valuator tree generation.
+The original generation of the base object,
+which is a |TREE|.
+@d V_T_Generation(v) ((v)->t_generation)
+@ @<Int aligned value elements@> =
+unsigned int t_generation;
+
+@
+@<Fail if generation mismatch@> =
+if (_MARPA_UNLIKELY(V_T_Generation(v) != T_Generation(t))) {
+    MARPA_ERROR(MARPA_ERR_BASE_GENERATION_MISMATCH);
+    return failure_indicator;
+}
 
 @*0 Valuator is nulling?.
 Is this valuator for a nulling parse?
@@ -13709,6 +13749,7 @@ int _marpa_v_trace(Marpa_Value public_v, int flag)
     const VALUE v = (VALUE)public_v;
     @<Unpack value objects@>@;
     @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
     if (_MARPA_UNLIKELY(!V_is_Active(v))) {
       MARPA_ERROR(MARPA_ERR_VALUATOR_INACTIVE);
       return failure_indicator;
@@ -13731,6 +13772,7 @@ Marpa_Nook_ID _marpa_v_nook(Marpa_Value public_v)
     const VALUE v = (VALUE)public_v;
     @<Unpack value objects@>@;
     @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
     if (_MARPA_UNLIKELY(V_is_Nulling(v))) return -1;
     if (_MARPA_UNLIKELY(!V_is_Active(v))) {
       MARPA_ERROR(MARPA_ERR_VALUATOR_INACTIVE);
@@ -13775,6 +13817,7 @@ int marpa_v_symbol_is_valued(
     const VALUE v = (VALUE)public_v;
     @<Unpack value objects@>@;
     @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
     @<Fail if |xsy_id| is malformed@>@;
     @<Soft fail if |xsy_id| does not exist@>@;
     return lbv_bit_test(XSY_is_Valued_BV_of_V(v), xsy_id);
@@ -13812,6 +13855,7 @@ int marpa_v_symbol_is_valued_set (
     const VALUE v = (VALUE)public_v;
     @<Return |-2| on failure@>@;
     @<Unpack value objects@>@;
+    @<Fail if generation mismatch@>@;
     @<Fail if fatal error@>@;
     if (_MARPA_UNLIKELY (value < 0 || value > 1))
       {
@@ -13835,6 +13879,7 @@ marpa_v_valued_force (Marpa_Value public_v)
   XSYID xsy_id;
   @<Unpack value objects@>@;
   @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
   xsy_count = XSY_Count_of_G (g);
   for (xsy_id = 0; xsy_id < xsy_count; xsy_id++)
     {
@@ -13857,6 +13902,7 @@ int marpa_v_rule_is_valued_set (
     @<Return |-2| on failure@>@;
     @<Unpack value objects@>@;
     @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
     if (_MARPA_UNLIKELY (value < 0 || value > 1))
       {
         MARPA_ERROR (MARPA_ERR_INVALID_BOOLEAN);
@@ -13879,6 +13925,7 @@ int marpa_v_rule_is_valued (
     @<Return |-2| on failure@>@;
     @<Unpack value objects@>@;
     @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
     @<Fail if |xrl_id| is malformed@>@;
     @<Soft fail if |xrl_id| does not exist@>@;
     {
@@ -13898,11 +13945,13 @@ typedef int Marpa_Step_Type;
 @<Function definitions@> =
 Marpa_Step_Type marpa_v_step(Marpa_Value public_v)
 {
-    @<Return |-2| on failure@>@;
     const VALUE v = (VALUE)public_v;
+    @<Return |-2| on failure@>@;
+    @<Unpack value objects@>@;
+    @<Fail if fatal error@>@;
+    @<Fail if generation mismatch@>@;
 
     if (V_is_Nulling(v)) {
-      @<Unpack value objects@>@;
       @<Step through a nulling valuator@>@;
       return Step_Type_of_V(v) = MARPA_STEP_INACTIVE;
     }
@@ -13914,7 +13963,6 @@ Marpa_Step_Type marpa_v_step(Marpa_Value public_v)
           case MARPA_STEP_INITIAL:
             {
               XSYID xsy_count;
-              @<Unpack value objects@>@;
               xsy_count = XSY_Count_of_G (g);
               lbv_fill (Valued_Locked_BV_of_V (v), xsy_count);
               @<Set rule-is-valued vector@>@;
@@ -14018,8 +14066,6 @@ for the rule.
        into this loop that is always the case -- if
        no rule was executed, this is a no-op. */
     int pop_arguments = 1;
-    @<Unpack value objects@>@;
-    @<Fail if fatal error@>@;
     and_nodes = ANDs_of_B(B_of_O(o));
 
     if (NOOK_of_V(v) < 0) {
