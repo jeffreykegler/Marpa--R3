@@ -5974,10 +5974,6 @@ It should free all memory associated with the valuation.
         slr.lmw_v = nil
 
         slr.tree_mode = nil
-        -- Libmarpa's tree pausing requires value objects to
-        -- be destroyed quickly
-        -- print("About to collect garbage")
-        collectgarbage()
     end
 
 ```

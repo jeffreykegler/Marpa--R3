@@ -186,7 +186,6 @@ $marpa_lua->exec(<<'END_OF_LUA');
         end
         ::LAST_STEP::
         value = nil
-        collectgarbage()
         actual_values[#actual_values+1] = stack[0]
     end
 

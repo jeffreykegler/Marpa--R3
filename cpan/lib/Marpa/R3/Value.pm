@@ -1526,7 +1526,6 @@ sub Marpa::R3::Scanless::R::value {
         -- io.stderr:write('tree:', inspect(slr.lmw_t))
         slr.lmw_v = nil
         -- print(inspect(_G))
-        collectgarbage()
         local result = slr.lmw_t:next()
         if not result then return result end
         -- print('result:', result)
