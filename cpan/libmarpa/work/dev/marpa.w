@@ -13099,61 +13099,6 @@ This is enforced by tracking the
 @<Int aligned tree elements@> = unsigned int t_generation;
 @ @<Initialize tree elements@> = t->t_generation = 0;
 
-@*0 Tree pause counting.
-Trees referenced by an active |VALUE| object
-cannot be iterated for the lifetime of that
-|VALUE| object.
-This is enforced by ``pausing'' the tree.
-Because there may be multiple |VALUE| objects
-for each |TREE| object,
-a pause counter is used.
-@ The |TREE| object's pause counter
-works much the same as a reference counter.
-And the two are tied together.
-Every time the pause counter is incremented,
-the |TREE| object's reference counter is also
-incremented.
-Similarly,
-every time the pause counter is decremented,
-the |TREE| object's reference counter is also
-decremented.
-For this reason, it is important that every
-tree ``pause'' be matched with a ``tree unpause''
-@ ``Pausing'' is used because the expected use of
-multiple |VALUE| objects is to evaluation a single
-tree instance in multiple ways ---
-|VALUE| objects are not expected to need to live
-into the next iteration of the |TREE| object.
-If a more complex relationship between |TREE| objects
-and |VALUE| objects becomes desirable, a cloning
-mechanism could be introduced.
-At this point,
-|TREE| objects are iterated directly for efficiency ---
-copying the |TREE| iterator to a tree instance would impose
-an overhead, one which adds absolutely no value
-for most applications.
-@d T_is_Paused(t) ((t)->t_pause_counter > 0)
-@<Int aligned tree elements@> = int t_pause_counter;
-@ @<Initialize tree elements@> = t->t_pause_counter = 0;
-@ @<Function definitions@> =
-PRIVATE void
-tree_pause (TREE t)
-{
-    MARPA_ASSERT(t->t_pause_counter >= 0);
-    MARPA_ASSERT(t->t_ref_count >= t->t_pause_counter);
-    t->t_pause_counter++;
-    tree_ref(t);
-}
-@ @<Function definitions@> =
-PRIVATE void
-tree_unpause (TREE t)
-{
-    MARPA_ASSERT(t->t_pause_counter > 0);
-    MARPA_ASSERT(t->t_ref_count >= t->t_pause_counter);
-    t->t_pause_counter--;
-    tree_unref(t);
-}
-
 @
 @<Function definitions@> =
 int marpa_t_next(Marpa_Tree t)
@@ -13163,10 +13108,6 @@ int marpa_t_next(Marpa_Tree t)
     int is_first_tree_attempt = (t->t_parse_count < 1);
     @<Unpack tree objects@>@;
     @<Fail if fatal error@>@;
-    if (T_is_Paused(t)) {
-          MARPA_ERROR (MARPA_ERR_TREE_PAUSED);
-          return failure_indicator;
-    }
     {
         const unsigned int next_generation = T_Generation(t)+1;
         if (next_generation > UINT_MAX - 42)
@@ -13642,7 +13583,6 @@ Marpa_Value marpa_v_new(Marpa_Tree t)
         Step_Type_of_V (v) = Next_Value_Type_of_V (v) = MARPA_STEP_INITIAL;
         V_T_Generation(v) = T_Generation(t);
         @<Initialize value elements@>@;
-        tree_pause (t);
         T_of_V(v) = t;
         if (T_is_Nulling(o)) {
           V_is_Nulling(v) = 1;
@@ -13705,7 +13645,6 @@ marpa_v_ref (Marpa_Value public_v)
 @ @<Function definitions@> =
 PRIVATE void value_free(VALUE v)
 {
-    tree_unpause(T_of_V(v));
     @<Destroy value elements@>@;
     @<Destroy value obstack@>@;
 }
