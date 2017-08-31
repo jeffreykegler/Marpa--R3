@@ -1813,57 +1813,7 @@ END_OF_LUA
 }
 
 sub trace_token_evaluation {
-    my ( $slr, $token_id, $token_value ) = @_;
-    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    my ( $cmd, $nook_ix, $and_node_id ) = $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => '',
-            args      => [],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-            }
-        },
-        <<'END_OF_LUA');
-        local slr = ...
-        _M.wrap(function ()
-            local nook_ix = slr.lmw_v:_nook()
-            if not nook_ix then
-                return 'trace', 'Nulling valuator'
-            end
-            local o = slr.lmw_o
-            local t = slr.lmw_t
-            local or_node_id = t:_nook_or_node(nook_ix)
-            local choice = t:_nook_choice(nook_ix)
-            local and_node_id = o:_and_node_order_get( or_node_id, choice )
-            return ok', 'ok', nook_ix, and_node_id
-        end)
-END_OF_LUA
-
-    return if $cmd eq 'return';
-
-    my $token_name;
-    if ( defined $token_id ) {
-        $token_name = $slg->g1_symbol_display($token_id);
-    }
-
-    print {$trace_file_handle}
-      'Pushed value from ',
-      $slr->and_node_tag($and_node_id),
-      ': ',
-      ( $token_name ? qq{$token_name = } : q{} ),
-      Data::Dumper->new( [ \$token_value ] )->Terse(1)->Dump
-      or Marpa::R3::exception('print to trace handle failed');
-
-    return;
-
+    die;
 } ## end sub trace_token_evaluation
 
 sub trace_stack_1 {
