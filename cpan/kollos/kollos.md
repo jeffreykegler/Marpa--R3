@@ -208,16 +208,6 @@ in these "Development Notes".
 * Eliminate all uses of "physical" and "virtual" wrt
   parse location.
 
-### Use generations in Libmarpa trees
-
-Currently a valuator "pauses" its base tree, so
-that it does not change during the life of the tree.
-This gets tricky for the Lua garbage collection --
-the valuator may not be garbage collected quickly,
-and no new tree can be created meantime.
-Instead, add a generation number to the tree, and
-use that.
-
 ### Kollos assumes core libraries are loaded
 
 Currently Kollos assumes that the
@@ -4261,6 +4251,73 @@ part of a "Pure Lua" implementation.
         return table.concat(pcs, ' ')
     end
 ```
+
+## SLIF valuer (SLV) class
+
+This is a registry object.
+
+### SLV fields
+
+```
+    -- miranda: section+ class_slv field declarations
+    class_slv_fields.lmw_b = true
+    class_slv_fields.lmw_o = true
+    class_slv_fields.lmw_t = true
+    class_slv_fields.regix = true
+    class_slv_fields.slr = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_slv_fields = {}
+    -- miranda: insert class_slv field declarations
+    declarations(_M.class_slv, class_slv_fields, 'slv')
+```
+
+```
+    -- miranda: section+ luaL_Reg definitions
+    static const struct luaL_Reg slv_methods[] = {
+      { NULL, NULL },
+    };
+
+```
+### SLV constructor
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.slv_new(slr, flat_args)
+        local slv = {}
+        setmetatable(slv, _M.class_slv)
+        slv.slr = slr
+        slv.regix = _M.register(_M.registry, slv)
+
+        local slg = slr.slg
+        local ranking_method = slg.ranking_method
+        _M.throw = false
+        local bocage = _M.bocage_new(slr.g1, slr.end_of_parse)
+        _M.throw = true
+        slv.lmw_b = bocage
+        if not bocage then return end
+
+        lmw_o = _M.order_new(bocage)
+        slv.lmw_o = lmw_o
+
+        if ranking_method == 'high_rule_only' then
+            slv.lmw_o:high_rank_only_set(1)
+            slv.lmw_o:rank()
+        end
+        if ranking_method == 'rule' then
+            slv.lmw_o:high_rank_only_set(0)
+            slv.lmw_o:rank()
+        end
+
+        lmw_t = _M.tree_new(lmw_o)
+        slr.lmw_t = lmw_t
+
+        return slv
+    end
+```
+
 
 ## Kollos semantics
 
@@ -8856,7 +8913,7 @@ Marpa::R3.
           marpa_lua_pushvalue(L, kollos_table_stack_ix);
           marpa_lua_setfield(L, -2, "kollos");
 
-          /* Create the SLIF grammar metatable */
+          /* Create the SLIF recce metatable */
           marpa_luaL_newlibtable(L, slr_methods);
           marpa_lua_pushvalue(L, upvalue_stack_ix);
           marpa_luaL_setfuncs(L, slr_methods, 1);
@@ -8864,6 +8921,17 @@ Marpa::R3.
           marpa_lua_setfield(L, -2, "__index");
           marpa_lua_pushvalue(L, -1);
           marpa_lua_setfield(L, kollos_table_stack_ix, "class_slr");
+          marpa_lua_pushvalue(L, kollos_table_stack_ix);
+          marpa_lua_setfield(L, -2, "kollos");
+
+          /* Create the SLIF value metatable */
+          marpa_luaL_newlibtable(L, slv_methods);
+          marpa_lua_pushvalue(L, upvalue_stack_ix);
+          marpa_luaL_setfuncs(L, slv_methods, 1);
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, -2, "__index");
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, kollos_table_stack_ix, "class_slv");
           marpa_lua_pushvalue(L, kollos_table_stack_ix);
           marpa_lua_setfield(L, -2, "kollos");
 
