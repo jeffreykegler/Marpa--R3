@@ -1593,48 +1593,14 @@ if entry == nil then return end
 return table.unpack(entry)
 END_OF_LUA
 
-                # say STDERR join "!", "Lua event:", @event;
-
                 my ( $event_type, @event_data ) = @event;
                 last EVENT if not $event_type;
-                if ( $event_type eq 'MARPA_STEP_TOKEN' ) {
-                    my ( $token_id, $token_value_ix, $token_value ) =
-                      @event_data;
-                    trace_token_evaluation( $slr, $token_id, $token_value );
-                    next EVENT;
-                } ## end if ( $event_type eq 'MARPA_STEP_TOKEN' )
 
                 say {$trace_file_handle} join q{ },
                   'value event:',
                   map { $_ // 'undef' } $event_type, @event_data
                   or Marpa::R3::exception('say to trace handle failed');
             } ## end EVENT: while (1)
-
-            if ( $trace_values >= 9 ) {
-
-                my ($highest_index) =
-                  $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    << 'END_OF_LUA', '' );
-    local recce =...
-    return recce:stack_top_index()
-END_OF_LUA
-
-                for my $i ( reverse 1 .. $highest_index ) {
-
-                    my ($value) =
-                      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                        << 'END_OF_LUA', 'i>*', $i );
-    local recce, ix =...
-    return recce:stack_get(ix)
-END_OF_LUA
-
-                    printf {$trace_file_handle} "Stack position %3d:\n", $i,
-                      or Marpa::R3::exception('print to trace handle failed');
-                    print {$trace_file_handle} q{ },
-                      Data::Dumper->new( [ \$value ] )->Terse(1)->Dump
-                      or Marpa::R3::exception('print to trace handle failed');
-                } ## end for my $i ( reverse 0 .. $value->highest_index )
-            } ## end if ( $trace_values >= 9 )
 
         } ## end if ($trace_values)
 
