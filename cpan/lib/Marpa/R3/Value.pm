@@ -1551,22 +1551,36 @@ END_OF_LUA
 END_OF_LUA
 
   STEP: while (1) {
-        my ( $value_type, @value_data ) = $slr->call_by_tag(
-            ( '@' . __FILE__ . ':' . __LINE__ ),
-            << 'END_OF_LUA', '');
-          local recce = ...
-          local result, new_values = recce:find_and_do_ops()
-          if result == -1 then return 'trace', -1, {} end
-          local this = recce.this_step
+
+    my ( $value_type, @value_data ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args      => [],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slr = ...
+        _M.wrap(function ()
+          local result, new_values = slr:find_and_do_ops()
+          if result == -1 then return 'ok', 'trace', -1, {} end
+          local this = slr.this_step
           local step_type = this.type
           if step_type == 'MARPA_STEP_INACTIVE' then
-             return step_type, -1, {}
+             return 'ok', step_type, -1, {}
           end
           local parm2 = -1
           if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
           if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
           if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
-          return step_type, parm2, new_values
+          return 'ok', step_type, parm2, new_values
+        end)
 END_OF_LUA
 
         if ($trace_values) {
@@ -1804,17 +1818,30 @@ sub trace_token_evaluation {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my ( $nook_ix, $and_node_id ) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', '>*' );
-    recce = ...
-    local nook_ix = recce.lmw_v:_nook()
-    local o = recce.lmw_o
-    local t = recce.lmw_t
-    local or_node_id = t:_nook_or_node(nook_ix)
-    local choice = t:_nook_choice(nook_ix)
-    local and_node_id = o:_and_node_order_get( or_node_id, choice )
-    return nook_ix, and_node_id
+    my ( $nook_ix, $and_node_id ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args      => [],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slr = ...
+        _M.wrap(function ()
+            local nook_ix = slr.lmw_v:_nook()
+            local o = slr.lmw_o
+            local t = slr.lmw_t
+            local or_node_id = t:_nook_or_node(nook_ix)
+            local choice = t:_nook_choice(nook_ix)
+            local and_node_id = o:_and_node_order_get( or_node_id, choice )
+            return ok', nook_ix, and_node_id
+        end)
 END_OF_LUA
 
     if ( not defined $nook_ix ) {
