@@ -1665,8 +1665,6 @@ END_OF_LUA
     return recce:stack_set(ix, sv)
 END_OF_LUA
 
-            trace_token_evaluation( $slr, $token_id, \$result )
-              if $trace_values;
             next STEP;
         } ## end if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' )
 
@@ -1777,10 +1775,6 @@ END_OF_LUA
 
     return $tag;
 }
-
-sub trace_token_evaluation {
-    die;
-} ## end sub trace_token_evaluation
 
 sub trace_stack_1 {
     my ( $slr, $args, $rule_id ) = @_;
