@@ -1818,7 +1818,7 @@ sub trace_token_evaluation {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
-    my ( $nook_ix, $and_node_id ) = $slr->coro_by_tag(
+    my ( $cmd, $nook_ix, $and_node_id ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => '',
@@ -1835,20 +1835,20 @@ sub trace_token_evaluation {
         local slr = ...
         _M.wrap(function ()
             local nook_ix = slr.lmw_v:_nook()
+            if not nook_ix then
+                return 'trace', 'Nulling valuator'
+            end
             local o = slr.lmw_o
             local t = slr.lmw_t
             local or_node_id = t:_nook_or_node(nook_ix)
             local choice = t:_nook_choice(nook_ix)
             local and_node_id = o:_and_node_order_get( or_node_id, choice )
-            return ok', nook_ix, and_node_id
+            return ok', 'ok', nook_ix, and_node_id
         end)
 END_OF_LUA
 
-    if ( not defined $nook_ix ) {
-        print {$trace_file_handle} "Nulling valuator\n"
-          or Marpa::R3::exception('Could not print to trace file');
-        return;
-    }
+    return if $cmd eq 'return';
+
     my $token_name;
     if ( defined $token_id ) {
         $token_name = $slg->g1_symbol_display($token_id);
