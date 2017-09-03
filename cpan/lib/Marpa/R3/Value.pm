@@ -1569,6 +1569,21 @@ END_OF_LUA
         local slr = ...
         _M.wrap(function ()
           local result, new_values = slr:find_and_do_ops()
+
+          if slr.trace_values > 0 then
+              local values_q = slr.trace_values_queue
+              for event_ix = 1, #values_q do
+                  local event = slr.trace_values_queue[event_ix]
+                  if event[1] then
+                      local msg = { 'value event:' }
+                      for ix = 1, #event do
+                          msg[#msg+1] = event[ix] or 'undef'
+                      end
+                      coroutine.yield('trace', table.concat(msg, ' '))
+                  end
+              end
+          end
+
           if result == -1 then return 'ok', 'trace', -1, {} end
           local this = slr.this_step
           local step_type = this.type
@@ -1581,39 +1596,6 @@ END_OF_LUA
           if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
           return 'ok', step_type, parm2, new_values
         end)
-END_OF_LUA
-
-    my @event = $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => '',
-            args      => [],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-            }
-        },
-                    <<'END_OF_LUA');
-local slr = ...;
-_M.wrap(function ()
-    if slr.trace_values > 0 then
-        local values_q = slr.trace_values_queue
-        for event_ix = 1, #values_q do
-            local event = slr.trace_values_queue[event_ix]
-            if event[1] then
-                local msg = { 'value event:' }
-                for ix = 1, #event do
-                    msg[#msg+1] = event[ix] or 'undef'
-                end
-                coroutine.yield('trace', table.concat(msg, ' '))
-            end
-        end
-    end
-    return 'ok'
-end)
 END_OF_LUA
 
         last STEP if not defined $value_type;
@@ -1727,11 +1709,25 @@ END_OF_LUA
 
             # my $wrapped_result = $result;
 
-            $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                << 'END_OF_LUA', 'S', $wrapped_result );
-    local recce, sv =...
-    local index = recce:stack_top_index()
-    return recce:stack_set(index, sv)
+    my ( $value_type, @value_data ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 'S',
+            args      => [$wrapped_result],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+    local slr, sv =...
+    _M.wrap(function ()
+        local index = slr:stack_top_index()
+        return slr:stack_set(index, sv)
+    end)
 END_OF_LUA
 
             if ($trace_values) {
