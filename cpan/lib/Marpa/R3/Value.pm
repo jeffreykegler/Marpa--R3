@@ -1530,6 +1530,11 @@ sub Marpa::R3::Scanless::R::value {
         if not result then return result end
         -- print('result:', result)
         slr.lmw_v = _M.value_new(slr.lmw_t)
+
+    local trace_values = slr.trace_values or 0
+    slr.lmw_v:_trace(trace_values)
+    slr:value_init(trace_values)
+
     return result
 END_OF_LUA
 
@@ -1540,15 +1545,6 @@ END_OF_LUA
     local $Marpa::R3::Context::slr  = $slr;
     local $Marpa::R3::Context::slg =
       $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my ($trace_values) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', '' );
-    local slr = ...
-    local trace_values = slr.trace_values or 0
-    slr.lmw_v:_trace(trace_values)
-    slr:value_init(trace_values)
-    return trace_values
-END_OF_LUA
 
   STEP: while (1) {
 
