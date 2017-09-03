@@ -1709,7 +1709,7 @@ END_OF_LUA
 
             # my $wrapped_result = $result;
 
-    my ( $value_type, @value_data ) = $slr->coro_by_tag(
+    $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 'S',
@@ -1726,7 +1726,7 @@ END_OF_LUA
     local slr, sv =...
     _M.wrap(function ()
         local index = slr:stack_top_index()
-        return slr:stack_set(index, sv)
+        slr:stack_set(index, sv)
     end)
 END_OF_LUA
 
