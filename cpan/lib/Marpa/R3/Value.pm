@@ -1585,21 +1585,38 @@ END_OF_LUA
 
         if ($trace_values) {
           EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {
-                my @event = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'i>*', $event_ix );
-local recce, event_ix = ...;
-local entry = recce.trace_values_queue[event_ix+1]
-if entry == nil then return end
-return table.unpack(entry)
+                my @event = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 'i>*',
+            args      => [$event_ix],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+                    <<'END_OF_LUA');
+local slr, event_ix = ...;
+_M.wrap(function ()
+    local entry = slr.trace_values_queue[event_ix+1]
+    if entry == nil then return 'ok' end
+    if entry[1] then
+        local msg = { 'value event:' }
+        for ix = 1, #entry do
+            msg[#msg+1] = entry[ix] or 'undef'
+        end
+        coroutine.yield('trace', table.concat(msg, ' '))
+    end
+    return 'ok', table.unpack(entry)
+end)
 END_OF_LUA
 
                 my ( $event_type, @event_data ) = @event;
                 last EVENT if not $event_type;
 
-                say {$trace_file_handle} join q{ },
-                  'value event:',
-                  map { $_ // 'undef' } $event_type, @event_data
-                  or Marpa::R3::exception('say to trace handle failed');
             } ## end EVENT: while (1)
 
         } ## end if ($trace_values)
