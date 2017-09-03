@@ -1583,13 +1583,11 @@ END_OF_LUA
         end)
 END_OF_LUA
 
-        if ($trace_values) {
-          EVENT: for ( my $event_ix = 0 ; ; $event_ix++ ) {
-                my @event = $slr->coro_by_tag(
+    my @event = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-            signature => 'i>*',
-            args      => [$event_ix],
+            signature => '',
+            args      => [],
             handlers  => {
                 trace => sub {
                     my ($msg) = @_;
@@ -1599,27 +1597,24 @@ END_OF_LUA
             }
         },
                     <<'END_OF_LUA');
-local slr, event_ix = ...;
+local slr = ...;
 _M.wrap(function ()
-    local entry = slr.trace_values_queue[event_ix+1]
-    if entry == nil then return 'ok' end
-    if entry[1] then
-        local msg = { 'value event:' }
-        for ix = 1, #entry do
-            msg[#msg+1] = entry[ix] or 'undef'
+    if slr.trace_values > 0 then
+        local values_q = slr.trace_values_queue
+        for event_ix = 1, #values_q do
+            local event = slr.trace_values_queue[event_ix]
+            if event[1] then
+                local msg = { 'value event:' }
+                for ix = 1, #event do
+                    msg[#msg+1] = event[ix] or 'undef'
+                end
+                coroutine.yield('trace', table.concat(msg, ' '))
+            end
         end
-        coroutine.yield('trace', table.concat(msg, ' '))
     end
-    return 'ok', table.unpack(entry)
+    return 'ok'
 end)
 END_OF_LUA
-
-                my ( $event_type, @event_data ) = @event;
-                last EVENT if not $event_type;
-
-            } ## end EVENT: while (1)
-
-        } ## end if ($trace_values)
 
         last STEP if not defined $value_type;
         last STEP if $value_type eq 'MARPA_STEP_INACTIVE';
