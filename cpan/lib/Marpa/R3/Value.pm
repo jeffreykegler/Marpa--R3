@@ -1722,7 +1722,9 @@ END_OF_LUA
                 },
                 terse_dump => sub {
                     my ($value) = @_;
-                    my $dumped = Data::Dumper->new( [$result] )->Terse(1)->Dump;
+                    my $unwrapped = do_tree_ops($slr, $value);
+                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+                    chomp $dumped;
                     return 'ok', $dumped;
                 },
             }
@@ -1747,16 +1749,12 @@ END_OF_LUA
             } 
             -- return nook_ix, and_node_id
             coroutine.yield('trace', table.concat(msg, ' '))
+            msg = { 'Calculated and pushed value:' }
+            msg[#msg+1] = coroutine.yield('terse_dump', sv)
+            coroutine.yield('trace', table.concat(msg, ' '))
         end
     end)
 END_OF_LUA
-
-            if ($trace_values) {
-                print {$trace_file_handle}
-                  'Calculated and pushed value: ',
-                  Data::Dumper->new( [$result] )->Terse(1)->Dump
-                  or Marpa::R3::exception('print to trace handle failed');
-            } ## end if ($trace_values)
 
             next STEP;
 
