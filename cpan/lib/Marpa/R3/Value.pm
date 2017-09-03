@@ -1732,7 +1732,7 @@ END_OF_LUA
 
             if ($trace_values) {
                 say {$trace_file_handle}
-                  trace_stack_1( $slr, $values, $irlid )
+                  trace_stack_1( $slr, (scalar @{$values}), $irlid )
                   or Marpa::R3::exception('Could not print to trace file');
                 print {$trace_file_handle}
                   'Calculated and pushed value: ',
@@ -1785,26 +1785,28 @@ END_OF_LUA
 }
 
 sub trace_stack_1 {
-    my ( $slr, $args, $rule_id ) = @_;
-    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my ( $slr, $argc, $rule_id ) = @_;
 
-    my $argc = scalar @{$args};
-    my ( $nook_ix, $and_node_id ) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-    local slr = ...
+    my ( $msg ) =
+      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', 'ii>*', $argc, $rule_id );
+    local slr, argc, irlid = ...
+    local slg = slr.slg
     local nook_ix = slr.lmw_v:_nook()
     local o = slr.lmw_o
     local t = slr.lmw_t
     local or_node_id = t:_nook_or_node(nook_ix)
     local choice = t:_nook_choice(nook_ix)
     local and_node_id = o:_and_order_get(or_node_id, choice)
-    return nook_ix, and_node_id
+    local msg = { 'Popping', tostring(argc), 'values to evaluate',
+       (slr:and_node_tag(and_node_id) .. ','),
+       'rule:',
+       slg:g1_rule_show(irlid)
+    } 
+    -- return nook_ix, and_node_id
+    return table.concat(msg, ' ')
 END_OF_LUA
 
-    return 'Popping ', $argc,
-      ' values to evaluate ',
-      $slr->and_node_tag($and_node_id),
-      ', rule: ', $slg->g1_rule_show($rule_id);
+    return $msg;
 
 } ## end sub trace_stack_1
 
