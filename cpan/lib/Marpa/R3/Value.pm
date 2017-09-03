@@ -1712,28 +1712,46 @@ END_OF_LUA
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-            signature => 'S',
-            args      => [$wrapped_result],
+            signature => 'Sii',
+            args      => [$wrapped_result, (scalar @{$values}), $irlid],
             handlers  => {
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;
                     return 'ok';
                 },
+                terse_dump => sub {
+                    my ($value) = @_;
+                    my $dumped = Data::Dumper->new( [$result] )->Terse(1)->Dump;
+                    return 'ok', $dumped;
+                },
             }
         },
         <<'END_OF_LUA');
-    local slr, sv =...
+    local slr, sv, argc, irlid =...
     _M.wrap(function ()
         local index = slr:stack_top_index()
         slr:stack_set(index, sv)
+        if slr.trace_values > 0 then
+            local slg = slr.slg
+            local nook_ix = slr.lmw_v:_nook()
+            local o = slr.lmw_o
+            local t = slr.lmw_t
+            local or_node_id = t:_nook_or_node(nook_ix)
+            local choice = t:_nook_choice(nook_ix)
+            local and_node_id = o:_and_order_get(or_node_id, choice)
+            local msg = { 'Popping', tostring(argc), 'values to evaluate',
+               (slr:and_node_tag(and_node_id) .. ','),
+               'rule:',
+               slg:g1_rule_show(irlid)
+            } 
+            -- return nook_ix, and_node_id
+            coroutine.yield('trace', table.concat(msg, ' '))
+        end
     end)
 END_OF_LUA
 
             if ($trace_values) {
-                say {$trace_file_handle}
-                  trace_stack_1( $slr, (scalar @{$values}), $irlid )
-                  or Marpa::R3::exception('Could not print to trace file');
                 print {$trace_file_handle}
                   'Calculated and pushed value: ',
                   Data::Dumper->new( [$result] )->Terse(1)->Dump
@@ -1789,21 +1807,6 @@ sub trace_stack_1 {
 
     my ( $msg ) =
       $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', 'ii>*', $argc, $rule_id );
-    local slr, argc, irlid = ...
-    local slg = slr.slg
-    local nook_ix = slr.lmw_v:_nook()
-    local o = slr.lmw_o
-    local t = slr.lmw_t
-    local or_node_id = t:_nook_or_node(nook_ix)
-    local choice = t:_nook_choice(nook_ix)
-    local and_node_id = o:_and_order_get(or_node_id, choice)
-    local msg = { 'Popping', tostring(argc), 'values to evaluate',
-       (slr:and_node_tag(and_node_id) .. ','),
-       'rule:',
-       slg:g1_rule_show(irlid)
-    } 
-    -- return nook_ix, and_node_id
-    return table.concat(msg, ' ')
 END_OF_LUA
 
     return $msg;
