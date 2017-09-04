@@ -1484,58 +1484,72 @@ sub Marpa::R3::Scanless::R::value {
           if ref $slr ne 'Marpa::R3::Scanless::R';
     }
 
-    my ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', '>*' );
-        local slr=...
-        local g1r = slr.g1
+    my ($result) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args      => [],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slr = ...
+        _M.wrap(function ()
+            local g1r = slr.g1
 
-        slr.tree_mode = slr.tree_mode or 'tree'
-        if slr.tree_mode ~= 'tree' then
-            error(
-                "value() called when recognizer is not in tree mode\n"
-                .. string.format('  The current mode is %q\n', slr.tree_mode)
-            )
-        end
+            slr.tree_mode = slr.tree_mode or 'tree'
+            if slr.tree_mode ~= 'tree' then
+                error(
+                    "value() called when recognizer is not in tree mode\n"
+                    .. string.format('  The current mode is %q\n', slr.tree_mode)
+                )
+            end
 
-        slr.phase = 'value'
-        local furthest_earleme = g1r:furthest_earleme()
-        local last_completed_earleme = g1r:current_earleme()
-        if furthest_earleme ~= last_completed_earleme then
-            error(string.format(
-                "Attempt to evaluate incompletely recognized parse:\n"
-                .. "  Last token ends at location %d\n"
-                .. "  Recognition done only as far as location %d\n",
-                furthest_earleme,
-                last_completed_earleme
-            ))
-        end
-        local lmw_t = slr.lmw_t
-        if not lmw_t then
-            -- No tree, therefore ordering is not initialized
-            local lmw_o = slr:ordering_get()
-            if not lmw_o then return false end
-            lmw_t = _M.tree_new(lmw_o)
-            slr.lmw_t = lmw_t
-        end
+            slr.phase = 'value'
+            local furthest_earleme = g1r:furthest_earleme()
+            local last_completed_earleme = g1r:current_earleme()
+            if furthest_earleme ~= last_completed_earleme then
+                error(string.format(
+                    "Attempt to evaluate incompletely recognized parse:\n"
+                    .. "  Last token ends at location %d\n"
+                    .. "  Recognition done only as far as location %d\n",
+                    furthest_earleme,
+                    last_completed_earleme
+                ))
+            end
+            local lmw_t = slr.lmw_t
+            if not lmw_t then
+                -- No tree, therefore ordering is not initialized
+                local lmw_o = slr:ordering_get()
+                if not lmw_o then return 'ok', false end
+                lmw_t = _M.tree_new(lmw_o)
+                slr.lmw_t = lmw_t
+            end
 
-        local max_parses = slr.max_parses
-        local parse_count = slr.lmw_t:parse_count()
-        if max_parses and parse_count > max_parses then
-            error(string.format("Maximum parse count (%d) exceeded", max_parses));
-        end
-        -- io.stderr:write('tree:', inspect(slr.lmw_t))
-        slr.lmw_v = nil
-        -- print(inspect(_G))
-        local result = slr.lmw_t:next()
-        if not result then return result end
-        -- print('result:', result)
-        slr.lmw_v = _M.value_new(slr.lmw_t)
+            local max_parses = slr.max_parses
+            local parse_count = slr.lmw_t:parse_count()
+            if max_parses and parse_count > max_parses then
+                error(string.format("Maximum parse count (%d) exceeded", max_parses));
+            end
+            -- io.stderr:write('tree:', inspect(slr.lmw_t))
+            slr.lmw_v = nil
+            -- print(inspect(_G))
+            local result = slr.lmw_t:next()
+            if not result then return 'ok', result end
+            -- print('result:', result)
+            slr.lmw_v = _M.value_new(slr.lmw_t)
 
-    local trace_values = slr.trace_values or 0
-    slr.lmw_v:_trace(trace_values)
-    slr:value_init(trace_values)
+        local trace_values = slr.trace_values or 0
+        slr.lmw_v:_trace(trace_values)
+        slr:value_init(trace_values)
 
-    return result
+        return 'ok', result
+    end)
 END_OF_LUA
 
     return if not defined $result;
