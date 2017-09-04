@@ -1272,6 +1272,7 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
         $eval_ok = eval {
             $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
             my $resume_arg;
+            my $handler_cmd;
           CORO_CALL: while (1) {
                 my ( $cmd, $yield_data ) =
                   $lua->call_by_tag( $regix, $resume_tag,
@@ -1286,8 +1287,9 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                 Marpa::R3::exception(qq{No coro handler for "$cmd"})
                   if not $handler;
                 $yield_data //= [];
-                my $handler_cmd;
                 ($handler_cmd, $resume_arg) = $handler->(@{$yield_data});
+                Marpa::R3::exception(qq{Bad return command ("$handler_cmd") from handler for "$cmd"})
+                  if not $handler_cmd or $handler_cmd ne 'ok';
             }
             return 1;
         };
