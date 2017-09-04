@@ -425,6 +425,7 @@ Restarted recognizer at B1L1c18
 Reading codepoint "*" 0x002a at B1L1c18
 Codepoint "*" 0x002a rejected as [\*] at B1L1c18
 Codepoint "*" 0x002a rejected as [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}] at B1L1c18
+valuator trace level: 1
 END_TRACE_OUTPUT
 
 # Marpa::R3::Display::End

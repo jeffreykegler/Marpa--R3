@@ -5998,13 +5998,9 @@ Called when a valuator is set up.
         slr.trace_values = trace_values;
         slr.trace_values_queue = {};
         if slr.trace_values > 0 then
-          local top_of_queue = #slr.trace_values_queue;
-          slr.trace_values_queue[top_of_queue+1] = {
-            "valuator trace level", 0,
-            slr.trace_values,
-          }
+          coroutine.yield('trace',
+            "valuator trace level: " ..  slr.trace_values)
         end
-
         slr.lmw_v.stack = {}
     end
 

@@ -309,6 +309,7 @@ Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option to 3
+valuator trace level: 3
 value event: starting op MARPA_STEP_TOKEN lua
 value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
 value event: starting op MARPA_STEP_RULE lua

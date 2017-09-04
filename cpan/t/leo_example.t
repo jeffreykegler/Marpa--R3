@@ -446,6 +446,7 @@ my $earley_sets_show_output_after = $recce->earley_sets_show();
 
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option to 2
+valuator trace level: 2
 Popping 1 values to evaluate R5:1@8-9S7@8, rule: Expression ::= Variable
 Calculated and pushed value: 3
 Popping 3 values to evaluate R4:3@6-9C5@8, rule: Expression ::= Lvalue MultiplyAssignOp Expression
