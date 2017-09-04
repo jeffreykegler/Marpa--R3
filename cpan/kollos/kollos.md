@@ -1767,10 +1767,10 @@ This is a registry object.
     class_slr_fields.token_values = true
     class_slr_fields.trace_terminals = true
     class_slr_fields.trace_values = true
-    class_slr_fields.trace_values_queue = true
     class_slr_fields.tree_mode = true
     class_slr_fields.trailers = true
     -- TODO delete after development
+    class_slr_fields.trace_values_queue = true
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
@@ -4491,13 +4491,6 @@ if not the value is an undef.
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
         stack[result_ix] = slr:current_token_literal()
-        if slr.trace_values > 0 then
-          local top_of_queue = #slr.trace_values_queue;
-          local tag, token_sv
-          slr.trace_values_queue[top_of_queue+1] =
-             {tag, slr.this_step.type, slr.this_step.symbol, slr.this_step.value, token_sv};
-             -- io.stderr:write('[step_type]: ', inspect(slr))
-        end
         return -1
     end
     op_fn_add("result_is_token_value", op_fn_result_is_token_value)
@@ -4575,10 +4568,10 @@ Returns a constant result.
         local result_ix = slr.this_step.result
         stack[result_ix] = constant_tree_op
         if slr.trace_values > 0 and slr.this_step.type == 'MARPA_STEP_TOKEN' then
-            local top_of_queue = #slr.trace_values_queue
-            slr.trace_values_queue[top_of_queue+1] =
-                { "valuator unknown step", slr.this_step.type, slr.token, constant}
-                      -- io.stderr:write('valuator unknown step: ', inspect(slr))
+            coroutine.yield('trace',
+                table.concat(
+                    { "valuator unknown step", slr.this_step.type, slr.token, constant},
+                    ' '))
         end
         return -1
     end
@@ -4885,11 +4878,11 @@ implementation, which returned the size of the
             local fn_key = ops[op_ix+1]
             local arg = ops[op_ix+2]
             if slr.trace_values >= 3 then
-              local queue = slr.trace_values_queue
               local tag = 'starting lua op'
-              queue[#queue+1] = {'starting op', slr.this_step.type, 'lua'}
-              queue[#queue+1] = {tag, slr.this_step.type, _M.vm_op_names[fn_key]}
-              -- io.stderr:write('starting op: ', inspect(slr))
+              coroutine.yield('trace',
+                  table.concat({'starting op', slr.this_step.type, 'lua'}, ' '))
+              coroutine.yield('trace',
+                  table.concat({tag, slr.this_step.type, _M.vm_op_names[fn_key]}, ' '))
             end
             -- io.stderr:write('ops: ', inspect(_M.vm_ops), '\n')
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')

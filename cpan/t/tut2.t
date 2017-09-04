@@ -310,52 +310,52 @@ Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 2' );
 my $expected_trace_output = <<'END_TRACE_OUTPUT';
 Setting trace_values option to 3
 valuator trace level: 3
-value event: starting op MARPA_STEP_TOKEN lua
-value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_TOKEN lua
-value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_TOKEN lua
-value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE push_one
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE push_one
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE push_one
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE callback
+starting op MARPA_STEP_TOKEN lua
+starting lua op MARPA_STEP_TOKEN result_is_token_value
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_TOKEN lua
+starting lua op MARPA_STEP_TOKEN result_is_token_value
+starting op MARPA_STEP_TOKEN lua
+starting lua op MARPA_STEP_TOKEN result_is_token_value
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE push_one
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE push_one
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE push_one
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE callback
 Popping 3 values to evaluate R2:3@0-3C1@2, rule: Term ::= Term '*' Factor
 Calculated and pushed value: 42
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_TOKEN lua
-value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_TOKEN lua
-value event: starting lua op MARPA_STEP_TOKEN result_is_token_value
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE push_one
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE push_one
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE push_one
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE callback
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_TOKEN lua
+starting lua op MARPA_STEP_TOKEN result_is_token_value
+starting op MARPA_STEP_TOKEN lua
+starting lua op MARPA_STEP_TOKEN result_is_token_value
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE push_one
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE push_one
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE push_one
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE callback
 Popping 3 values to evaluate R4:3@0-5C3@4, rule: Expression ::= Expression '+' Term
 Calculated and pushed value: 49
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-value event: starting op MARPA_STEP_RULE lua
-value event: starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
+starting op MARPA_STEP_RULE lua
+starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start:]['] ::= [:start:]
 Real symbol count is 1
 END_TRACE_OUTPUT
