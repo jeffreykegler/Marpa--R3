@@ -1579,21 +1579,6 @@ END_OF_LUA
         local slr = ...
         _M.wrap(function ()
           local result, new_values = slr:find_and_do_ops()
-
-          if slr.trace_values > 0 then
-              local values_q = slr.trace_values_queue
-              for event_ix = 1, #values_q do
-                  local event = slr.trace_values_queue[event_ix]
-                  if event[1] then
-                      local msg = { 'value event:' }
-                      for ix = 1, #event do
-                          msg[#msg+1] = event[ix] or 'undef'
-                      end
-                      coroutine.yield('trace', table.concat(msg, ' '))
-                  end
-              end
-          end
-
           if result == -1 then return 'ok', 'trace', -1, {} end
           local this = slr.this_step
           local step_type = this.type

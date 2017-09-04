@@ -1770,7 +1770,6 @@ This is a registry object.
     class_slr_fields.tree_mode = true
     class_slr_fields.trailers = true
     -- TODO delete after development
-    class_slr_fields.trace_values_queue = true
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
@@ -4915,7 +4914,6 @@ with "trace" and "do not return" being special cases.
 ```
     -- miranda: section+ VM operations
     function _M.class_slr.find_and_do_ops(slr)
-        slr.trace_values_queue = {}
         local grammar = slr.slg
         while true do
             local new_values = {}
@@ -4958,7 +4956,6 @@ with "trace" and "do not return" being special cases.
             if do_ops_result > 0 then
                 return 3, new_values
             end
-            if #slr.trace_values_queue > 0 then return -1, new_values end
         end
     end
 
@@ -5989,7 +5986,6 @@ Called when a valuator is set up.
         end
 
         slr.trace_values = trace_values;
-        slr.trace_values_queue = {};
         if slr.trace_values > 0 then
           coroutine.yield('trace',
             "valuator trace level: " ..  slr.trace_values)
@@ -6012,7 +6008,6 @@ It should free all memory associated with the valuation.
         -- io.stderr:write('Initializing rule semantics to nil\n')
 
         slr.trace_values = 0;
-        slr.trace_values_queue = {};
 
         slr.lmw_b = nil
         slr.lmw_o = nil
