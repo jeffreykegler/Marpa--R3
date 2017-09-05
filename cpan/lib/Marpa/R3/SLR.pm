@@ -1295,8 +1295,11 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                    next CORO_CALL;
                 }
                 if ($handler_cmd eq 'sig') {
-                   $signature = shift @resume_arg;
-                   $resume_arg = \@resume_arg;
+                   # say Data::Dumper::Dumper(\@resume_arg);
+                   my $resume_arg0 = $resume_arg[0];
+                   $signature = shift @{$resume_arg0};
+                   # say Data::Dumper::Dumper($resume_arg0);
+                   $resume_arg = $resume_arg0;
                    next CORO_CALL;
                 }
                 Marpa::R3::exception(qq{Bad return command ("$handler_cmd") from handler for "$cmd"})
