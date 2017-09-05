@@ -1271,14 +1271,13 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
         local $@;
         $eval_ok = eval {
             $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
-            my $resume_arg;
-            my $handler_cmd;
+            my $resume_arg = '';
+            my $signature = 's';
           CORO_CALL: while (1) {
                 my ( $cmd, $yield_data ) =
                   $lua->call_by_tag( $regix, $resume_tag,
                     'local slr, resume_arg = ...; return _M.resume(resume_arg)',
-                    's', $resume_arg );
-
+                    $signature, $resume_arg ) ;
                 if (not $cmd) {
                    @results = @{$yield_data};
                    return 1;
@@ -1287,9 +1286,20 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                 Marpa::R3::exception(qq{No coro handler for "$cmd"})
                   if not $handler;
                 $yield_data //= [];
-                ($handler_cmd, $resume_arg) = $handler->(@{$yield_data});
+                my ($handler_cmd, @resume_arg) = $handler->(@{$yield_data});
+                Marpa::R3::exception(qq{Undefined return command from handler for "$cmd"})
+                   if not defined $handler_cmd;
+                if ($handler_cmd eq 'ok') {
+                   $signature = 's';
+                   $resume_arg = $resume_arg[0];
+                   next CORO_CALL;
+                }
+                if ($handler_cmd eq 'signature') {
+                   $signature = shift @resume_arg;
+                   $resume_arg = \@resume_arg;
+                   next CORO_CALL;
+                }
                 Marpa::R3::exception(qq{Bad return command ("$handler_cmd") from handler for "$cmd"})
-                  if not $handler_cmd or $handler_cmd ne 'ok';
             }
             return 1;
         };
