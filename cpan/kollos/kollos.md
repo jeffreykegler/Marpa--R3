@@ -4561,11 +4561,10 @@ Returns a constant result.
 ```
     -- miranda: section+ VM operations
     local function op_fn_result_is_constant(slr, constant_ix)
-        local constant_tree_op = { 'perl', 'constant', constant_ix }
-        setmetatable(constant_tree_op, _M.mt_tree_op)
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
-        stack[result_ix] = constant_tree_op
+        local constant = coroutine.yield('constant', constant_ix)
+        stack[result_ix] = constant
         if slr.trace_values > 0 and slr.this_step.type == 'MARPA_STEP_TOKEN' then
             coroutine.yield('trace',
                 table.concat(

@@ -1294,7 +1294,7 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
                    $resume_arg = $resume_arg[0];
                    next CORO_CALL;
                 }
-                if ($handler_cmd eq 'signature') {
+                if ($handler_cmd eq 'sig') {
                    $signature = shift @resume_arg;
                    $resume_arg = \@resume_arg;
                    next CORO_CALL;
