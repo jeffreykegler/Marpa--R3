@@ -4393,7 +4393,7 @@ Perhaps I should delete this.
         for k,v in pairs(mt) do
             print(k, v)
         end
-        return -2
+        return
     end
     op_fn_add("debug", op_fn_debug)
 
@@ -4409,7 +4409,7 @@ It may be useful in debugging.
     -- miranda: section+ VM operations
 
     local function op_fn_noop (slr)
-        return -2
+        return
     end
     op_fn_add("noop", op_fn_noop)
 
@@ -4596,7 +4596,7 @@ Push an undef on the values array.
         local undef_tree_op = { 'perl', 'undef' }
         setmetatable(undef_tree_op, _M.mt_tree_op)
         new_values[next_ix] = undef_tree_op
-        return -2
+        return
     end
     op_fn_add("push_undef", op_fn_push_undef)
 
@@ -4617,7 +4617,7 @@ Push one of the RHS child values onto the values array.
         local result_ix = slr.this_step.result
         local next_ix = #new_values + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
-        return -2
+        return
     end
     op_fn_add("push_one", op_fn_push_one)
 
@@ -4665,7 +4665,7 @@ Otherwise the values of the RHS children are pushed.
         if slr.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
             new_values[next_ix] = slr:current_token_literal()
-            return -2
+            return
         end
         if slr.this_step.type == 'MARPA_STEP_RULE' then
             local stack = slr.lmw_v.stack
@@ -4676,10 +4676,10 @@ Otherwise the values of the RHS children are pushed.
                 new_values[to_ix] = stack[from_ix]
                 to_ix = to_ix + 1
             end
-            return -2
+            return
         end
         -- if 'MARPA_STEP_NULLING_SYMBOL', or unrecogized type
-        return -2
+        return
     end
     op_fn_add("push_values", op_fn_push_values)
 
@@ -4708,7 +4708,7 @@ in terms of the input string.
         end
         local next_ix = #new_values + 1;
         new_values[next_ix] = l0_start
-        return -2
+        return
     end
     op_fn_add("push_start", op_fn_push_start)
 
@@ -4737,7 +4737,7 @@ that is, in terms of the input string
         end
         local next_ix = #new_values + 1;
         new_values[next_ix] = l0_length
-        return -2
+        return
     end
     op_fn_add("push_length", op_fn_push_length)
 
@@ -4753,7 +4753,7 @@ in terms of G1 Earley sets.
     local function op_fn_push_g1_start(slr, dummy, new_values)
         local next_ix = #new_values + 1;
         new_values[next_ix] = slr.this_step.start_es_id
-        return -2
+        return
     end
     op_fn_add("push_g1_start", op_fn_push_g1_start)
 
@@ -4770,7 +4770,7 @@ that is, in terms of G1 Earley sets.
         local next_ix = #new_values + 1;
         new_values[next_ix] = (slr.this_step.es_id
             - slr.this_step.start_es_id) + 1
-        return -2
+        return
     end
     op_fn_add("push_g1_length", op_fn_push_g1_length)
 
@@ -4786,7 +4786,7 @@ that is, in terms of G1 Earley sets.
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
         local next_ix = #new_values + 1;
         new_values[next_ix] = constant_tree_op
-        return -2
+        return
     end
     op_fn_add("push_constant", op_fn_push_constant)
 
@@ -4802,7 +4802,7 @@ of every sequence of operations
     -- miranda: section+ VM operations
     local function op_fn_bless(slr, blessing_ix)
         slr.this_step.blessing_ix = blessing_ix
-        return -2
+        return
     end
     op_fn_add("bless", op_fn_bless)
 
@@ -4887,7 +4887,7 @@ implementation, which returned the size of the
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
             local op_fn = _M.vm_ops[fn_key]
             local result = op_fn(slr, arg, new_values)
-            if result >= -1 then return result end
+            if result then return result end
             op_ix = op_ix + 3
         end
         return -1
