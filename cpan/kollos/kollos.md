@@ -4889,7 +4889,7 @@ implementation, which returned the size of the
             local result = op_fn(slr, arg, new_values)
             if result >= -1 then return result end
             op_ix = op_ix + 3
-            end
+        end
         return -1
     end
 
@@ -4899,17 +4899,6 @@ implementation, which returned the size of the
 
 Determine the appropriate VM operations for this
 step, and perform them.
-Return codes are
-
-* 3 for callback;
-* 1 for return the step type;
-* 0 for return an empty list;
-* -1 for return 'trace';
-* -2 for no return.
-
-The mnemonic for these codes is
-that they represent the size of the list returned to Perl,
-with "trace" and "do not return" being special cases.
 
 ```
     -- miranda: section+ VM operations
@@ -4920,7 +4909,7 @@ with "trace" and "do not return" being special cases.
             local ops = {}
             slr:step()
             if slr.this_step.type == 'MARPA_STEP_INACTIVE' then
-                return 0, new_values
+                return new_values
             end
             if slr.this_step.type == 'MARPA_STEP_RULE' then
                 ops = grammar.rule_semantics[slr.this_step.rule]
@@ -4943,7 +4932,7 @@ with "trace" and "do not return" being special cases.
                 end
                 goto DO_OPS
             end
-            if true then return 1, new_values end
+            if true then return new_values end
             ::DO_OPS::
             if not ops then
                 error(string.format('No semantics defined for %s', slr.this_step.type))
@@ -4954,7 +4943,7 @@ with "trace" and "do not return" being special cases.
             local above_top = slr.this_step.result + 1
             for i = above_top,#stack do stack[i] = nil end
             if do_ops_result > 0 then
-                return 3, new_values
+                return new_values
             end
         end
     end
