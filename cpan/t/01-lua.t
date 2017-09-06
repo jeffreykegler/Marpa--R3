@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 53;
+use Test::More tests => 26;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -36,9 +36,6 @@ do_global_test('return 42', [], ['42'], 'The answer is 42: 1');
 do_global_test('strict.declare("taxicurry", true)', [], [], 'Taxi curry: declare');
 do_global_test('function taxicurry(fact2) return 9^3 + fact2 end', [], [], 'Taxi curry: 1');
 do_global_test('return taxicurry(10^3)', [], [1729], 'Taxi curry: 2');
-do_global_test("local x = ...; x[0] = 42; return x", [[]], [[42]], 'The answer is 42: 2');
-do_global_test("local x = ...; local tmp = x[1]; x[1] = x[0]; x[0] = tmp; return x", [[42, 7]], [[7, 42]], "Swap array elements: 1");
-do_global_test("local y = ...; y[1], y[0] = y[0], y[1]; return y", [[42, 7]], [[7, 42]], "Swap array elements: 2");
 do_global_test("local y = ...; return glue.sv.top_index(y)", [[42, 7]], [1], "Array top index of 1");
 do_global_test("local y = ...; return glue.sv.top_index(y)", [[]], [-1], "Array top index of -1");
 
@@ -98,56 +95,6 @@ push @tests, [
     sub { return [] },
     [1729],
     'Taxicurry: 2'
-];
-push @tests, [
-    ( '@' . __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...;
-    x[0] = 42; return x",
-    'S',
-    sub { return [ [] ] },
-    [ [42] ],
-    'The answer is 42: 2'
-];
-push @tests, [
-    ( '@' . __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...;
-    local tmp = x[1]; x[1] = x[0]; x[0] = tmp;
-    return x",
-    'S',
-    sub { return [ [ 42, 7 ] ] },
-    [ [ 7,  42 ] ],
-    "Swap array elements: 1"
-];
-push @tests, [
-    ( '@' . __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...; x[1], x[0] = x[0], x[1]; return x",
-    'S',
-    sub { return [ [ 42, 7 ] ] },
-    [ [ 7,  42 ] ],
-    "Swap array elements: 2"
-];
-push @tests, [
-    ( '@' . __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...; glue.sv.fill(x, 1); return x",
-    'S',
-    sub { return [ [ 1, 2, 3, 4 ] ] },
-    [ [ 1, 2 ] ],
-    "Fill method: 1"
-];
-push @tests, [
-    ( '@' . __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...; glue.sv.fill(x, 4); return x",
-    'S',
-    sub { return [ [ 1, 2, 3, 4 ] ] },
-    [ [ 1, 2, 3, 4, undef ] ],
-    "Fill method: 2"
-];
-push @tests, [
-    ( '@' . __FILE__ . ':' . __LINE__ ),
-    "local %OBJECT%, x = ...; glue.sv.fill(x, -1); return x",
-    'S',
-    sub { return [ [ 1, 2, 3, 4 ] ] },
-    [ [] ], "Fill method: 3"
 ];
 
 sub do_recce_test {

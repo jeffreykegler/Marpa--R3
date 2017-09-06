@@ -122,8 +122,6 @@ static int marpa_r3_warn(const char* format, ...)
  */
 
 #define MT_NAME_SV "Glue_sv"
-#define MT_NAME_AV "Glue_av"
-#define MT_NAME_ARRAY "Glue_array"
 
 /* Returns 0 if visitee_ix "thing" is already "seen",
  * otherwise, sets it "seen" and returns 1.
@@ -771,41 +769,6 @@ static int glue_sv_add_meth (lua_State* L) {
     return 1;
 }
 
-/* Fetch from table at index key.
- * The reference count is not changed, the caller must use this
- * SV immediately, or increment the reference count.
- * Will return 0, if there is no SV at that index.
- */
-static SV** glue_av_fetch(SV* table, lua_Integer key) {
-     dTHX;
-     AV* av;
-     if ( !SvROK(table) ) {
-        croak ("Attempt to fetch from an SV which is not a ref");
-     }
-     if ( SvTYPE(SvRV(table)) != SVt_PVAV) {
-        croak ("Attempt to fetch from an SV which is not an AV ref");
-     }
-     av = (AV*)SvRV(table);
-     return av_fetch(av, (int)key, 0);
-}
-
-static int glue_av_fetch_meth(lua_State* L) {
-    SV** p_result_sv;
-    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    lua_Integer key = marpa_luaL_checkinteger(L, 2);
-
-    p_result_sv = glue_av_fetch(*p_table_sv, key);
-    if (p_result_sv) {
-        SV* const sv = *p_result_sv;
-        /* Increment the reference count and put this SV on top of the stack */
-        MARPA_SV_SV(L, sv);
-    } else {
-        /* Put a new nil SV on top of the stack */
-        glue_sv_undef(L);
-    }
-    return 1;
-}
-
 /* Basically a Lua wrapper for Perl's av_len()
  */
 static int
@@ -827,31 +790,6 @@ glue_av_len_meth (lua_State * L)
     av = (AV *) SvRV (table);
     marpa_lua_pushinteger (L, av_len (av));
     return 1;
-}
-
-static void glue_av_store(SV* table, lua_Integer key, SV*value) {
-     dTHX;
-     AV* av;
-     if ( !SvROK(table) ) {
-        croak ("Attempt to index an SV which is not ref");
-     }
-     if ( SvTYPE(SvRV(table)) != SVt_PVAV) {
-        croak ("Attempt to index an SV which is not an AV ref");
-     }
-     av = (AV*)SvRV(table);
-     av_store(av, (int)key, value);
-}
-
-static int glue_av_store_meth(lua_State* L) {
-    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    lua_Integer key = marpa_luaL_checkinteger(L, 2);
-    SV* value_sv = coerce_to_sv(L, 3, '-');
-
-    /* coerce_to_sv transfered a reference count to us, which we
-     * pass on to the AV.
-     */
-    glue_av_store(*p_table_sv, key, value_sv);
-    return 0;
 }
 
 static void
@@ -926,8 +864,6 @@ static int glue_sv_addr_meth(lua_State* L) {
 static const struct luaL_Reg glue_sv_meths[] = {
     {"__add", glue_sv_add_meth},
     {"__gc", glue_sv_finalize_meth},
-    {"__index", glue_av_fetch_meth},
-    {"__newindex", glue_av_store_meth},
     {"__tostring", glue_sv_tostring_meth},
     {NULL, NULL},
 };
