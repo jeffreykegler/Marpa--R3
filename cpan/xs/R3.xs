@@ -744,31 +744,6 @@ glue_sv_dump_func (lua_State * L)
     return 0;
 }
 
-/* Convert Lua object to number, including our custom Marpa userdata's
- */
-static lua_Number marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
-    dTHX;
-    void* ud;
-    int pisnum2;
-    lua_Number n;
-    if (pisnum) *pisnum = 1;
-    n = marpa_lua_tonumberx(L, idx, &pisnum2);
-    if (pisnum2) return n;
-    ud = marpa_luaL_testudata(L, idx, MT_NAME_SV);
-    if (!ud) {
-        if (pisnum) *pisnum = 0;
-        return 0;
-    }
-    return (lua_Number) SvNV (*(SV**)ud);
-}
-
-static int glue_sv_add_meth (lua_State* L) {
-    lua_Number num1 = marpa_xlua_tonumber(L, 1, NULL);
-    lua_Number num2 = marpa_xlua_tonumber(L, 2, NULL);
-    marpa_lua_pushnumber(L, num1+num2);
-    return 1;
-}
-
 /* Basically a Lua wrapper for Perl's av_len()
  */
 static int
@@ -790,43 +765,6 @@ glue_av_len_meth (lua_State * L)
     av = (AV *) SvRV (table);
     marpa_lua_pushinteger (L, av_len (av));
     return 1;
-}
-
-static void
-glue_av_fill (lua_State * L, SV * sv, int x)
-{
-  dTHX;
-  AV *av;
-  SV **p_sv = (SV **) marpa_lua_newuserdata (L, sizeof (SV *));
-     /* warn("%s %d\n", __FILE__, __LINE__); */
-  *p_sv = sv;
-     /* warn("%s %d\n", __FILE__, __LINE__); */
-  if (!SvROK (sv))
-    {
-      croak ("Attempt to fetch from an SV which is not a ref");
-    }
-     /* warn("%s %d\n", __FILE__, __LINE__); */
-  if (SvTYPE (SvRV (sv)) != SVt_PVAV)
-    {
-      croak ("Attempt to fill an SV which is not an AV ref");
-    }
-     /* warn("%s %d\n", __FILE__, __LINE__); */
-  av = (AV *) SvRV (sv);
-     /* warn("%s %d about to call av_file(..., %d)\n", __FILE__, __LINE__, x); */
-  av_fill (av, x);
-     /* warn("%s %d\n", __FILE__, __LINE__); */
-}
-
-static int glue_av_fill_meth (lua_State* L) {
-    /* After development, check not needed */
-    /* I think this call is not used anywhere in the test suite */
-    SV** p_table_sv = (SV**)marpa_luaL_checkudata(L, 1, MT_NAME_SV);
-    /* warn("%s %d\n", __FILE__, __LINE__); */
-    lua_Integer index = marpa_luaL_checkinteger(L, 2);
-    /* warn("%s %d\n", __FILE__, __LINE__); */
-    glue_av_fill(L, *p_table_sv, (int)index);
-    /* warn("%s %d\n", __FILE__, __LINE__); */
-    return 0;
 }
 
 static int glue_sv_tostring_meth(lua_State* L) {
@@ -862,14 +800,12 @@ static int glue_sv_addr_meth(lua_State* L) {
 }
 
 static const struct luaL_Reg glue_sv_meths[] = {
-    {"__add", glue_sv_add_meth},
     {"__gc", glue_sv_finalize_meth},
     {"__tostring", glue_sv_tostring_meth},
     {NULL, NULL},
 };
 
 static const struct luaL_Reg glue_sv_funcs[] = {
-    {"fill", glue_av_fill_meth},
     {"top_index", glue_av_len_meth},
     {"undef", glue_sv_undef},
     {"svaddr", glue_sv_svaddr_meth},
