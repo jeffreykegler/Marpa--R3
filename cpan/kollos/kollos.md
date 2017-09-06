@@ -4865,6 +4865,9 @@ implementation, which returned the size of the
 
 ### Run the virtual machine
 
+Return `true` if the caller should continue reading ops,
+`false` if it should call back to Perl.
+
 ```
     -- miranda: section+ VM operations
     function _M.class_slr.do_ops(slr, ops, new_values)
