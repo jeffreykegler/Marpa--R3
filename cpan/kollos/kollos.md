@@ -4467,7 +4467,7 @@ The result of the semantics is a Perl undef.
         local undef_tree_op = { 'perl', 'undef' }
         setmetatable(undef_tree_op, _M.mt_tree_op)
         stack[slr.this_step.result] = undef_tree_op
-        return -1
+        return 'continue'
     end
     op_fn_add("result_is_undef", op_fn_result_is_undef)
 
@@ -4490,7 +4490,7 @@ if not the value is an undef.
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
         stack[result_ix] = slr:current_token_literal()
-        return -1
+        return 'continue'
     end
     op_fn_add("result_is_token_value", op_fn_result_is_token_value)
 
@@ -4517,7 +4517,7 @@ if not the value is an undef.
             end
             stack[result_ix] = stack[fetch_ix]
         until 1
-        return -1
+        return 'continue'
     end
     op_fn_add("result_is_n_of_rhs", op_fn_result_is_n_of_rhs)
 
@@ -4548,7 +4548,7 @@ the "N of RHS" operation should be used.
         if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
         end
-        return -1
+        return 'continue'
     end
     op_fn_add("result_is_n_of_sequence", op_fn_result_is_n_of_sequence)
 
@@ -4572,7 +4572,7 @@ Returns a constant result.
                     { "valuator unknown step", slr.this_step.type, slr.token, constant},
                     ' '))
         end
-        return -1
+        return 'continue'
     end
     op_fn_add("result_is_constant", op_fn_result_is_constant)
 
@@ -4824,7 +4824,7 @@ is the result of this sequence of operations.
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
         stack[result_ix] = new_values
-        return -1
+        return 'continue'
     end
     op_fn_add("result_is_array", op_fn_result_is_array)
 
@@ -4857,7 +4857,7 @@ implementation, which returned the size of the
           new_values = { 'perl', 'bless', new_values, blessing_ix }
           setmetatable(new_values, _M.mt_tree_op)
         end
-        return 3
+        return 'callback'
     end
     op_fn_add("callback", op_fn_callback)
 
@@ -4890,7 +4890,7 @@ Return `true` if the caller should continue reading ops,
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
             local op_fn = _M.vm_ops[fn_key]
             local result = op_fn(slr, arg, new_values)
-            if result then return result == -1 end
+            if result then return result == 'continue' end
             op_ix = op_ix + 3
         end
         return true
