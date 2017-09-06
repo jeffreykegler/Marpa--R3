@@ -1590,7 +1590,7 @@ END_OF_LUA
         <<'END_OF_LUA');
         local slr = ...
         _M.wrap(function ()
-          local new_values = slr:find_and_do_ops()
+          local new_values = slr:do_steps()
           local this = slr.this_step
           local step_type = this.type
           if step_type == 'MARPA_STEP_INACTIVE' then

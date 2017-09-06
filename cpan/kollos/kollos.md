@@ -4871,7 +4871,7 @@ implementation, which returned the size of the
         local op_ix = 1
         while op_ix <= #ops do
             local op_code = ops[op_ix]
-            if op_code == 0 then return -1 end
+            if op_code == 0 then return true end
             if op_code ~= _M.defines.op_lua then
             end
             local fn_key = ops[op_ix+1]
@@ -4887,10 +4887,10 @@ implementation, which returned the size of the
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
             local op_fn = _M.vm_ops[fn_key]
             local result = op_fn(slr, arg, new_values)
-            if result then return result end
+            if result then return result == -1 end
             op_ix = op_ix + 3
         end
-        return -1
+        return true
     end
 
 ```
@@ -4902,7 +4902,7 @@ step, and perform them.
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.find_and_do_ops(slr)
+    function _M.class_slr.do_steps(slr)
         local grammar = slr.slg
         while true do
             local new_values = {}
@@ -4942,9 +4942,7 @@ step, and perform them.
             -- truncate stack
             local above_top = slr.this_step.result + 1
             for i = above_top,#stack do stack[i] = nil end
-            if do_ops_result > 0 then
-                return new_values
-            end
+            if not do_ops_result then return new_values end
         end
     end
 
