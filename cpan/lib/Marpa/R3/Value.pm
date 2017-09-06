@@ -1500,7 +1500,14 @@ sub Marpa::R3::Scanless::R::value {
                     my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
                         ->[$constant_ix];
                     return 'sig', [ 'S', (bless [ 'asis', $constant ], "Marpa::R3::Tree_Op")];
-                }
+                },
+                terse_dump => sub {
+                    my ($value) = @_;
+                    my $unwrapped = do_tree_ops($slr, $value);
+                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+                    chomp $dumped;
+                    return 'ok', $dumped;
+                },
             }
         },
         <<'END_OF_LUA');
@@ -1584,7 +1591,14 @@ END_OF_LUA
                     my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
                         ->[$constant_ix];
                     return 'sig', [ 'S', (bless [ 'asis', $constant ], "Marpa::R3::Tree_Op")];
-                }
+                },
+                terse_dump => sub {
+                    my ($value) = @_;
+                    my $unwrapped = do_tree_ops($slr, $value);
+                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+                    chomp $dumped;
+                    return 'ok', $dumped;
+                },
             }
         },
         <<'END_OF_LUA');
@@ -1752,7 +1766,7 @@ END_OF_LUA
                (slr:and_node_tag(and_node_id) .. ','),
                'rule:',
                slg:g1_rule_show(irlid)
-            } 
+            }
             -- return nook_ix, and_node_id
             coroutine.yield('trace', table.concat(msg, ' '))
             msg = { 'Calculated and pushed value:' }
@@ -1781,10 +1795,33 @@ END_OF_LUA
 
     } ## end STEP: while (1)
 
-    my ($final_value) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', '', );
-    local recce =...
-    return recce:stack_get(1)
+    my ($final_value) =
+    $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args      => [],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+                terse_dump => sub {
+                    my ($value) = @_;
+                    my $unwrapped = do_tree_ops($slr, $value);
+                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+                    chomp $dumped;
+                    return 'ok', $dumped;
+                },
+            }
+        },
+        <<'END_OF_LUA');
+    local slr =...
+    _M.wrap(function ()
+        local retour = slr:stack_get(1)
+        return 'ok', retour
+    end)
 END_OF_LUA
 
 # say "final value: ", Data::Dumper::Dumper( \(do_tree_ops($slr, $final_value)) );
@@ -1850,7 +1887,7 @@ sub trace_op {
     end
     return
         '', nook_ix, or_node_id, choice,
-            o:_and_order_get(or_node_id, choice), 
+            o:_and_order_get(or_node_id, choice),
             trace_irl_id,
             g1g:_nrl_is_virtual_rhs(trace_irl_id),
             g1g:_nrl_is_virtual_lhs(trace_irl_id),

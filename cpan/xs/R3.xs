@@ -730,6 +730,22 @@ static int glue_sv_finalize_meth (lua_State* L) {
     return 0;
 }
 
+/* Basically a Lua wrapper for Perl's sv_dump()
+ */
+static int
+glue_sv_dump_func (lua_State * L)
+{
+    dTHX;
+    SV **const p_sv = (SV **) marpa_luaL_testudata (L, 1, MT_NAME_SV);
+    if (!p_sv) {
+      warn("Not an MT_NAME_SV userdata, type =%s\n",
+            marpa_luaL_typename (L, 1));
+      return 0;
+    }
+    sv_dump(*p_sv);
+    return 0;
+}
+
 /* Convert Lua object to number, including our custom Marpa userdata's
  */
 static lua_Number marpa_xlua_tonumber (lua_State* L, int idx, int* pisnum) {
@@ -926,6 +942,7 @@ static const struct luaL_Reg glue_sv_funcs[] = {
 };
 
 static const struct luaL_Reg glue_funcs[] = {
+    {"sv_dump", glue_sv_dump_func},
     {NULL, NULL},
 };
 

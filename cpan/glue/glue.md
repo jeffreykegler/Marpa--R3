@@ -429,6 +429,17 @@ a message
 
 ```
     -- miranda: section+ most Lua function definitions
+    function glue.dump(element)
+        local ele_type = type(element)
+        if ele_type == 'table' then
+           for ix = 1, #element do
+               glue.dump(element[ix])
+           end
+           return
+        end
+        glue.sv_dump(element)
+    end
+
     function glue.check_perl_l0_block_ix(slr, block_ix_arg)
         local block_ix, l0_pos, end_pos = slr:block_where(block_ix_arg)
         if not block_ix then
