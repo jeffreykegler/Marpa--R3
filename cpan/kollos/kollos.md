@@ -4464,9 +4464,7 @@ The result of the semantics is a Perl undef.
 
     local function op_fn_result_is_undef(slr)
         local stack = slr.lmw_v.stack
-        local undef_tree_op = { 'perl', 'undef' }
-        setmetatable(undef_tree_op, _M.mt_tree_op)
-        stack[slr.this_step.result] = undef_tree_op
+        stack[slr.this_step.result] = coroutine.yield('perl_undef')
         return 'continue'
     end
     op_fn_add("result_is_undef", op_fn_result_is_undef)
@@ -4591,9 +4589,8 @@ Push an undef on the values array.
 
     local function op_fn_push_undef(slr, dummy, new_values)
         local next_ix = #new_values + 1;
-        local undef_tree_op = { 'perl', 'undef' }
-        setmetatable(undef_tree_op, _M.mt_tree_op)
-        new_values[next_ix] = undef_tree_op
+        local constant = coroutine.yield('perl_undef')
+        new_values[next_ix] = constant
         return
     end
     op_fn_add("push_undef", op_fn_push_undef)

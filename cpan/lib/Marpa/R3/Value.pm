@@ -26,26 +26,6 @@ package Marpa::R3::Internal::Value;
 
 use English qw( -no_match_vars );
 
-sub gen_trace_handler {
-    my ($trace_file_handle) = @_;
-    return sub {
-        my ($msg) = @_;
-        say {$trace_file_handle} $msg;
-        return 'ok';
-    }
-}
-
-sub gen_terse_dump_handler {
-    my ($slr) = @_;
-    return sub {
-        my ($value) = @_;
-        my $unwrapped = do_tree_ops( $slr, $value );
-        my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
-        chomp $dumped;
-        return 'ok', $dumped;
-      }
-}
-
 # Given the grammar and an action name, resolve it to a closure,
 # or return undef
 sub resolve_action {
@@ -1489,6 +1469,30 @@ sub Marpa::R3::Scanless::R::value {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
+    my %value_handlers = (
+        trace => sub {
+            my ($msg) = @_;
+            say {$trace_file_handle} $msg;
+            return 'ok';
+        },
+        terse_dump => sub {
+            my ($value) = @_;
+            my $unwrapped = do_tree_ops( $slr, $value );
+            my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+            chomp $dumped;
+            return 'ok', $dumped;
+        },
+        constant => sub {
+            my ($constant_ix) = @_;
+            my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
+              ->[$constant_ix];
+            return 'sig', [ 'S', $constant ];
+        },
+        perl_undef => sub {
+            return 'sig', [ 'S', undef ];
+        },
+    );
+
     if ( scalar @_ != 1 ) {
         Marpa::R3::exception(
             'Too many arguments to Marpa::R3::Scanless::R::value')
@@ -1500,16 +1504,7 @@ sub Marpa::R3::Scanless::R::value {
         {
             signature => '',
             args      => [],
-            handlers  => {
-                trace => gen_trace_handler($trace_file_handle),
-                constant => sub {
-                    my ($constant_ix) = @_;
-                    my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
-                        ->[$constant_ix];
-                    return 'sig', [ 'S', $constant ];
-                },
-                terse_dump => gen_terse_dump_handler($slr),
-            }
+            handlers  => \%value_handlers
         },
         <<'END_OF_LUA');
         local slr = ...
@@ -1581,16 +1576,7 @@ END_OF_LUA
         {
             signature => '',
             args      => [],
-            handlers  => {
-                trace => gen_trace_handler($trace_file_handle),
-                constant => sub {
-                    my ($constant_ix) = @_;
-                    my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
-                        ->[$constant_ix];
-                    return 'sig', [ 'S', $constant ];
-                },
-                terse_dump => gen_terse_dump_handler($slr),
-            }
+            handlers  => \%value_handlers
         },
         <<'END_OF_LUA');
         local slr = ...
@@ -1725,10 +1711,7 @@ END_OF_LUA
         {
             signature => 'Sii',
             args      => [$wrapped_result, (scalar @{$values}), $irlid],
-            handlers  => {
-                trace => gen_trace_handler($trace_file_handle),
-                terse_dump => gen_terse_dump_handler($slr),
-            }
+            handlers  => \%value_handlers
         },
         <<'END_OF_LUA');
     local slr, sv, argc, irlid =...
@@ -1782,10 +1765,7 @@ END_OF_LUA
         {
             signature => '',
             args      => [],
-            handlers  => {
-                trace => gen_trace_handler($trace_file_handle),
-                terse_dump => gen_terse_dump_handler($slr),
-            }
+            handlers  => \%value_handlers
         },
         <<'END_OF_LUA');
     local slr =...
