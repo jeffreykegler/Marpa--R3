@@ -531,57 +531,6 @@ END_OF_LUA
     return ( $rule_resolutions, \@lexeme_resolutions );
 }
 
-sub do_tree_ops {
-    my ( $slr, $tree ) = @_;
-    my $blessing = Scalar::Util::blessed $tree;
-    if ( not defined $blessing ) {
-        my $ref = ref $tree;
-
-        # say STDERR "ref_type = $ref";
-        if ( $ref eq 'ARRAY' ) {
-
-            # say STDERR "Recursing into unblessed array";
-            return [ map { do_tree_ops( $slr, $_ ) } @{$tree} ];
-        }
-        if ( $ref eq 'REF' ) {
-
-            # say STDERR "Recursing into unblessed ref";
-            return \( do_tree_ops( $slr, ${$tree} ) );
-        }
-        return $tree;
-    }
-    if ( $blessing ne "Marpa::R3::Tree_Op" ) {
-        my $ref_type = Scalar::Util::reftype $tree;
-
-        # say STDERR "ref_type = $ref_type";
-        if ( $ref_type eq 'ARRAY)' ) {
-
-            # say STDERR "Recursing into blessed array";
-            return bless [ map { do_tree_ops( $slr, $_ ) } @{$tree} ],
-              $blessing;
-        }
-        if ( $ref_type eq 'REF)' ) {
-
-            # say STDERR "Recursing into blessed ref";
-            return bless \( do_tree_ops( $slr, ${$tree} ) ), $blessing;
-        }
-        return $tree;
-    }
-    my $tree_op = $tree->[0];
-    Marpa::R3::exception("Tree op missing") if not defined $tree_op;
-    if ( $tree_op eq 'asis' ) {
-
-        # say STDERR "Removing asis wrapper";
-        return $tree->[1];
-    }
-    if ( $tree_op ne 'perl' ) {
-        Marpa::R3::exception(qq{Unknown tree op ("$tree_op")});
-    }
-    my $lua_to_perl_tree_op = $tree->[1];
-    Marpa::R3::exception(
-        qq{Unknown Lua-to-Perl tree op ("$lua_to_perl_tree_op")});
-}
-
 sub op_fn_key_by_name {
     my ( $slg, $name ) = @_;
     my ($key) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1459,8 +1408,7 @@ sub Marpa::R3::Scanless::R::value {
         },
         terse_dump => sub {
             my ($value) = @_;
-            my $unwrapped = do_tree_ops( $slr, $value );
-            my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+            my $dumped = Data::Dumper->new( [$value] )->Terse(1)->Dump;
             chomp $dumped;
             return 'ok', $dumped;
         },
@@ -1632,13 +1580,8 @@ END_OF_LUA
                 );
             } ## end if ( not $eval_ok or @warnings )
 
-            my $wrapped_result = bless [ 'asis', $result ],
-              "Marpa::R3::Tree_Op";
-
-            # my $wrapped_result = $result;
-
             $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                << 'END_OF_LUA', 'S', $wrapped_result );
+                << 'END_OF_LUA', 'S', $result );
     local recce, sv =...
     local ix = recce:stack_top_index()
     return recce:stack_set(ix, sv)
@@ -1663,11 +1606,6 @@ END_OF_LUA
                 local $Marpa::R3::Context::irlid = $irlid;
                 local $Marpa::R3::Context::production_id = $slg->g1_rule_to_production_id($irlid);
 
-                # say STDERR "Before tree ops: ", Data::Dumper::Dumper($values);
-                $values = do_tree_ops( $slr, $values );
-
-                # say STDERR "After tree ops: ", Data::Dumper::Dumper($values);
-
                 $eval_ok = eval {
                     $result = $closure->( $semantics_arg0, $values );
                     1;
@@ -1688,17 +1626,11 @@ END_OF_LUA
                 } ## end if ( not $eval_ok or @warnings )
             }
 
-            # say STDERR "Before wrapping: ", Data::Dumper::Dumper($result);
-            my $wrapped_result = bless [ 'asis', $result ],
-              "Marpa::R3::Tree_Op";
-
-            # my $wrapped_result = $result;
-
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 'Sii',
-            args      => [$wrapped_result, (scalar @{$values}), $irlid],
+            args      => [$result, (scalar @{$values}), $irlid],
             handlers  => \%value_handlers
         },
         <<'END_OF_LUA');
@@ -1763,8 +1695,7 @@ END_OF_LUA
     end)
 END_OF_LUA
 
-# say "final value: ", Data::Dumper::Dumper( \(do_tree_ops($slr, $final_value)) );
-    return do_tree_ops( $slr, \($final_value) );
+    return \($final_value);
 
 }
 
