@@ -744,29 +744,6 @@ glue_sv_dump_func (lua_State * L)
     return 0;
 }
 
-/* Basically a Lua wrapper for Perl's av_len()
- */
-static int
-glue_av_len_meth (lua_State * L)
-{
-    dTHX;
-    AV *av;
-    SV **const p_table_sv = (SV **) marpa_luaL_checkudata (L, 1, MT_NAME_SV);
-    SV* const table = *p_table_sv;
-
-    if (!SvROK (table))
-      {
-          croak ("Attempt to fetch from an SV which is not a ref");
-      }
-    if (SvTYPE (SvRV (table)) != SVt_PVAV)
-      {
-          croak ("Attempt to fetch from an SV which is not an AV ref");
-      }
-    av = (AV *) SvRV (table);
-    marpa_lua_pushinteger (L, av_len (av));
-    return 1;
-}
-
 static int glue_sv_tostring_meth(lua_State* L) {
     /* Lua stack: [ sv_userdata ] */
     /* After development, check not needed */
@@ -806,7 +783,6 @@ static const struct luaL_Reg glue_sv_meths[] = {
 };
 
 static const struct luaL_Reg glue_sv_funcs[] = {
-    {"top_index", glue_av_len_meth},
     {"undef", glue_sv_undef},
     {"svaddr", glue_sv_svaddr_meth},
     {"addr", glue_sv_addr_meth},

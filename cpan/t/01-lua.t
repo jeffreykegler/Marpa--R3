@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 24;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -36,8 +36,6 @@ do_global_test('return 42', [], ['42'], 'The answer is 42: 1');
 do_global_test('strict.declare("taxicurry", true)', [], [], 'Taxi curry: declare');
 do_global_test('function taxicurry(fact2) return 9^3 + fact2 end', [], [], 'Taxi curry: 1');
 do_global_test('return taxicurry(10^3)', [], [1729], 'Taxi curry: 2');
-do_global_test("local y = ...; return glue.sv.top_index(y)", [[42, 7]], [1], "Array top index of 1");
-do_global_test("local y = ...; return glue.sv.top_index(y)", [[]], [-1], "Array top index of -1");
 
 sub do_global_test {
     my ($code, $args, $expected, $test_name) = @_;
