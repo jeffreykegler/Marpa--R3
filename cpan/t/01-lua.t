@@ -16,7 +16,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 48;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -93,6 +93,54 @@ push @tests, [
     sub { return [] },
     [1729],
     'Taxicurry: 2'
+];
+push @tests, [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'local %OBJECT%, x = ...; return x',
+    'S',
+    sub { return [42] },
+    [42],
+    'SV integer to SV'
+];
+push @tests, [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'local %OBJECT%, x = ...; return x',
+    'S',
+    sub { return [[42,"forty two"]] },
+    [[42,"forty two"]],
+    'SV array to SV'
+];
+push @tests, [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'local %OBJECT%, x = ...; return x',
+    'S',
+    sub { return ["forty two"] },
+    ["forty two"],
+    'SV string to SV'
+];
+push @tests, [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'local %OBJECT%, x = ...; return {x}',
+    'S',
+    sub { return [[42,"forty two"]] },
+    [[[42,"forty two"]]],
+    'SV array to SV 2'
+];
+push @tests, [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'local %OBJECT%, x = ...; return {x,x}',
+    'S',
+    sub { return [[42,"forty two"]] },
+    [[[42,"forty two"],[42,"forty two"]]],
+    'SV array to SV 3'
+];
+push @tests, [
+    ( '@' . __FILE__ . ':' . __LINE__ ),
+    'local %OBJECT%, x = ...; return {40,x,41,{x},43}',
+    'S',
+    sub { return [[42,"forty two"]] },
+    [[40,[42,"forty two"],41,[[42,"forty two"]], 43]],
+    'SV array to SV 4'
 ];
 
 sub do_recce_test {
