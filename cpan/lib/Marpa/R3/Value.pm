@@ -1507,7 +1507,7 @@ END_OF_LUA
 
   STEP: while (1) {
 
-    my ( $value_type, @value_data ) = $slr->coro_by_tag(
+    my ( $cmd, $value_type, @value_data ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => '',
@@ -1517,22 +1517,25 @@ END_OF_LUA
         <<'END_OF_LUA');
         local slr = ...
         _M.wrap(function ()
-          local new_values = slr:do_steps()
-          local this = slr.this_step
-          local step_type = this.type
-          if step_type == 'MARPA_STEP_INACTIVE' then
-             return 'ok', step_type, -1, {}
-          end
-          local parm2 = -1
-          if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
-          if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
-          if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
-          return 'ok', step_type, parm2, new_values
+            do -- TODO -- this will become 'while true do'
+                local new_values = slr:do_steps()
+                local this = slr.this_step
+                local step_type = this.type
+                if step_type == 'MARPA_STEP_INACTIVE' then
+                   return 'ok', 'last'
+                end
+                local parm2 = -1
+                if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
+                if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
+                if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
+                return 'ok', 'ok', step_type, parm2, new_values
+            end
         end)
 END_OF_LUA
 
-        last STEP if not defined $value_type;
-        last STEP if $value_type eq 'MARPA_STEP_INACTIVE';
+        last STEP if $cmd eq 'last';
+        next STEP if $cmd eq 'next';
+
         next STEP if $value_type eq 'trace';
 
         my $semantics_arg0 = $per_parse_arg // {};
@@ -1728,10 +1731,9 @@ sub trace_op {
 
     my ($slr)  = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my $trace_output = q{};
 
     my (
-        $cmd,
+        $cmd, $trace_output,
         $nook_ix,      $or_node_id,       $choice,      $and_node_id,
         $trace_irl_id, $virtual_rhs, $virtual_lhs,
         $real_symbol_count
@@ -1740,7 +1742,7 @@ sub trace_op {
         <<'END_OF_LUA' , '' );
     local slr = ...
     if not slr.trace_values or slr.trace_values < 2 then
-        return 'return'
+        return 'return', ''
     end
     local nook_ix = slr.lmw_v:_nook()
     local b = slr.lmw_b
@@ -1753,33 +1755,35 @@ sub trace_op {
     local or_node_position = b:_or_node_position(or_node_id)
     local irl_length = g1g:_nrl_length(trace_irl_id)
     if irl_length ~= or_node_position then
-        return 'return'
+        return 'return', ''
+    end
+    local is_virtual_rhs = g1g:_nrl_is_virtual_rhs(trace_irl_id)
+    local is_virtual_lhs = g1g:_nrl_is_virtual_lhs(trace_irl_id)
+    local real_symbol_count = g1g:_real_symbol_count(trace_irl_id)
+    if not is_virtual_rhs and not is_virtual_lhs then
+        return 'return', ''
+    end
+    if is_virtual_rhs and not is_virtual_lhs then
+        local msg = {'Head of Virtual Rule: '}
+        msg[#msg+1] = slr:and_node_tag(and_node_id)
+        msg[#msg+1] = ', rule: '
+        msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
+        msg[#msg+1] = '\n'
+        msg[#msg+1] = 'Incrementing virtual rule by '
+        msg[#msg+1] = real_symbol_count
+        msg[#msg+1] = ' symbols\n'
+        return 'return', table.concat(msg)
     end
     return
-        '', nook_ix, or_node_id, choice,
+        '', '', nook_ix, or_node_id, choice,
             o:_and_order_get(or_node_id, choice),
             trace_irl_id,
-            g1g:_nrl_is_virtual_rhs(trace_irl_id),
-            g1g:_nrl_is_virtual_lhs(trace_irl_id),
-            g1g:_real_symbol_count(trace_irl_id)
+            is_virtual_rhs,
+            is_virtual_lhs,
+            real_symbol_count
 END_OF_LUA
 
     if ($cmd eq 'return') { return $trace_output; }
-    return $trace_output if not $virtual_rhs and not $virtual_lhs;
-
-    if ( $virtual_rhs and not $virtual_lhs ) {
-
-        $trace_output .= join q{},
-          'Head of Virtual Rule: ',
-          $slr->and_node_tag($and_node_id),
-          ', rule: ', $slg->brief_nrl($trace_irl_id),
-          "\n",
-          'Incrementing virtual rule by ', $real_symbol_count, ' symbols', "\n"
-          or Marpa::R3::exception('Could not print to trace file');
-
-        return $trace_output;
-
-    } ## end if ( $virtual_rhs and not $virtual_lhs )
 
     if ( $virtual_lhs and $virtual_rhs ) {
 
