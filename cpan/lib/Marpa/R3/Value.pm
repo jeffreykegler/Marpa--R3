@@ -26,14 +26,25 @@ package Marpa::R3::Internal::Value;
 
 use English qw( -no_match_vars );
 
-sub Marpa::R3::show_rank_ref {
-    my ($rank_ref) = @_;
-    return 'undef' if not defined $rank_ref;
-    return 'SKIP'  if $rank_ref == -1;
-    return ${$rank_ref};
-} ## end sub Marpa::R3::show_rank_ref
+sub gen_trace_handler {
+    my ($trace_file_handle) = @_;
+    return sub {
+        my ($msg) = @_;
+        say {$trace_file_handle} $msg;
+        return 'ok';
+    }
+}
 
-package Marpa::R3::Internal::Value;
+sub gen_terse_dump_handler {
+    my ($slr) = @_;
+    return sub {
+        my ($value) = @_;
+        my $unwrapped = do_tree_ops( $slr, $value );
+        my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
+        chomp $dumped;
+        return 'ok', $dumped;
+      }
+}
 
 # Given the grammar and an action name, resolve it to a closure,
 # or return undef
@@ -1490,24 +1501,14 @@ sub Marpa::R3::Scanless::R::value {
             signature => '',
             args      => [],
             handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
+                trace => gen_trace_handler($trace_file_handle),
                 constant => sub {
                     my ($constant_ix) = @_;
                     my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
                         ->[$constant_ix];
                     return 'sig', [ 'S', (bless [ 'asis', $constant ], "Marpa::R3::Tree_Op")];
                 },
-                terse_dump => sub {
-                    my ($value) = @_;
-                    my $unwrapped = do_tree_ops($slr, $value);
-                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
-                    chomp $dumped;
-                    return 'ok', $dumped;
-                },
+                terse_dump => gen_terse_dump_handler($slr),
             }
         },
         <<'END_OF_LUA');
@@ -1581,24 +1582,14 @@ END_OF_LUA
             signature => '',
             args      => [],
             handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
+                trace => gen_trace_handler($trace_file_handle),
                 constant => sub {
                     my ($constant_ix) = @_;
                     my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
                         ->[$constant_ix];
                     return 'sig', [ 'S', (bless [ 'asis', $constant ], "Marpa::R3::Tree_Op")];
                 },
-                terse_dump => sub {
-                    my ($value) = @_;
-                    my $unwrapped = do_tree_ops($slr, $value);
-                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
-                    chomp $dumped;
-                    return 'ok', $dumped;
-                },
+                terse_dump => gen_terse_dump_handler($slr),
             }
         },
         <<'END_OF_LUA');
@@ -1735,18 +1726,8 @@ END_OF_LUA
             signature => 'Sii',
             args      => [$wrapped_result, (scalar @{$values}), $irlid],
             handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-                terse_dump => sub {
-                    my ($value) = @_;
-                    my $unwrapped = do_tree_ops($slr, $value);
-                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
-                    chomp $dumped;
-                    return 'ok', $dumped;
-                },
+                trace => gen_trace_handler($trace_file_handle),
+                terse_dump => gen_terse_dump_handler($slr),
             }
         },
         <<'END_OF_LUA');
@@ -1802,18 +1783,8 @@ END_OF_LUA
             signature => '',
             args      => [],
             handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-                terse_dump => sub {
-                    my ($value) = @_;
-                    my $unwrapped = do_tree_ops($slr, $value);
-                    my $dumped = Data::Dumper->new( [$unwrapped] )->Terse(1)->Dump;
-                    chomp $dumped;
-                    return 'ok', $dumped;
-                },
+                trace => gen_trace_handler($trace_file_handle),
+                terse_dump => gen_terse_dump_handler($slr),
             }
         },
         <<'END_OF_LUA');
