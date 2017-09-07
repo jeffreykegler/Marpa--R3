@@ -4508,9 +4508,7 @@ if not the value is an undef.
             if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
             if fetch_ix > slr.this_step.arg_n then
-                local undef_tree_op = { 'perl', 'undef' }
-                setmetatable(undef_tree_op, _M.mt_tree_op)
-                stack[result_ix] = undef_tree_op
+                stack[result_ix] = coroutine.yield('perl_undef')
                 break
             end
             stack[result_ix] = stack[fetch_ix]
@@ -4813,8 +4811,7 @@ is the result of this sequence of operations.
     local function op_fn_result_is_array(slr, dummy, new_values)
         local blessing_ix = slr.this_step.blessing_ix
         if blessing_ix then
-          new_values = { 'perl', 'bless', new_values, blessing_ix }
-          setmetatable(new_values, _M.mt_tree_op)
+          new_values = coroutine.yield('bless', new_values, blessing_ix)
         end
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
@@ -4849,8 +4846,7 @@ implementation, which returned the size of the
         end
         local blessing_ix = slr.this_step.blessing_ix
         if blessing_ix then
-          new_values = { 'perl', 'bless', new_values, blessing_ix }
-          setmetatable(new_values, _M.mt_tree_op)
+          new_values = coroutine.yield('bless', new_values, blessing_ix)
         end
         return 'callback'
     end
