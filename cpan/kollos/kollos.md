@@ -4963,50 +4963,6 @@ Set up the default VM operations
 
 ```
 
-### Tree export operations
-
-The "tree export operations" are performed when a tree is transformed
-from Kollos form to a form
-suitable for its parent layer.
-Currently the only parent layer is Marpa::R3.
-
-The tree export operations
-are defined as light userdata referring to a dedicated global
-constant, which guarantees they will never collide with user data.
-The global constants are defined only for the purpose of creating
-a unique address --
-their contents are never used.
-
-These operations are always the first element of a sequence.
-They tell
-Kollos how to transform the rest of the sequence.
-
-The "asis" operation simply passes on the 2nd element of the sequence
-as an SV.
-It probably will not be needed much
-
-```
-    -- miranda: section+ C global constant variables
-    static int tree_op_asis;
-    -- miranda: section+ create tree export operations
-    marpa_lua_pushlightuserdata(L, (void *)&tree_op_asis);
-    marpa_lua_setfield(L, kollos_table_stack_ix, "tree_op_asis");
-
-```
-
-The "bless" operation passes on the 2nd element of the sequence,
-blessed using the 3rd element.
-The 3rd element must be a string.
-
-```
-    -- miranda: section+ C global constant variables
-    static int tree_op_bless;
-    -- miranda: section+ create tree export operations
-    marpa_lua_pushlightuserdata(L, (void *)&tree_op_bless);
-    marpa_lua_setfield(L, kollos_table_stack_ix, "tree_op_bless");
-
-```
-
 ### VM-related utilities for use in the Perl code
 
 The following operations are used by the higher-level Perl code
@@ -7481,8 +7437,6 @@ Luacheck declarations
     -- miranda: language c
     -- miranda: insert preliminaries to the c library code
 
-    -- miranda: insert C global constant variables
-
     -- miranda: insert private error code declarations
     -- miranda: insert define error codes
     -- miranda: insert private event code declarations
@@ -7743,27 +7697,6 @@ Luacheck declarations
     static char kollos_ltrv_ud_mt_key;
     static char kollos_ptrv_ud_mt_key;
     static char kollos_trv_ud_mt_key;
-
-```
-
-The metatable for tree ops is actually empty.
-The presence or absence of the metatable itself
-is used to determine if a table contains a
-tree op.
-
-```
-    -- miranda: section+ C extern variables
-    extern char kollos_tree_op_mt_key;
-    -- miranda: section+ metatable keys
-    char kollos_tree_op_mt_key;
-    -- miranda: section+ set up empty metatables
-    /* Set up tree op metatable, initially empty */
-    /* tree_op_metatable = {} */
-    marpa_lua_newtable (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_tree_op_mt_key);
-    /* kollos.mt_tree_op = tree_op_metatable */
-    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_tree_op");
 
 ```
 
@@ -9113,8 +9046,6 @@ Marpa::R3.
 
             /* [ kollos ] */
 
-        -- miranda: insert create tree export operations
-
         marpa_lua_settop (L, kollos_table_stack_ix);
         /* [ kollos ] */
         return 1;
@@ -9402,12 +9333,10 @@ nothing in the code enforces it.
 ```
     -- miranda: section+ C extern variables
     extern char kollos_X_fallback_mt_key;
-    extern char kollos_X_proto_asis_mt_key;
     extern char kollos_X_proto_mt_key;
     extern char kollos_X_mt_key;
     -- miranda: section+ metatable keys
     char kollos_X_fallback_mt_key;
-    char kollos_X_proto_asis_mt_key;
     char kollos_X_proto_mt_key;
     char kollos_X_mt_key;
     -- miranda: section+ set up empty metatables
@@ -9425,13 +9354,6 @@ nothing in the code enforces it.
     marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_mt_key);
     /* kollos.mt_X_proto = mt_X_proto */
     marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto");
-
-    /* mt_X_proto_asis = {} */
-    marpa_lua_newtable (L);
-    marpa_lua_pushvalue (L, -1);
-    marpa_lua_rawsetp (L, LUA_REGISTRYINDEX, &kollos_X_proto_asis_mt_key);
-    /* kollos.mt_X_proto_asis = mt_X_proto_asis */
-    marpa_lua_setfield (L, kollos_table_stack_ix, "mt_X_proto_asis");
 
     /* Set up exception metatables, initially empty */
     /* mt_X = {} */
@@ -9525,7 +9447,6 @@ inspect package to dump it.
 
     _M.mt_X.__tostring = X_tostring
     _M.mt_X_proto.__tostring = X_tostring
-    _M.mt_X_proto_asis.__tostring = X_tostring
     _M.mt_X_fallback.__tostring = X_fallback_tostring
 
 ```

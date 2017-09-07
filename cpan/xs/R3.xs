@@ -177,33 +177,9 @@ coerce_to_sv (lua_State * L, int idx, char sig)
 
    marpa_lua_newtable(L);
    visited_ix = marpa_lua_gettop(L);
-   /* The tree op metatable is at visited_ix + 1 */
-   marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, (void*)&kollos_tree_op_mt_key);
    result = recursive_coerce_to_sv(L, visited_ix, absolute_index, sig);
    marpa_lua_settop(L, visited_ix-1);
    return result;
-}
-
-/* Stack hygiene is left to the caller and to coerce_to_av()
- */
-static SV*
-do_lua_tree_op (lua_State * L, int visited_ix, int idx, char signature)
-{
-    dTHX;
-    const char *lua_tree_op;
-    marpa_lua_geti (L, idx, 1);
-    if (marpa_lua_type (L, -1) != LUA_TSTRING) {
-        croak (R3ERR "Lua tree op is not a string; " MYLUA_TAG);
-    }
-    lua_tree_op = marpa_lua_tostring (L, -1);
-    if (!strcmp (lua_tree_op, "perl")) {
-        SV *av_ref = coerce_to_av (L, visited_ix, idx, signature);
-        sv_bless (av_ref, gv_stashpv ("Marpa::R3::Tree_Op", 1));
-        return av_ref;
-    }
-    croak (R3ERR "tree op (%s) not implemented; " MYLUA_TAG, lua_tree_op);
-    /* NOTREACHED */
-    return 0;
 }
 
 /* Reworked from Lua's utf8_decode.
@@ -297,29 +273,17 @@ recursive_coerce_to_sv (lua_State * L, int visited_ix, int idx, char signature)
         break;
     case LUA_TTABLE:
         {
-          /* If table at idx has a metatable, compare it with the
-           * tree op metatable.  If equal, do the tree ops.
-           */
-          if (marpa_lua_getmetatable (L, idx)
-              && marpa_lua_compare (L, visited_ix + 1, -1, LUA_OPEQ))
-            {
-              result = do_lua_tree_op (L, visited_ix, idx, signature);
+            switch (signature) {
+            default:
+            case '0':
+            case '1':
+                result = coerce_to_av (L, visited_ix, idx, signature);
+                break;
+            case '2':
+                result = coerce_to_pairs (L, visited_ix, idx);
+                break;
             }
-          else
-            {
-              switch (signature)
-                {
-                default:
-                case '0':
-                case '1':
-                  result = coerce_to_av (L, visited_ix, idx, signature);
-                  break;
-                case '2':
-                  result = coerce_to_pairs (L, visited_ix, idx);
-	  break;
-	}
-    }
-}
+        }
         break;
     case LUA_TUSERDATA:
         {
