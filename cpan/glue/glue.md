@@ -437,6 +437,9 @@ a message
            end
            return
         end
+        if ele_type == 'userdata' then
+            io.stderr:write('metatable: ', inspect(getmetatable(element)))
+        end
         glue.sv_dump(element)
     end
 

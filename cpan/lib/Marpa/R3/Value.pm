@@ -1506,7 +1506,7 @@ sub Marpa::R3::Scanless::R::value {
                     my ($constant_ix) = @_;
                     my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
                         ->[$constant_ix];
-                    return 'sig', [ 'S', (bless [ 'asis', $constant ], "Marpa::R3::Tree_Op")];
+                    return 'sig', [ 'S', $constant ];
                 },
                 terse_dump => gen_terse_dump_handler($slr),
             }
@@ -1587,7 +1587,7 @@ END_OF_LUA
                     my ($constant_ix) = @_;
                     my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
                         ->[$constant_ix];
-                    return 'sig', [ 'S', (bless [ 'asis', $constant ], "Marpa::R3::Tree_Op")];
+                    return 'sig', [ 'S', $constant ];
                 },
                 terse_dump => gen_terse_dump_handler($slr),
             }

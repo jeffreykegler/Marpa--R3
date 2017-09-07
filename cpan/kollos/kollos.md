@@ -4781,11 +4781,11 @@ that is, in terms of G1 Earley sets.
 ```
     -- miranda: section+ VM operations
     local function op_fn_push_constant(slr, constant_ix, new_values)
-        local constant_tree_op = { 'perl', 'constant', constant_ix }
-        setmetatable(constant_tree_op, _M.mt_tree_op)
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
         local next_ix = #new_values + 1;
-        new_values[next_ix] = constant_tree_op
+        local constant = coroutine.yield('constant', constant_ix)
+
+        new_values[next_ix] = constant
         return
     end
     op_fn_add("push_constant", op_fn_push_constant)
