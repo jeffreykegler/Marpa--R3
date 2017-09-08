@@ -1417,7 +1417,7 @@ sub Marpa::R3::Scanless::R::value {
     my %value_handlers = (
         trace => sub {
             my ($msg) = @_;
-            my $nl = ($msg =~ /\n\z/xms) ? '' : "\n";
+            my $nl = ( $msg =~ /\n\z/xms ) ? '' : "\n";
             print {$trace_file_handle} $msg, $nl;
             return 'ok';
         },
@@ -1429,7 +1429,7 @@ sub Marpa::R3::Scanless::R::value {
         },
         constant => sub {
             my ($constant_ix) = @_;
-            my $constant = $constants ->[$constant_ix];
+            my $constant = $constants->[$constant_ix];
             return 'sig', [ 'S', $constant ];
         },
         perl_undef => sub {
@@ -1439,6 +1439,40 @@ sub Marpa::R3::Scanless::R::value {
             my ( $value, $blessing_ix ) = @_;
             my $blessing = $constants->[$blessing_ix];
             return 'sig', [ 'S', ( bless $value, $blessing ) ];
+        },
+        perl_nulling_semantics => sub {
+            my ($token_id) = @_;
+            my $value_ref = $nulling_closures->[$token_id];
+            my $result;
+            my @warnings;
+            my $eval_ok;
+          DO_EVAL: {
+                local $SIG{__WARN__} = sub {
+                    push @warnings, [ $_[0], ( caller 0 ) ];
+                };
+                $eval_ok = eval {
+                    my $irlid = $null_values->[$token_id];
+                    local $Marpa::R3::Context::irlid = $irlid;
+                    local $Marpa::R3::Context::production_id =
+                      $slg->g1_rule_to_production_id($irlid);
+                    $result = $value_ref->( $semantics_arg0, [] );
+                    1;
+                };
+            } ## end DO_EVAL:
+            if ( not $eval_ok or @warnings ) {
+                my $fatal_error = $EVAL_ERROR;
+                code_problems(
+                    {
+                        fatal_error => $fatal_error,
+                        eval_ok     => $eval_ok,
+                        warnings    => \@warnings,
+                        where       => 'computing value',
+                        long_where  => 'Computing value for null symbol: '
+                          . $slg->g1_symbol_display($token_id),
+                    }
+                );
+            } ## end if ( not $eval_ok or @warnings )
+            return 'sig', [ 'S', $result ];
         }
     );
 
@@ -1534,7 +1568,12 @@ END_OF_LUA
                 local parm2 = -1
                 if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
                 if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
-                if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
+                if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
+                    local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
+                    local ix = slr:stack_top_index()
+                    slr:stack_set(ix, sv)
+                    return 'ok', 'next'
+                end
                 if step_type == 'MARPA_STEP_TRACE' then
                     local msg = slr:trace_valuer_step()
                     if msg then coroutine.yield('trace', msg) end
@@ -1547,57 +1586,6 @@ END_OF_LUA
 
         last STEP if $cmd eq 'last';
         next STEP if $cmd eq 'next';
-
-        # TODO -- Delete after development
-        die if $value_type eq 'trace';
-
-        if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' ) {
-            my ($token_id) = @value_data;
-            my $value_ref = $nulling_closures->[$token_id];
-            my $result;
-
-            my @warnings;
-            my $eval_ok;
-
-          DO_EVAL: {
-                local $SIG{__WARN__} = sub {
-                    push @warnings, [ $_[0], ( caller 0 ) ];
-                };
-
-                $eval_ok = eval {
-                    my $irlid = $null_values->[$token_id];
-                    local $Marpa::R3::Context::irlid = $irlid;
-                    local $Marpa::R3::Context::production_id =
-                      $slg->g1_rule_to_production_id($irlid);
-                    $result = $value_ref->( $semantics_arg0, [] );
-                    1;
-                };
-
-            } ## end DO_EVAL:
-
-            if ( not $eval_ok or @warnings ) {
-                my $fatal_error = $EVAL_ERROR;
-                code_problems(
-                    {
-                        fatal_error => $fatal_error,
-                        eval_ok     => $eval_ok,
-                        warnings    => \@warnings,
-                        where       => 'computing value',
-                        long_where  => 'Computing value for null symbol: '
-                          . $slg->g1_symbol_display($token_id),
-                    }
-                );
-            } ## end if ( not $eval_ok or @warnings )
-
-            $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                << 'END_OF_LUA', 'S', $result );
-    local recce, sv =...
-    local ix = recce:stack_top_index()
-    return recce:stack_set(ix, sv)
-END_OF_LUA
-
-            next STEP;
-        } ## end if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' )
 
         if ( $value_type eq 'MARPA_STEP_RULE' ) {
             my ( $irlid, $values ) = @value_data;
