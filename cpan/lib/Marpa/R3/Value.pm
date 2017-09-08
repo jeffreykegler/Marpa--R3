@@ -1716,103 +1716,15 @@ END_OF_LUA
     return $tag;
 }
 
-sub trace_stack_1 {
-    my ( $slr, $argc, $rule_id ) = @_;
-
-    my ( $msg ) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', 'ii>*', $argc, $rule_id );
-END_OF_LUA
-
-    return $msg;
-
-} ## end sub trace_stack_1
-
+# TODO -- move into Lua and delete
 sub trace_op {
-
     my ($slr)  = @_;
-    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
-    my (
-        $cmd, $trace_output,
-        $nook_ix,      $or_node_id,       $choice,      $and_node_id,
-        $trace_irl_id, $virtual_rhs, $virtual_lhs,
-        $real_symbol_count
-      )
+    my ( $trace_output)
       = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA' , '' );
     local slr = ...
-    if not slr.trace_values or slr.trace_values < 2 then
-        return 'return', ''
-    end
-    local nook_ix = slr.lmw_v:_nook()
-    local b = slr.lmw_b
-    local o = slr.lmw_o
-    local t = slr.lmw_t
-    local g1g = slr.slg.g1
-    local or_node_id = t:_nook_or_node(nook_ix)
-    local choice = t:_nook_choice(nook_ix)
-    local trace_irl_id = b:_or_node_nrl(or_node_id)
-    local or_node_position = b:_or_node_position(or_node_id)
-    local irl_length = g1g:_nrl_length(trace_irl_id)
-    if irl_length ~= or_node_position then
-        return 'return', ''
-    end
-    local is_virtual_rhs = g1g:_nrl_is_virtual_rhs(trace_irl_id)
-    local is_virtual_lhs = g1g:_nrl_is_virtual_lhs(trace_irl_id)
-    local real_symbol_count = g1g:_real_symbol_count(trace_irl_id)
-    if not is_virtual_rhs and not is_virtual_lhs then
-        return 'return', ''
-    end
-    if is_virtual_rhs and not is_virtual_lhs then
-        local msg = {'Head of Virtual Rule: '}
-        msg[#msg+1] = slr:and_node_tag(and_node_id)
-        msg[#msg+1] = ', rule: '
-        msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
-        msg[#msg+1] = '\n'
-        msg[#msg+1] = 'Incrementing virtual rule by '
-        msg[#msg+1] = real_symbol_count
-        msg[#msg+1] = ' symbols\n'
-        return 'return', table.concat(msg)
-    end
-    return
-        '', '', nook_ix, or_node_id, choice,
-            o:_and_order_get(or_node_id, choice),
-            trace_irl_id,
-            is_virtual_rhs,
-            is_virtual_lhs,
-            real_symbol_count
+    return slr:trace_valuer_step()
 END_OF_LUA
-
-    if ($cmd eq 'return') { return $trace_output; }
-
-    if ( $virtual_lhs and $virtual_rhs ) {
-
-        $trace_output .= join q{},
-          'Virtual Rule: ',
-          $slr->and_node_tag($and_node_id),
-          ', rule: ', $slg->brief_nrl($trace_irl_id),
-          "\nAdding ",
-          $real_symbol_count,
-          "\n";
-
-        return $trace_output;
-
-    } ## end if ( $virtual_lhs and $virtual_rhs )
-
-    if ( not $virtual_rhs and $virtual_lhs ) {
-
-        $trace_output .= join q{},
-          'New Virtual Rule: ',
-          $slr->and_node_tag($and_node_id),
-          ', rule: ', $slg->brief_nrl($trace_irl_id),
-          "\nReal symbol count is ",
-          $real_symbol_count,
-          "\n";
-
-        return $trace_output;
-
-    } ## end if ( not $virtual_rhs and $virtual_lhs )
-
     return $trace_output;
 } ## end sub trace_op
 

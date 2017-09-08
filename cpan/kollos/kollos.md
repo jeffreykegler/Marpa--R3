@@ -4251,6 +4251,69 @@ part of a "Pure Lua" implementation.
     end
 ```
 
+TODO: Move to SLV, then delete
+```
+    -- miranda: section+ forward declarations
+    local trace_valuer_step
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.trace_valuer_step ( slr )
+        if not slr.trace_values or slr.trace_values < 2 then
+            return ''
+        end
+        local nook_ix = slr.lmw_v:_nook()
+        local b = slr.lmw_b
+        local o = slr.lmw_o
+        local t = slr.lmw_t
+        local g1g = slr.slg.g1
+        local or_node_id = t:_nook_or_node(nook_ix)
+        local choice = t:_nook_choice(nook_ix)
+        local and_node_id = o:_and_order_get(or_node_id, choice)
+        local trace_irl_id = b:_or_node_nrl(or_node_id)
+        local or_node_position = b:_or_node_position(or_node_id)
+        local irl_length = g1g:_nrl_length(trace_irl_id)
+        if irl_length ~= or_node_position then
+            return ''
+        end
+        local is_virtual_rhs = g1g:_nrl_is_virtual_rhs(trace_irl_id) ~= 0
+        local is_virtual_lhs = g1g:_nrl_is_virtual_lhs(trace_irl_id) ~= 0
+        local real_symbol_count = g1g:_real_symbol_count(trace_irl_id)
+        if is_virtual_rhs and not is_virtual_lhs then
+            local msg = {'Head of Virtual Rule: '}
+            msg[#msg+1] = slr:and_node_tag(and_node_id)
+            msg[#msg+1] = ', rule: '
+            msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
+            msg[#msg+1] = '\n'
+            msg[#msg+1] = 'Incrementing virtual rule by '
+            msg[#msg+1] = real_symbol_count
+            msg[#msg+1] = ' symbols\n'
+            return table.concat(msg)
+        end
+        if is_virtual_rhs and is_virtual_lhs then
+            local msg = {'Virtual Rule: '}
+            msg[#msg+1] = slr:and_node_tag(and_node_id)
+            msg[#msg+1] = ', rule: '
+            msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
+            msg[#msg+1] = '\n'
+            msg[#msg+1] = 'Incrementing virtual rule by '
+            msg[#msg+1] = real_symbol_count
+            msg[#msg+1] = '\n'
+            return table.concat(msg)
+        end
+        if not is_virtual_rhs and is_virtual_lhs then
+            local msg = {'New Virtual Rule: '}
+            msg[#msg+1] = slr:and_node_tag(and_node_id)
+            msg[#msg+1] = ', rule: '
+            msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
+            msg[#msg+1] = '\n'
+            msg[#msg+1] = 'Real symbol count is '
+            msg[#msg+1] = real_symbol_count
+            msg[#msg+1] = '\n'
+            return table.concat(msg)
+        end
+        return ''
+    end
+```
+
 ## SLIF valuer (SLV) class
 
 This is a registry object.
