@@ -284,7 +284,7 @@ sub code_problems {
         push @msg, $fatal_error_message;
     } ## end if ($fatal_error)
 
-    Marpa::R3::exception(@msg);
+    die(@msg);
 
     # this is to keep perlcritic happy
     return 1;
