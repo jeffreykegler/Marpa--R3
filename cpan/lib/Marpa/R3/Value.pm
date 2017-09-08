@@ -1580,9 +1580,7 @@ END_OF_LUA
 
     return if not defined $result;
 
-  STEP: while (1) {
-
-    my ( $cmd ) = $slr->coro_by_tag(
+ $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => '',
@@ -1595,14 +1593,10 @@ END_OF_LUA
         local o = slr.lmw_o
         local t = slr.lmw_t
         _M.wrap(function ()
-            do -- TODO -- this will become 'while true do'
+            while true do
                 local new_values = slr:do_steps()
                 local this = slr.this_step
                 local step_type = this.type
-                if step_type == 'MARPA_STEP_INACTIVE' then
-                   return 'ok', 'last'
-                end
-                local parm2 = -1
                 if step_type == 'MARPA_STEP_RULE' then
                     -- print(inspect(new_values, {depth=2}))
                     local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
@@ -1624,27 +1618,26 @@ END_OF_LUA
                         msg[#msg+1] = coroutine.yield('terse_dump', sv)
                         coroutine.yield('trace', table.concat(msg, ' '))
                     end
-                    return 'ok', 'next'
+                    goto NEXT_STEP
                 end
                 if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
                     local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
                     local ix = slr:stack_top_index()
                     slr:stack_set(ix, sv)
-                    return 'ok', 'next'
+                    goto NEXT_STEP
                 end
                 if step_type == 'MARPA_STEP_TRACE' then
                     local msg = slr:trace_valuer_step()
                     if msg then coroutine.yield('trace', msg) end
-                    return 'ok', 'next'
+                    goto NEXT_STEP
                 end
-                return 'ok', 'ok'
+                goto LAST_STEP
+                ::NEXT_STEP::
             end
+            ::LAST_STEP::
+            return 'ok'
         end)
 END_OF_LUA
-
-        last STEP if $cmd eq 'last';
-
-    } ## end STEP: while (1)
 
     my ($final_value) =
     $slr->coro_by_tag(
