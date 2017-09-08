@@ -1580,6 +1580,7 @@ END_OF_LUA
 
     return if not defined $result;
 
+    my ($cmd, $final_value) =
  $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
@@ -1612,7 +1613,6 @@ END_OF_LUA
                            'rule:',
                            slg:g1_rule_show(this.rule)
                         }
-                        -- return nook_ix, and_node_id
                         coroutine.yield('trace', table.concat(msg, ' '))
                         msg = { 'Calculated and pushed value:' }
                         msg[#msg+1] = coroutine.yield('terse_dump', sv)
@@ -1635,26 +1635,12 @@ END_OF_LUA
                 ::NEXT_STEP::
             end
             ::LAST_STEP::
-            return 'ok'
+            local retour = slr:stack_get(1)
+            return 'ok', 'ok', retour
         end)
 END_OF_LUA
 
-    my ($final_value) =
-    $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => '',
-            args      => [],
-            handlers  => \%value_handlers
-        },
-        <<'END_OF_LUA');
-    local slr =...
-    _M.wrap(function ()
-        local retour = slr:stack_get(1)
-        return 'ok', retour
-    end)
-END_OF_LUA
-
+    return if $cmd ne 'ok';
     return \($final_value);
 
 }
