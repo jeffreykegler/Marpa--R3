@@ -100,6 +100,7 @@ Test Warning 1 at <LOCATION>
 * WARNING MESSAGE NUMBER 1:
 Test Warning 2 at <LOCATION>
 Marpa::R3 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | expected DEFAULT_ACTION_FEATURE run phase warning
@@ -112,6 +113,7 @@ Computing value for rule: trailer ::= Text
 Test Warning 1 at <LOCATION>
 * WARNING MESSAGE NUMBER 1:
 Test Warning 2 at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 Marpa::R3 exception at <LOCATION>
 __END__
 
@@ -131,6 +133,7 @@ Computing value for rule: F ::= F MultOp F
 * THIS WAS THE FATAL ERROR MESSAGE:
 Illegal division by zero at <LOCATION>
 Marpa::R3 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | expected DEFAULT_ACTION_FEATURE run phase error
@@ -140,6 +143,7 @@ __END__
 Computing value for rule: trailer ::= Text
 * THIS WAS THE FATAL ERROR MESSAGE:
 Illegal division by zero at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 Marpa::R3 exception at <LOCATION>
 __END__
 
@@ -159,6 +163,7 @@ Computing value for rule: F ::= F MultOp F
 * THIS WAS THE FATAL ERROR MESSAGE:
 test call to die at <LOCATION>
 Marpa::R3 exception at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 __END__
 
 | expected DEFAULT_ACTION_FEATURE run phase die
@@ -168,6 +173,7 @@ __END__
 Computing value for rule: trailer ::= Text
 * THIS WAS THE FATAL ERROR MESSAGE:
 test call to die at <LOCATION>
+Marpa::R3 exception at <LOCATION>
 Marpa::R3 exception at <LOCATION>
 __END__
 

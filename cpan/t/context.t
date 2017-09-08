@@ -148,10 +148,14 @@ my $actual_eval_error = $EVAL_ERROR
 Test::More::ok( ( not defined $eval_ok ),
     "bail with string argument happened" );
 $actual_eval_error
-    =~ s/\A User \s+ bailed \s+ at \s+ line \s+ \d+ [^\n]* \n/<LOCATION LINE>/xms;
+    =~ s/\A User \s+ bailed \s+ at \s+ line \s+ \d+ [^\n]*/<LOCATION LINE>/xms;
+$actual_eval_error
+    =~ s/^ Marpa::R3 \s+ exception \s+ at [^\n]*/<EXCEPTION LINE>/xms;
 Test::More::is(
     $actual_eval_error,
-    '<LOCATION LINE>' . $bail_message . "\n",
+    "<LOCATION LINE>\n"
+    . $bail_message . "\n"
+    . "<EXCEPTION LINE>\n",
     "bail with string argument"
 );
 
