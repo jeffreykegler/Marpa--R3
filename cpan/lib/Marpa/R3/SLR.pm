@@ -1309,6 +1309,8 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
         $eval_error = $@;
     }
     if ( not $eval_ok ) {
+        # if it's an object, just die
+        die $eval_error if ref $eval_error;
         Marpa::R3::exception($eval_error);
     }
     return @results;
