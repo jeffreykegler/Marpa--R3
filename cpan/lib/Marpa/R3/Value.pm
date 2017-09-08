@@ -1473,6 +1473,40 @@ sub Marpa::R3::Scanless::R::value {
                 );
             } ## end if ( not $eval_ok or @warnings )
             return 'sig', [ 'S', $result ];
+        },
+        perl_rule_semantics => sub {
+            my ( $irlid, $values ) = @_;
+            # say Data::Dumper::Dumper($values);
+            my $closure = $rule_closures->[$irlid];
+            my $result;
+            if ( defined $closure ) {
+                my @warnings;
+                my $eval_ok;
+                local $SIG{__WARN__} = sub {
+                    push @warnings, [ $_[0], ( caller 0 ) ];
+                };
+                local $Marpa::R3::Context::irlid = $irlid;
+                local $Marpa::R3::Context::production_id =
+                  $slg->g1_rule_to_production_id($irlid);
+                $eval_ok = eval {
+                    $result = $closure->( $semantics_arg0, $values );
+                    1;
+                };
+                if ( not $eval_ok or @warnings ) {
+                    my $fatal_error = $EVAL_ERROR;
+                    code_problems(
+                        {
+                            fatal_error => $fatal_error,
+                            eval_ok     => $eval_ok,
+                            warnings    => \@warnings,
+                            where       => 'computing value',
+                            long_where  => 'Computing value for rule: '
+                              . $slg->g1_rule_show($irlid),
+                        }
+                    );
+                } ## end if ( not $eval_ok or @warnings )
+            }
+            return 'sig', [ 'S', $result ];
         }
     );
 
@@ -1548,7 +1582,7 @@ END_OF_LUA
 
   STEP: while (1) {
 
-    my ( $cmd, $value_type, @value_data ) = $slr->coro_by_tag(
+    my ( $cmd ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => '',
@@ -1557,6 +1591,9 @@ END_OF_LUA
         },
         <<'END_OF_LUA');
         local slr = ...
+        local slg = slr.slg
+        local o = slr.lmw_o
+        local t = slr.lmw_t
         _M.wrap(function ()
             do -- TODO -- this will become 'while true do'
                 local new_values = slr:do_steps()
@@ -1566,8 +1603,29 @@ END_OF_LUA
                    return 'ok', 'last'
                 end
                 local parm2 = -1
-                if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
-                if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
+                if step_type == 'MARPA_STEP_RULE' then
+                    -- print(inspect(new_values, {depth=2}))
+                    local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
+                    local ix = slr:stack_top_index()
+                    slr:stack_set(ix, sv)
+                    if slr.trace_values > 0 then
+                        local nook_ix = slr.lmw_v:_nook()
+                        local or_node_id = t:_nook_or_node(nook_ix)
+                        local choice = t:_nook_choice(nook_ix)
+                        local and_node_id = o:_and_order_get(or_node_id, choice)
+                        local msg = { 'Popping', tostring(#new_values), 'values to evaluate',
+                           (slr:and_node_tag(and_node_id) .. ','),
+                           'rule:',
+                           slg:g1_rule_show(this.rule)
+                        }
+                        -- return nook_ix, and_node_id
+                        coroutine.yield('trace', table.concat(msg, ' '))
+                        msg = { 'Calculated and pushed value:' }
+                        msg[#msg+1] = coroutine.yield('terse_dump', sv)
+                        coroutine.yield('trace', table.concat(msg, ' '))
+                    end
+                    return 'ok', 'next'
+                end
                 if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
                     local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
                     local ix = slr:stack_top_index()
@@ -1579,89 +1637,12 @@ END_OF_LUA
                     if msg then coroutine.yield('trace', msg) end
                     return 'ok', 'next'
                 end
-                return 'ok', 'ok', step_type, parm2, new_values
+                return 'ok', 'ok'
             end
         end)
 END_OF_LUA
 
         last STEP if $cmd eq 'last';
-        next STEP if $cmd eq 'next';
-
-        if ( $value_type eq 'MARPA_STEP_RULE' ) {
-            my ( $irlid, $values ) = @value_data;
-            my $closure = $rule_closures->[$irlid];
-
-            next STEP if not defined $closure;
-            my $result;
-
-            {
-                my @warnings;
-                my $eval_ok;
-                local $SIG{__WARN__} = sub {
-                    push @warnings, [ $_[0], ( caller 0 ) ];
-                };
-                local $Marpa::R3::Context::irlid = $irlid;
-                local $Marpa::R3::Context::production_id = $slg->g1_rule_to_production_id($irlid);
-
-                $eval_ok = eval {
-                    $result = $closure->( $semantics_arg0, $values );
-                    1;
-                };
-
-                if ( not $eval_ok or @warnings ) {
-                    my $fatal_error = $EVAL_ERROR;
-                    code_problems(
-                        {
-                            fatal_error => $fatal_error,
-                            eval_ok     => $eval_ok,
-                            warnings    => \@warnings,
-                            where       => 'computing value',
-                            long_where  => 'Computing value for rule: '
-                              . $slg->g1_rule_show($irlid),
-                        }
-                    );
-                } ## end if ( not $eval_ok or @warnings )
-            }
-
-    $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 'Sii',
-            args      => [$result, (scalar @{$values}), $irlid],
-            handlers  => \%value_handlers
-        },
-        <<'END_OF_LUA');
-    local slr, sv, argc, irlid =...
-    _M.wrap(function ()
-        local index = slr:stack_top_index()
-        slr:stack_set(index, sv)
-        if slr.trace_values > 0 then
-            local slg = slr.slg
-            local nook_ix = slr.lmw_v:_nook()
-            local o = slr.lmw_o
-            local t = slr.lmw_t
-            local or_node_id = t:_nook_or_node(nook_ix)
-            local choice = t:_nook_choice(nook_ix)
-            local and_node_id = o:_and_order_get(or_node_id, choice)
-            local msg = { 'Popping', tostring(argc), 'values to evaluate',
-               (slr:and_node_tag(and_node_id) .. ','),
-               'rule:',
-               slg:g1_rule_show(irlid)
-            }
-            -- return nook_ix, and_node_id
-            coroutine.yield('trace', table.concat(msg, ' '))
-            msg = { 'Calculated and pushed value:' }
-            msg[#msg+1] = coroutine.yield('terse_dump', sv)
-            coroutine.yield('trace', table.concat(msg, ' '))
-        end
-    end)
-END_OF_LUA
-
-            next STEP;
-
-        } ## end if ( $value_type eq 'MARPA_STEP_RULE' )
-
-        die "Internal error: Unknown value type $value_type";
 
     } ## end STEP: while (1)
 
