@@ -4258,7 +4258,7 @@ TODO: Move to SLV, then delete
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.trace_valuer_step ( slr )
         if not slr.trace_values or slr.trace_values < 2 then
-            return ''
+            return
         end
         local nook_ix = slr.lmw_v:_nook()
         local b = slr.lmw_b
@@ -4272,7 +4272,7 @@ TODO: Move to SLV, then delete
         local or_node_position = b:_or_node_position(or_node_id)
         local irl_length = g1g:_nrl_length(trace_irl_id)
         if irl_length ~= or_node_position then
-            return ''
+            return
         end
         local is_virtual_rhs = g1g:_nrl_is_virtual_rhs(trace_irl_id) ~= 0
         local is_virtual_lhs = g1g:_nrl_is_virtual_lhs(trace_irl_id) ~= 0
@@ -4310,7 +4310,7 @@ TODO: Move to SLV, then delete
             msg[#msg+1] = '\n'
             return table.concat(msg)
         end
-        return ''
+        return
     end
 ```
 

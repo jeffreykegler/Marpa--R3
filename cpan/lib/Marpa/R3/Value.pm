@@ -1403,7 +1403,8 @@ sub Marpa::R3::Scanless::R::value {
     my %value_handlers = (
         trace => sub {
             my ($msg) = @_;
-            say {$trace_file_handle} $msg;
+            my $nl = ($msg =~ /\n\z/xms) ? '' : "\n";
+            print {$trace_file_handle} $msg, $nl;
             return 'ok';
         },
         terse_dump => sub {
@@ -1528,6 +1529,11 @@ END_OF_LUA
                 if step_type == 'MARPA_STEP_RULE' then parm2 = this.rule end
                 if step_type == 'MARPA_STEP_TOKEN' then parm2 = this.symbol end
                 if step_type == 'MARPA_STEP_NULLING_SYMBOL' then parm2 = this.symbol end
+                if step_type == 'MARPA_STEP_TRACE' then
+                    local msg = slr:trace_valuer_step()
+                    if msg then coroutine.yield('trace', msg) end
+                    return 'ok', 'next'
+                end
                 return 'ok', 'ok', step_type, parm2, new_values
             end
         end)
@@ -1667,17 +1673,6 @@ END_OF_LUA
 
         } ## end if ( $value_type eq 'MARPA_STEP_RULE' )
 
-        if ( $value_type eq 'MARPA_STEP_TRACE' ) {
-
-            if ( my $trace_output = trace_op($slr) ) {
-                print {$trace_file_handle} $trace_output
-                  or Marpa::R3::exception('Could not print to trace file');
-            }
-
-            next STEP;
-
-        } ## end if ( $value_type eq 'MARPA_STEP_TRACE' )
-
         die "Internal error: Unknown value type $value_type";
 
     } ## end STEP: while (1)
@@ -1715,18 +1710,6 @@ END_OF_LUA
 
     return $tag;
 }
-
-# TODO -- move into Lua and delete
-sub trace_op {
-    my ($slr)  = @_;
-    my ( $trace_output)
-      = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA' , '' );
-    local slr = ...
-    return slr:trace_valuer_step()
-END_OF_LUA
-    return $trace_output;
-} ## end sub trace_op
 
 1;
 
