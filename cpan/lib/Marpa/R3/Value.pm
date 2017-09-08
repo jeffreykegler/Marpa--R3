@@ -1400,6 +1400,20 @@ sub Marpa::R3::Scanless::R::value {
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
+        my $semantics_arg0 = $per_parse_arg // {};
+        my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
+        my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
+        my $nulling_closures =
+          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
+        my $rule_closures =
+          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
+
+    local $Marpa::R3::Context::rule = undef;
+    local $Marpa::R3::Context::irlid = undef;
+    local $Marpa::R3::Context::slr  = $slr;
+    local $Marpa::R3::Context::slg =
+      $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+
     my %value_handlers = (
         trace => sub {
             my ($msg) = @_;
@@ -1415,8 +1429,7 @@ sub Marpa::R3::Scanless::R::value {
         },
         constant => sub {
             my ($constant_ix) = @_;
-            my $constant = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
-              ->[$constant_ix];
+            my $constant = $constants ->[$constant_ix];
             return 'sig', [ 'S', $constant ];
         },
         perl_undef => sub {
@@ -1424,8 +1437,7 @@ sub Marpa::R3::Scanless::R::value {
         },
         bless => sub {
             my ( $value, $blessing_ix ) = @_;
-            my $blessing = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]
-              ->[$blessing_ix];
+            my $blessing = $constants->[$blessing_ix];
             return 'sig', [ 'S', ( bless $value, $blessing ) ];
         }
     );
@@ -1500,12 +1512,6 @@ END_OF_LUA
 
     return if not defined $result;
 
-    local $Marpa::R3::Context::rule = undef;
-    local $Marpa::R3::Context::irlid = undef;
-    local $Marpa::R3::Context::slr  = $slr;
-    local $Marpa::R3::Context::slg =
-      $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-
   STEP: while (1) {
 
     my ( $cmd, $value_type, @value_data ) = $slr->coro_by_tag(
@@ -1542,14 +1548,8 @@ END_OF_LUA
         last STEP if $cmd eq 'last';
         next STEP if $cmd eq 'next';
 
-        next STEP if $value_type eq 'trace';
-
-        my $semantics_arg0 = $per_parse_arg // {};
-        my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
-        my $nulling_closures =
-          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
-        my $rule_closures =
-          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
+        # TODO -- Delete after development
+        die if $value_type eq 'trace';
 
         if ( $value_type eq 'MARPA_STEP_NULLING_SYMBOL' ) {
             my ($token_id) = @value_data;
