@@ -1749,13 +1749,8 @@ This is a registry object.
     class_slr_fields.l0_irls = true
     class_slr_fields.irls = true
     class_slr_fields.lexeme_queue = true
-    class_slr_fields.lmw_b = true
-    class_slr_fields.lmw_o = true
-    class_slr_fields.lmw_t = true
-    class_slr_fields.lmw_v = true
     class_slr_fields.max_parses = true
     class_slr_fields.per_es = true
-    class_slr_fields.phase = true
     class_slr_fields.regix = true
     class_slr_fields.slg = true
     class_slr_fields.start_of_lexeme = true
@@ -1767,12 +1762,18 @@ This is a registry object.
     class_slr_fields.token_values = true
     class_slr_fields.trace_terminals = true
     class_slr_fields.trace_values = true
-    class_slr_fields.tree_mode = true
     class_slr_fields.trailers = true
     -- TODO delete after development
+    class_slr_fields.phase = true
+    class_slr_fields.tree_mode = true
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
+    class_slr_fields.slv = true
+    class_slr_fields.lmw_b = true
+    class_slr_fields.lmw_o = true
+    class_slr_fields.lmw_t = true
+    class_slr_fields.lmw_v = true
 ```
 
 *At end of input* field:
@@ -2903,6 +2904,9 @@ Returns the Libmarpa object if it could "get" one,
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ordering_get(slr)
+        -- TODO Delete after development
+        slr.slv = slr:slv_new()
+
         local slg = slr.slg
         local ranking_method = slg.ranking_method
         if slr.has_parse == false then return slr.has_parse end
@@ -4322,9 +4326,6 @@ This is a registry object.
 
 ```
     -- miranda: section+ class_slv field declarations
-    class_slv_fields.lmw_b = true
-    class_slv_fields.lmw_o = true
-    class_slv_fields.lmw_t = true
     class_slv_fields.regix = true
     class_slv_fields.slr = true
 ```
@@ -4352,30 +4353,6 @@ This is a registry object.
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
         slv.regix = _M.register(_M.registry, slv)
-
-        local slg = slr.slg
-        local ranking_method = slg.ranking_method
-        _M.throw = false
-        local bocage = _M.bocage_new(slr.g1, slr.end_of_parse)
-        _M.throw = true
-        slv.lmw_b = bocage
-        if not bocage then return end
-
-        lmw_o = _M.order_new(bocage)
-        slv.lmw_o = lmw_o
-
-        if ranking_method == 'high_rule_only' then
-            slv.lmw_o:high_rank_only_set(1)
-            slv.lmw_o:rank()
-        end
-        if ranking_method == 'rule' then
-            slv.lmw_o:high_rank_only_set(0)
-            slv.lmw_o:rank()
-        end
-
-        lmw_t = _M.tree_new(lmw_o)
-        slr.lmw_t = lmw_t
-
         return slv
     end
 ```
