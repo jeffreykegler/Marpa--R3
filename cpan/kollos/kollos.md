@@ -2896,47 +2896,18 @@ lexer.
     end
 ```
 
-Get the Libmarpa ordering object of `slr`,
-creating it if necessary.
-Returns the Libmarpa object if it could "get" one,
-`nil` otherwise
+TODO: Delete after development
 
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ordering_get(slr)
         -- TODO Delete after development
-        slr.slv = slr:slv_new()
-
-        local slg = slr.slg
-        local ranking_method = slg.ranking_method
-        if slr.has_parse == false then return slr.has_parse end
-        local lmw_o = slr.lmw_o
-        if lmw_o then
-            slr.has_parse = true
-            return lmw_o
+        local slv = slr.slv
+        if not slv then
+            slv = slr:slv_new()
+            slr.slv = slv
         end
-        _M.throw = false
-        local bocage = _M.bocage_new(slr.g1, slr.end_of_parse)
-        _M.throw = true
-        slr.lmw_b = bocage
-        if not bocage then
-            slr.has_parse = false
-            return
-        end
-
-        lmw_o = _M.order_new(bocage)
-        slr.lmw_o = lmw_o
-
-        if ranking_method == 'high_rule_only' then
-            slr.lmw_o:high_rank_only_set(1)
-            slr.lmw_o:rank()
-        end
-        if ranking_method == 'rule' then
-            slr.lmw_o:high_rank_only_set(0)
-            slr.lmw_o:rank()
-        end
-        slr.has_parse = true
-        return lmw_o
+        return slv:ordering_get()
     end
 ```
 
@@ -4357,6 +4328,53 @@ This is a registry object.
     end
 ```
 
+### SLV mutators
+
+Get the Libmarpa ordering object of `slv`,
+creating it if necessary.
+Returns the Libmarpa object if it could "get" one,
+`nil` otherwise
+
+TODO: The new SLV object may make this unnecessary,
+or at least the subject of refactoring.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.ordering_get(slv)
+        local slr = slv.slr
+
+        local slg = slr.slg
+        local ranking_method = slg.ranking_method
+        if slr.has_parse == false then return slr.has_parse end
+        local lmw_o = slr.lmw_o
+        if lmw_o then
+            slr.has_parse = true
+            return lmw_o
+        end
+        _M.throw = false
+        local bocage = _M.bocage_new(slr.g1, slr.end_of_parse)
+        _M.throw = true
+        slr.lmw_b = bocage
+        if not bocage then
+            slr.has_parse = false
+            return
+        end
+
+        lmw_o = _M.order_new(bocage)
+        slr.lmw_o = lmw_o
+
+        if ranking_method == 'high_rule_only' then
+            slr.lmw_o:high_rank_only_set(1)
+            slr.lmw_o:rank()
+        end
+        if ranking_method == 'rule' then
+            slr.lmw_o:high_rank_only_set(0)
+            slr.lmw_o:rank()
+        end
+        slr.has_parse = true
+        return lmw_o
+    end
+```
 
 ## Kollos semantics
 
