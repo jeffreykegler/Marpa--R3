@@ -6026,28 +6026,28 @@ TODO: Move to SLV and delete
                     last_completed_earleme
                 ))
             end
-            local t = slr.lmw_t
-            if not t then
+            local lmw_t = slr.lmw_t
+            if not lmw_t then
                 -- No tree, therefore ordering is not initialized
                 local lmw_o = slr:ordering_get()
                 if not lmw_o then return 'ok', 'undef' end
-                t = _M.tree_new(lmw_o)
-                slr.lmw_t = t
+                lmw_t = _M.tree_new(lmw_o)
+                slr.lmw_t = lmw_t
             end
             local lmw_o = slr.lmw_o
 
             local max_parses = slr.max_parses
-            local parse_count = t:parse_count()
+            local parse_count = lmw_t:parse_count()
             if max_parses and parse_count > max_parses then
                 error(string.format("Maximum parse count (%d) exceeded", max_parses));
             end
             -- io.stderr:write('tree:', inspect(t))
             slr.lmw_v = nil
             -- print(inspect(_G))
-            local result = t:next()
+            local result = lmw_t:next()
             if not result then return 'ok', 'undef' end
             -- print('result:', result)
-            slr.lmw_v = _M.value_new(t)
+            slr.lmw_v = _M.value_new(lmw_t)
 
         local trace_values = slr.trace_values or 0
         slr.lmw_v:_trace(trace_values)
@@ -6064,8 +6064,8 @@ TODO: Move to SLV and delete
                     slr:stack_set(ix, sv)
                     if slr.trace_values > 0 then
                         local nook_ix = slr.lmw_v:_nook()
-                        local or_node_id = t:_nook_or_node(nook_ix)
-                        local choice = t:_nook_choice(nook_ix)
+                        local or_node_id = lmw_t:_nook_or_node(nook_ix)
+                        local choice = lmw_t:_nook_choice(nook_ix)
                         local and_node_id = lmw_o:_and_order_get(or_node_id, choice)
                         local msg = { 'Popping', tostring(#new_values), 'values to evaluate',
                            (slr:and_node_tag(and_node_id) .. ','),
