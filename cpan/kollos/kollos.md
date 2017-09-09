@@ -4330,6 +4330,108 @@ This is a registry object.
 
 ### SLV mutators
 
+```
+    -- miranda: section+ valuator Libmarpa wrapper Lua functions
+    function _M.class_slv.value(slv)
+        local slr = slv.slr
+        local slg = slr.slg
+        _M.wrap(function ()
+            local g1r = slr.g1
+
+            slr.tree_mode = slr.tree_mode or 'tree'
+            if slr.tree_mode ~= 'tree' then
+                error(
+                    "value() called when recognizer is not in tree mode\n"
+                    .. string.format('  The current mode is %q\n', slr.tree_mode)
+                )
+            end
+
+            slr.phase = 'value'
+            local furthest_earleme = g1r:furthest_earleme()
+            local last_completed_earleme = g1r:current_earleme()
+            if furthest_earleme ~= last_completed_earleme then
+                error(string.format(
+                    "Attempt to evaluate incompletely recognized parse:\n"
+                    .. "  Last token ends at location %d\n"
+                    .. "  Recognition done only as far as location %d\n",
+                    furthest_earleme,
+                    last_completed_earleme
+                ))
+            end
+            local lmw_t = slr.lmw_t
+            if not lmw_t then
+                -- No tree, therefore ordering is not initialized
+                local lmw_o = slr:ordering_get()
+                if not lmw_o then return 'ok', 'undef' end
+                lmw_t = _M.tree_new(lmw_o)
+                slr.lmw_t = lmw_t
+            end
+            local lmw_o = slr.lmw_o
+
+            local max_parses = slr.max_parses
+            local parse_count = lmw_t:parse_count()
+            if max_parses and parse_count > max_parses then
+                error(string.format("Maximum parse count (%d) exceeded", max_parses));
+            end
+            -- io.stderr:write('tree:', inspect(t))
+            slr.lmw_v = nil
+            -- print(inspect(_G))
+            local result = lmw_t:next()
+            if not result then return 'ok', 'undef' end
+            -- print('result:', result)
+            slr.lmw_v = _M.value_new(lmw_t)
+
+        local trace_values = slr.trace_values or 0
+        slr.lmw_v:_trace(trace_values)
+        slr:value_init(trace_values)
+
+            while true do
+                local new_values = slr:do_steps()
+                local this = slr.this_step
+                local step_type = this.type
+                if step_type == 'MARPA_STEP_RULE' then
+                    -- print(inspect(new_values, {depth=2}))
+                    local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
+                    local ix = slr:stack_top_index()
+                    slr:stack_set(ix, sv)
+                    if slr.trace_values > 0 then
+                        local nook_ix = slr.lmw_v:_nook()
+                        local or_node_id = lmw_t:_nook_or_node(nook_ix)
+                        local choice = lmw_t:_nook_choice(nook_ix)
+                        local and_node_id = lmw_o:_and_order_get(or_node_id, choice)
+                        local msg = { 'Popping', tostring(#new_values), 'values to evaluate',
+                           (slr:and_node_tag(and_node_id) .. ','),
+                           'rule:',
+                           slg:g1_rule_show(this.rule)
+                        }
+                        coroutine.yield('trace', table.concat(msg, ' '))
+                        msg = { 'Calculated and pushed value:' }
+                        msg[#msg+1] = coroutine.yield('terse_dump', sv)
+                        coroutine.yield('trace', table.concat(msg, ' '))
+                    end
+                    goto NEXT_STEP
+                end
+                if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
+                    local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
+                    local ix = slr:stack_top_index()
+                    slr:stack_set(ix, sv)
+                    goto NEXT_STEP
+                end
+                if step_type == 'MARPA_STEP_TRACE' then
+                    local msg = slr:trace_valuer_step()
+                    if msg then coroutine.yield('trace', msg) end
+                    goto NEXT_STEP
+                end
+                goto LAST_STEP
+                ::NEXT_STEP::
+            end
+            ::LAST_STEP::
+            local retour = slr:stack_get(1)
+            return 'ok', 'ok', retour
+        end)
+    end
+```
+
 Get the Libmarpa ordering object of `slv`,
 creating it if necessary.
 Returns the Libmarpa object if it could "get" one,
@@ -5997,101 +6099,12 @@ TODO: Move to SLV and delete
 ```
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
     function _M.class_slr.value(slr)
-        local slg = slr.slg
-        _M.wrap(function ()
-            local g1r = slr.g1
-
-            slr.tree_mode = slr.tree_mode or 'tree'
-            if slr.tree_mode ~= 'tree' then
-                error(
-                    "value() called when recognizer is not in tree mode\n"
-                    .. string.format('  The current mode is %q\n', slr.tree_mode)
-                )
-            end
-
-            slr.phase = 'value'
-            local furthest_earleme = g1r:furthest_earleme()
-            local last_completed_earleme = g1r:current_earleme()
-            if furthest_earleme ~= last_completed_earleme then
-                error(string.format(
-                    "Attempt to evaluate incompletely recognized parse:\n"
-                    .. "  Last token ends at location %d\n"
-                    .. "  Recognition done only as far as location %d\n",
-                    furthest_earleme,
-                    last_completed_earleme
-                ))
-            end
-            local lmw_t = slr.lmw_t
-            if not lmw_t then
-                -- No tree, therefore ordering is not initialized
-                local lmw_o = slr:ordering_get()
-                if not lmw_o then return 'ok', 'undef' end
-                lmw_t = _M.tree_new(lmw_o)
-                slr.lmw_t = lmw_t
-            end
-            local lmw_o = slr.lmw_o
-
-            local max_parses = slr.max_parses
-            local parse_count = lmw_t:parse_count()
-            if max_parses and parse_count > max_parses then
-                error(string.format("Maximum parse count (%d) exceeded", max_parses));
-            end
-            -- io.stderr:write('tree:', inspect(t))
-            slr.lmw_v = nil
-            -- print(inspect(_G))
-            local result = lmw_t:next()
-            if not result then return 'ok', 'undef' end
-            -- print('result:', result)
-            slr.lmw_v = _M.value_new(lmw_t)
-
-        local trace_values = slr.trace_values or 0
-        slr.lmw_v:_trace(trace_values)
-        slr:value_init(trace_values)
-
-            while true do
-                local new_values = slr:do_steps()
-                local this = slr.this_step
-                local step_type = this.type
-                if step_type == 'MARPA_STEP_RULE' then
-                    -- print(inspect(new_values, {depth=2}))
-                    local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
-                    local ix = slr:stack_top_index()
-                    slr:stack_set(ix, sv)
-                    if slr.trace_values > 0 then
-                        local nook_ix = slr.lmw_v:_nook()
-                        local or_node_id = lmw_t:_nook_or_node(nook_ix)
-                        local choice = lmw_t:_nook_choice(nook_ix)
-                        local and_node_id = lmw_o:_and_order_get(or_node_id, choice)
-                        local msg = { 'Popping', tostring(#new_values), 'values to evaluate',
-                           (slr:and_node_tag(and_node_id) .. ','),
-                           'rule:',
-                           slg:g1_rule_show(this.rule)
-                        }
-                        coroutine.yield('trace', table.concat(msg, ' '))
-                        msg = { 'Calculated and pushed value:' }
-                        msg[#msg+1] = coroutine.yield('terse_dump', sv)
-                        coroutine.yield('trace', table.concat(msg, ' '))
-                    end
-                    goto NEXT_STEP
-                end
-                if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
-                    local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
-                    local ix = slr:stack_top_index()
-                    slr:stack_set(ix, sv)
-                    goto NEXT_STEP
-                end
-                if step_type == 'MARPA_STEP_TRACE' then
-                    local msg = slr:trace_valuer_step()
-                    if msg then coroutine.yield('trace', msg) end
-                    goto NEXT_STEP
-                end
-                goto LAST_STEP
-                ::NEXT_STEP::
-            end
-            ::LAST_STEP::
-            local retour = slr:stack_get(1)
-            return 'ok', 'ok', retour
-        end)
+        local slv = slr.slv
+        if not slv then
+            slv = slr:slv_new()
+            slr.slv = slv
+        end
+        return slv:value()
     end
 ```
 
