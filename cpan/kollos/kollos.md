@@ -4350,7 +4350,7 @@ This is a registry object.
                     -- print(inspect(new_values, {depth=2}))
                     local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
                     local ix = slr:stack_top_index()
-                    slr:stack_set(ix, sv)
+                    slv:stack_set(ix, sv)
                     if slr.trace_values > 0 then
                         local nook_ix = slr.lmw_v:_nook()
                         local or_node_id = lmw_t:_nook_or_node(nook_ix)
@@ -4371,7 +4371,7 @@ This is a registry object.
                 if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
                     local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
                     local ix = slr:stack_top_index()
-                    slr:stack_set(ix, sv)
+                    slv:stack_set(ix, sv)
                     goto NEXT_STEP
                 end
                 if step_type == 'MARPA_STEP_TRACE' then
@@ -4383,7 +4383,7 @@ This is a registry object.
                 ::NEXT_STEP::
             end
             ::LAST_STEP::
-            local retour = slr:stack_get(1)
+            local retour = slv:stack_get(1)
             return 'ok', 'ok', retour
         end)
     end
@@ -4453,7 +4453,31 @@ or at least the subject of refactoring.
     end
 ```
 
+#### Set the value of a stack entry
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.stack_set(slv, ix, v)
+        local slr = slv.slr
+        local stack = slr.lmw_v.stack
+        stack[ix+0] = v
+    end
+
+```
+
 ### SLV accessors
+
+#### Return the value of a stack entry
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.stack_get(slv, ix)
+        local slr = slv.slr
+        local stack = slr.lmw_v.stack
+        return stack[ix+0]
+    end
+
+```
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -5194,28 +5218,6 @@ to set and discover various Lua values.
     -- miranda: section+ Utilities for semantics
     function _M.class_slr.stack_top_index(slr)
         return slr.this_step.result
-    end
-
-```
-
-#### Return the value of a stack entry
-
-```
-    -- miranda: section+ Utilities for semantics
-    function _M.class_slr.stack_get(slr, ix)
-        local stack = slr.lmw_v.stack
-        return stack[ix+0]
-    end
-
-```
-
-#### Set the value of a stack entry
-
-```
-    -- miranda: section+ Utilities for semantics
-    function _M.class_slr.stack_set(slr, ix, v)
-        local stack = slr.lmw_v.stack
-        stack[ix+0] = v
     end
 
 ```
