@@ -4343,7 +4343,7 @@ This is a registry object.
         slr.lmw_v.stack = {}
 
             while true do
-                local new_values = slr:do_steps()
+                local new_values = slv:do_steps()
                 local this = slr.this_step
                 local step_type = this.type
                 if step_type == 'MARPA_STEP_RULE' then
@@ -5094,11 +5094,13 @@ step, and perform them.
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.do_steps(slr)
+    function _M.class_slv.do_steps(slv)
+        local slr = slv.slr
         local grammar = slr.slg
         while true do
             local new_values = {}
             local ops = {}
+            -- TODO Note usage of lmw_v in lca_slr_step_meth
             slr:step()
             if slr.this_step.type == 'MARPA_STEP_INACTIVE' then
                 return new_values
