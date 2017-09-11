@@ -1769,11 +1769,14 @@ This is a registry object.
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
-    class_slr_fields.slv = true
     class_slr_fields.lmw_b = true
     class_slr_fields.lmw_o = true
     class_slr_fields.lmw_t = true
     class_slr_fields.lmw_v = true
+    -- TODO delete after development
+    -- This temporary implementation leak valuers
+    class_slr_fields.slv = true
+    class_slr_fields.v_regix = true
 ```
 
 *At end of input* field:
@@ -1893,7 +1896,15 @@ together.
                     g_g1_symbols[symbol_id].pause_after_active
             }
         end
-        slr:valuation_reset()
+
+        -- TODO: Eliminate this once "internal" valuator is factored
+        --   away.
+        local slv = slr.slv
+        if not slv then
+            slv = slr:slv_new()
+            slr.slv = slv
+        end
+        slv:valuation_reset()
 
         slr:common_set(flat_args, {'event_is_active',
             -- TODO delete after development
@@ -4323,6 +4334,8 @@ This is a registry object.
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
+        -- TODO The temporary implementation leaks valuers
+        --   fix this
         slv.regix = _M.register(_M.registry, slv)
         return slv
     end
@@ -4383,7 +4396,12 @@ This is a registry object.
 
         local trace_values = slr.trace_values or 0
         slr.lmw_v:_trace(trace_values)
-        slr:value_init(trace_values)
+
+        if trace_values > 0 then
+          coroutine.yield('trace',
+            "valuator trace level: " ..  slr.trace_values)
+        end
+        slr.lmw_v.stack = {}
 
             while true do
                 local new_values = slr:do_steps()
@@ -4429,6 +4447,24 @@ This is a registry object.
             local retour = slr:stack_get(1)
             return 'ok', 'ok', retour
         end)
+    end
+```
+
+A function to be called whenever a valuator is reset.
+It should free all memory associated with the valuation.
+
+TODO: Refactoring may eliminate the need for this.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.valuation_reset(slv)
+        local slr = slv.slr
+        slr.trace_values = 0;
+        slr.lmw_b = nil
+        slr.lmw_o = nil
+        slr.lmw_t = nil
+        slr.lmw_v = nil
+        slr.tree_mode = nil
     end
 ```
 
@@ -6069,29 +6105,6 @@ Libmarpa wrapper class.
     _M.class_bocage._or_node_irl = nil
 ```
 
-### Initialize a valuator
-
-Called when a valuator is set up.
-
-```
-    -- miranda: section+ valuator Libmarpa wrapper Lua functions
-
-    function _M.class_slr.value_init(slr, trace_values)
-
-        if not slr.lmw_v then
-            error('no slr.lmw_v in value_init()')
-        end
-
-        slr.trace_values = trace_values;
-        if slr.trace_values > 0 then
-          coroutine.yield('trace',
-            "valuator trace level: " ..  slr.trace_values)
-        end
-        slr.lmw_v.stack = {}
-    end
-
-```
-
 ### Get a value from a valuator
 
 TODO: Move to SLV and delete
@@ -6110,26 +6123,22 @@ TODO: Move to SLV and delete
 
 ### Reset a valuator
 
-A function to be called whenever a valuator is reset.
-It should free all memory associated with the valuation.
+TODO: Move to SLV and delete
+
+TODO: I expect refactoring will eliminate the need for this.
+
 
 ```
 
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
-
     function _M.class_slr.valuation_reset(slr)
-        -- io.stderr:write('Initializing rule semantics to nil\n')
-
-        slr.trace_values = 0;
-
-        slr.lmw_b = nil
-        slr.lmw_o = nil
-        slr.lmw_t = nil
-        slr.lmw_v = nil
-
-        slr.tree_mode = nil
+        local slv = slr.slv
+        if not slv then
+            slv = slr:slv_new()
+            slr.slv = slv
+        end
+        return slv:valuation_reset()
     end
-
 ```
 
 ### SLV diagnostics
