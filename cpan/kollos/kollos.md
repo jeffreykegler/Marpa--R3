@@ -1776,7 +1776,6 @@ This is a registry object.
     -- TODO delete after development
     -- This temporary implementation leak valuers
     class_slr_fields.slv = true
-    class_slr_fields.v_regix = true
 ```
 
 *At end of input* field:
@@ -2914,10 +2913,6 @@ TODO: Delete after development
     function _M.class_slr.ordering_get(slr)
         -- TODO Delete after development
         local slv = slr.slv
-        if not slv then
-            slv = slr:slv_new()
-            slr.slv = slv
-        end
         return slv:ordering_get()
     end
 ```
@@ -4308,7 +4303,6 @@ This is a registry object.
 
 ```
     -- miranda: section+ class_slv field declarations
-    class_slv_fields.regix = true
     class_slv_fields.slr = true
 ```
 
@@ -4334,9 +4328,8 @@ This is a registry object.
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
-        -- TODO The temporary implementation leaks valuers
-        --   fix this
-        slv.regix = _M.register(_M.registry, slv)
+        -- TODO Turn this into a registry object
+        -- slv.regix = _M.register(_M.registry, slv)
         return slv
     end
 ```
@@ -6113,10 +6106,6 @@ TODO: Move to SLV and delete
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
     function _M.class_slr.value(slr)
         local slv = slr.slv
-        if not slv then
-            slv = slr:slv_new()
-            slr.slv = slv
-        end
         return slv:value()
     end
 ```
@@ -6133,10 +6122,6 @@ TODO: I expect refactoring will eliminate the need for this.
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
     function _M.class_slr.valuation_reset(slr)
         local slv = slr.slv
-        if not slv then
-            slv = slr:slv_new()
-            slr.slv = slv
-        end
         return slv:valuation_reset()
     end
 ```
