@@ -4357,7 +4357,7 @@ This is a registry object.
                 if step_type == 'MARPA_STEP_RULE' then
                     -- print(inspect(new_values, {depth=2}))
                     local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
-                    local ix = slr:stack_top_index()
+                    local ix = slv:stack_top_index()
                     slv:stack_set(ix, sv)
                     if slr.trace_values > 0 then
                         local nook_ix = slr.lmw_v:_nook()
@@ -4378,7 +4378,7 @@ This is a registry object.
                 end
                 if step_type == 'MARPA_STEP_NULLING_SYMBOL' then
                     local sv = coroutine.yield('perl_nulling_semantics', this.symbol)
-                    local ix = slr:stack_top_index()
+                    local ix = slv:stack_top_index()
                     slv:stack_set(ix, sv)
                     goto NEXT_STEP
                 end
@@ -4483,6 +4483,17 @@ or at least the subject of refactoring.
         local slr = slv.slr
         local stack = slr.lmw_v.stack
         return stack[ix+0]
+    end
+
+```
+
+#### Return the top index of the stack
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.stack_top_index(slv)
+        local slr = slv.slr
+        return slr.this_step.result
     end
 
 ```
@@ -5216,16 +5227,6 @@ to set and discover various Lua values.
     -- miranda: section+ Utilities for semantics
     function _M.get_op_fn_name_by_key(op_key)
         return _M.vm_op_names[op_key]
-    end
-
-```
-
-#### Return the top index of the stack
-
-```
-    -- miranda: section+ Utilities for semantics
-    function _M.class_slr.stack_top_index(slr)
-        return slr.this_step.result
     end
 
 ```
