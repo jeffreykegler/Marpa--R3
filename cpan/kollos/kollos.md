@@ -1817,7 +1817,6 @@ together.
 ```
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg slr_methods[] = {
-      {"step", lca_slr_step_meth},
       { NULL, NULL },
     };
 
@@ -2922,23 +2921,30 @@ TODO: Delete after development
 
 ```
     -- miranda: section+ class_slr C methods
-    static int lca_slr_step_meth (lua_State * L)
+    static int lca_slv_step_meth (lua_State * L)
     {
         Marpa_Value v;
         lua_Integer step_type;
-        const int recce_table = marpa_lua_gettop (L);
+        const int value_table = marpa_lua_gettop (L);
+        /* TODO -- delete recce_table after development --
+           should no longer be used */
+        int recce_table;
         int step_table;
 
         marpa_luaL_checktype (L, 1, LUA_TTABLE);
-        /* Lua stack: [ recce_table ] */
+        /* Lua stack: [ value_table ] */
+        marpa_lua_getfield(L, value_table, "slr");
+        /* Lua stack: [ value_table, recce_table ] */
+        recce_table = marpa_lua_gettop (L);
+
         marpa_lua_getfield(L, recce_table, "lmw_v");
-        /* Lua stack: [ recce_table, lmw_v ] */
+        /* Lua stack: [ value_table, recce_table, lmw_v ] */
         marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
                     -1, "_libmarpa")), 1,
             "Internal error: recce._libmarpa userdata not set");
-        /* Lua stack: [ recce_table, lmw_v, v_ud ] */
+        /* Lua stack: [ value_table, recce_table, lmw_v, v_ud ] */
         v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
-        /* Lua stack: [ recce_table, lmw_v, v_ud ] */
+        /* Lua stack: [ value_table, recce_table, lmw_v, v_ud ] */
         marpa_lua_settop (L, recce_table);
         /* Lua stack: [ recce_table ] */
         marpa_lua_newtable (L);
@@ -4263,6 +4269,7 @@ This is a registry object.
 ```
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg slv_methods[] = {
+      {"step", lca_slv_step_meth},
       { NULL, NULL },
     };
 
@@ -5125,8 +5132,8 @@ step, and perform them.
         while true do
             local new_values = {}
             local ops = {}
-            -- TODO Note usage of lmw_v in lca_slr_step_meth
-            slr:step()
+            -- TODO Note usage of lmw_v in lca_slv_step_meth
+            slv:step()
             if slr.this_step.type == 'MARPA_STEP_INACTIVE' then
                 return new_values
             end
