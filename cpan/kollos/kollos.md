@@ -1900,7 +1900,7 @@ together.
         --   away.
         local slv = slr.slv
         if not slv then
-            slv = slr:slv_new()
+            slv = slr:slv_new_i()
             slr.slv = slv
         end
         slv:valuation_reset()
@@ -4276,9 +4276,13 @@ This is a registry object.
 ```
 ### SLV constructor
 
+Temporary constructor for development.
+Creates an "slr-internal" version of slv,
+which is not kept in the registry.
+
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.slv_new(slr, flat_args)
+    function _M.class_slr.slv_new_i(slr, flat_args)
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
