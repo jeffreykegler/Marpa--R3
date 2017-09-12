@@ -4625,7 +4625,8 @@ Perhaps I should delete this.
 ```
     -- miranda: section VM operations
 
-    local function op_fn_debug (slr)
+    local function op_fn_debug (slv)
+        local slr = slv.slr
         for k,v in pairs(slr) do
             print(k, v)
         end
@@ -4649,7 +4650,7 @@ It may be useful in debugging.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_noop (slr)
+    local function op_fn_noop (slv)
         return
     end
     op_fn_add("noop", op_fn_noop)
@@ -4667,7 +4668,7 @@ fast fails with a clear message.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_bail (slr)
+    local function op_fn_bail (slv)
         error('executing VM op "bail"')
     end
     op_fn_add("bail", op_fn_bail)
@@ -4703,7 +4704,8 @@ The result of the semantics is a Perl undef.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_result_is_undef(slr)
+    local function op_fn_result_is_undef(slv)
+        local slr = slv.slr
         local stack = slr.lmw_v.stack
         stack[slr.this_step.result] = coroutine.yield('perl_undef')
         return 'continue'
@@ -4722,9 +4724,10 @@ if not the value is an undef.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_result_is_token_value(slr)
+    local function op_fn_result_is_token_value(slv)
+        local slr = slv.slr
         if slr.this_step.type ~= 'MARPA_STEP_TOKEN' then
-          return op_fn_result_is_undef(slr)
+          return op_fn_result_is_undef(slv)
         end
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
@@ -4739,9 +4742,10 @@ if not the value is an undef.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_n_of_rhs(slr, rhs_ix)
+    local function op_fn_result_is_n_of_rhs(slv, rhs_ix)
+        local slr = slv.slr
         if slr.this_step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_result_is_undef(slr)
+          return op_fn_result_is_undef(slv)
         end
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
@@ -4772,14 +4776,15 @@ the "N of RHS" operation should be used.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_n_of_sequence(slr, item_ix)
+    local function op_fn_result_is_n_of_sequence(slv, item_ix)
+        local slr = slv.slr
         if slr.this_step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_result_is_undef(slr)
+          return op_fn_result_is_undef(slv)
         end
         local result_ix = slr.this_step.result
         local fetch_ix = result_ix + item_ix * 2
         if fetch_ix > slr.this_step.arg_n then
-          return op_fn_result_is_undef(slr)
+          return op_fn_result_is_undef(slv)
         end
         local stack = slr.lmw_v.stack
         if item_ix > 0 then
@@ -4797,7 +4802,8 @@ Returns a constant result.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_constant(slr, constant_ix)
+    local function op_fn_result_is_constant(slv, constant_ix)
+        local slr = slv.slr
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
         stack[result_ix] = coroutine.yield('constant', constant_ix)
@@ -4826,7 +4832,8 @@ Push an undef on the values array.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_push_undef(slr, dummy, new_values)
+    local function op_fn_push_undef(slv, dummy, new_values)
+        local slr = slv.slr
         local next_ix = #new_values + 1;
         local constant = coroutine.yield('perl_undef')
         new_values[next_ix] = constant
@@ -4843,9 +4850,10 @@ Push one of the RHS child values onto the values array.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_push_one(slr, rhs_ix, new_values)
+    local function op_fn_push_one(slv, rhs_ix, new_values)
+        local slr = slv.slr
         if slr.this_step.type ~= 'MARPA_STEP_RULE' then
-          return op_fn_push_undef(slr, nil, new_values)
+          return op_fn_push_undef(slv, nil, new_values)
         end
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
@@ -4895,7 +4903,8 @@ Otherwise the values of the RHS children are pushed.
 ```
     -- miranda: section+ VM operations
 
-    local function op_fn_push_values(slr, increment, new_values)
+    local function op_fn_push_values(slv, increment, new_values)
+        local slr = slv.slr
         if slr.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
             new_values[next_ix] = slr:current_token_literal()
@@ -4926,7 +4935,8 @@ in terms of the input string.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_start(slr, dummy, new_values)
+    local function op_fn_push_start(slv, dummy, new_values)
+        local slr = slv.slr
         local start_es = slr.this_step.start_es_id
         local per_es = slr.per_es
         local l0_start
@@ -4956,7 +4966,8 @@ that is, in terms of the input string
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_length(slr, dummy, new_values)
+    local function op_fn_push_length(slv, dummy, new_values)
+        local slr = slv.slr
         local start_es = slr.this_step.start_es_id
         local end_es = slr.this_step.es_id
         local per_es = slr.per_es
@@ -4984,7 +4995,8 @@ in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_g1_start(slr, dummy, new_values)
+    local function op_fn_push_g1_start(slv, dummy, new_values)
+        local slr = slv.slr
         local next_ix = #new_values + 1;
         new_values[next_ix] = slr.this_step.start_es_id
         return
@@ -5000,7 +5012,8 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_g1_length(slr, dummy, new_values)
+    local function op_fn_push_g1_length(slv, dummy, new_values)
+        local slr = slv.slr
         local next_ix = #new_values + 1;
         new_values[next_ix] = (slr.this_step.es_id
             - slr.this_step.start_es_id) + 1
@@ -5014,7 +5027,8 @@ that is, in terms of G1 Earley sets.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_push_constant(slr, constant_ix, new_values)
+    local function op_fn_push_constant(slv, constant_ix, new_values)
+        local slr = slv.slr
         -- io.stderr:write('constant_ix: ', constant_ix, "\n")
         local next_ix = #new_values + 1;
         local constant = coroutine.yield('constant', constant_ix)
@@ -5034,7 +5048,8 @@ of every sequence of operations
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_bless(slr, blessing_ix)
+    local function op_fn_bless(slv, blessing_ix)
+        local slr = slv.slr
         slr.this_step.blessing_ix = blessing_ix
         return
     end
@@ -5049,7 +5064,8 @@ is the result of this sequence of operations.
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_result_is_array(slr, dummy, new_values)
+    local function op_fn_result_is_array(slv, dummy, new_values)
+        local slr = slv.slr
         local blessing_ix = slr.this_step.blessing_ix
         if blessing_ix then
           new_values = coroutine.yield('bless', new_values, blessing_ix)
@@ -5073,7 +5089,8 @@ implementation, which returned the size of the
 
 ```
     -- miranda: section+ VM operations
-    local function op_fn_callback(slr, dummy, new_values)
+    local function op_fn_callback(slv, dummy, new_values)
+        local slr = slv.slr
         local blessing_ix = slr.this_step.blessing_ix
         local step_type = slr.this_step.type
         if step_type ~= 'MARPA_STEP_RULE'
@@ -5102,7 +5119,8 @@ Return `true` if the caller should continue reading ops,
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.do_ops(slr, ops, new_values)
+    function _M.class_slv.do_ops(slv, ops, new_values)
+        local slr = slv.slr
         local op_ix = 1
         while op_ix <= #ops do
             local op_code = ops[op_ix]
@@ -5121,7 +5139,7 @@ Return `true` if the caller should continue reading ops,
             -- io.stderr:write('ops: ', inspect(_M.vm_ops), '\n')
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
             local op_fn = _M.vm_ops[fn_key]
-            local result = op_fn(slr, arg, new_values)
+            local result = op_fn(slv, arg, new_values)
             if result then return result == 'continue' end
             op_ix = op_ix + 3
         end
@@ -5174,7 +5192,7 @@ step, and perform them.
             if not ops then
                 error(string.format('No semantics defined for %s', slr.this_step.type))
             end
-            local do_ops_result = slr:do_ops(ops, new_values)
+            local do_ops_result = slv:do_ops(ops, new_values)
             local stack = slr.lmw_v.stack
             -- truncate stack
             local above_top = slr.this_step.result + 1
