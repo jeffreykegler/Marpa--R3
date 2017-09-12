@@ -1755,7 +1755,6 @@ This is a registry object.
     class_slr_fields.slg = true
     class_slr_fields.start_of_lexeme = true
     class_slr_fields.terminals_expected = true
-    class_slr_fields.this_step = true
     class_slr_fields.too_many_earley_items = true
     class_slr_fields.token_is_literal = true
     class_slr_fields.token_is_undef = true
@@ -1769,13 +1768,15 @@ This is a registry object.
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
+    -- TODO delete after development
+    -- This temporary implementation leak valuers
+    class_slr_fields.slv = true
+    -- TODO move to SLV
     class_slr_fields.lmw_b = true
     class_slr_fields.lmw_o = true
     class_slr_fields.lmw_t = true
     class_slr_fields.lmw_v = true
-    -- TODO delete after development
-    -- This temporary implementation leak valuers
-    class_slr_fields.slv = true
+    class_slr_fields.this_step = true
 ```
 
 *At end of input* field:
