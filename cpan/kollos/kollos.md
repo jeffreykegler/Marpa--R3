@@ -4257,6 +4257,7 @@ This is a registry object.
 ```
     -- miranda: section+ class_slv field declarations
     class_slv_fields.slr = true
+    class_slv_fields.regix = true
 ```
 
 ```
@@ -4286,9 +4287,20 @@ which is not kept in the registry.
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
-        -- TODO Turn this into a registry object
-        -- slv.regix = _M.register(_M.registry, slv)
+        slv.regix = -1
         return slv
+    end
+    function _M.class_slr.islv_register(slr)
+        local slv = slr.slv
+        local regix = slv_regix
+        if regix >= 0 then
+            _M.userX(
+               "slr:islv_register(): already registered as",
+               inspect(regix))
+        end
+        regix = _M.register(_M.registry, slv)
+        slv.regix = regix
+        return regix
     end
 ```
 
