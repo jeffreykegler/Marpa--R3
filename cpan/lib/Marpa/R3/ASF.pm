@@ -389,6 +389,7 @@ sub Marpa::R3::ASF::new {
             if ( $arg eq 'slr' ) {
                 $asf->[Marpa::R3::Internal::ASF::SLR] = $slr =
                     $arg_hash->{$arg};
+                $asf->[Marpa::R3::Internal::ASF::SLV] = Marpa::R3::Scanless::V->link({recce => $slr});
                 next ARG;
             }
             if ( $arg eq 'factoring_max' ) {

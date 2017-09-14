@@ -4292,13 +4292,14 @@ which is not kept in the registry.
     end
     function _M.class_slr.islv_register(slr)
         local slv = slr.slv
-        local regix = slv_regix
+        local regix = slv.regix
         if regix >= 0 then
             _M.userX(
-               "slr:islv_register(): already registered as",
+               "slr:islv_register(): already registered as %s",
                inspect(regix))
         end
         regix = _M.register(_M.registry, slv)
+        print("Registered slv as " .. regix)
         slv.regix = regix
         return regix
     end

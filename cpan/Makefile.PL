@@ -447,6 +447,7 @@ WriteMakefile(
         q[lib/Marpa/R3/MetaG.pm]     => q[$(INST_LIB)/Marpa/R3/MetaG.pm],
         q[lib/Marpa/R3/SLG.pm]       => q[$(INST_LIB)/Marpa/R3/SLG.pm],
         q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
+        q[lib/Marpa/R3/SLV.pm]       => q[$(INST_LIB)/Marpa/R3/SLV.pm],
         q[lib/Marpa/R3/Value.pm]   => q[$(INST_LIB)/Marpa/R3/Value.pm],
         q[lib/Marpa/R3/Version.pm] => q[$(INST_LIB)/Marpa/R3/Version.pm],
         q[lib/Marpa/R3/X.pm]       => q[$(INST_LIB)/Marpa/R3/X.pm]

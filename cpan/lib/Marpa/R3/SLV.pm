@@ -29,6 +29,18 @@ use English qw( -no_match_vars );
 
 our $PACKAGE = 'Marpa::R3::Scanless::V';
 
+# Set those common args which are at the Perl level.
+sub perl_common_set {
+    my ( $slv, $flat_args ) = @_;
+    if ( my $value = $flat_args->{'trace_file_handle'} ) {
+        $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] = $value;
+    }
+    my $trace_file_handle =
+      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+    delete $flat_args->{'trace_file_handle'};
+    return $flat_args;
+}
+
 sub Marpa::R3::Scanless::V::link {
     my ( $class, @args ) = @_;
 
@@ -43,30 +55,30 @@ sub Marpa::R3::Scanless::V::link {
       if not $flat_args;
     $flat_args = perl_common_set( $slv, $flat_args );
 
-    my $slg = $flat_args->{recce};
+    my $slr = $flat_args->{recce};
     Marpa::R3::exception(
         qq{Marpa::R3::Scanless::V::new() called without a "recce" argument} )
-      if not defined $slg;
+      if not defined $slr;
     $slv->[Marpa::R3::Internal::Scanless::V::SLR] = $slr;
     delete $flat_args->{grammar};
 
     my $slr_class = 'Marpa::R3::Scanless::R';
-    if ( not blessed $slg or not $slg->isa($slg_class) ) {
-        my $ref_type = ref $slg;
+    if ( not blessed $slr or not $slr->isa($slr_class) ) {
+        my $ref_type = ref $slr;
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
         Marpa::R3::exception(
             qq{'recce' named argument to new() is $desc\n},
-            "  It should be a ref to $slg_class\n"
+            "  It should be a ref to $slr_class\n"
         );
-    } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
+    }
 
     $slr->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] //=
-      $slg->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
 
-    my $lua = $slg->[Marpa::R3::Internal::Scanless::R::L];
+    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
     $slr->[Marpa::R3::Internal::Scanless::V::L] = $lua;
 
     my ( $regix ) = $slr->coro_by_tag(
@@ -85,8 +97,8 @@ sub Marpa::R3::Scanless::V::link {
         <<'END_OF_LUA');
         local slr, flat_args = ...
         _M.wrap(function ()
-            local slv = slr:islv_register(flat_args)
-            return 'ok', slv.regix
+            local v_regix = slr:islv_register(flat_args)
+            return 'ok', v_regix
         end)
 END_OF_LUA
 
