@@ -131,6 +131,7 @@ __DATA__
       both structures from being freed, and create a memory leak. }
 
     SLR { The underlying SLR }
+    SLV { The underlying SLV }
     LEXEME_RESOLUTIONS
     RULE_RESOLUTIONS
 
@@ -219,6 +220,16 @@ __DATA__
     TRACE_FILE_HANDLE
     EVENT_HANDLERS { Application-level event handlers }
     CURRENT_EVENT
+
+    :package=Marpa::R3::Internal::Scanless::V
+
+    SLR
+
+    L { Lua Interpreter }
+    REGIX { Registry index in Lua interpreter --
+        a valid Lua index but not a pseudo-index. }
+
+    TRACE_FILE_HANDLE
 
     { vim: set expandtab shiftwidth=4:
     }
