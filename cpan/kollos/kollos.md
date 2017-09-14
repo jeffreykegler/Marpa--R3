@@ -1902,6 +1902,7 @@ together.
         if not slv then
             slv = slr:slv_new_i()
             slr.slv = slv
+            slr:islv_register()
         end
         slv:valuation_reset()
 
@@ -4258,6 +4259,7 @@ This is a registry object.
     -- miranda: section+ class_slv field declarations
     class_slv_fields.slr = true
     class_slv_fields.regix = true
+    class_slv_fields.is_r_internal = true
 ```
 
 ```
@@ -4290,6 +4292,7 @@ which is not kept in the registry.
         slv.regix = -1
         return slv
     end
+    -- TODO islv_register() not needed after development
     function _M.class_slr.islv_register(slr)
         local slv = slr.slv
         local regix = slv.regix
@@ -4299,8 +4302,9 @@ which is not kept in the registry.
                inspect(regix))
         end
         regix = _M.register(_M.registry, slv)
-        print("Registered slv as " .. regix)
+        -- print("Registered slv as " .. regix)
         slv.regix = regix
+        slv.is_r_internal = true
         return regix
     end
 ```

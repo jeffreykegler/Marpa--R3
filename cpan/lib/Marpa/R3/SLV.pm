@@ -97,7 +97,8 @@ sub Marpa::R3::Scanless::V::link {
         <<'END_OF_LUA');
         local slr, flat_args = ...
         _M.wrap(function ()
-            local v_regix = slr:islv_register(flat_args)
+            -- local v_regix = slr:islv_register(flat_args)
+            local v_regix = slr.slv.regix
             return 'ok', v_regix
         end)
 END_OF_LUA
@@ -129,8 +130,11 @@ sub Marpa::R3::Scanless::V::DESTROY {
     local slv = ...
     local slr = slv.slr
     slr:valuation_reset()
-    local regix = slv.regix
-    _M.unregister(_M.registry, regix)
+    -- TODO test unnecessary once slr-internal slv is eliminated
+    if not slv.is_r_internal then
+        local regix = slv.regix
+        _M.unregister(_M.registry, regix)
+    end
 END_OF_LUA
 }
 
