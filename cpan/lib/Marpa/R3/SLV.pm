@@ -79,7 +79,7 @@ sub Marpa::R3::Scanless::V::link {
       $slr->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
 
     my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
-    $slr->[Marpa::R3::Internal::Scanless::V::L] = $lua;
+    $slv->[Marpa::R3::Internal::Scanless::V::L] = $lua;
 
     my ( $regix ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),

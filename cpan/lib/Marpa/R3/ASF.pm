@@ -174,13 +174,15 @@ sub set_last_choice {
     my $choice     = $nook->[Marpa::R3::Internal::Nook::FIRST_CHOICE];
     return if $choice > $#{$and_nodes};
     if ( nook_has_semantic_cause( $asf, $nook ) ) {
+        my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
         my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
         my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
         my $and_node_id = $and_nodes->[$choice];
-        my ($current_predecessor) = $slr->call_by_tag(
+        my ($current_predecessor) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            local slr, id = ...
+            local slv, id = ...
+            local slr = slv.slr
             local current = slr.lmw_b:_and_node_predecessor(id)
             return current and current or -1
 END_OF_LUA
@@ -189,10 +191,11 @@ END_OF_LUA
             $choice++;
             $and_node_id = $and_nodes->[$choice];
             last AND_NODE if not defined $and_node_id;
-            my ($next_predecessor) = $slr->call_by_tag(
+            my ($next_predecessor) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA',
-                local slr, id = ...
+                local slv, id = ...
+                local slr = slv.slr
                 local next = slr.lmw_b:_and_node_predecessor(id)
                 return next and next or -1
 END_OF_LUA
