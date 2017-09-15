@@ -129,9 +129,9 @@ sub Marpa::R3::Scanless::V::DESTROY {
         <<'END_OF_LUA', '');
     local slv = ...
     local slr = slv.slr
-    slr:valuation_reset()
     -- TODO test unnecessary once slr-internal slv is eliminated
     if not slv.is_r_internal then
+        slr:valuation_reset()
         local regix = slv.regix
         _M.unregister(_M.registry, regix)
     end

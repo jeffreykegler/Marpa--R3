@@ -1394,6 +1394,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
@@ -1412,7 +1413,7 @@ sub Marpa::R3::Scanless::R::value {
     local $Marpa::R3::Context::irlid = undef;
     local $Marpa::R3::Context::slg = $slg;
     local $Marpa::R3::Context::slr  = $slr;
-    # local $Marpa::R3::Context::slv  = $slv;
+    local $Marpa::R3::Context::slv  = $slv;
 
     my %value_handlers = (
         trace => sub {
