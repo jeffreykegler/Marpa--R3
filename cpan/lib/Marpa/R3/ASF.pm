@@ -386,13 +386,15 @@ sub Marpa::R3::ASF::new {
     my $asf = bless [], $class;
 
     my $slr;
+    my $slv;
 
     for my $arg_hash (@arg_hashes) {
         ARG: for my $arg ( keys %{$arg_hash} ) {
             if ( $arg eq 'slr' ) {
                 $asf->[Marpa::R3::Internal::ASF::SLR] = $slr =
                     $arg_hash->{$arg};
-                $asf->[Marpa::R3::Internal::ASF::SLV] = Marpa::R3::Scanless::V->link({recce => $slr});
+                $asf->[Marpa::R3::Internal::ASF::SLV] = $slv =
+                    Marpa::R3::Scanless::V->link({recce => $slr});
                 next ARG;
             }
             if ( $arg eq 'factoring_max' ) {
@@ -413,18 +415,18 @@ sub Marpa::R3::ASF::new {
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-     $slr->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
+     $slv->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
-    local recce = ...
-    if recce.tree_mode then
+    local slv = ...
+    if slv.tree_mode then
         error(
             "An attempt was made to create an ASF for a SLIF recognizer already in use\n"
             .. "   The recognizer must be reset first\n"
             .. string.format('  The current SLIF recognizer mode is $q\n',
-                recce.tree_mode)
+                slv.tree_mode)
         )
     end
-    recce.tree_mode = 'forest'
+    slv.tree_mode = 'forest'
 END_OF_LUA
 
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],

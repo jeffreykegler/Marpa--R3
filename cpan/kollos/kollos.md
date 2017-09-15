@@ -1774,7 +1774,6 @@ This is a registry object.
     class_slr_fields.lmw_b = true
     class_slr_fields.lmw_o = true
     class_slr_fields.lmw_t = true
-    class_slr_fields.tree_mode = true
 ```
 
 *At end of input* field:
@@ -4258,6 +4257,7 @@ This is a registry object.
     class_slv_fields.slr = true
     class_slv_fields.regix = true
     class_slv_fields.is_r_internal = true
+    class_slv_fields.tree_mode = true
     class_slv_fields.this_step = true
     class_slv_fields.lmw_v = true
 ```
@@ -4319,11 +4319,11 @@ which is not kept in the registry.
         _M.wrap(function ()
             local g1r = slr.g1
 
-            slr.tree_mode = slr.tree_mode or 'tree'
-            if slr.tree_mode ~= 'tree' then
+            slv.tree_mode = slv.tree_mode or 'tree'
+            if slv.tree_mode ~= 'tree' then
                 error(
                     "value() called when recognizer is not in tree mode\n"
-                    .. string.format('  The current mode is %q\n', slr.tree_mode)
+                    .. string.format('  The current mode is %q\n', slv.tree_mode)
                 )
             end
 
@@ -4432,7 +4432,7 @@ TODO: Refactoring may eliminate the need for this.
         slr.lmw_o = nil
         slr.lmw_t = nil
         slv.lmw_v = nil
-        slr.tree_mode = nil
+        slv.tree_mode = nil
     end
 ```
 
