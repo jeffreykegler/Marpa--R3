@@ -158,8 +158,7 @@ sub Marpa::R3::Context::g1_range {
     my ( $start, $end ) =
       $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 local slv = ...
-local slr = slv.slr
-return slr.this_step.start_es_id, slr.this_step.es_id
+return slv.this_step.start_es_id, slv.this_step.es_id
 END_OF_LUA
     return $start, $end;
 } ## end sub Marpa::R3::Context::g1_range
@@ -170,8 +169,8 @@ sub Marpa::R3::Context::lc_range {
       $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 local slv = ...
 local slr = slv.slr
-local g1_first = slr.this_step.start_es_id
-local g1_last = slr.this_step.es_id - 1
+local g1_first = slv.this_step.start_es_id
+local g1_last = slv.this_step.es_id - 1
 local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
 local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
 return slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
@@ -184,9 +183,8 @@ sub Marpa::R3::Context::g1_span {
     my ( $start, $length ) =
       $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 local slv = ...
-local slr = slv.slr
-local start = slr.this_step.start_es_id + 0
-local length = (start - slr.this_step.es_id) + 1
+local start = slv.this_step.start_es_id + 0
+local length = (start - slv.this_step.es_id) + 1
 return start, length
 END_OF_LUA
     return $start, $length;

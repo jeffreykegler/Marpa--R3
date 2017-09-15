@@ -1776,7 +1776,6 @@ This is a registry object.
     class_slr_fields.lmw_o = true
     class_slr_fields.lmw_t = true
     class_slr_fields.lmw_v = true
-    class_slr_fields.this_step = true
 ```
 
 *At end of input* field:
@@ -2952,7 +2951,7 @@ TODO: Delete after development
         /* Lua stack: [ recce_table, step_table ] */
         step_table = marpa_lua_gettop (L);
         marpa_lua_pushvalue (L, -1);
-        marpa_lua_setfield (L, recce_table, "this_step");
+        marpa_lua_setfield (L, value_table, "this_step");
         /* Lua stack: [ recce_table, step_table ] */
 
         step_type = (lua_Integer) marpa_v_step (v);
@@ -4260,6 +4259,7 @@ This is a registry object.
     class_slv_fields.slr = true
     class_slv_fields.regix = true
     class_slv_fields.is_r_internal = true
+    class_slv_fields.this_step = true
 ```
 
 ```
@@ -4373,7 +4373,7 @@ which is not kept in the registry.
 
             while true do
                 local new_values = slv:do_steps()
-                local this = slr.this_step
+                local this = slv.this_step
                 local step_type = this.type
                 if step_type == 'MARPA_STEP_RULE' then
                     -- print(inspect(new_values, {depth=2}))
@@ -4514,7 +4514,7 @@ or at least the subject of refactoring.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.stack_top_index(slv)
         local slr = slv.slr
-        return slr.this_step.result
+        return slv.this_step.result
     end
 
 ```
@@ -4701,7 +4701,7 @@ fast fails with a clear message.
 If an operation in the VM returns -1, it is a
 "result operation".
 The actual result is expected to be in the stack
-at index `slr.this_step.result`.
+at index `slv.this_step.result`.
 
 The result operation is not required to be the
 last operation in a sequence,
@@ -4715,7 +4715,7 @@ If a sequence ends without encountering a result
 operation, an implicit "no-op" result operation
 is assumed and, as usual,
 the result is the value in the stack
-at index `slr.this_step.result`.
+at index `slv.this_step.result`.
 
 #### VM "result is undef" operation
 
@@ -4728,7 +4728,7 @@ The result of the semantics is a Perl undef.
     local function op_fn_result_is_undef(slv)
         local slr = slv.slr
         local stack = slr.lmw_v.stack
-        stack[slr.this_step.result] = coroutine.yield('perl_undef')
+        stack[slv.this_step.result] = coroutine.yield('perl_undef')
         return 'continue'
     end
     op_fn_add("result_is_undef", op_fn_result_is_undef)
@@ -4747,11 +4747,11 @@ if not the value is an undef.
 
     local function op_fn_result_is_token_value(slv)
         local slr = slv.slr
-        if slr.this_step.type ~= 'MARPA_STEP_TOKEN' then
+        if slv.this_step.type ~= 'MARPA_STEP_TOKEN' then
           return op_fn_result_is_undef(slv)
         end
         local stack = slr.lmw_v.stack
-        local result_ix = slr.this_step.result
+        local result_ix = slv.this_step.result
         stack[result_ix] = slv:current_token_literal()
         return 'continue'
     end
@@ -4765,15 +4765,15 @@ if not the value is an undef.
     -- miranda: section+ VM operations
     local function op_fn_result_is_n_of_rhs(slv, rhs_ix)
         local slr = slv.slr
-        if slr.this_step.type ~= 'MARPA_STEP_RULE' then
+        if slv.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(slv)
         end
         local stack = slr.lmw_v.stack
-        local result_ix = slr.this_step.result
+        local result_ix = slv.this_step.result
         repeat
             if rhs_ix == 0 then break end
             local fetch_ix = result_ix + rhs_ix
-            if fetch_ix > slr.this_step.arg_n then
+            if fetch_ix > slv.this_step.arg_n then
                 stack[result_ix] = coroutine.yield('perl_undef')
                 break
             end
@@ -4799,12 +4799,12 @@ the "N of RHS" operation should be used.
     -- miranda: section+ VM operations
     local function op_fn_result_is_n_of_sequence(slv, item_ix)
         local slr = slv.slr
-        if slr.this_step.type ~= 'MARPA_STEP_RULE' then
+        if slv.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(slv)
         end
-        local result_ix = slr.this_step.result
+        local result_ix = slv.this_step.result
         local fetch_ix = result_ix + item_ix * 2
-        if fetch_ix > slr.this_step.arg_n then
+        if fetch_ix > slv.this_step.arg_n then
           return op_fn_result_is_undef(slv)
         end
         local stack = slr.lmw_v.stack
@@ -4826,12 +4826,12 @@ Returns a constant result.
     local function op_fn_result_is_constant(slv, constant_ix)
         local slr = slv.slr
         local stack = slr.lmw_v.stack
-        local result_ix = slr.this_step.result
+        local result_ix = slv.this_step.result
         stack[result_ix] = coroutine.yield('constant', constant_ix)
-        if slr.trace_values > 0 and slr.this_step.type == 'MARPA_STEP_TOKEN' then
+        if slr.trace_values > 0 and slv.this_step.type == 'MARPA_STEP_TOKEN' then
             coroutine.yield('trace',
                 table.concat(
-                    { "valuator unknown step", slr.this_step.type, slr.token, constant},
+                    { "valuator unknown step", slv.this_step.type, slr.token, constant},
                     ' '))
         end
         return 'continue'
@@ -4873,11 +4873,11 @@ Push one of the RHS child values onto the values array.
 
     local function op_fn_push_one(slv, rhs_ix, new_values)
         local slr = slv.slr
-        if slr.this_step.type ~= 'MARPA_STEP_RULE' then
+        if slv.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_push_undef(slv, nil, new_values)
         end
         local stack = slr.lmw_v.stack
-        local result_ix = slr.this_step.result
+        local result_ix = slv.this_step.result
         local next_ix = #new_values + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
         return
@@ -4893,20 +4893,20 @@ equivalent of the current token.
 It assumes that there *is* a current token,
 that is,
 it assumes that the caller has ensured that
-`slr.this_step.type ~= 'MARPA_STEP_TOKEN'`.
+`slv.this_step.type ~= 'MARPA_STEP_TOKEN'`.
 
 ```
     -- miranda: section+ VM operations
     function _M.class_slv.current_token_literal(slv)
       local slr = slv.slr
-      if slr.token_is_literal == slr.this_step.value then
-          local start_es = slr.this_step.start_es_id
-          local end_es = slr.this_step.es_id
+      if slr.token_is_literal == slv.this_step.value then
+          local start_es = slv.this_step.start_es_id
+          local end_es = slv.this_step.es_id
           local g1_count = end_es - start_es
           local literal = slr:g1_literal(start_es, g1_count)
           return literal
       end
-      return slr.token_values[slr.this_step.value]
+      return slr.token_values[slv.this_step.value]
     end
 
 ```
@@ -4927,15 +4927,15 @@ Otherwise the values of the RHS children are pushed.
 
     local function op_fn_push_values(slv, increment, new_values)
         local slr = slv.slr
-        if slr.this_step.type == 'MARPA_STEP_TOKEN' then
+        if slv.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
             new_values[next_ix] = slv:current_token_literal()
             return
         end
-        if slr.this_step.type == 'MARPA_STEP_RULE' then
+        if slv.this_step.type == 'MARPA_STEP_RULE' then
             local stack = slr.lmw_v.stack
-            local arg_n = slr.this_step.arg_n
-            local result_ix = slr.this_step.result
+            local arg_n = slv.this_step.arg_n
+            local result_ix = slv.this_step.result
             local to_ix = #new_values + 1;
             for from_ix = result_ix,arg_n,increment do
                 new_values[to_ix] = stack[from_ix]
@@ -4959,7 +4959,7 @@ in terms of the input string.
     -- miranda: section+ VM operations
     local function op_fn_push_start(slv, dummy, new_values)
         local slr = slv.slr
-        local start_es = slr.this_step.start_es_id
+        local start_es = slv.this_step.start_es_id
         local per_es = slr.per_es
         local l0_start
         start_es = start_es + 1
@@ -4990,8 +4990,8 @@ that is, in terms of the input string
     -- miranda: section+ VM operations
     local function op_fn_push_length(slv, dummy, new_values)
         local slr = slv.slr
-        local start_es = slr.this_step.start_es_id
-        local end_es = slr.this_step.es_id
+        local start_es = slv.this_step.start_es_id
+        local end_es = slv.this_step.es_id
         local per_es = slr.per_es
         local l0_length = 0
         start_es = start_es + 1
@@ -5020,7 +5020,7 @@ in terms of G1 Earley sets.
     local function op_fn_push_g1_start(slv, dummy, new_values)
         local slr = slv.slr
         local next_ix = #new_values + 1;
-        new_values[next_ix] = slr.this_step.start_es_id
+        new_values[next_ix] = slv.this_step.start_es_id
         return
     end
     op_fn_add("push_g1_start", op_fn_push_g1_start)
@@ -5037,8 +5037,8 @@ that is, in terms of G1 Earley sets.
     local function op_fn_push_g1_length(slv, dummy, new_values)
         local slr = slv.slr
         local next_ix = #new_values + 1;
-        new_values[next_ix] = (slr.this_step.es_id
-            - slr.this_step.start_es_id) + 1
+        new_values[next_ix] = (slv.this_step.es_id
+            - slv.this_step.start_es_id) + 1
         return
     end
     op_fn_add("push_g1_length", op_fn_push_g1_length)
@@ -5072,7 +5072,7 @@ of every sequence of operations
     -- miranda: section+ VM operations
     local function op_fn_bless(slv, blessing_ix)
         local slr = slv.slr
-        slr.this_step.blessing_ix = blessing_ix
+        slv.this_step.blessing_ix = blessing_ix
         return
     end
     op_fn_add("bless", op_fn_bless)
@@ -5088,12 +5088,12 @@ is the result of this sequence of operations.
     -- miranda: section+ VM operations
     local function op_fn_result_is_array(slv, dummy, new_values)
         local slr = slv.slr
-        local blessing_ix = slr.this_step.blessing_ix
+        local blessing_ix = slv.this_step.blessing_ix
         if blessing_ix then
           new_values = coroutine.yield('bless', new_values, blessing_ix)
         end
         local stack = slr.lmw_v.stack
-        local result_ix = slr.this_step.result
+        local result_ix = slv.this_step.result
         stack[result_ix] = new_values
         return 'continue'
     end
@@ -5113,8 +5113,8 @@ implementation, which returned the size of the
     -- miranda: section+ VM operations
     local function op_fn_callback(slv, dummy, new_values)
         local slr = slv.slr
-        local blessing_ix = slr.this_step.blessing_ix
-        local step_type = slr.this_step.type
+        local blessing_ix = slv.this_step.blessing_ix
+        local step_type = slv.this_step.type
         if step_type ~= 'MARPA_STEP_RULE'
             and step_type ~= 'MARPA_STEP_NULLING_SYMBOL'
         then
@@ -5124,7 +5124,7 @@ implementation, which returned the size of the
             )
             os.exit(false)
         end
-        local blessing_ix = slr.this_step.blessing_ix
+        local blessing_ix = slv.this_step.blessing_ix
         if blessing_ix then
           new_values = coroutine.yield('bless', new_values, blessing_ix)
         end
@@ -5154,9 +5154,9 @@ Return `true` if the caller should continue reading ops,
             if slr.trace_values >= 3 then
               local tag = 'starting lua op'
               coroutine.yield('trace',
-                  table.concat({'starting op', slr.this_step.type, 'lua'}, ' '))
+                  table.concat({'starting op', slv.this_step.type, 'lua'}, ' '))
               coroutine.yield('trace',
-                  table.concat({tag, slr.this_step.type, _M.vm_op_names[fn_key]}, ' '))
+                  table.concat({tag, slv.this_step.type, _M.vm_op_names[fn_key]}, ' '))
             end
             -- io.stderr:write('ops: ', inspect(_M.vm_ops), '\n')
             -- io.stderr:write('fn_key: ', inspect(fn_key), '\n')
@@ -5185,25 +5185,25 @@ step, and perform them.
             local ops = {}
             -- TODO Note usage of lmw_v in lca_slv_step_meth
             slv:step()
-            if slr.this_step.type == 'MARPA_STEP_INACTIVE' then
+            if slv.this_step.type == 'MARPA_STEP_INACTIVE' then
                 return new_values
             end
-            if slr.this_step.type == 'MARPA_STEP_RULE' then
-                ops = grammar.rule_semantics[slr.this_step.rule]
+            if slv.this_step.type == 'MARPA_STEP_RULE' then
+                ops = grammar.rule_semantics[slv.this_step.rule]
                 if not ops then
                     ops = _M.rule_semantics_default
                 end
                 goto DO_OPS
             end
-            if slr.this_step.type == 'MARPA_STEP_TOKEN' then
-                ops = grammar.token_semantics[slr.this_step.symbol]
+            if slv.this_step.type == 'MARPA_STEP_TOKEN' then
+                ops = grammar.token_semantics[slv.this_step.symbol]
                 if not ops then
                     ops = _M.token_semantics_default
                 end
                 goto DO_OPS
             end
-            if slr.this_step.type == 'MARPA_STEP_NULLING_SYMBOL' then
-                ops = grammar.nulling_semantics[slr.this_step.symbol]
+            if slv.this_step.type == 'MARPA_STEP_NULLING_SYMBOL' then
+                ops = grammar.nulling_semantics[slv.this_step.symbol]
                 if not ops then
                     ops = _M.nulling_semantics_default
                 end
@@ -5212,12 +5212,12 @@ step, and perform them.
             if true then return new_values end
             ::DO_OPS::
             if not ops then
-                error(string.format('No semantics defined for %s', slr.this_step.type))
+                error(string.format('No semantics defined for %s', slv.this_step.type))
             end
             local do_ops_result = slv:do_ops(ops, new_values)
             local stack = slr.lmw_v.stack
             -- truncate stack
-            local above_top = slr.this_step.result + 1
+            local above_top = slv.this_step.result + 1
             for i = above_top,#stack do stack[i] = nil end
             if not do_ops_result then return new_values end
         end
