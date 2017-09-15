@@ -154,20 +154,22 @@ sub Marpa::R3::Context::bail {   ## no critic (Subroutines::RequireArgUnpacking)
 ## use critic
 
 sub Marpa::R3::Context::g1_range {
-    my $slr = $Marpa::R3::Context::slr;
+    my $slv = $Marpa::R3::Context::slv;
     my ( $start, $end ) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-local slr = ...
+      $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+local slv = ...
+local slr = slv.slr
 return slr.this_step.start_es_id, slr.this_step.es_id
 END_OF_LUA
     return $start, $end;
 } ## end sub Marpa::R3::Context::g1_range
 
 sub Marpa::R3::Context::lc_range {
-    my $slr = $Marpa::R3::Context::slr;
+    my $slv = $Marpa::R3::Context::slv;
     my ( $lc_range ) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-local slr = ...
+      $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+local slv = ...
+local slr = slv.slr
 local g1_first = slr.this_step.start_es_id
 local g1_last = slr.this_step.es_id - 1
 local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
@@ -178,10 +180,11 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Context::g1_span {
-    my $slr = $Marpa::R3::Context::slr;
+    my $slv = $Marpa::R3::Context::slv;
     my ( $start, $length ) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-local slr = ...
+      $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
+local slv = ...
+local slr = slv.slr
 local start = slr.this_step.start_es_id + 0
 local length = (start - slr.this_step.es_id) + 1
 return start, length
