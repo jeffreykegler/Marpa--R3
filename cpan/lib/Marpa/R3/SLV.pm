@@ -60,7 +60,7 @@ sub Marpa::R3::Scanless::V::link {
         qq{Marpa::R3::Scanless::V::new() called without a "recce" argument} )
       if not defined $slr;
     $slv->[Marpa::R3::Internal::Scanless::V::SLR] = $slr;
-    delete $flat_args->{grammar};
+    delete $flat_args->{recce};
 
     my $slr_class = 'Marpa::R3::Scanless::R';
     if ( not blessed $slr or not $slr->isa($slr_class) ) {
@@ -72,11 +72,11 @@ sub Marpa::R3::Scanless::V::link {
         );
     }
 
-    $slr->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] //=
+    $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] //=
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
 
     my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
     $slv->[Marpa::R3::Internal::Scanless::V::L] = $lua;

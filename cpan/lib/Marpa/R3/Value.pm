@@ -1410,9 +1410,9 @@ sub Marpa::R3::Scanless::R::value {
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::irlid = undef;
+    local $Marpa::R3::Context::slg = $slg;
     local $Marpa::R3::Context::slr  = $slr;
-    local $Marpa::R3::Context::slg =
-      $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    # local $Marpa::R3::Context::slv  = $slv;
 
     my %value_handlers = (
         trace => sub {
