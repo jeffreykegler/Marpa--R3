@@ -1764,7 +1764,6 @@ This is a registry object.
     class_slr_fields.trailers = true
     -- TODO delete after development
     class_slr_fields.phase = true
-    class_slr_fields.tree_mode = true
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
@@ -1775,7 +1774,7 @@ This is a registry object.
     class_slr_fields.lmw_b = true
     class_slr_fields.lmw_o = true
     class_slr_fields.lmw_t = true
-    class_slr_fields.lmw_v = true
+    class_slr_fields.tree_mode = true
 ```
 
 *At end of input* field:
@@ -2937,7 +2936,7 @@ TODO: Delete after development
         /* Lua stack: [ value_table, recce_table ] */
         recce_table = marpa_lua_gettop (L);
 
-        marpa_lua_getfield(L, recce_table, "lmw_v");
+        marpa_lua_getfield(L, value_table, "lmw_v");
         /* Lua stack: [ value_table, recce_table, lmw_v ] */
         marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
                     -1, "_libmarpa")), 1,
@@ -4260,6 +4259,7 @@ This is a registry object.
     class_slv_fields.regix = true
     class_slv_fields.is_r_internal = true
     class_slv_fields.this_step = true
+    class_slv_fields.lmw_v = true
 ```
 
 ```
@@ -4355,21 +4355,21 @@ which is not kept in the registry.
                 error(string.format("Maximum parse count (%d) exceeded", max_parses));
             end
             -- io.stderr:write('tree:', inspect(t))
-            slr.lmw_v = nil
+            slv.lmw_v = nil
             -- print(inspect(_G))
             local result = lmw_t:next()
             if not result then return 'ok', 'undef' end
             -- print('result:', result)
-            slr.lmw_v = _M.value_new(lmw_t)
+            slv.lmw_v = _M.value_new(lmw_t)
 
         local trace_values = slr.trace_values or 0
-        slr.lmw_v:_trace(trace_values)
+        slv.lmw_v:_trace(trace_values)
 
         if trace_values > 0 then
           coroutine.yield('trace',
             "valuator trace level: " ..  slr.trace_values)
         end
-        slr.lmw_v.stack = {}
+        slv.lmw_v.stack = {}
 
             while true do
                 local new_values = slv:do_steps()
@@ -4381,7 +4381,7 @@ which is not kept in the registry.
                     local ix = slv:stack_top_index()
                     slv:stack_set(ix, sv)
                     if slr.trace_values > 0 then
-                        local nook_ix = slr.lmw_v:_nook()
+                        local nook_ix = slv.lmw_v:_nook()
                         local or_node_id = lmw_t:_nook_or_node(nook_ix)
                         local choice = lmw_t:_nook_choice(nook_ix)
                         local and_node_id = lmw_o:_and_order_get(or_node_id, choice)
@@ -4431,7 +4431,7 @@ TODO: Refactoring may eliminate the need for this.
         slr.lmw_b = nil
         slr.lmw_o = nil
         slr.lmw_t = nil
-        slr.lmw_v = nil
+        slv.lmw_v = nil
         slr.tree_mode = nil
     end
 ```
@@ -4488,7 +4488,7 @@ or at least the subject of refactoring.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.stack_set(slv, ix, v)
         local slr = slv.slr
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         stack[ix+0] = v
     end
 
@@ -4502,7 +4502,7 @@ or at least the subject of refactoring.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.stack_get(slv, ix)
         local slr = slv.slr
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         return stack[ix+0]
     end
 
@@ -4526,7 +4526,7 @@ or at least the subject of refactoring.
         if not slr.trace_values or slr.trace_values < 2 then
             return
         end
-        local nook_ix = slr.lmw_v:_nook()
+        local nook_ix = slv.lmw_v:_nook()
         local b = slr.lmw_b
         local o = slr.lmw_o
         local t = slr.lmw_t
@@ -4727,7 +4727,7 @@ The result of the semantics is a Perl undef.
 
     local function op_fn_result_is_undef(slv)
         local slr = slv.slr
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         stack[slv.this_step.result] = coroutine.yield('perl_undef')
         return 'continue'
     end
@@ -4750,7 +4750,7 @@ if not the value is an undef.
         if slv.this_step.type ~= 'MARPA_STEP_TOKEN' then
           return op_fn_result_is_undef(slv)
         end
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
         stack[result_ix] = slv:current_token_literal()
         return 'continue'
@@ -4768,7 +4768,7 @@ if not the value is an undef.
         if slv.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_result_is_undef(slv)
         end
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
         repeat
             if rhs_ix == 0 then break end
@@ -4807,7 +4807,7 @@ the "N of RHS" operation should be used.
         if fetch_ix > slv.this_step.arg_n then
           return op_fn_result_is_undef(slv)
         end
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         if item_ix > 0 then
             stack[result_ix] = stack[fetch_ix]
         end
@@ -4825,7 +4825,7 @@ Returns a constant result.
     -- miranda: section+ VM operations
     local function op_fn_result_is_constant(slv, constant_ix)
         local slr = slv.slr
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
         stack[result_ix] = coroutine.yield('constant', constant_ix)
         if slr.trace_values > 0 and slv.this_step.type == 'MARPA_STEP_TOKEN' then
@@ -4876,7 +4876,7 @@ Push one of the RHS child values onto the values array.
         if slv.this_step.type ~= 'MARPA_STEP_RULE' then
           return op_fn_push_undef(slv, nil, new_values)
         end
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
         local next_ix = #new_values + 1;
         new_values[next_ix] = stack[result_ix + rhs_ix]
@@ -4933,7 +4933,7 @@ Otherwise the values of the RHS children are pushed.
             return
         end
         if slv.this_step.type == 'MARPA_STEP_RULE' then
-            local stack = slr.lmw_v.stack
+            local stack = slv.lmw_v.stack
             local arg_n = slv.this_step.arg_n
             local result_ix = slv.this_step.result
             local to_ix = #new_values + 1;
@@ -5092,7 +5092,7 @@ is the result of this sequence of operations.
         if blessing_ix then
           new_values = coroutine.yield('bless', new_values, blessing_ix)
         end
-        local stack = slr.lmw_v.stack
+        local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
         stack[result_ix] = new_values
         return 'continue'
@@ -5183,7 +5183,6 @@ step, and perform them.
         while true do
             local new_values = {}
             local ops = {}
-            -- TODO Note usage of lmw_v in lca_slv_step_meth
             slv:step()
             if slv.this_step.type == 'MARPA_STEP_INACTIVE' then
                 return new_values
@@ -5215,7 +5214,7 @@ step, and perform them.
                 error(string.format('No semantics defined for %s', slv.this_step.type))
             end
             local do_ops_result = slv:do_ops(ops, new_values)
-            local stack = slr.lmw_v.stack
+            local stack = slv.lmw_v.stack
             -- truncate stack
             local above_top = slv.this_step.result + 1
             for i = above_top,#stack do stack[i] = nil end
