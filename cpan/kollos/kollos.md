@@ -4752,7 +4752,7 @@ if not the value is an undef.
         end
         local stack = slr.lmw_v.stack
         local result_ix = slr.this_step.result
-        stack[result_ix] = slr:current_token_literal()
+        stack[result_ix] = slv:current_token_literal()
         return 'continue'
     end
     op_fn_add("result_is_token_value", op_fn_result_is_token_value)
@@ -4897,7 +4897,8 @@ it assumes that the caller has ensured that
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slr.current_token_literal(slr)
+    function _M.class_slv.current_token_literal(slv)
+      local slr = slv.slr
       if slr.token_is_literal == slr.this_step.value then
           local start_es = slr.this_step.start_es_id
           local end_es = slr.this_step.es_id
@@ -4928,7 +4929,7 @@ Otherwise the values of the RHS children are pushed.
         local slr = slv.slr
         if slr.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
-            new_values[next_ix] = slr:current_token_literal()
+            new_values[next_ix] = slv:current_token_literal()
             return
         end
         if slr.this_step.type == 'MARPA_STEP_RULE' then
