@@ -20,7 +20,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 40;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -482,11 +482,6 @@ END_OF_TEXT
         }
         else {
             Test::More::fail(qq{Unexpected result for length=$i, "$value"});
-        }
-
-        if ( $i == 3 ) {
-                Marpa::R3::Test::is( $recce->tree_show(),
-                    $tree_expected{$value}, qq{Tree, "$value"} );
         }
 
     } ## end while ( my $value_ref = $recce->value() )
