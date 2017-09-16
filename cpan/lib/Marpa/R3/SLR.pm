@@ -438,21 +438,6 @@ END__OF_LUA
     return $desc;
 } ## end sub character_describe
 
-sub Marpa::R3::Scanless::R::ambiguity_metric {
-    my ($slr) = @_;
-
-    my ($metric) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END__OF_LUA', '>*' );
-    local recce = ...
-    local order = recce:ordering_get()
-    if not order then return 0 end
-    return order:ambiguity_metric()
-END__OF_LUA
-
-    return $metric;
-} ## end sub Marpa::R3::Scanless::R::ambiguity_metric
-
 # This is a Marpa Scanless::G method, but is included in this
 # file because internally it is all about the recognizer.
 sub Marpa::R3::Scanless::G::parse {
@@ -1680,7 +1665,14 @@ sub Marpa::R3::Scanless::R::ambiguous {
     my ( $slr, $verbose ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
     return $slv->ambiguous( $verbose);
-} ## end sub Marpa::R3::Scanless::R::ambiguous
+}
+
+# TODO Delete after development
+sub Marpa::R3::Scanless::R::ambiguity_metric {
+    my ( $slr, $verbose ) = @_;
+    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return $slv->ambiguity_metric( $verbose);
+}
 
 1;
 

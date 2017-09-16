@@ -361,6 +361,22 @@ sub Marpa::R3::Scanless::V::ambiguous {
     return Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
 } ## end sub Marpa::R3::Scanless::R::ambiguous
 
+sub Marpa::R3::Scanless::V::ambiguity_metric {
+    my ($slv) = @_;
+    my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+
+    my ($metric) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local recce = ...
+    local order = recce:ordering_get()
+    if not order then return 0 end
+    return order:ambiguity_metric()
+END__OF_LUA
+
+    return $metric;
+} ## end sub Marpa::R3::Scanless::R::ambiguity_metric
+
 # not to be documented
 sub Marpa::R3::Scanless::V::regix {
     my ( $slv ) = @_;
