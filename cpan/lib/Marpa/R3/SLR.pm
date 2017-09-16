@@ -453,19 +453,6 @@ END__OF_LUA
     return $metric;
 } ## end sub Marpa::R3::Scanless::R::ambiguity_metric
 
-sub Marpa::R3::Scanless::R::ambiguous {
-    my ($slr) = @_;
-    local $Marpa::R3::Context::slr = $slr;
-    my $ambiguity_metric = $slr->ambiguity_metric();
-    return q{No parse} if $ambiguity_metric <= 0;
-    return q{} if $ambiguity_metric == 1;
-    my $asf = Marpa::R3::ASF->new( { slr => $slr } );
-    die 'Could not create ASF' if not defined $asf;
-    my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
-    my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
-    return Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
-} ## end sub Marpa::R3::Scanless::R::ambiguous
-
 # This is a Marpa Scanless::G method, but is included in this
 # file because internally it is all about the recognizer.
 sub Marpa::R3::Scanless::G::parse {
@@ -1687,6 +1674,13 @@ sub Marpa::R3::Scanless::R::tree_show {
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
     return $slv->tree_show( $verbose);
 }
+
+# TODO Delete after development
+sub Marpa::R3::Scanless::R::ambiguous {
+    my ( $slr, $verbose ) = @_;
+    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return $slv->ambiguous( $verbose);
+} ## end sub Marpa::R3::Scanless::R::ambiguous
 
 1;
 

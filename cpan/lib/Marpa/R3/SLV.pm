@@ -348,6 +348,19 @@ END_OF_LUA
     return $text;
 }
 
+sub Marpa::R3::Scanless::V::ambiguous {
+    my ($slv) = @_;
+    my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+    my $ambiguity_metric = $slr->ambiguity_metric();
+    return q{No parse} if $ambiguity_metric <= 0;
+    return q{} if $ambiguity_metric == 1;
+    my $asf = Marpa::R3::ASF->new( { slr => $slr } );
+    die 'Could not create ASF' if not defined $asf;
+    my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
+    my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
+    return Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+} ## end sub Marpa::R3::Scanless::R::ambiguous
+
 # not to be documented
 sub Marpa::R3::Scanless::V::regix {
     my ( $slv ) = @_;

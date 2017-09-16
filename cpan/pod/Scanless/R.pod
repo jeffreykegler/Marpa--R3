@@ -888,6 +888,8 @@ normalize-whitespace: 1
         die "Parse is ambiguous\n", $ambiguous_status;
     }
 
+    TODO: Move this to Scanless::V pod
+
 =for Marpa::R3::Display::End
 
 This method should be called after the C<read()> method.
@@ -1410,6 +1412,8 @@ Currently, all failures are thrown.
 name: Scanless ambiguity_metric() synopsis
 
     my $ambiguity_metric = $recce->ambiguity_metric();
+
+    TODO: Move this to Scanless::V pod
 
 =for Marpa::R3::Display::End
 
