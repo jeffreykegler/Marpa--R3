@@ -2924,33 +2924,27 @@ TODO: Delete after development
         Marpa_Value v;
         lua_Integer step_type;
         const int value_table = marpa_lua_gettop (L);
-        /* TODO -- delete recce_table after development --
-           should no longer be used */
-        int recce_table;
         int step_table;
 
         marpa_luaL_checktype (L, 1, LUA_TTABLE);
         /* Lua stack: [ value_table ] */
-        marpa_lua_getfield(L, value_table, "slr");
-        /* Lua stack: [ value_table, recce_table ] */
-        recce_table = marpa_lua_gettop (L);
 
         marpa_lua_getfield(L, value_table, "lmw_v");
-        /* Lua stack: [ value_table, recce_table, lmw_v ] */
+        /* Lua stack: [ value_table, lmw_v ] */
         marpa_luaL_argcheck (L, (LUA_TUSERDATA == marpa_lua_getfield (L,
                     -1, "_libmarpa")), 1,
             "Internal error: recce._libmarpa userdata not set");
-        /* Lua stack: [ value_table, recce_table, lmw_v, v_ud ] */
+        /* Lua stack: [ value_table, lmw_v, v_ud ] */
         v = *(Marpa_Value *) marpa_lua_touserdata (L, -1);
-        /* Lua stack: [ value_table, recce_table, lmw_v, v_ud ] */
-        marpa_lua_settop (L, recce_table);
-        /* Lua stack: [ recce_table ] */
+        /* Lua stack: [ value_table, lmw_v, v_ud ] */
+        marpa_lua_settop (L, value_table);
+        /* Lua stack: [ value_table ] */
         marpa_lua_newtable (L);
-        /* Lua stack: [ recce_table, step_table ] */
+        /* Lua stack: [ value_table, step_table ] */
         step_table = marpa_lua_gettop (L);
         marpa_lua_pushvalue (L, -1);
         marpa_lua_setfield (L, value_table, "this_step");
-        /* Lua stack: [ recce_table, step_table ] */
+        /* Lua stack: [ value_table, step_table ] */
 
         step_type = (lua_Integer) marpa_v_step (v);
         marpa_lua_pushstring (L, step_name_by_code (step_type));
