@@ -278,7 +278,7 @@ sub Marpa::R3::Scanless::V::nook_show {
     <<'END_OF_LUA', 'i', $nook_id);
     local slv, nook_id = ...
     local slr = slv.slr
-    local tree = slr.lmw_t
+    local tree = slv.lmw_t
     -- print('nook_id', nook_id)
     local or_node_id = tree:_nook_or_node(nook_id)
     if not or_node_id then return end
@@ -298,7 +298,7 @@ sub Marpa::R3::Scanless::V::nook_show {
 
     if not or_node_id then return end
 
-    local tree = slr.lmw_t
+    local tree = slv.lmw_t
     text = text .. " " .. slr:or_node_tag(or_node_id) .. ' p'
     if tree:_nook_predecessor_is_ready(nook_id) ~= 0 then
         text = text .. '=ok'
@@ -321,7 +321,7 @@ END_OF_LUA
         my $this_choice;
         ($this_choice) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-            'local slv, nook_id = ...; return slv.slr.lmw_t:_nook_choice(nook_id)',
+            'local slv, nook_id = ...; return slv.lmw_t:_nook_choice(nook_id)',
             'i', $nook_id
         );
         CHOICE: for ( my $choice_ix = 0;; $choice_ix++ ) {
