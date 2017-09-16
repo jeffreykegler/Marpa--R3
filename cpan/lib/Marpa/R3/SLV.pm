@@ -351,9 +351,11 @@ END_OF_LUA
 sub Marpa::R3::Scanless::V::ambiguous {
     my ($slv) = @_;
     my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
-    my $ambiguity_metric = $slr->ambiguity_metric();
+    my $ambiguity_metric = $slv->ambiguity_metric();
     return q{No parse} if $ambiguity_metric <= 0;
     return q{} if $ambiguity_metric == 1;
+    # TODO ASF must be created for end location of SLV,
+    #   not of SLR!
     my $asf = Marpa::R3::ASF->new( { slr => $slr } );
     die 'Could not create ASF' if not defined $asf;
     my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
@@ -363,13 +365,12 @@ sub Marpa::R3::Scanless::V::ambiguous {
 
 sub Marpa::R3::Scanless::V::ambiguity_metric {
     my ($slv) = @_;
-    my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
 
-    my ($metric) = $slr->call_by_tag(
+    my ($metric) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END__OF_LUA', '>*' );
-    local recce = ...
-    local order = recce:ordering_get()
+    local slv = ...
+    local order = slv:ordering_get()
     if not order then return 0 end
     return order:ambiguity_metric()
 END__OF_LUA

@@ -2903,17 +2903,6 @@ lexer.
     end
 ```
 
-TODO: Delete after development
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.ordering_get(slr)
-        -- TODO Delete after development
-        local slv = slr.slv
-        return slv:ordering_get()
-    end
-```
-
 ### Evaluation
 
 ```
@@ -4336,7 +4325,7 @@ which is not kept in the registry.
             local lmw_t = slv.lmw_t
             if not lmw_t then
                 -- No tree, therefore ordering is not initialized
-                local lmw_o = slr:ordering_get()
+                local lmw_o = slv:ordering_get()
                 if not lmw_o then return 'ok', 'undef' end
                 lmw_t = _M.tree_new(lmw_o)
                 slv.lmw_t = lmw_t

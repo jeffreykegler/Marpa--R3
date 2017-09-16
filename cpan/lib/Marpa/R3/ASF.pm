@@ -450,11 +450,11 @@ END_OF_LUA
 
     $asf->[Marpa::R3::Internal::ASF::GLADES] = [];
 
-    my ($is_null) = $slr->call_by_tag(
+    my ($is_null) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
-    local recce = ...
-    local order = recce:ordering_get()
+    local slv = ...
+    local order = slv:ordering_get()
     if not order then
         error( 'Parse failed' )
     end
