@@ -16,7 +16,10 @@
 # of side effects in the constructor
 # Perhaps I should eliminate this test entirely?
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 

@@ -12,7 +12,10 @@
 
 # Synopsis for Scannerless version of Stuizand interface
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 use English qw( -no_match_vars );

@@ -10,7 +10,10 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use warnings;
 use strict;
 use English qw( -no_match_vars );

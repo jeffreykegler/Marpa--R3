@@ -12,7 +12,10 @@
 
 # Progress report for a trivial grammar
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 

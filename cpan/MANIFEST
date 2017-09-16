@@ -314,6 +314,7 @@ t/thin_eq.t
 t/too_many_g1_yims.t
 t/too_many_l0_yims.t
 t/topsyn.t
+t/tree.t
 t/tut2.t
 t/wall.t
 t/zorro.t

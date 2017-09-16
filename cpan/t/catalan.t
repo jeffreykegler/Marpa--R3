@@ -12,7 +12,10 @@
 
 # Note: replacement for catalan.t ...
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 
 # Count the ways of parenthesizing N symbols in pairs
 # This generates the Catalan numbers

@@ -13,7 +13,10 @@
 # Bug found by amon: duplicate events when mixing external
 # and internal scanning.
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 use English qw( -no_match_vars );

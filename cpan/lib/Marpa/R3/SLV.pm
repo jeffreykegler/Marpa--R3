@@ -330,7 +330,7 @@ END_OF_LUA
     ('@' . __FILE__ . ':' . __LINE__),
                 <<'END_OF_LUA', 'ii>*', $or_node_id, $choice_ix );
                 local slv, or_node_id, choice_ix = ...
-                local slr - slv.slr
+                local slr = slv.slr
                 return slr.lmw_o:_and_order_get(or_node_id+0, choice_ix+0)
 END_OF_LUA
 

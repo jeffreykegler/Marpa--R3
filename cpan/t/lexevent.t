@@ -15,7 +15,10 @@
 # Test of scannerless parsing -- named lexeme events
 # deactivation and reactivation
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 

@@ -14,7 +14,10 @@
 
 # Tutorial 2 synopsis
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 use POSIX qw(setlocale LC_ALL);

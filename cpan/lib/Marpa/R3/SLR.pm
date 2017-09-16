@@ -1681,6 +1681,13 @@ sub Marpa::R3::Scanless::R::regix {
     return $regix;
 }
 
+# TODO Delete after development
+sub Marpa::R3::Scanless::R::tree_show {
+    my ( $slr, $verbose ) = @_;
+    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return $slv->tree_show( $verbose);
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:

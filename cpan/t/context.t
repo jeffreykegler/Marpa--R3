@@ -14,7 +14,10 @@
 
 # Test of bail() and context variables in SLIF semantics
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 

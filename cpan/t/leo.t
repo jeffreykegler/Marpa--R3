@@ -13,7 +13,10 @@
 # The example from p. 166 of Leo's paper,
 # augmented to test Leo prediction items.
 
+# VALUATOR: TODO
+
 use 5.010001;
+
 use strict;
 use warnings;
 use POSIX qw(setlocale LC_ALL);
