@@ -1614,39 +1614,6 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::verbose_or_node {
-    my ( $slr, $or_node_id ) = @_;
-    my ($text, $nrl_id, $position)
-        = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', 'i', $or_node_id);
-        local recce, or_node_id = ...
-        local bocage = recce.lmw_b
-        local origin = bocage:_or_node_origin(or_node_id)
-        if not origin then return end
-        local set = bocage:_or_node_set(or_node_id)
-        local position = bocage:_or_node_position(or_node_id)
-        local g1r = recce.g1
-        local origin_earleme = g1r:earleme(origin)
-        local current_earleme = g1r:earleme(set)
-        local text = string.format(
-            'OR-node #%d: R%d:@%d-%d\n',
-            or_node_id,
-            position,
-            origin_earleme,
-            current_earleme,
-            )
-
-END_OF_LUA
-    return if not $text;
-
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    $text .= ( q{ } x 4 )
-        . $slg->dotted_nrl_show( $nrl_id, $position ) . "\n";
-    return $text;
-}
-
-# not to be documented
 sub Marpa::R3::Scanless::R::regix {
     my ( $slr ) = @_;
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];

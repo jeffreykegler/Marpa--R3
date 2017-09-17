@@ -1851,7 +1851,7 @@ sub Marpa::R3::ASF::show_powersets {
 
 sub dump_nook {
     my ( $asf, $nook ) = @_;
-    my $slr        = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv        = $asf->[Marpa::R3::Internal::ASF::SLV];
     my $or_nodes   = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
     my $or_node_id = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
     my $and_node_count = scalar @{ $or_nodes->[$or_node_id] };
@@ -1872,7 +1872,7 @@ sub dump_nook {
         . $nook->[Marpa::R3::Internal::Nook::FIRST_CHOICE] . q{-}
         . $nook->[Marpa::R3::Internal::Nook::LAST_CHOICE]
         . qq{ of $and_node_count: };
-    $text .= $slr->verbose_or_node($or_node_id);
+    $text .= $slv->verbose_or_node($or_node_id);
     return $text;
 } ## end sub dump_nook
 
