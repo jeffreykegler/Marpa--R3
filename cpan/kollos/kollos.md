@@ -1772,7 +1772,6 @@ This is a registry object.
     class_slr_fields.slv = true
     -- TODO move to SLV
     class_slr_fields.lmw_b = true
-    class_slr_fields.lmw_o = true
 ```
 
 *At end of input* field:
@@ -4241,6 +4240,7 @@ This is a registry object.
     class_slv_fields.is_r_internal = true
     class_slv_fields.tree_mode = true
     class_slv_fields.this_step = true
+    class_slv_fields.lmw_o = true
     class_slv_fields.lmw_t = true
     class_slv_fields.lmw_v = true
 ```
@@ -4330,7 +4330,7 @@ which is not kept in the registry.
                 lmw_t = _M.tree_new(lmw_o)
                 slv.lmw_t = lmw_t
             end
-            local lmw_o = slr.lmw_o
+            local lmw_o = slv.lmw_o
 
             local max_parses = slr.max_parses
             local parse_count = lmw_t:parse_count()
@@ -4412,7 +4412,7 @@ TODO: Refactoring may eliminate the need for this.
         local slr = slv.slr
         slr.trace_values = 0;
         slr.lmw_b = nil
-        slr.lmw_o = nil
+        slv.lmw_o = nil
         slv.lmw_t = nil
         slv.lmw_v = nil
         slv.tree_mode = nil
@@ -4435,7 +4435,7 @@ or at least the subject of refactoring.
         local slg = slr.slg
         local ranking_method = slg.ranking_method
         if slr.has_parse == false then return slr.has_parse end
-        local lmw_o = slr.lmw_o
+        local lmw_o = slv.lmw_o
         if lmw_o then
             slr.has_parse = true
             return lmw_o
@@ -4450,15 +4450,15 @@ or at least the subject of refactoring.
         end
 
         lmw_o = _M.order_new(bocage)
-        slr.lmw_o = lmw_o
+        slv.lmw_o = lmw_o
 
         if ranking_method == 'high_rule_only' then
-            slr.lmw_o:high_rank_only_set(1)
-            slr.lmw_o:rank()
+            slv.lmw_o:high_rank_only_set(1)
+            slv.lmw_o:rank()
         end
         if ranking_method == 'rule' then
-            slr.lmw_o:high_rank_only_set(0)
-            slr.lmw_o:rank()
+            slv.lmw_o:high_rank_only_set(0)
+            slv.lmw_o:rank()
         end
         slr.has_parse = true
         return lmw_o
@@ -4511,7 +4511,7 @@ or at least the subject of refactoring.
         end
         local nook_ix = slv.lmw_v:_nook()
         local b = slr.lmw_b
-        local o = slr.lmw_o
+        local o = slv.lmw_o
         local t = slv.lmw_t
         local g1g = slr.slg.g1
         local or_node_id = t:_nook_or_node(nook_ix)

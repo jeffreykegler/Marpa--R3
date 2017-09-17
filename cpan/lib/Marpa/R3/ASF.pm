@@ -470,13 +470,13 @@ END_OF_LUA
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES] = [];
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
 
-        my ($and_node_ids) = $slr->call_by_tag(
+        my ($and_node_ids) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i>*', $or_node_id );
         -- assumes throw mode
-        local recce, or_node_id = ...
+        local slv, or_node_id = ...
         local and_node_ids = {}
-        local order = recce.lmw_o
+        local order = slv.lmw_o
         local count = order:_or_node_and_node_count(or_node_id)
         if not count then return and_node_ids end
         for ix = 1, count do
