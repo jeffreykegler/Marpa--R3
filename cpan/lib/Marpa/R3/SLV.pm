@@ -339,12 +339,25 @@ END_OF_LUA
                 $text .= q{*};
             }
             my $and_node_tag =
-                $slr->and_node_tag( $and_node_id );
+                $slv->and_node_tag( $and_node_id );
             $text .= " ::= a$and_node_id $and_node_tag";
             $text .= "\n";
         } ## end CHOICE: for ( my $choice_ix = 0;; $choice_ix++ )
     } ## end DESCRIBE_CHOICES:
     return $text;
+}
+
+# not to be documented
+sub Marpa::R3::Scanless::V::and_node_tag {
+    my ( $slv, $and_node_id ) = @_;
+
+    my ($tag) = $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', 'i', $and_node_id );
+    local slv, and_node_id=...
+    return slv:and_node_tag(and_node_id)
+END_OF_LUA
+
+    return $tag;
 }
 
 # not to be documented

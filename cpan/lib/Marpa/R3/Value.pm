@@ -1538,18 +1538,6 @@ END_OF_LUA
 
 # INTERNAL OK AFTER HERE _marpa_
 
-sub Marpa::R3::Scanless::R::and_node_tag {
-    my ( $slr, $and_node_id ) = @_;
-
-    my ($tag) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        << 'END_OF_LUA', 'i', $and_node_id );
-    local recce,and_node_id=...
-    return recce:and_node_tag(and_node_id)
-END_OF_LUA
-
-    return $tag;
-}
-
 1;
 
 # vim: expandtab shiftwidth=4:

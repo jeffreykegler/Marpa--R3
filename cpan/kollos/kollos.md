@@ -4371,7 +4371,7 @@ which is not kept in the registry.
                         local choice = lmw_t:_nook_choice(nook_ix)
                         local and_node_id = lmw_o:_and_order_get(or_node_id, choice)
                         local msg = { 'Popping', tostring(#new_values), 'values to evaluate',
-                           (slr:and_node_tag(and_node_id) .. ','),
+                           (slv:and_node_tag(and_node_id) .. ','),
                            'rule:',
                            slg:g1_rule_show(this.rule)
                         }
@@ -4530,7 +4530,7 @@ or at least the subject of refactoring.
         local real_symbol_count = g1g:_real_symbol_count(trace_irl_id)
         if is_virtual_rhs and not is_virtual_lhs then
             local msg = {'Head of Virtual Rule: '}
-            msg[#msg+1] = slr:and_node_tag(and_node_id)
+            msg[#msg+1] = slv:and_node_tag(and_node_id)
             msg[#msg+1] = ', rule: '
             msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
             msg[#msg+1] = '\n'
@@ -4541,7 +4541,7 @@ or at least the subject of refactoring.
         end
         if is_virtual_rhs and is_virtual_lhs then
             local msg = {'Virtual Rule: '}
-            msg[#msg+1] = slr:and_node_tag(and_node_id)
+            msg[#msg+1] = slv:and_node_tag(and_node_id)
             msg[#msg+1] = ', rule: '
             msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
             msg[#msg+1] = '\n'
@@ -4552,7 +4552,7 @@ or at least the subject of refactoring.
         end
         if not is_virtual_rhs and is_virtual_lhs then
             local msg = {'New Virtual Rule: '}
-            msg[#msg+1] = slr:and_node_tag(and_node_id)
+            msg[#msg+1] = slv:and_node_tag(and_node_id)
             msg[#msg+1] = ', rule: '
             msg[#msg+1] = g1g:brief_nrl(trace_irl_id)
             msg[#msg+1] = '\n'
@@ -4569,7 +4569,8 @@ or at least the subject of refactoring.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_slr.and_node_tag(slr, and_node_id)
+    function _M.class_slv.and_node_tag(slv, and_node_id)
+        local slr = slv.slr
         local bocage = slr.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
         local origin = bocage:_or_node_origin(parent_or_node_id)
