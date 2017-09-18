@@ -1600,24 +1600,17 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::bocage_show {
-    my ($slr)     = @_;
-
-    my ($result) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-        <<'END_OF_LUA', '');
-        local recce = ...
-        return recce:bocage_show()
-END_OF_LUA
-
-    return $result;
-}
-
-# not to be documented
 sub Marpa::R3::Scanless::R::regix {
     my ( $slr ) = @_;
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
     return $regix;
+}
+
+# TODO Delete after development
+sub Marpa::R3::Scanless::R::bocage_show {
+    my ( $slr, $verbose ) = @_;
+    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return $slv->bocage_show( $verbose);
 }
 
 # TODO Delete after development

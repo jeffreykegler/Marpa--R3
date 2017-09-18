@@ -4666,7 +4666,8 @@ or at least the subject of refactoring.
         return table.concat(result, '\n')
     end
 
-    function _M.class_slr.or_node_tag(slr, or_node_id)
+    function _M.class_slv.or_node_tag(slv, or_node_id)
+        local slr = slv.slr
         local bocage = slr.lmw_b
         local set = bocage:_or_node_set(or_node_id)
         local nrl_id = bocage:_or_node_nrl(or_node_id)
@@ -4731,7 +4732,8 @@ or at least the subject of refactoring.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_slr.bocage_show(slr)
+    function _M.class_slv.bocage_show(slv)
+        local slr = slv.slr
         local bocage = slr.lmw_b
         local data = {}
         local or_node_id = -1
@@ -4755,13 +4757,13 @@ or at least the subject of refactoring.
                 local cause_irl_id
                 if cause_id then
                     cause_irl_id = bocage:_or_node_nrl(cause_id)
-                    cause_tag = slr:or_node_tag(cause_id)
+                    cause_tag = slv:or_node_tag(cause_id)
                 end
-                local parent_tag = slr:or_node_tag(or_node_id)
+                local parent_tag = slv:or_node_tag(or_node_id)
                 local predecessor_id = bocage:_and_node_predecessor(and_node_id)
                 local predecessor_tag = "-"
                 if predecessor_id then
-                    predecessor_tag = slr:or_node_tag(predecessor_id)
+                    predecessor_tag = slv:or_node_tag(predecessor_id)
                 end
                 local tag = string.format(
                     "%d: %d=%s %s %s",

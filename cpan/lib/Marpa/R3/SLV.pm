@@ -299,7 +299,7 @@ sub Marpa::R3::Scanless::V::nook_show {
     if not or_node_id then return end
 
     local tree = slv.lmw_t
-    text = text .. " " .. slr:or_node_tag(or_node_id) .. ' p'
+    text = text .. " " .. slv:or_node_tag(or_node_id) .. ' p'
     if tree:_nook_predecessor_is_ready(nook_id) ~= 0 then
         text = text .. '=ok'
     else
@@ -394,6 +394,20 @@ END_OF_LUA
     $text .= ( q{ } x 4 )
         . $slg->dotted_nrl_show( $nrl_id, $position ) . "\n";
     return $text;
+}
+
+# not to be documented
+sub Marpa::R3::Scanless::V::bocage_show {
+    my ($slv)     = @_;
+
+    my ($result) = $slv->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', '');
+        local slv = ...
+        return slv:bocage_show()
+END_OF_LUA
+
+    return $result;
 }
 
 sub Marpa::R3::Scanless::V::ambiguous {
