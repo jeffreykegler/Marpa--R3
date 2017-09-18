@@ -674,12 +674,13 @@ sub nid_token_id {
     my ( $asf, $nid ) = @_;
     return if $nid > $NID_LEAF_BASE;
     my $and_node_id  = nid_to_and_node($nid);
-    my $slr          = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv          = $asf->[Marpa::R3::Internal::ASF::SLV];
 
-    my ($token_id) = $slr->call_by_tag(
+    my ($token_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        local slr, and_node_id = ...
+        local slv, and_node_id = ...
+        local slr = slv.slr
         local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
         local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
         return token_id
@@ -696,11 +697,12 @@ sub nid_symbol_id {
     Marpa::R3::exception("No symbol ID for node ID: $nid") if $nid < 0;
 
     # Not a token, so return the LHS of the rule
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my ($lhs_id) = $slr->call_by_tag(
+    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my ($lhs_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        local slr, nid = ...
+        local slv, nid = ...
+        local slr = slv.slr
         local irl_id = slr.lmw_b:_or_node_nrl(nid)
         local g1g = slr.slg.g1
         local xrl_id = g1g:_source_xrl(irl_id)
@@ -839,8 +841,7 @@ sub factoring_finish {
     my $nidset_by_id   = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
     my $powerset_by_id = $asf->[Marpa::R3::Internal::ASF::POWERSET_BY_ID];
 
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
 
     my @worklist = ( 0 .. $#{$factoring_stack} );
 
@@ -859,9 +860,9 @@ sub factoring_finish {
             if ( !$work_nook->[Marpa::R3::Internal::Nook::CAUSE_IS_EXPANDED] )
             {
                 if ( not nook_has_semantic_cause( $asf, $work_nook ) ) {
-                    ($child_or_node) = $slr->call_by_tag(
+                    ($child_or_node) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                        'local slr, work_and_node_id = ...; return slr.lmw_b:_and_node_cause(work_and_node_id)',
+                        'local slv, work_and_node_id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_cause(work_and_node_id)',
                         'i',
                         $work_and_node_id);
                     $child_is_cause = 1;
@@ -872,9 +873,9 @@ sub factoring_finish {
             if ( !$work_nook
                 ->[Marpa::R3::Internal::Nook::PREDECESSOR_IS_EXPANDED] )
             {
-                ($child_or_node) = $slr->call_by_tag(
+                ($child_or_node) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                    'local slr, work_and_node_id = ...; return slr.lmw_b:_and_node_predecessor(work_and_node_id)',
+                    'local slv, work_and_node_id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_predecessor(work_and_node_id)',
                     'i',
                     $work_and_node_id);
                 if ( defined $child_or_node ) {
@@ -918,12 +919,12 @@ sub factoring_finish {
 
 sub and_nodes_to_cause_nids {
     my ( $asf, @and_node_ids ) = @_;
-    my $slr    = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv    = $asf->[Marpa::R3::Internal::ASF::SLV];
     my %causes = ();
     for my $and_node_id (@and_node_ids) {
-        my ($cause_nid) = $slr->call_by_tag(
+        my ($cause_nid) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            'local recce, and_node_id = ...; return recce.lmw_b:_and_node_cause(and_node_id)',
+            'local slv, and_node_id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_cause(and_node_id)',
             'i',
             $and_node_id);
         $cause_nid //= and_node_to_nid($and_node_id);
