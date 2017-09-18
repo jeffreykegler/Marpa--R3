@@ -509,35 +509,6 @@ END_OF_LUA
     return 1;
 }
 
-# For the non-legacy case,
-# I reset the ordering, forcing it to be recalculated
-# for each parse series.
-# But I do not actually allow the ranking method to
-# be changed once a parse is created.
-# Since I am stabilizing Marpa::R3, the "fix" should
-# probably be to save the overhead, rather than
-# to allow 'ranking_method' to be changed.
-#
-# But for now I will do nothing.
-# JK -- Mon Nov 24 17:35:24 PST 2014
-#
-# In Marpa::R3, the ranking_method can only be set in
-# the recce constructor, so I should stop resetting the
-# ordering
-# JK -- Sun May  1 19:18:08 PDT 2016
-#
-sub Marpa::R3::Scanless::R::reset_evaluation {
-    my ($slr) = @_;
-
-    $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-    <<'END_OF_LUA', '' );
-        local slr = ...
-        slr:valuation_reset()
-END_OF_LUA
-
-    return;
-}
-
 # Brief description of block/line/column for
 # an L0 range
 sub lc_brief {
