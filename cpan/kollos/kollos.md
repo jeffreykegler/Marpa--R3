@@ -22,19 +22,17 @@ OTHER DEALINGS IN THE SOFTWARE.
 # The Kollos code
 
 # Table of contents
-<!--
-cd kollos && ../lua/lua toc.lua < kollos.md
--->
 * [About Kollos](#about-kollos)
 * [Abbreviations](#abbreviations)
 * [Development Notes](#development-notes)
   * [To Do](#to-do)
     * [TODO notes](#todo-notes)
   * [Terminology fixes](#terminology-fixes)
-  * [Use generations in Libmarpa trees](#use-generations-in-libmarpa-trees)
   * [Kollos assumes core libraries are loaded](#kollos-assumes-core-libraries-are-loaded)
   * [New lexer features](#new-lexer-features)
   * [Discard default statement?](#discard-default-statement)
+  * [Remove Libmarpa trace facility](#remove-libmarpa-trace-facility)
+  * [Remove Libmarpa lookers](#remove-libmarpa-lookers)
 * [Concepts](#concepts)
   * [External, inner and internal](#external-inner-and-internal)
   * [Symbol names, IDs and forms](#symbol-names-ids-and-forms)
@@ -45,6 +43,7 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [SLG accessors](#slg-accessors)
   * [Mutators](#mutators)
   * [Hash to runtime processing](#hash-to-runtime-processing)
+    * [Add a G1 rule](#add-a-g1-rule)
 * [SLIF recognizer (SLR) class](#slif-recognizer-slr-class)
   * [SLR fields](#slr-fields)
   * [SLR constructors](#slr-constructors)
@@ -56,6 +55,15 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Events](#events)
   * [Progress reporting](#progress-reporting)
   * [SLR diagnostics](#slr-diagnostics)
+* [SLIF valuer (SLV) class](#slif-valuer-slv-class)
+  * [SLV fields](#slv-fields)
+  * [SLV constructor](#slv-constructor)
+  * [SLV mutators](#slv-mutators)
+    * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
+  * [SLV accessors](#slv-accessors)
+    * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
+    * [Return the top index of the stack](#return-the-top-index-of-the-stack)
+  * [SLV diagnostics](#slv-diagnostics)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
     * [VM add op utility](#vm-add-op-utility)
@@ -83,14 +91,9 @@ cd kollos && ../lua/lua toc.lua < kollos.md
     * [VM operation: callback](#vm-operation-callback)
   * [Run the virtual machine](#run-the-virtual-machine)
   * [Find and perform the VM operations](#find-and-perform-the-vm-operations)
-  * [Tree export operations](#tree-export-operations)
   * [VM-related utilities for use in the Perl code](#vm-related-utilities-for-use-in-the-perl-code)
     * [Return operation key given its name](#return-operation-key-given-its-name)
     * [Return operation name given its key](#return-operation-name-given-its-key)
-    * [Return the top index of the stack](#return-the-top-index-of-the-stack)
-    * [Return the value of a stack entry](#return-the-value-of-a-stack-entry)
-    * [Set the value of a stack entry](#set-the-value-of-a-stack-entry)
-    * [Convert current, origin Earley set to L0 span](#convert-current-origin-earley-set-to-l0-span)
   * [Input](#input)
 * [Lexeme (LEX) class](#lexeme-lex-class)
   * [LEX fields](#lex-fields)
@@ -115,9 +118,8 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Functions for tracing Earley sets](#functions-for-tracing-earley-sets)
 * [Libmarpa valuer wrapper class](#libmarpa-valuer-wrapper-class)
   * [Adjust metal tables](#adjust-metal-tables)
-  * [Initialize a valuator](#initialize-a-valuator)
+  * [Get a value from a valuator](#get-a-value-from-a-valuator)
   * [Reset a valuator](#reset-a-valuator)
-  * [SLV diagnostics](#slv-diagnostics)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
   * [Libmarpa class constructors](#libmarpa-class-constructors)
@@ -4563,6 +4565,234 @@ or at least the subject of refactoring.
     end
 ```
 
+### SLV diagnostics
+
+```
+    -- miranda: section+ diagnostics
+    function _M.class_slr.and_node_tag(slr, and_node_id)
+        local bocage = slr.lmw_b
+        local parent_or_node_id = bocage:_and_node_parent(and_node_id)
+        local origin = bocage:_or_node_origin(parent_or_node_id)
+        local origin_earleme = slr.g1:earleme(origin)
+
+        local current_earley_set = bocage:_or_node_set(parent_or_node_id)
+        local current_earleme = slr.g1:earleme(current_earley_set)
+
+        local cause_id = bocage:_and_node_cause(and_node_id)
+        local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+
+        local middle_earley_set = bocage:_and_node_middle(and_node_id)
+        local middle_earleme = slr.g1:earleme(middle_earley_set)
+
+        local position = bocage:_or_node_position(parent_or_node_id)
+        local nrl_id = bocage:_or_node_nrl(parent_or_node_id)
+
+        local tag = { string.format("R%d:%d@%d-%d",
+            nrl_id,
+            position,
+            origin_earleme,
+            current_earleme)
+        }
+
+        if cause_id then
+            tag[#tag+1] = string.format("C%d", bocage:_or_node_nrl(cause_id))
+        else
+            tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
+        end
+        tag[#tag+1] = string.format("@%d", middle_earleme)
+        return table.concat(tag)
+    end
+
+    function _M.class_slr.and_nodes_show(slr)
+        local bocage = slr.lmw_b
+        local g1r = slr.g1
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local parent = bocage:_and_node_parent(id)
+            -- print('parent:', parent)
+            if not parent then break end
+            local predecessor = bocage:_and_node_predecessor(id)
+            local cause = bocage:_and_node_cause(id)
+            local symbol = bocage:_and_node_symbol(id)
+            local origin = bocage:_or_node_origin(parent)
+            local set = bocage:_or_node_set(parent)
+            local nrl_id = bocage:_or_node_nrl(parent)
+            local position = bocage:_or_node_position(parent)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+            local middle_earley_set = bocage:_and_node_middle(id)
+            local middle_earleme = g1r:earleme(middle_earley_set)
+            local desc = {string.format(
+                "And-node #%d: R%d:%d@%d-%d",
+                id,
+                nrl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            -- Marpa::R2's show_and_nodes() had a minor bug:
+            -- cause_nrl_id was not set properly and therefore
+            -- not used in the sort.  That problem is fixed
+            -- here.
+            local cause_nrl_id = -1
+            if cause then
+                cause_nrl_id = bocage:_or_node_nrl(cause)
+                desc[#desc+1] = 'C' .. cause_nrl_id
+            else
+                desc[#desc+1] = 'S' .. symbol
+            end
+            desc[#desc+1] = '@' .. middle_earleme
+            if not symbol then symbol = -1 end
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                nrl_id,
+                position,
+                middle_earleme,
+                symbol,
+                cause_nrl_id,
+                table.concat(desc)
+            }
+        end
+
+        table.sort(data, _M.cmp_seq)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+    function _M.class_slr.or_node_tag(slr, or_node_id)
+        local bocage = slr.lmw_b
+        local set = bocage:_or_node_set(or_node_id)
+        local nrl_id = bocage:_or_node_nrl(or_node_id)
+        local origin = bocage:_or_node_origin(or_node_id)
+        local position = bocage:_or_node_position(or_node_id)
+        return string.format("R%d:%d@%d-%d",
+            nrl_id,
+            position,
+            origin,
+            set)
+    end
+
+    function _M.class_slr.or_nodes_show(slr)
+        local bocage = slr.lmw_b
+        local g1r = slr.g1
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local origin = bocage:_or_node_origin(id)
+            if not origin then break end
+            local set = bocage:_or_node_set(id)
+            local nrl_id = bocage:_or_node_nrl(id)
+            local position = bocage:_or_node_position(id)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+
+            local desc = {string.format(
+                "R%d:%d@%d-%d",
+                nrl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                nrl_id,
+                table.concat(desc)
+            }
+        end
+
+        local function cmp_data(i, j)
+            for ix = 1, #i do
+                if i[ix] < j[ix] then return true end
+                if i[ix] > j[ix] then return false end
+            end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+```
+
+`bocage_show` returns a string which describes the bocage.
+
+```
+    -- miranda: section+ diagnostics
+    function _M.class_slr.bocage_show(slr)
+        local bocage = slr.lmw_b
+        local data = {}
+        local or_node_id = -1
+        while true do
+            or_node_id = or_node_id + 1
+            local irl_id = bocage:_or_node_nrl(or_node_id)
+            if not irl_id then goto LAST_OR_NODE end
+            local position = bocage:_or_node_position(or_node_id)
+            local or_origin = bocage:_or_node_origin(or_node_id)
+            local origin_earleme = slr.g1:earleme(or_origin)
+            local or_set = bocage:_or_node_set(or_node_id)
+            local current_earleme = slr.g1:earleme(or_set)
+            local and_node_ids = {}
+            local first_and_id = bocage:_or_node_first_and(or_node_id)
+            local last_and_id = bocage:_or_node_last_and(or_node_id)
+            for and_node_id = first_and_id, last_and_id do
+                local symbol = bocage:_and_node_symbol(and_node_id)
+                local cause_tag
+                if symbol then cause_tag = 'S' .. symbol end
+                local cause_id = bocage:_and_node_cause(and_node_id)
+                local cause_irl_id
+                if cause_id then
+                    cause_irl_id = bocage:_or_node_nrl(cause_id)
+                    cause_tag = slr:or_node_tag(cause_id)
+                end
+                local parent_tag = slr:or_node_tag(or_node_id)
+                local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+                local predecessor_tag = "-"
+                if predecessor_id then
+                    predecessor_tag = slr:or_node_tag(predecessor_id)
+                end
+                local tag = string.format(
+                    "%d: %d=%s %s %s",
+                    and_node_id,
+                    or_node_id,
+                    parent_tag,
+                    predecessor_tag,
+                    cause_tag
+                )
+                data[#data+1] = { and_node_id, tag }
+            end
+            ::LAST_AND_NODE::
+        end
+        ::LAST_OR_NODE::
+
+        local function cmp_data(i, j)
+            if i[1] < j[1] then return true end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+
+    end
+
+```
+
 ## Kollos semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
@@ -6168,234 +6398,6 @@ TODO: I expect refactoring will eliminate the need for this.
         local slv = slr.slv
         return slv:valuation_reset()
     end
-```
-
-### SLV diagnostics
-
-```
-    -- miranda: section+ diagnostics
-    function _M.class_slr.and_node_tag(slr, and_node_id)
-        local bocage = slr.lmw_b
-        local parent_or_node_id = bocage:_and_node_parent(and_node_id)
-        local origin = bocage:_or_node_origin(parent_or_node_id)
-        local origin_earleme = slr.g1:earleme(origin)
-
-        local current_earley_set = bocage:_or_node_set(parent_or_node_id)
-        local current_earleme = slr.g1:earleme(current_earley_set)
-
-        local cause_id = bocage:_and_node_cause(and_node_id)
-        local predecessor_id = bocage:_and_node_predecessor(and_node_id)
-
-        local middle_earley_set = bocage:_and_node_middle(and_node_id)
-        local middle_earleme = slr.g1:earleme(middle_earley_set)
-
-        local position = bocage:_or_node_position(parent_or_node_id)
-        local nrl_id = bocage:_or_node_nrl(parent_or_node_id)
-
-        local tag = { string.format("R%d:%d@%d-%d",
-            nrl_id,
-            position,
-            origin_earleme,
-            current_earleme)
-        }
-
-        if cause_id then
-            tag[#tag+1] = string.format("C%d", bocage:_or_node_nrl(cause_id))
-        else
-            tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
-        end
-        tag[#tag+1] = string.format("@%d", middle_earleme)
-        return table.concat(tag)
-    end
-
-    function _M.class_slr.and_nodes_show(slr)
-        local bocage = slr.lmw_b
-        local g1r = slr.g1
-        local data = {}
-        local id = -1
-        while true do
-            id = id + 1
-            local parent = bocage:_and_node_parent(id)
-            -- print('parent:', parent)
-            if not parent then break end
-            local predecessor = bocage:_and_node_predecessor(id)
-            local cause = bocage:_and_node_cause(id)
-            local symbol = bocage:_and_node_symbol(id)
-            local origin = bocage:_or_node_origin(parent)
-            local set = bocage:_or_node_set(parent)
-            local nrl_id = bocage:_or_node_nrl(parent)
-            local position = bocage:_or_node_position(parent)
-            local origin_earleme = g1r:earleme(origin)
-            local current_earleme = g1r:earleme(set)
-            local middle_earley_set = bocage:_and_node_middle(id)
-            local middle_earleme = g1r:earleme(middle_earley_set)
-            local desc = {string.format(
-                "And-node #%d: R%d:%d@%d-%d",
-                id,
-                nrl_id,
-                position,
-                origin_earleme,
-                current_earleme)}
-            -- Marpa::R2's show_and_nodes() had a minor bug:
-            -- cause_nrl_id was not set properly and therefore
-            -- not used in the sort.  That problem is fixed
-            -- here.
-            local cause_nrl_id = -1
-            if cause then
-                cause_nrl_id = bocage:_or_node_nrl(cause)
-                desc[#desc+1] = 'C' .. cause_nrl_id
-            else
-                desc[#desc+1] = 'S' .. symbol
-            end
-            desc[#desc+1] = '@' .. middle_earleme
-            if not symbol then symbol = -1 end
-            data[#data+1] = {
-                origin_earleme,
-                current_earleme,
-                nrl_id,
-                position,
-                middle_earleme,
-                symbol,
-                cause_nrl_id,
-                table.concat(desc)
-            }
-        end
-
-        table.sort(data, _M.cmp_seq)
-        local result = {}
-        for _,datum in pairs(data) do
-            result[#result+1] = datum[#datum]
-        end
-        result[#result+1] = '' -- so concat adds a final '\n'
-        return table.concat(result, '\n')
-    end
-
-    function _M.class_slr.or_node_tag(slr, or_node_id)
-        local bocage = slr.lmw_b
-        local set = bocage:_or_node_set(or_node_id)
-        local nrl_id = bocage:_or_node_nrl(or_node_id)
-        local origin = bocage:_or_node_origin(or_node_id)
-        local position = bocage:_or_node_position(or_node_id)
-        return string.format("R%d:%d@%d-%d",
-            nrl_id,
-            position,
-            origin,
-            set)
-    end
-
-    function _M.class_slr.or_nodes_show(slr)
-        local bocage = slr.lmw_b
-        local g1r = slr.g1
-        local data = {}
-        local id = -1
-        while true do
-            id = id + 1
-            local origin = bocage:_or_node_origin(id)
-            if not origin then break end
-            local set = bocage:_or_node_set(id)
-            local nrl_id = bocage:_or_node_nrl(id)
-            local position = bocage:_or_node_position(id)
-            local origin_earleme = g1r:earleme(origin)
-            local current_earleme = g1r:earleme(set)
-
-            local desc = {string.format(
-                "R%d:%d@%d-%d",
-                nrl_id,
-                position,
-                origin_earleme,
-                current_earleme)}
-            data[#data+1] = {
-                origin_earleme,
-                current_earleme,
-                nrl_id,
-                table.concat(desc)
-            }
-        end
-
-        local function cmp_data(i, j)
-            for ix = 1, #i do
-                if i[ix] < j[ix] then return true end
-                if i[ix] > j[ix] then return false end
-            end
-            return false
-        end
-
-        table.sort(data, cmp_data)
-        local result = {}
-        for _,datum in pairs(data) do
-            result[#result+1] = datum[#datum]
-        end
-        result[#result+1] = '' -- so concat adds a final '\n'
-        return table.concat(result, '\n')
-    end
-
-```
-
-`bocage_show` returns a string which describes the bocage.
-
-```
-    -- miranda: section+ diagnostics
-    function _M.class_slr.bocage_show(slr)
-        local bocage = slr.lmw_b
-        local data = {}
-        local or_node_id = -1
-        while true do
-            or_node_id = or_node_id + 1
-            local irl_id = bocage:_or_node_nrl(or_node_id)
-            if not irl_id then goto LAST_OR_NODE end
-            local position = bocage:_or_node_position(or_node_id)
-            local or_origin = bocage:_or_node_origin(or_node_id)
-            local origin_earleme = slr.g1:earleme(or_origin)
-            local or_set = bocage:_or_node_set(or_node_id)
-            local current_earleme = slr.g1:earleme(or_set)
-            local and_node_ids = {}
-            local first_and_id = bocage:_or_node_first_and(or_node_id)
-            local last_and_id = bocage:_or_node_last_and(or_node_id)
-            for and_node_id = first_and_id, last_and_id do
-                local symbol = bocage:_and_node_symbol(and_node_id)
-                local cause_tag
-                if symbol then cause_tag = 'S' .. symbol end
-                local cause_id = bocage:_and_node_cause(and_node_id)
-                local cause_irl_id
-                if cause_id then
-                    cause_irl_id = bocage:_or_node_nrl(cause_id)
-                    cause_tag = slr:or_node_tag(cause_id)
-                end
-                local parent_tag = slr:or_node_tag(or_node_id)
-                local predecessor_id = bocage:_and_node_predecessor(and_node_id)
-                local predecessor_tag = "-"
-                if predecessor_id then
-                    predecessor_tag = slr:or_node_tag(predecessor_id)
-                end
-                local tag = string.format(
-                    "%d: %d=%s %s %s",
-                    and_node_id,
-                    or_node_id,
-                    parent_tag,
-                    predecessor_tag,
-                    cause_tag
-                )
-                data[#data+1] = { and_node_id, tag }
-            end
-            ::LAST_AND_NODE::
-        end
-        ::LAST_OR_NODE::
-
-        local function cmp_data(i, j)
-            if i[1] < j[1] then return true end
-            return false
-        end
-
-        table.sort(data, cmp_data)
-        local result = {}
-        for _,datum in pairs(data) do
-            result[#result+1] = datum[#datum]
-        end
-        result[#result+1] = '' -- so concat adds a final '\n'
-        return table.concat(result, '\n')
-
-    end
-
 ```
 
 ## Libmarpa interface
