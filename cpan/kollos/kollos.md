@@ -1897,7 +1897,7 @@ together.
         --   away.
         local slv = slr.slv
         if not slv then
-            slv = slr:slv_new_i()
+            slv = slr:slv_new_i({})
             slr.slv = slv
             slr:islv_register()
         end
@@ -2086,6 +2086,8 @@ the recognizer's Lua-level settings.
                 coroutine.yield('trace', 'Setting trace_values option to ' .. value)
             end
             slr.trace_values = value
+            -- TODO hack -- delete after development
+            if slr.slv then slr.slv.trace_values = value end
         end
 
         -- too_many_earley_items named argument --
@@ -2101,6 +2103,7 @@ the recognizer's Lua-level settings.
             slr.g1:earley_item_warning_threshold_set(value)
         end
 
+        -- TODO -- delete after development
         -- 'end' named argument --
         raw_value = flat_args["end"]
         if raw_value then
@@ -4245,6 +4248,8 @@ This is a registry object.
     class_slv_fields.lmw_o = true
     class_slv_fields.lmw_t = true
     class_slv_fields.lmw_v = true
+    class_slv_fields.end_of_parse = true
+    class_slv_fields.trace_values = true
 ```
 
 ```
@@ -4275,6 +4280,8 @@ which is not kept in the registry.
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
         slv.regix = -1
+        slv.trace_values = slr.trace_values
+        slv:common_set(flat_args, {'end'})
         return slv
     end
     -- TODO islv_register() not needed after development
@@ -4291,6 +4298,64 @@ which is not kept in the registry.
         slv.regix = regix
         slv.is_r_internal = true
         return regix
+    end
+```
+
+A common processor for
+the valuator's Lua-level settings.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.common_set(slv, flat_args, extra_args)
+        local ok_args = {
+            ['end'] = true,
+            trace_values = true
+        }
+        if extra_args then
+            for ix = 1, #extra_args do
+                ok_args[extra_args[ix]] = true
+            end
+        end
+
+        for name, value in pairs(flat_args) do
+           if not ok_args[name] then
+               error(string.format(
+                   'Bad slv named argument: %s => %s',
+                   inspect(name),
+                   inspect(value)
+               ))
+           end
+        end
+
+        local raw_value
+
+        -- trace_values named argument --
+        raw_value = flat_args.trace_values
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "trace_values" named argument: %s',
+                   inspect(raw_value)))
+            end
+            if value ~= 0 then
+                coroutine.yield('trace', 'Setting trace_values option to ' .. value)
+            end
+            slv.trace_values = value
+        end
+
+        -- 'end' named argument --
+        raw_value = flat_args["end"]
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "end" named argument: %s',
+                   inspect(raw_value)))
+            end
+            slv.end_of_parse = value
+        end
+
     end
 ```
 
@@ -4347,12 +4412,12 @@ which is not kept in the registry.
             -- print('result:', result)
             slv.lmw_v = _M.value_new(lmw_t)
 
-        local trace_values = slr.trace_values or 0
+        local trace_values = slv.trace_values or 0
         slv.lmw_v:_trace(trace_values)
 
         if trace_values > 0 then
           coroutine.yield('trace',
-            "valuator trace level: " ..  slr.trace_values)
+            "valuator trace level: " ..  slv.trace_values)
         end
         slv.lmw_v.stack = {}
 
@@ -4365,7 +4430,7 @@ which is not kept in the registry.
                     local sv = coroutine.yield('perl_rule_semantics', this.rule, new_values)
                     local ix = slv:stack_top_index()
                     slv:stack_set(ix, sv)
-                    if slr.trace_values > 0 then
+                    if slv.trace_values > 0 then
                         local nook_ix = slv.lmw_v:_nook()
                         local or_node_id = lmw_t:_nook_or_node(nook_ix)
                         local choice = lmw_t:_nook_choice(nook_ix)
@@ -4412,7 +4477,7 @@ TODO: Refactoring may eliminate the need for this.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.valuation_reset(slv)
         local slr = slv.slr
-        slr.trace_values = 0;
+        slv.trace_values = 0;
         slr.lmw_b = nil
         slv.lmw_o = nil
         slv.lmw_t = nil
@@ -4508,7 +4573,7 @@ or at least the subject of refactoring.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.trace_valuer_step ( slv )
         local slr = slv.slr
-        if not slr.trace_values or slr.trace_values < 2 then
+        if not slv.trace_values or slv.trace_values < 2 then
             return
         end
         local nook_ix = slv.lmw_v:_nook()
@@ -5046,7 +5111,7 @@ Returns a constant result.
         local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
         stack[result_ix] = coroutine.yield('constant', constant_ix)
-        if slr.trace_values > 0 and slv.this_step.type == 'MARPA_STEP_TOKEN' then
+        if slv.trace_values > 0 and slv.this_step.type == 'MARPA_STEP_TOKEN' then
             coroutine.yield('trace',
                 table.concat(
                     { "valuator unknown step", slv.this_step.type, slr.token, constant},
@@ -5369,7 +5434,7 @@ Return `true` if the caller should continue reading ops,
             end
             local fn_key = ops[op_ix+1]
             local arg = ops[op_ix+2]
-            if slr.trace_values >= 3 then
+            if slv.trace_values >= 3 then
               local tag = 'starting lua op'
               coroutine.yield('trace',
                   table.concat({'starting op', slv.this_step.type, 'lua'}, ' '))
