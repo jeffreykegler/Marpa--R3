@@ -289,7 +289,6 @@ sub Marpa::R3::Scanless::R::DESTROY {
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
     local slr = ...
-    slr:valuation_reset()
     local regix = slr.regix
     _M.unregister(_M.registry, regix)
     _M.unregister(_M.registry, slr.slv.regix)
