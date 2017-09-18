@@ -230,16 +230,17 @@ sub nook_increment {
 sub nook_has_semantic_cause {
     my ( $asf, $nook ) = @_;
     my $or_node   = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
 
-    my ($result) = $slr->call_by_tag(
+    my ($result) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $or_node);
-    local recce, or_node = ...
-    local irl_id = recce.lmw_b:_or_node_nrl(or_node)
-    local predot_position = recce.lmw_b:_or_node_position(or_node) - 1
-    local predot_isyid = recce.slg.g1:_nrl_rhs(irl_id, predot_position)
-    return recce.slg.g1:_nsy_is_semantic(predot_isyid)
+    local slv, or_node = ...
+    local slr = slv.slr
+    local irl_id = slr.lmw_b:_or_node_nrl(or_node)
+    local predot_position = slr.lmw_b:_or_node_position(or_node) - 1
+    local predot_isyid = slr.slg.g1:_nrl_rhs(irl_id, predot_position)
+    return slr.slg.g1:_nsy_is_semantic(predot_isyid)
 END_OF_LUA
      return $result;
 } ## end sub nook_has_semantic_cause
@@ -249,13 +250,14 @@ END_OF_LUA
 sub Marpa::R3::ASF::peak {
     my ($asf)    = @_;
     my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
-    my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv      = $asf->[Marpa::R3::Internal::ASF::SLV];
 
-    my ($augment_or_node_id) = $slr->call_by_tag(
+    my ($augment_or_node_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
-        local recce = ...
-        local bocage = recce.lmw_b
+        local slv = ...
+        local slr = slv.slr
+        local bocage = slr.lmw_b
         if not bocage then error('No Bocage') end
         return bocage:_top_or_node()
 END_OF_LUA
@@ -263,9 +265,9 @@ END_OF_LUA
     # TODO: Why does Lua think this was a string?
     my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
     my ($start_or_node_id)
-        = $slr->call_by_tag(
+        = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            'local recce, id = ...; return recce.lmw_b:_and_node_cause(id)',
+            'local slv, id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_cause(id)',
             'i',
             $augment_and_node_id
             );
@@ -524,13 +526,15 @@ sub Marpa::R3::ASF::glade_visited_clear {
 
 sub nid_sort_ix {
     my ( $asf, $nid ) = @_;
+    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
 
     if ( $nid >= 0 ) {
-        my ($result) = $slr->call_by_tag(
+        my ($result) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $nid);
-        local slr, nid = ...
+        local slv, nid = ...
+        local slr = slv.slr
         local irl_id = slr.lmw_b:_or_node_nrl(nid)
         return slr.slg.g1:_source_xrl(irl_id)
 END_OF_LUA
@@ -539,10 +543,11 @@ END_OF_LUA
 
     my $and_node_id  = nid_to_and_node($nid);
 
-    my ($result) = $slr->call_by_tag(
+    my ($result) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $and_node_id);
-    local slr, and_node_id = ...
+    local slv, and_node_id = ...
+    local slr = slv.slr
     local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
     local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
     -- -2 is reserved for 'end of data'
