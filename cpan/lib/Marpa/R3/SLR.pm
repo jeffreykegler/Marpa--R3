@@ -1574,29 +1574,16 @@ END_OF_LUA
 
 # not to be documented
 sub Marpa::R3::Scanless::R::or_nodes_show {
-    my ( $slr ) = @_;
-
-    my ($result) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '');
-    local recce = ...
-    return recce:or_nodes_show()
-END_OF_LUA
-
-    return $result;
+    my ( $slr, $verbose ) = @_;
+    my $slv = Marpa::R3::Scanless::V->link( { recce => $slr } );
+    return $slv->or_nodes_show($verbose);
 }
 
 # not to be documented
 sub Marpa::R3::Scanless::R::and_nodes_show {
-    my ( $slr ) = @_;
-    my ($result) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '');
-    local recce = ...
-    return recce:and_nodes_show()
-END_OF_LUA
-
-    return $result;
+    my ( $slr, $verbose ) = @_;
+    my $slv = Marpa::R3::Scanless::V->link( { recce => $slr } );
+    return $slv->and_nodes_show($verbose);
 }
 
 # not to be documented

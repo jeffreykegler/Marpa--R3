@@ -410,6 +410,33 @@ END_OF_LUA
     return $result;
 }
 
+# not to be documented
+sub Marpa::R3::Scanless::V::or_nodes_show {
+    my ( $slv ) = @_;
+
+    my ($result) = $slv->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local slv = ...
+    return slv:or_nodes_show()
+END_OF_LUA
+
+    return $result;
+}
+
+# not to be documented
+sub Marpa::R3::Scanless::V::and_nodes_show {
+    my ( $slv ) = @_;
+    my ($result) = $slv->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local slv = ...
+    return slv:and_nodes_show()
+END_OF_LUA
+
+    return $result;
+}
+
 sub Marpa::R3::Scanless::V::ambiguous {
     my ($slv) = @_;
     my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];

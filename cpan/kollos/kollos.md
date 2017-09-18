@@ -4604,7 +4604,8 @@ or at least the subject of refactoring.
         return table.concat(tag)
     end
 
-    function _M.class_slr.and_nodes_show(slr)
+    function _M.class_slv.and_nodes_show(slv)
+        local slr = slv.slr
         local bocage = slr.lmw_b
         local g1r = slr.g1
         local data = {}
@@ -4680,7 +4681,8 @@ or at least the subject of refactoring.
             set)
     end
 
-    function _M.class_slr.or_nodes_show(slr)
+    function _M.class_slv.or_nodes_show(slv)
+        local slr = slv.slr
         local bocage = slr.lmw_b
         local g1r = slr.g1
         local data = {}
