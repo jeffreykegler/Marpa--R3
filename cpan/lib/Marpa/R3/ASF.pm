@@ -573,14 +573,15 @@ sub Marpa::R3::ASF::recce {
 sub nid_rule_id {
     my ( $asf, $nid ) = @_;
     return if $nid < 0;
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
 
-    my ($xrl_id) = $slr->call_by_tag(
+    my ($xrl_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $nid);
-    local recce, nid = ...
-    local irl_id = recce.lmw_b:_or_node_nrl(nid)
-    local xrl_id = recce.slg.g1:_source_xrl(irl_id)
+    local slv, nid = ...
+    local slr = slv.slr
+    local irl_id = slr.lmw_b:_or_node_nrl(nid)
+    local xrl_id = slr.slg.g1:_source_xrl(irl_id)
     return xrl_id
 END_OF_LUA
     return $xrl_id;
@@ -588,14 +589,15 @@ END_OF_LUA
 
 sub or_node_es_span {
     my ( $asf, $choicepoint ) = @_;
-    my $slr        = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv        = $asf->[Marpa::R3::Internal::ASF::SLV];
 
-    my ($origin_es, $current_es) = $slr->call_by_tag(
+    my ($origin_es, $current_es) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $choicepoint);
-    local recce, choicepoint = ...
-    local origin_es = recce.lmw_b:_or_node_origin(choicepoint)
-    local current_es = recce.lmw_b:_or_node_set(choicepoint)
+    local slv, choicepoint = ...
+    local slr = slv.slr
+    local origin_es = slr.lmw_b:_or_node_origin(choicepoint)
+    local current_es = slr.lmw_b:_or_node_set(choicepoint)
     return origin_es, current_es
 END_OF_LUA
 
@@ -604,12 +606,13 @@ END_OF_LUA
 
 sub token_es_span {
     my ( $asf, $and_node_id ) = @_;
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
 
-    my ($predecessor_id, $parent_or_node_id) = $slr->call_by_tag(
+    my ($predecessor_id, $parent_or_node_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        local slr, and_node_id = ...
+        local slv, and_node_id = ...
+        local slr = slv.slr
         local b = slr.lmw_b
         return
             b:_and_node_predecessor(and_node_id),
@@ -619,10 +622,11 @@ END_OF_LUA
 
     if ( defined $predecessor_id ) {
 
-        my ($origin_es, $current_es) = $slr->call_by_tag(
+        my ($origin_es, $current_es) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            local slr, predecessor_id, parent_or_node_id = ...
+            local slv, predecessor_id, parent_or_node_id = ...
+            local slr = slv.slr
             local b = slr.lmw_b
             return
                 b:_or_node_set(predecessor_id),
