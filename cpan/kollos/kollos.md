@@ -1771,8 +1771,6 @@ This is a registry object.
     -- TODO delete after development
     -- This temporary implementation leak valuers
     class_slr_fields.slv = true
-    -- TODO move to SLV
-    class_slr_fields.lmw_b = true
 ```
 
 *At end of input* field:
@@ -4227,6 +4225,7 @@ This is a registry object.
     class_slv_fields.is_r_internal = true
     class_slv_fields.tree_mode = true
     class_slv_fields.this_step = true
+    class_slv_fields.lmw_b = true
     class_slv_fields.lmw_o = true
     class_slv_fields.lmw_t = true
     class_slv_fields.lmw_v = true
@@ -4458,9 +4457,8 @@ TODO: Refactoring may eliminate the need for this.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.valuation_reset(slv)
-        local slr = slv.slr
         slv.trace_values = 0;
-        slr.lmw_b = nil
+        slv.lmw_b = nil
         slv.lmw_o = nil
         slv.lmw_t = nil
         slv.lmw_v = nil
@@ -4498,7 +4496,7 @@ or at least the subject of refactoring.
         _M.throw = false
         local bocage = _M.bocage_new(slr.g1, end_of_parse)
         _M.throw = true
-        slr.lmw_b = bocage
+        slv.lmw_b = bocage
         if not bocage then
             slr.has_parse = false
             return
@@ -4565,7 +4563,7 @@ or at least the subject of refactoring.
             return
         end
         local nook_ix = slv.lmw_v:_nook()
-        local b = slr.lmw_b
+        local b = slv.lmw_b
         local o = slv.lmw_o
         local t = slv.lmw_t
         local g1g = slr.slg.g1
@@ -4624,7 +4622,7 @@ or at least the subject of refactoring.
     -- miranda: section+ diagnostics
     function _M.class_slv.and_node_tag(slv, and_node_id)
         local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
         local origin = bocage:_or_node_origin(parent_or_node_id)
         local origin_earleme = slr.g1:earleme(origin)
@@ -4659,7 +4657,7 @@ or at least the subject of refactoring.
 
     function _M.class_slv.and_nodes_show(slv)
         local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         local g1r = slr.g1
         local data = {}
         local id = -1
@@ -4722,7 +4720,7 @@ or at least the subject of refactoring.
 
     function _M.class_slv.or_node_tag(slv, or_node_id)
         local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         local set = bocage:_or_node_set(or_node_id)
         local nrl_id = bocage:_or_node_nrl(or_node_id)
         local origin = bocage:_or_node_origin(or_node_id)
@@ -4736,7 +4734,7 @@ or at least the subject of refactoring.
 
     function _M.class_slv.or_nodes_show(slv)
         local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         local g1r = slr.g1
         local data = {}
         local id = -1
@@ -4789,7 +4787,7 @@ or at least the subject of refactoring.
     -- miranda: section+ diagnostics
     function _M.class_slv.bocage_show(slv)
         local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         local data = {}
         local or_node_id = -1
         while true do

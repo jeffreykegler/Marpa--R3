@@ -182,8 +182,7 @@ sub set_last_choice {
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
             local slv, id = ...
-            local slr = slv.slr
-            local current = slr.lmw_b:_and_node_predecessor(id)
+            local current = slv.lmw_b:_and_node_predecessor(id)
             return current and current or -1
 END_OF_LUA
             'i', $and_node_id);
@@ -195,8 +194,7 @@ END_OF_LUA
         ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA',
                 local slv, id = ...
-                local slr = slv.slr
-                local next = slr.lmw_b:_and_node_predecessor(id)
+                local next = slv.lmw_b:_and_node_predecessor(id)
                 return next and next or -1
 END_OF_LUA
                 'i', ($and_node_id // -1));
@@ -237,8 +235,8 @@ sub nook_has_semantic_cause {
     <<'END_OF_LUA', 'i', $or_node);
     local slv, or_node = ...
     local slr = slv.slr
-    local irl_id = slr.lmw_b:_or_node_nrl(or_node)
-    local predot_position = slr.lmw_b:_or_node_position(or_node) - 1
+    local irl_id = slv.lmw_b:_or_node_nrl(or_node)
+    local predot_position = slv.lmw_b:_or_node_position(or_node) - 1
     local predot_isyid = slr.slg.g1:_nrl_rhs(irl_id, predot_position)
     return slr.slg.g1:_nsy_is_semantic(predot_isyid)
 END_OF_LUA
@@ -256,8 +254,7 @@ sub Marpa::R3::ASF::peak {
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
         local slv = ...
-        local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         if not bocage then error('No Bocage') end
         return bocage:_top_or_node()
 END_OF_LUA
@@ -267,7 +264,7 @@ END_OF_LUA
     my ($start_or_node_id)
         = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            'local slv, id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_cause(id)',
+            'local slv, id = ...; return slv.lmw_b:_and_node_cause(id)',
             'i',
             $augment_and_node_id
             );
@@ -535,7 +532,7 @@ sub nid_sort_ix {
         <<'END_OF_LUA', 'i', $nid);
         local slv, nid = ...
         local slr = slv.slr
-        local irl_id = slr.lmw_b:_or_node_nrl(nid)
+        local irl_id = slv.lmw_b:_or_node_nrl(nid)
         return slr.slg.g1:_source_xrl(irl_id)
 END_OF_LUA
         return $result;
@@ -548,7 +545,7 @@ END_OF_LUA
     <<'END_OF_LUA', 'i', $and_node_id);
     local slv, and_node_id = ...
     local slr = slv.slr
-    local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
+    local token_nsy_id = slv.lmw_b:_and_node_symbol(and_node_id)
     local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
     -- -2 is reserved for 'end of data'
     return -token_id - 3
@@ -580,7 +577,7 @@ sub nid_rule_id {
     <<'END_OF_LUA', 'i', $nid);
     local slv, nid = ...
     local slr = slv.slr
-    local irl_id = slr.lmw_b:_or_node_nrl(nid)
+    local irl_id = slv.lmw_b:_or_node_nrl(nid)
     local xrl_id = slr.slg.g1:_source_xrl(irl_id)
     return xrl_id
 END_OF_LUA
@@ -596,8 +593,8 @@ sub or_node_es_span {
     <<'END_OF_LUA', 'i', $choicepoint);
     local slv, choicepoint = ...
     local slr = slv.slr
-    local origin_es = slr.lmw_b:_or_node_origin(choicepoint)
-    local current_es = slr.lmw_b:_or_node_set(choicepoint)
+    local origin_es = slv.lmw_b:_or_node_origin(choicepoint)
+    local current_es = slv.lmw_b:_or_node_set(choicepoint)
     return origin_es, current_es
 END_OF_LUA
 
@@ -613,7 +610,7 @@ sub token_es_span {
     <<'END_OF_LUA',
         local slv, and_node_id = ...
         local slr = slv.slr
-        local b = slr.lmw_b
+        local b = slv.lmw_b
         return
             b:_and_node_predecessor(and_node_id),
             b:_and_node_parent(and_node_id)
@@ -627,7 +624,7 @@ END_OF_LUA
         <<'END_OF_LUA',
             local slv, predecessor_id, parent_or_node_id = ...
             local slr = slv.slr
-            local b = slr.lmw_b
+            local b = slv.lmw_b
             return
                 b:_or_node_set(predecessor_id),
                 b:_or_node_set(parent_or_node_id)
@@ -681,7 +678,7 @@ sub nid_token_id {
     <<'END_OF_LUA',
         local slv, and_node_id = ...
         local slr = slv.slr
-        local token_nsy_id = slr.lmw_b:_and_node_symbol(and_node_id)
+        local token_nsy_id = slv.lmw_b:_and_node_symbol(and_node_id)
         local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
         return token_id
 END_OF_LUA
@@ -703,7 +700,7 @@ sub nid_symbol_id {
     <<'END_OF_LUA',
         local slv, nid = ...
         local slr = slv.slr
-        local irl_id = slr.lmw_b:_or_node_nrl(nid)
+        local irl_id = slv.lmw_b:_or_node_nrl(nid)
         local g1g = slr.slg.g1
         local xrl_id = g1g:_source_xrl(irl_id)
         local lhs_id = g1g:rule_lhs(xrl_id)
@@ -862,7 +859,7 @@ sub factoring_finish {
                 if ( not nook_has_semantic_cause( $asf, $work_nook ) ) {
                     ($child_or_node) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                        'local slv, work_and_node_id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_cause(work_and_node_id)',
+                        'local slv, work_and_node_id = ...; return slv.lmw_b:_and_node_cause(work_and_node_id)',
                         'i',
                         $work_and_node_id);
                     $child_is_cause = 1;
@@ -875,7 +872,7 @@ sub factoring_finish {
             {
                 ($child_or_node) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                    'local slv, work_and_node_id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_predecessor(work_and_node_id)',
+                    'local slv, work_and_node_id = ...; return slv.lmw_b:_and_node_predecessor(work_and_node_id)',
                     'i',
                     $work_and_node_id);
                 if ( defined $child_or_node ) {
@@ -924,7 +921,7 @@ sub and_nodes_to_cause_nids {
     for my $and_node_id (@and_node_ids) {
         my ($cause_nid) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            'local slv, and_node_id = ...; local slr = slv.slr; return slr.lmw_b:_and_node_cause(and_node_id)',
+            'local slv, and_node_id = ...; return slv.lmw_b:_and_node_cause(and_node_id)',
             'i',
             $and_node_id);
         $cause_nid //= and_node_to_nid($and_node_id);

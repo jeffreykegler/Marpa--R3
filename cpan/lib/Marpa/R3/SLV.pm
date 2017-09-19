@@ -372,7 +372,7 @@ sub Marpa::R3::Scanless::V::verbose_or_node {
         <<'END_OF_LUA', 'i', $or_node_id);
         local slv, or_node_id = ...
         local slr = slv.slr
-        local bocage = slr.lmw_b
+        local bocage = slv.lmw_b
         local origin = bocage:_or_node_origin(or_node_id)
         if not origin then return end
         local set = bocage:_or_node_set(or_node_id)
