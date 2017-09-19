@@ -4507,8 +4507,13 @@ or at least the subject of refactoring.
             slr.has_parse = true
             return lmw_o
         end
+        local end_of_parse = slr.end_of_parse
+        if not end_of_parse or end_of_parse < 0 then
+            end_of_parse = slr.g1:latest_earley_set()
+        end
+        slv.end_of_parse = end_of_parse
         _M.throw = false
-        local bocage = _M.bocage_new(slr.g1, slr.end_of_parse)
+        local bocage = _M.bocage_new(slr.g1, end_of_parse)
         _M.throw = true
         slr.lmw_b = bocage
         if not bocage then
