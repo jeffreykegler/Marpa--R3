@@ -1890,16 +1890,6 @@ together.
             }
         end
 
-        -- TODO: Eliminate this once "internal" valuator is factored
-        --   away.
-        local slv = slr.slv
-        if not slv then
-            slv = slr:slv_new_i({})
-            slr.slv = slv
-            slr:islv_register()
-        end
-        slv:valuation_reset()
-
         slr:common_set(flat_args, {'event_is_active',
             -- TODO delete after development
             'event_handlers'
@@ -1934,6 +1924,16 @@ together.
         -- is just a place holder
         slr.token_is_literal = 2
         slr.token_values[slr.token_is_literal] = glue.sv.undef()
+
+        -- TODO: Eliminate this once "internal" valuator is factored
+        --   away.
+        local slv = slr.slv
+        if not slv then
+            slv = slr:slv_new_i({})
+            slr.slv = slv
+            slr:islv_register()
+        end
+        slv:valuation_reset()
 
         return slr
     end
