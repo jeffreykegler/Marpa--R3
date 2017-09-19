@@ -4483,6 +4483,7 @@ TODO: Refactoring may eliminate the need for this.
         slv.lmw_t = nil
         slv.lmw_v = nil
         slv.tree_mode = nil
+        slv.end_of_parse = nil
     end
 ```
 
@@ -4507,10 +4508,7 @@ or at least the subject of refactoring.
             slr.has_parse = true
             return lmw_o
         end
-        local end_of_parse = slv.end_of_parse
-        if not end_of_parse then
-            end_of_parse = slr.end_of_parse
-        end
+        local end_of_parse = slv.end_of_parse or slr.end_of_parse
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = slr.g1:latest_earley_set()
         end
