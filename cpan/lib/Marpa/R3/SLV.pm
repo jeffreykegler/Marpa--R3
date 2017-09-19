@@ -500,7 +500,7 @@ sub Marpa::R3::Scanless::V::series_restart {
         local slv, flat_args = ...
         local slr = slv.slr
         return _M.wrap(function ()
-                slr.phase = "read"
+                if slv.is_r_internal then slr.phase = "read" end
                 slr:valuation_reset()
                 slr:common_set(flat_args)
             end
