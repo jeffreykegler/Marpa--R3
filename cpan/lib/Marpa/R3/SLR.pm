@@ -475,37 +475,9 @@ sub Marpa::R3::Scanless::G::parse {
 } ## end sub Marpa::R3::Scanless::G::parse
 
 sub Marpa::R3::Scanless::R::series_restart {
-    my ( $slr , @args ) = @_;
-    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
-    Marpa::R3::exception( sprintf $error_message, '$slr->series_restart()' ) if not $flat_args;
-
-    $flat_args = perl_common_set($slr, $flat_args);
-    my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 's',
-            args      => [ $flat_args ],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                }
-            }
-        },
-        <<'END_OF_LUA');
-        local slr, flat_args = ...
-        return _M.wrap(function ()
-                slr.phase = "read"
-                slr:valuation_reset()
-                slr:common_set(flat_args)
-            end
-        )
-END_OF_LUA
-    return 1;
+    my ( $slr, @args ) = @_;
+    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return $slv->series_restart( @args );
 }
 
 # Brief description of block/line/column for

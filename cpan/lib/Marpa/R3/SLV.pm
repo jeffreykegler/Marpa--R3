@@ -30,7 +30,7 @@ use English qw( -no_match_vars );
 our $PACKAGE = 'Marpa::R3::Scanless::V';
 
 # Set those common args which are at the Perl level.
-sub perl_common_set {
+sub slv_common_set {
     my ( $slv, $flat_args ) = @_;
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
         $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] = $value;
@@ -53,7 +53,7 @@ sub Marpa::R3::Scanless::V::link {
     my ( $flat_args, $error_message ) = Marpa::R3::flatten_hash_args( \@args );
     Marpa::R3::exception( sprintf $error_message, '$slv->new' )
       if not $flat_args;
-    $flat_args = perl_common_set( $slv, $flat_args );
+    $flat_args = slv_common_set( $slv, $flat_args );
 
     my $slr = $flat_args->{recce};
     Marpa::R3::exception(
@@ -143,7 +143,7 @@ sub Marpa::R3::Scanless::V::set {
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
     Marpa::R3::exception( sprintf $error_message, '$slv->set()' ) if not $flat_args;
-    $flat_args = perl_common_set($slv, $flat_args);
+    $flat_args = slv_common_set($slv, $flat_args);
     my $trace_file_handle =
       $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
 
@@ -472,6 +472,41 @@ sub Marpa::R3::Scanless::V::regix {
     my ( $slv ) = @_;
     my $regix = $slv->[Marpa::R3::Internal::Scanless::V::REGIX];
     return $regix;
+}
+
+sub Marpa::R3::Scanless::V::series_restart {
+    my ( $slv , @args ) = @_;
+    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
+    Marpa::R3::exception( sprintf $error_message, '$slv->series_restart()' ) if not $flat_args;
+
+    $flat_args = slv_common_set($slv, $flat_args);
+    my $trace_file_handle =
+      $slv->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+    $slv->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [ $flat_args ],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                }
+            }
+        },
+        <<'END_OF_LUA');
+        local slv, flat_args = ...
+        local slr = slv.slr
+        return _M.wrap(function ()
+                slr.phase = "read"
+                slr:valuation_reset()
+                slr:common_set(flat_args)
+            end
+        )
+END_OF_LUA
+    return 1;
 }
 
 1;
