@@ -1739,7 +1739,6 @@ This is a registry object.
     class_slr_fields.codepoint = true
     class_slr_fields.current_block = true
     class_slr_fields.end_of_lexeme = true
-    class_slr_fields.end_of_parse = true
     class_slr_fields.event_queue = true
     class_slr_fields.g1 = true
     class_slr_fields.has_parse = true
@@ -2017,7 +2016,6 @@ the recognizer's Lua-level settings.
     function _M.class_slr.common_set(slr, flat_args, extra_args)
         local ok_args = {
             trace_terminals = true,
-            ['end'] = true,
             max_parses = true,
             too_many_earley_items = true,
             trace_values = true
@@ -2101,22 +2099,6 @@ the recognizer's Lua-level settings.
             end
             slr.too_many_earley_items = value
             slr.g1:earley_item_warning_threshold_set(value)
-        end
-
-        -- TODO -- delete after development
-        -- 'end' named argument --
-        raw_value = flat_args["end"]
-        if raw_value then
-            local value = math.tointeger(raw_value)
-            if not value then
-               error(string.format(
-                   'Bad value for "end" named argument: %s',
-                   inspect(raw_value)))
-            end
-            if slr.lmw_b then
-                error'Cannot reset end of parse once evaluation has started'
-            end
-            slr.end_of_parse = value
         end
 
         -- 'event_is_active' named argument --
@@ -4508,7 +4490,7 @@ or at least the subject of refactoring.
             slr.has_parse = true
             return lmw_o
         end
-        local end_of_parse = slv.end_of_parse or slr.end_of_parse
+        local end_of_parse = slv.end_of_parse
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = slr.g1:latest_earley_set()
         end
