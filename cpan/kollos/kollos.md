@@ -6459,22 +6459,6 @@ TODO: Move to SLV and delete
     end
 ```
 
-### Reset a valuator
-
-TODO: Move to SLV and delete
-
-TODO: I expect refactoring will eliminate the need for this.
-
-
-```
-
-    -- miranda: section+ valuator Libmarpa wrapper Lua functions
-    function _M.class_slr.valuation_reset(slr)
-        local slv = slr.slv
-        return slv:valuation_reset()
-    end
-```
-
 ## Libmarpa interface
 
 ```

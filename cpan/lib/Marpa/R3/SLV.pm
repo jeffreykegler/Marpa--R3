@@ -131,7 +131,7 @@ sub Marpa::R3::Scanless::V::DESTROY {
     local slr = slv.slr
     -- TODO test unnecessary once slr-internal slv is eliminated
     if not slv.is_r_internal then
-        slr:valuation_reset()
+        slv:valuation_reset()
         local regix = slv.regix
         _M.unregister(_M.registry, regix)
     end
@@ -501,7 +501,7 @@ sub Marpa::R3::Scanless::V::series_restart {
         local slr = slv.slr
         return _M.wrap(function ()
                 if slv.is_r_internal then slr.phase = "read" end
-                slr:valuation_reset()
+                slv:valuation_reset()
                 slr:common_set(flat_args)
             end
         )
