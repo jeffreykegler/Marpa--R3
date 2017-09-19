@@ -4507,7 +4507,10 @@ or at least the subject of refactoring.
             slr.has_parse = true
             return lmw_o
         end
-        local end_of_parse = slr.end_of_parse
+        local end_of_parse = slv.end_of_parse
+        if not end_of_parse then
+            end_of_parse = slr.end_of_parse
+        end
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = slr.g1:latest_earley_set()
         end

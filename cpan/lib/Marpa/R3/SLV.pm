@@ -474,6 +474,7 @@ sub Marpa::R3::Scanless::V::regix {
     return $regix;
 }
 
+# TODO delete after development
 sub Marpa::R3::Scanless::V::series_restart {
     my ( $slv , @args ) = @_;
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
@@ -502,7 +503,7 @@ sub Marpa::R3::Scanless::V::series_restart {
         return _M.wrap(function ()
                 if slv.is_r_internal then slr.phase = "read" end
                 slv:valuation_reset()
-                slr:common_set(flat_args)
+                slv:common_set(flat_args, {'end'})
             end
         )
 END_OF_LUA
