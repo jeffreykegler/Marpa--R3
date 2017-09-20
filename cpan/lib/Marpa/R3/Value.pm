@@ -1396,6 +1396,7 @@ sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return if not $slv;
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;

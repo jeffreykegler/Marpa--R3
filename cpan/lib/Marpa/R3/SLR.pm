@@ -477,6 +477,7 @@ sub Marpa::R3::Scanless::G::parse {
 sub Marpa::R3::Scanless::R::series_restart {
     my ( $slr, @args ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    Marpa::R3::exception("No parse series to restart") if not $slv;
     return $slv->series_restart( @args );
 }
 
@@ -1518,6 +1519,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::or_nodes_show {
     my ( $slr, $verbose ) = @_;
     my $slv = Marpa::R3::Scanless::V->link( { recce => $slr } );
+    return "No or nodes\n" if not $slv;
     return $slv->or_nodes_show($verbose);
 }
 
@@ -1525,6 +1527,7 @@ sub Marpa::R3::Scanless::R::or_nodes_show {
 sub Marpa::R3::Scanless::R::and_nodes_show {
     my ( $slr, $verbose ) = @_;
     my $slv = Marpa::R3::Scanless::V->link( { recce => $slr } );
+    return "No and nodes\n" if not $slv;
     return $slv->and_nodes_show($verbose);
 }
 
@@ -1539,6 +1542,7 @@ sub Marpa::R3::Scanless::R::regix {
 sub Marpa::R3::Scanless::R::bocage_show {
     my ( $slr, $verbose ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return "No bocage\n" if not $slv;
     return $slv->bocage_show( $verbose);
 }
 
@@ -1546,6 +1550,7 @@ sub Marpa::R3::Scanless::R::bocage_show {
 sub Marpa::R3::Scanless::R::tree_show {
     my ( $slr, $verbose ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return "No tree\n" if not $slv;
     return $slv->tree_show( $verbose);
 }
 
@@ -1553,6 +1558,7 @@ sub Marpa::R3::Scanless::R::tree_show {
 sub Marpa::R3::Scanless::R::ambiguous {
     my ( $slr, $verbose ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return 0 if not $slv;
     return $slv->ambiguous( $verbose);
 }
 
@@ -1560,6 +1566,7 @@ sub Marpa::R3::Scanless::R::ambiguous {
 sub Marpa::R3::Scanless::R::ambiguity_metric {
     my ( $slr, $verbose ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
+    return 0 if not $slv;
     return $slv->ambiguity_metric( $verbose);
 }
 

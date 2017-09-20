@@ -394,6 +394,8 @@ sub Marpa::R3::ASF::new {
                     $arg_hash->{$arg};
                 $asf->[Marpa::R3::Internal::ASF::SLV] = $slv =
                     Marpa::R3::Scanless::V->link({recce => $slr});
+                Marpa::R3::exception( qq{No parse in $asf->new()})
+                   if not $slv;
                 next ARG;
             }
             if ( $arg eq 'factoring_max' ) {

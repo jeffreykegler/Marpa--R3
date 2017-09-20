@@ -45,7 +45,6 @@ sub Marpa::R3::Scanless::V::link {
     my ( $class, @args ) = @_;
 
     my $slv = [];
-    bless $slv, $class;
 
     # Set recognizer args to default
     # Lua equivalent is set below
@@ -98,14 +97,17 @@ sub Marpa::R3::Scanless::V::link {
         local slr, flat_args = ...
         _M.wrap(function ()
             -- local v_regix = slr:islv_register(flat_args)
-            local v_regix = slr.slv.regix
+            local slv = slr.slv
+            if not slv then return 'ok', -1 end
+            local v_regix = slv.regix
             return 'ok', v_regix
         end)
 END_OF_LUA
 
+    return if $regix < 0;
     $slv->[Marpa::R3::Internal::Scanless::V::REGIX]  = $regix;
 
-    return $slv;
+    return bless $slv, $class;
 }
 
 sub Marpa::R3::Scanless::V::DESTROY {
