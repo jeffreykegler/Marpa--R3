@@ -1927,13 +1927,12 @@ together.
 
         -- TODO: Eliminate this once "internal" valuator is factored
         --   away.
-        local slv = slr.slv
-        if not slv then
-            slv = slr:slv_new_i({})
+        local slv = slr:slv_new_i({})
+        if slv then
             slr.slv = slv
             slr:islv_register()
+            slv:valuation_reset()
         end
-        slv:valuation_reset()
 
         return slr
     end
