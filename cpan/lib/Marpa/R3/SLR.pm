@@ -1558,7 +1558,7 @@ sub Marpa::R3::Scanless::R::tree_show {
 sub Marpa::R3::Scanless::R::ambiguous {
     my ( $slr, $verbose ) = @_;
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
-    return 0 if not $slv;
+    return "No parse" if not $slv;
     return $slv->ambiguous( $verbose);
 }
 
