@@ -1931,7 +1931,6 @@ together.
         if slv then
             slr.slv = slv
             slr:islv_register()
-            slv:valuation_reset()
         end
 
         return slr
@@ -4260,7 +4259,7 @@ which is not kept in the registry.
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
         slv.regix = -1
-        slv.trace_values = slr.trace_values
+        slv.trace_values = slr.trace_values or 0
         slv:common_set(flat_args, {'end'})
         return slv
     end
@@ -4392,7 +4391,7 @@ the valuator's Lua-level settings.
             -- print('result:', result)
             slv.lmw_v = _M.value_new(lmw_t)
 
-        local trace_values = slv.trace_values or 0
+        local trace_values = slv.trace_values
         slv.lmw_v:_trace(trace_values)
 
         if trace_values > 0 then
