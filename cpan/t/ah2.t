@@ -497,7 +497,7 @@ END_OF_TEXT
     if ( $ambiguity_metric > 1 ) {
 
         $recce->series_restart( { end => $i } );
-        my $asf = Marpa::R3::ASF->new( { slr => $recce } );
+        my $asf = Marpa::R3::ASF->new( { slr => $recce, end => $i } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 
