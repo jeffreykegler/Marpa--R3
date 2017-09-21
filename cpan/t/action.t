@@ -85,7 +85,7 @@ sub do_parse {
     my $grammar = Marpa::R3::Scanless::G->new( { source  => \$dsl } );
     my $slr     = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $slr->read( \'ABCD' );
-    return $slr->value();
+    return $slr->old_value();
 }
 
 my $value_ref;

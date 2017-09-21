@@ -347,7 +347,7 @@ my %expected_value = (
 $recce->set( { max_parses => 10, } );
 
 my $i = 0;
-while ( defined( my $value = $recce->value() ) ) {
+while ( defined( my $value = $recce->old_value() ) ) {
     my $value = ${$value};
     if ( defined $expected_value{$value} ) {
         delete $expected_value{$value};
@@ -357,7 +357,7 @@ while ( defined( my $value = $recce->value() ) ) {
         Test::More::fail("Unexpected Value $i: $value");
     }
     $i++;
-} ## end while ( defined( my $value = $recce->value() ) )
+} ## end while ( defined( my $value = $recce->old_value() ) )
 
 1;    # In case used as "do" file
 

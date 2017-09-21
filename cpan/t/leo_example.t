@@ -439,7 +439,7 @@ END_EARLEY_SETS
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
 $recce->set( { trace_file_handle => $trace_fh, trace_values => 2 } );
-my $value_ref = $recce->value();
+my $value_ref = $recce->old_value();
 close $trace_fh;
 
 my $value = ref $value_ref ? ${$value_ref} : 'No Parse';

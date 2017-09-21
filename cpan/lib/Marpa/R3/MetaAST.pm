@@ -36,7 +36,7 @@ sub new {
         Marpa::R3::exception( "Parse of BNF/Scanless source failed:\n",
             $ambiguity_status );
     }
-    my $value_ref = $meta_recce->value();
+    my $value_ref = $meta_recce->old_value();
     Marpa::R3::exception('Parse of BNF/Scanless source failed')
         if not defined $value_ref;
     my $ast = { meta_recce => $meta_recce, top_node => ${$value_ref} };

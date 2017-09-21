@@ -69,7 +69,7 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \q{a} );
 
-my $value_ref = $recce->value();
+my $value_ref = $recce->old_value();
 my $value = defined $value_ref ? ${$value_ref} : 'undef';
 Test::More::is( $value, '(a;;;;;)', 'subp test' );
 

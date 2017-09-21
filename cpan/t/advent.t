@@ -164,7 +164,7 @@ for my $test_data (@tests) {
                 last PROCESSING;
             } ## end if ( not $eval_ok )
 
-            my $value_ref = $re->value();
+            my $value_ref = $re->old_value();
             my $last_hand;
             my ( $hand_start, $hand_length ) = $re->last_completed('hand');
             if ( defined $hand_start ) {

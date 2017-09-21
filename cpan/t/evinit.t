@@ -153,7 +153,7 @@ sub do_test {
         $pos = $recce->resume($pos);
     }
 
-    my $value_ref = $recce->value();
+    my $value_ref = $recce->old_value();
     if ( not defined $value_ref ) {
         die "No parse\n";
     }

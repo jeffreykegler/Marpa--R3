@@ -71,7 +71,7 @@ if ( my $ambiguous_status = $recce->ambiguous() ) {
     die "Parse is ambiguous\n", $ambiguous_status;
 }
 
-my $value_ref = $recce->value;
+my $value_ref = $recce->old_value;
 my $value = ${$value_ref};
 
 sub My_Actions::do_add {
@@ -303,7 +303,7 @@ Marpa::R3::Test::is( $earley_sets_show_output, $expected_earley_sets,
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
 $recce->set( { trace_file_handle => $trace_fh, trace_values => 3 } );
-$value_ref = $recce->value();
+$value_ref = $recce->old_value();
 $recce->set( { trace_file_handle => \*STDOUT, trace_values => 0 } );
 close $trace_fh;
 
@@ -368,7 +368,7 @@ Marpa::R3::Test::is( $trace_output, $expected_trace_output,
 
 $recce->series_restart();
 
-$value_ref = $recce->value();
+$value_ref = $recce->old_value();
 $value = $value_ref ? ${$value_ref} : 'No Parse';
 Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 3' );
 

@@ -79,7 +79,7 @@ sub my_parser {
     if ( not defined eval { $recce->read( \$string ); 1 } ) {
         return 'No parse', $EVAL_ERROR, $parse_arg->show_sequence_so_far();
     }
-    my $value_ref = $recce->value( $parse_arg);
+    my $value_ref = $recce->old_value( $parse_arg);
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse',
             $parse_arg->show_sequence_so_far();

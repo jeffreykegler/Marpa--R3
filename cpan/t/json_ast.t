@@ -297,7 +297,7 @@ sub parse {
         }
     );
     $re->read( \$string );
-    my $ast = ${ $re->value() };
+    my $ast = ${ $re->old_value() };
     return $parser->decode ( $ast );
 } ## end sub parse
 

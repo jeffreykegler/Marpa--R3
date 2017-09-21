@@ -56,7 +56,7 @@ my $grammar = Marpa::R3::Scanless::G->new(
 
 package My_Actions;
 # The SELF object is a very awkward way of specifying the per-parse
-# argument directly, one which was necessary before the $recce->value()
+# argument directly, one which was necessary before the $recce->old_value()
 # method took an argument.
 # This way of doing things is discourage and preserved here for testing purposes.
 our $SELF;
@@ -109,7 +109,7 @@ sub my_parser {
         $abbreviated_error =~ s/\n.*//xms;
         die $self->show_last_expression(), $EVAL_ERROR;
     } ## end if ( not defined $eval_ok )
-    my $value_ref = $recce->value;
+    my $value_ref = $recce->old_value;
     if ( not defined $value_ref ) {
         die join q{ },
             'Input read to end but no parse',

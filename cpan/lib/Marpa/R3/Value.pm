@@ -1391,8 +1391,9 @@ END_OF_LUA
 
 }
 
+# TODO delete after development
 # Returns false if no parse
-sub Marpa::R3::Scanless::R::value {
+sub Marpa::R3::Scanless::R::old_value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});

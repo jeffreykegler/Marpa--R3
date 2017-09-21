@@ -117,7 +117,7 @@ sub my_parser {
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $recce->read( \$string ); 1 ...})
     my $value_ref;
-    if ( not defined eval { $value_ref = $recce->value($ppo); 1 } ) {
+    if ( not defined eval { $value_ref = $recce->old_value($ppo); 1 } ) {
 
         # say $EVAL_ERROR
         my $abbreviated_error = $EVAL_ERROR;

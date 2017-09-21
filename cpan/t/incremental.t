@@ -60,7 +60,7 @@ for my $loc ( 1 .. $n ) {
 
     $recce->series_restart();
     $recce->resume( undef, 1 );
-    die "No parse" if not my $value_ref = $recce->value();
+    die "No parse" if not my $value_ref = $recce->old_value();
     local $Data::Dumper::Deepcopy = 1;
     # say STDERR Data::Dumper::Dumper($value_ref);
     my $actual = ${$value_ref};

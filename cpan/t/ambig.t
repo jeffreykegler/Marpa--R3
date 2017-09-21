@@ -93,7 +93,7 @@ PROCESSING: {
 
     $is_ambiguous_parse = 0;
 
-    my $value_ref = $recce->value();
+    my $value_ref = $recce->old_value();
     if ( not defined $value_ref ) {
         $actual_value  = 'No parse';
         $actual_result = 'Input read to end but no parse';
@@ -165,7 +165,7 @@ for my $ranking_method ('none', 'rule', 'high_rule_only'){
     if ($ranking_method eq 'high_rule_only'){
         # count parses and test that there is only one
         my $parse_count = 0;
-        while (defined $recce->value()) { ++$parse_count }
+        while (defined $recce->old_value()) { ++$parse_count }
         Test::More::is( $parse_count, 1, "$ranking_method ranking, single parse" );
         # reset recognizer and test ambiguity methods
         $recce->series_restart();

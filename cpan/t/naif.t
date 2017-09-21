@@ -49,7 +49,7 @@ $rec->lexeme_complete(undef, 1);
 $rec->lexeme_alternative('y',\"some");
 $rec->lexeme_complete(undef, 1);
 
-my $value_ref = $rec->value();
+my $value_ref = $rec->old_value();
 die if not defined $value_ref;
 
 Test::More::is_deeply(

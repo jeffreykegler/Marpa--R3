@@ -127,7 +127,7 @@ my $expected_size = 6;
 Marpa::R3::Test::is( $max_size, $expected_size,
     "Earley set size was $max_size; $expected_size was expected" );
 
-my $value_ref = $recce->value();
+my $value_ref = $recce->old_value();
 my $value = $value_ref ? ${$value_ref} : 'No parse';
 Marpa::R3::Test::is( $value, 'acacac', 'Leo unit rule parse' );
 

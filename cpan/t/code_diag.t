@@ -290,7 +290,7 @@ sub run_test {
     $recce->read(\'2*3+4*1trailer');
 
     my $expected  = '(((2*3)+(4*1))==10;trailer;[default null];[null])';
-    my $value_ref = $recce->value();
+    my $value_ref = $recce->old_value();
     my $value     = $value_ref ? ${$value_ref} : 'No parse';
     Marpa::R3::Test::is( $value, $expected, 'Ambiguous Equation Value' );
 

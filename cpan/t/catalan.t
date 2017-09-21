@@ -56,7 +56,7 @@ sub do_pairings {
 
     $recce->read( \( 'a' x $n ) );
 
-    while ( my $value_ref = $recce->value() ) {
+    while ( my $value_ref = $recce->old_value() ) {
         $parse_count++;
     }
     return $parse_count;

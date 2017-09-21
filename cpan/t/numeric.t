@@ -89,7 +89,7 @@ for my $maximal ( 0, 1 ) {
 
 # Marpa::R3::Display::End
 
-        my $result = $recce->value();
+        my $result = $recce->old_value();
         die "No parse" if not defined $result;
         Test::More::is( ${$result}, $expected->[$i],
             "$name parse, length=$i" );

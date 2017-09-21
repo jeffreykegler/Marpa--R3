@@ -340,7 +340,7 @@ END_OF_AHMS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $recce->read( \$input );
-my $value_ref = $recce->value();
+my $value_ref = $recce->old_value();
 
 Marpa::R3::Test::is( $recce->earley_sets_show(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );

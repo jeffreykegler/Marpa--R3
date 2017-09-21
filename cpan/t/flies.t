@@ -126,7 +126,7 @@ for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
         $lexeme_start += length $word;
     } ## end for my $word ( split q{ }, $data )
 
-    while ( defined( my $value_ref = $recce->value() ) ) {
+    while ( defined( my $value_ref = $recce->old_value() ) ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         push @actual, $value;
     }

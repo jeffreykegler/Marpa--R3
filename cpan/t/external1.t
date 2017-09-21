@@ -116,7 +116,7 @@ sub my_parser {
         die qq{No token found at position $start_of_lexeme, before "},
             substr( $string, pos $string, 40 ), q{"};
     } ## end TOKEN: while (1)
-    my $value_ref = $recce->value();
+    my $value_ref = $recce->old_value();
     if ( not defined $value_ref ) {
         die "No parse was found, after reading the entire input\n";
     }

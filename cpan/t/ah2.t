@@ -475,7 +475,7 @@ END_OF_TEXT
         } ## end TESTS_FOLDED_FROM_bocage_t
     }
 
-    while ( my $value_ref = $recce->value() ) {
+    while ( my $value_ref = $recce->old_value() ) {
 
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         $value //= '[undef]';
@@ -487,7 +487,7 @@ END_OF_TEXT
             Test::More::fail(qq{Unexpected result for length=$i, "$value"});
         }
 
-    } ## end while ( my $value_ref = $recce->value() )
+    } ## end while ( my $value_ref = $recce->old_value() )
 
     for my $value ( keys %{$expected} ) {
         Test::More::fail(qq{Missing result for length=$i, "$value"});

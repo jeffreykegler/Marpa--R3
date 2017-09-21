@@ -138,7 +138,7 @@ for my $sentence (split /\n/, $paragraph){
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar  } );
     $recce->read( \$sentence );
 
-    while ( defined( my $value_ref = $recce->value() ) ) {
+    while ( defined( my $value_ref = $recce->old_value() ) ) {
         my $value = $value_ref ? bracket ( ${$value_ref} ) : 'No parse';
         push @actual, $value;
     }

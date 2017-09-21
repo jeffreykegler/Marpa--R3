@@ -174,7 +174,7 @@ sub my_parser {
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     $recce->read($p_input_string);
-    my $value_ref = $recce->value();
+    my $value_ref = $recce->old_value();
     if ( not defined $value_ref ) {
         die "No parse was found, after reading the entire input\n";
     }

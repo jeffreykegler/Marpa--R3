@@ -143,7 +143,7 @@ for my $input_length ( 1 .. 4 ) {
         { grammar => $grammar, max_parses => 10 } );
     my $input = substr('abcd', 0, $input_length);
     $recce->read( \$input );
-    while ( my $value_ref = $recce->value() ) {
+    while ( my $value_ref = $recce->old_value() ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         my $expected = $expected[$input_length];
         if ( defined $expected->{$value} ) {
@@ -153,7 +153,7 @@ for my $input_length ( 1 .. 4 ) {
         else {
             Test::More::fail(qq{Unexpected value: "$value"});
         }
-    } ## end while ( my $value_ref = $recce->value() )
+    } ## end while ( my $value_ref = $recce->old_value() )
 } ## end for my $input_length ( 1 .. 4 )
 
 # Local Variables:

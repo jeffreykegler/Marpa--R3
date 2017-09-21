@@ -466,7 +466,7 @@ sub Marpa::R3::Scanless::G::parse {
             $ambiguous_status );
     }
 
-    my $value_ref = $slr->value();
+    my $value_ref = $slr->old_value();
     Marpa::R3::exception(
         '$slr->parse() read the input, but there was no parse', "\n" )
         if not $value_ref;

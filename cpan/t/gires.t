@@ -150,7 +150,7 @@ for my $test_data (@tests_data) {
             last PROCESSING;
         } ## end if ( not defined eval { $recce->read( \$input ); 1 })
         my $value_ref ;
-        if ( not defined eval { $value_ref = $recce->value(); 1 } ) {
+        if ( not defined eval { $value_ref = $recce->old_value(); 1 } ) {
             say $EVAL_ERROR if $DEBUG;
             my $abbreviated_error = $EVAL_ERROR;
             chomp $abbreviated_error;

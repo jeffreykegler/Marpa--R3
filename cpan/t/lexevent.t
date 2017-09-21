@@ -173,7 +173,7 @@ sub do_test {
         $retour = $slr->resume($current_position);
         $current_position = $retour if $retour > $current_position;
     }
-    my $value_ref = $slr->value();
+    my $value_ref = $slr->old_value();
     if ( not defined $value_ref ) {
         die "No parse\n";
     }

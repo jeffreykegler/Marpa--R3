@@ -126,7 +126,7 @@ TEST: for my $test_data (@test_data) {
     $recce->read( \$test_input );
 
     my @parses;
-    while ( defined( my $value_ref = $recce->value() ) ) {
+    while ( defined( my $value_ref = $recce->old_value() ) ) {
         push @parses, ${$value_ref};
     }
     my $expected_parse_count = scalar @{$test_results};

@@ -115,7 +115,7 @@ END_OF_OUTPUT
 
 # Marpa::R3::Display::End
 
-my $value = $slr->value();
+my $value = $slr->old_value();
 Marpa::R3::Test::is( ${$value}, $expected, 'Null example' );
 
 # Local Variables:

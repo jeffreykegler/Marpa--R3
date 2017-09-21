@@ -733,7 +733,7 @@ sub my_parser {
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $recce->read( \$string ); 1 ...})
-    my $value_ref = $recce->value();
+    my $value_ref = $recce->old_value();
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse';
     }
