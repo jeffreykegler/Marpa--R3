@@ -117,7 +117,6 @@ if ( !$is_ambiguous_parse ) {
     Test::More::fail(qq{glade_g1_span() length});
 }
 else {
-    $recce->series_restart();
     my $asf = Marpa::R3::ASF->new( { slr => $recce } );
     my $glade_id = $asf->peak;
 
@@ -168,7 +167,6 @@ for my $ranking_method ('none', 'rule', 'high_rule_only'){
         while (defined $recce->old_value()) { ++$parse_count }
         Test::More::is( $parse_count, 1, "$ranking_method ranking, single parse" );
         # reset recognizer and test ambiguity methods
-        $recce->series_restart();
         Test::More::is( $recce->ambiguous(), '', "$ranking_method ranking, single parse, ambiguous status is empty" );
         Test::More::is( $recce->ambiguity_metric(), 1, "$ranking_method ranking, single parse, ambiguity metric is 1" );
     }
