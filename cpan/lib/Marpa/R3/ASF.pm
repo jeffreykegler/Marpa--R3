@@ -393,8 +393,8 @@ sub Marpa::R3::ASF::new {
                 $asf->[Marpa::R3::Internal::ASF::SLR] = $slr =
                     $arg_hash->{$arg};
                 $asf->[Marpa::R3::Internal::ASF::SLV] = $slv =
-                    Marpa::R3::Scanless::V->link({recce => $slr});
-                Marpa::R3::exception( qq{No parse in $asf->new()})
+                    Marpa::R3::Scanless::V->new({recce => $slr});
+                Marpa::R3::exception( q{No parse in $asf->new()})
                    if not $slv;
                 next ARG;
             }
