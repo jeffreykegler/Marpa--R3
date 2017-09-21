@@ -4561,6 +4561,14 @@ or at least the subject of refactoring.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slv.end_of_parse(slv)
+        return slv.end_of_parse
+    end
+
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slv.trace_valuer_step ( slv )
         local slr = slv.slr
         if not slv.trace_values or slv.trace_values < 2 then

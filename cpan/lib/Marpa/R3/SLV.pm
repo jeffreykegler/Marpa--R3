@@ -515,7 +515,7 @@ sub Marpa::R3::Scanless::V::ambiguous {
     return q{} if $ambiguity_metric == 1;
     # TODO ASF must be created for end location of SLV,
     #   not of SLR!
-    my $asf = Marpa::R3::ASF->new( { slr => $slr } );
+    my $asf = Marpa::R3::ASF->new( { slr => $slr, end => $slv->g1_pos() } );
     die 'Could not create ASF' if not defined $asf;
     my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
     my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
@@ -536,6 +536,17 @@ END__OF_LUA
 
     return $metric;
 } ## end sub Marpa::R3::Scanless::R::ambiguity_metric
+
+sub Marpa::R3::Scanless::V::g1_pos {
+    my ( $slv ) = @_;
+    my ($g1_pos) = $slv->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local slv = ...
+    return slv:g1_pos()
+END__OF_LUA
+    return $g1_pos;
+}
 
 # not to be documented
 sub Marpa::R3::Scanless::V::regix {
