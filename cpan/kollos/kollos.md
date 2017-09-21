@@ -4278,6 +4278,11 @@ which is not kept in the registry.
         slv.is_r_internal = true
         return regix
     end
+    function _M.class_slr.slv_new(slr, flat_args)
+        local slv = slr:slv_new_i(flat_args)
+        regix = _M.register(_M.registry, slv)
+        slv.regix = regix
+    end
 ```
 
 A common processor for

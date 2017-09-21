@@ -41,6 +41,7 @@ sub slv_common_set {
     return $flat_args;
 }
 
+# TODO -- Delete after development
 sub Marpa::R3::Scanless::V::link {
     my ( $class, @args ) = @_;
 
@@ -56,7 +57,7 @@ sub Marpa::R3::Scanless::V::link {
 
     my $slr = $flat_args->{recce};
     Marpa::R3::exception(
-        qq{Marpa::R3::Scanless::V::new() called without a "recce" argument} )
+        qq{Marpa::R3::Scanless::V::link() called without a "recce" argument} )
       if not defined $slr;
     $slv->[Marpa::R3::Internal::Scanless::V::SLR] = $slr;
     delete $flat_args->{recce};
@@ -101,6 +102,73 @@ sub Marpa::R3::Scanless::V::link {
             if not slv then return 'ok', -1 end
             local v_regix = slv.regix
             return 'ok', v_regix
+        end)
+END_OF_LUA
+
+    return if $regix < 0;
+    $slv->[Marpa::R3::Internal::Scanless::V::REGIX]  = $regix;
+
+    return bless $slv, $class;
+}
+
+sub Marpa::R3::Scanless::V::new {
+    my ( $class, @args ) = @_;
+
+    my $slv = [];
+
+    # Set recognizer args to default
+    # Lua equivalent is set below
+
+    my ( $flat_args, $error_message ) = Marpa::R3::flatten_hash_args( \@args );
+    Marpa::R3::exception( sprintf $error_message, '$slv->new' )
+      if not $flat_args;
+    $flat_args = slv_common_set( $slv, $flat_args );
+
+    my $slr = $flat_args->{recce};
+    Marpa::R3::exception(
+        qq{Marpa::R3::Scanless::V::link() called without a "recce" argument} )
+      if not defined $slr;
+    $slv->[Marpa::R3::Internal::Scanless::V::SLR] = $slr;
+    delete $flat_args->{recce};
+
+    my $slr_class = 'Marpa::R3::Scanless::R';
+    if ( not blessed $slr or not $slr->isa($slr_class) ) {
+        my $ref_type = ref $slr;
+        my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
+        Marpa::R3::exception(
+            qq{'recce' named argument to new() is $desc\n},
+            "  It should be a ref to $slr_class\n"
+        );
+    }
+
+    $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] //=
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+    my $trace_file_handle =
+      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+
+    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    $slv->[Marpa::R3::Internal::Scanless::V::L] = $lua;
+
+    my ( $regix ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [$flat_args],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slr, flat_args = ...
+        _M.wrap(function ()
+            local slv = slr:slv_new(flat_args)
+            if not slv then return 'ok', -1 end
+            return 'ok', slv.regix
         end)
 END_OF_LUA
 
