@@ -132,6 +132,8 @@ __DATA__
 
     SLR { The underlying SLR }
     SLV { The underlying SLV }
+    END_OF_PARSE
+
     LEXEME_RESOLUTIONS
     RULE_RESOLUTIONS
 

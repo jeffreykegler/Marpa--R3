@@ -385,22 +385,22 @@ sub Marpa::R3::ASF::new {
     my $asf = bless [], $class;
 
     my $slr;
-    my $slv;
+    my $end_of_parse;
 
     for my $arg_hash (@arg_hashes) {
         ARG: for my $arg ( keys %{$arg_hash} ) {
             if ( $arg eq 'slr' ) {
                 $asf->[Marpa::R3::Internal::ASF::SLR] = $slr =
                     $arg_hash->{$arg};
-                $asf->[Marpa::R3::Internal::ASF::SLV] = $slv =
-                    Marpa::R3::Scanless::V->new({recce => $slr});
-                Marpa::R3::exception( q{No parse in $asf->new()})
-                   if not $slv;
                 next ARG;
             }
             if ( $arg eq 'factoring_max' ) {
                 $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] =
                     $arg_hash->{$arg};
+                next ARG;
+            }
+            if ( $arg eq 'end' ) {
+                $end_of_parse = $arg_hash->{$arg};
                 next ARG;
             }
             Marpa::R3::exception(
@@ -415,6 +415,12 @@ sub Marpa::R3::ASF::new {
     $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] //= 42;
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+
+    my %v_args = (recce => $slr);
+    $v_args{end} = $end_of_parse if $end_of_parse;
+    my $slv = Marpa::R3::Scanless::V->new(\%v_args);
+    Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
+    $asf->[Marpa::R3::Internal::ASF::SLV] = $slv;
 
      $slv->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
