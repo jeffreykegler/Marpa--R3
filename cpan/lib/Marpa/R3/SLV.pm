@@ -240,6 +240,151 @@ END_OF_LUA
     return $slv;
 }
 
+# Returns false if no parse
+sub Marpa::R3::Scanless::V::value {
+    my ( $slv, $per_parse_arg ) = @_;
+    my $slr    = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+
+    my $trace_actions =
+      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+    my $trace_file_handle =
+      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+
+        my $semantics_arg0 = $per_parse_arg // {};
+        my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
+        my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
+        my $nulling_closures =
+          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
+        my $rule_closures =
+          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
+
+    local $Marpa::R3::Context::rule = undef;
+    local $Marpa::R3::Context::irlid = undef;
+    local $Marpa::R3::Context::slg = $slg;
+    local $Marpa::R3::Context::slr  = $slr;
+    local $Marpa::R3::Context::slv  = $slv;
+
+    my %value_handlers = (
+        trace => sub {
+            my ($msg) = @_;
+            my $nl = ( $msg =~ /\n\z/xms ) ? '' : "\n";
+            print {$trace_file_handle} $msg, $nl;
+            return 'ok';
+        },
+        terse_dump => sub {
+            my ($value) = @_;
+            my $dumped = Data::Dumper->new( [$value] )->Terse(1)->Dump;
+            chomp $dumped;
+            return 'ok', $dumped;
+        },
+        constant => sub {
+            my ($constant_ix) = @_;
+            my $constant = $constants->[$constant_ix];
+            return 'sig', [ 'S', $constant ];
+        },
+        perl_undef => sub {
+            return 'sig', [ 'S', undef ];
+        },
+        bless => sub {
+            my ( $value, $blessing_ix ) = @_;
+            my $blessing = $constants->[$blessing_ix];
+            return 'sig', [ 'S', ( bless $value, $blessing ) ];
+        },
+        perl_nulling_semantics => sub {
+            my ($token_id) = @_;
+            my $value_ref = $nulling_closures->[$token_id];
+            my $result;
+            my @warnings;
+            my $eval_ok;
+          DO_EVAL: {
+                local $SIG{__WARN__} = sub {
+                    push @warnings, [ $_[0], ( caller 0 ) ];
+                };
+                $eval_ok = eval {
+                    my $irlid = $null_values->[$token_id];
+                    local $Marpa::R3::Context::irlid = $irlid;
+                    local $Marpa::R3::Context::production_id =
+                      $slg->g1_rule_to_production_id($irlid);
+                    $result = $value_ref->( $semantics_arg0, [] );
+                    1;
+                };
+            } ## end DO_EVAL:
+            if ( not $eval_ok or @warnings ) {
+                my $fatal_error = $EVAL_ERROR;
+                code_problems(
+                    {
+                        fatal_error => $fatal_error,
+                        eval_ok     => $eval_ok,
+                        warnings    => \@warnings,
+                        where       => 'computing value',
+                        long_where  => 'Computing value for null symbol: '
+                          . $slg->g1_symbol_display($token_id),
+                    }
+                );
+            } ## end if ( not $eval_ok or @warnings )
+            return 'sig', [ 'S', $result ];
+        },
+        perl_rule_semantics => sub {
+            my ( $irlid, $values ) = @_;
+            # say Data::Dumper::Dumper($values);
+            my $closure = $rule_closures->[$irlid];
+            my $result;
+            if ( defined $closure ) {
+                my @warnings;
+                my $eval_ok;
+                local $SIG{__WARN__} = sub {
+                    push @warnings, [ $_[0], ( caller 0 ) ];
+                };
+                local $Marpa::R3::Context::irlid = $irlid;
+                local $Marpa::R3::Context::production_id =
+                  $slg->g1_rule_to_production_id($irlid);
+                $eval_ok = eval {
+                    $result = $closure->( $semantics_arg0, $values );
+                    1;
+                };
+                if ( not $eval_ok or @warnings ) {
+                    my $fatal_error = $EVAL_ERROR;
+                    code_problems(
+                        {
+                            fatal_error => $fatal_error,
+                            eval_ok     => $eval_ok,
+                            warnings    => \@warnings,
+                            where       => 'computing value',
+                            long_where  => 'Computing value for rule: '
+                              . $slg->g1_rule_show($irlid),
+                        }
+                    );
+                } ## end if ( not $eval_ok or @warnings )
+            }
+            return 'sig', [ 'S', $result ];
+        }
+    );
+
+    if ( scalar @_ != 1 ) {
+        Marpa::R3::exception(
+            'Too many arguments to Marpa::R3::Scanless::V::value')
+          if ref $slr ne 'Marpa::R3::Scanless::V';
+    }
+
+    my ($cmd, $final_value) =
+ $slv->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args      => [],
+            handlers  => \%value_handlers
+        },
+        <<'END_OF_LUA');
+        local slr = ...
+        return slv:value()
+END_OF_LUA
+
+    return if $cmd ne 'ok';
+    return \($final_value);
+
+}
+
 # not to be documented
 sub Marpa::R3::Scanless::V::call_by_tag {
     my ( $slv, $tag, $codestr, $signature, @args ) = @_;
