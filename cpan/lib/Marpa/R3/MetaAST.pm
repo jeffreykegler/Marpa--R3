@@ -29,19 +29,23 @@ use English qw( -no_match_vars );
 sub new {
     my ( $class, $p_rules_source ) = @_;
     my $meta_recce = Marpa::R3::Internal::Scanless::meta_recce();
+    my $valuer;
     eval { $meta_recce->read($p_rules_source) }
-        or Marpa::R3::exception( "Parse of BNF/Scanless source failed\n",
+      or Marpa::R3::exception( "Parse of BNF/Scanless source failed\n",
         $EVAL_ERROR );
-    if ( my $ambiguity_status = $meta_recce->ambiguous() ) {
+    $valuer = Marpa::R3::Scanless::V->new( { recce => $meta_recce } );
+    my $ambiguity_level = $valuer->is_ambiguous();
+    if ( $ambiguity_level != 1 ) {
+        my $ambiguity_status = $valuer->ambiguous();
         Marpa::R3::exception( "Parse of BNF/Scanless source failed:\n",
             $ambiguity_status );
     }
-    my $value_ref = $meta_recce->old_value();
+    my $value_ref = $valuer->value();
     Marpa::R3::exception('Parse of BNF/Scanless source failed')
-        if not defined $value_ref;
+      if not defined $value_ref;
     my $ast = { meta_recce => $meta_recce, top_node => ${$value_ref} };
     return bless $ast, $class;
-} ## end sub new
+}
 
 sub Marpa::R3::Internal::MetaAST::Parse::substring {
     my ( $parse, $start, $length ) = @_;

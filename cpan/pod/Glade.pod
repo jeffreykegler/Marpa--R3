@@ -600,7 +600,7 @@ name: ASF ambiguity reporting
 normalize-whitespace: 1
 partial: 1
 
-    if ( $recce->ambiguity_metric() > 1 ) {
+    if ( $recce->is_ambiguous() > 1 ) {
         my $asf = Marpa::R3::ASF->new( { slr => $recce } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
@@ -612,7 +612,7 @@ partial: 1
         $actual_result =
             Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
-    } ## end if ( $recce->ambiguity_metric() > 1 )
+    }
 
 =for Marpa::R3::Display::End
 
@@ -634,12 +634,12 @@ Ambiguity reports are as L<described below|"Ambiguity reports">.
 
 While the C<ambiguities()> method can be called to determine whether
 or not ambiguities exist, it is the more expensive way to do it.
-The L<$slr-E<gt>ambiguity_metric() method|Marpa::R3::Scanless::R/"ambiguity_metric()">
+The L<$slr-E<gt>is_ambiguous() method|Marpa::R3::Scanless::R/"is_ambiguous()">
 tests an already-existing boolean and is therefore extremely fast.
 If you are simply testing for ambiguity,
-use the C<ambiguity_metric()> method instead.
+use the C<is_ambiguous()> method instead.
 If you can save time when you know that a parse is unambiguous,
-you may want to test for ambiguity with the C<ambiguity_metric()> method
+you may want to test for ambiguity with the C<is_ambiguous()> method
 before calling the C<ambiguities()> method.
 
 =head2 ambiguities_show()

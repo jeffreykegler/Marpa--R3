@@ -75,7 +75,8 @@ PROCESSING: {
 # Marpa::R3::Display
 # name: ASF ambiguity reporting
 
-    if ( $recce->ambiguity_metric() > 1 ) {
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    if ( $valuer->is_ambiguous() > 1 ) {
         my $asf = Marpa::R3::ASF->new( { slr => $recce } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
@@ -87,13 +88,13 @@ PROCESSING: {
         $actual_result =
             Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
-    } ## end if ( $recce->ambiguity_metric() > 1 )
+    }
 
 # Marpa::R3::Display::End
 
     $is_ambiguous_parse = 0;
 
-    my $value_ref = $recce->old_value();
+    my $value_ref = $valuer->value();
     if ( not defined $value_ref ) {
         $actual_value  = 'No parse';
         $actual_result = 'Input read to end but no parse';
@@ -132,7 +133,7 @@ else {
 
 } ## end else [ if ( !$is_ambiguous_parse ) ]
 
-# Tests of ambiguity_metric() anb ambiguous() across all ranking methods
+# Tests of is_ambiguous() anb ambiguous() across all ranking methods
 $source = \(<<'END_OF_SOURCE');
 
 top ::= unchoice rank => 1
@@ -152,27 +153,38 @@ END_OF_SOURCE
 
 $input = q{a b};
 
-for my $ranking_method ('none', 'rule', 'high_rule_only'){
+for my $ranking_method ( 'none', 'rule', 'high_rule_only' ) {
 
     my $ranking_grammar = Marpa::R3::Scanless::G->new(
         { ranking_method => $ranking_method, source => $source } );
 
     $recce = Marpa::R3::Scanless::R->new( { grammar => $ranking_grammar } );
 
-    $recce->read(\$input);
+    $recce->read( \$input );
 
-    if ($ranking_method eq 'high_rule_only'){
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+
+    if ( $ranking_method eq 'high_rule_only' ) {
+
         # count parses and test that there is only one
         my $parse_count = 0;
-        while (defined $recce->old_value()) { ++$parse_count }
-        Test::More::is( $parse_count, 1, "$ranking_method ranking, single parse" );
+        while ( defined $valuer->value() ) { ++$parse_count }
+        Test::More::is( $parse_count, 1,
+            "$ranking_method ranking, single parse" );
+
         # reset recognizer and test ambiguity methods
-        Test::More::is( $recce->ambiguous(), '', "$ranking_method ranking, single parse, ambiguous status is empty" );
-        Test::More::is( $recce->ambiguity_metric(), 1, "$ranking_method ranking, single parse, ambiguity metric is 1" );
+        Test::More::is( $valuer->ambiguous(), '',
+            "$ranking_method ranking, single parse, ambiguous status is empty"
+        );
+        Test::More::is( $valuer->is_ambiguous(),
+            1, "$ranking_method ranking, single parse, ambiguity level is 1" );
     }
-    else{
-        Test::More::isnt( $recce->ambiguous(), '', "$ranking_method ranking, many parses, ambiguous status isn't empty" );
-        Test::More::ok( $recce->ambiguity_metric() > 1, "$ranking_method ranking, many parses, ambiguity metric > 1" );
+    else {
+        Test::More::isnt( $valuer->ambiguous(), '',
+            "$ranking_method ranking, many parses, ambiguous status isn't empty"
+        );
+        Test::More::ok( $valuer->is_ambiguous() > 1,
+            "$ranking_method ranking, many parses, ambiguity level > 1" );
     }
 } ## end for my $ranking_method ...
 

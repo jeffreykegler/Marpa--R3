@@ -461,12 +461,15 @@ sub Marpa::R3::Scanless::G::parse {
             "  The cause may be an event\n",
             "  The $slr->parse() method does not allow parses to trigger events";
     } ## end if ( $length_read != length $input_length )
-    if ( my $ambiguous_status = $slr->ambiguous() ) {
+    my $slv = Marpa::R3::Scanless::V->new( { recce => $slr });
+    my $is_ambiguous = $slv->is_ambiguous();
+    if ( $is_ambiguous != 1 ) {
+        my $ambiguous_status = $slv->ambiguous();
         Marpa::R3::exception( "Parse of the input is ambiguous\n",
             $ambiguous_status );
     }
 
-    my $value_ref = $slr->old_value();
+    my $value_ref = $slv->value();
     Marpa::R3::exception(
         '$slr->parse() read the input, but there was no parse', "\n" )
         if not $value_ref;
@@ -1545,22 +1548,6 @@ sub Marpa::R3::Scanless::R::tree_show {
     my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
     return "No tree\n" if not $slv;
     return $slv->tree_show( $verbose);
-}
-
-# TODO Delete after development
-sub Marpa::R3::Scanless::R::ambiguous {
-    my ( $slr, $verbose ) = @_;
-    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
-    return "No parse" if not $slv;
-    return $slv->ambiguous( $verbose);
-}
-
-# TODO Delete after development
-sub Marpa::R3::Scanless::R::ambiguity_metric {
-    my ( $slr, $verbose ) = @_;
-    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
-    return 0 if not $slv;
-    return $slv->ambiguity_metric( $verbose);
 }
 
 1;

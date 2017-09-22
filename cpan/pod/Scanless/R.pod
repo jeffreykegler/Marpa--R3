@@ -1406,12 +1406,12 @@ Currently, all failures are thrown.
 
 =head1 Accessors
 
-=head2 ambiguity_metric()
+=head2 is_ambiguous()
 
 =for Marpa::R3::Display
-name: Scanless ambiguity_metric() synopsis
+name: Scanless is_ambiguous() synopsis
 
-    my $ambiguity_metric = $recce->ambiguity_metric();
+    my $is_ambiguous = $recce->is_ambiguous();
 
     TODO: Move this to Scanless::V pod
 
@@ -1421,24 +1421,11 @@ Succeeds and
 returns 1 if there was an unambiguous parse,
 in other words if there was exactly one parse tree.
 Succeeds and
-returns 2 or greater if the parse was ambiguous,
+returns 2 if the parse was ambiguous,
 in other words if there was more than one parse tree.
 Succeeds and returns 0 if there are no parse trees,
 because parsing failed.
-Currently, all other failures are thrown.
-
-When the return value is 2 or greater,
-the return value is B<not> necessarily the parse count.
-Instead, it is a value which is subject to change.
-and on which an application should not rely.
-The intent was that, some day,
-return values of 2 or greater would represent a "metric" which
-was cheap to compute,
-but which
-estimated the degree of ambiguity in some useful way.
-The best metric is, of course,
-would be the exact parse count,
-but determining that is expensive.
+All other failures are thrown.
 
 =head2 g1_to_l0_first()
 

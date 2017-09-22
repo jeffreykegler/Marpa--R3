@@ -60,9 +60,10 @@ EOI
 
 my $r = Marpa::R3::Scanless::R->new( { grammar => $g } );
 $r->read( \$input );
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $r } );
 
 {
- my $ambiguous_status = $r->ambiguous();
+ my $ambiguous_status = $valuer->ambiguous();
 my $expected = <<'EOS';
 Ambiguous symch at Glade=2, Symbol=<Expr>:
   The ambiguity is at B1L1c1-10
@@ -72,7 +73,7 @@ Ambiguous symch at Glade=2, Symbol=<Expr>:
   Symch 1 is a rule: Expr ::= Expr '-' Expr
 EOS
 Marpa::R3::Test::is($ambiguous_status, $expected, 'ambiguous_status()');
-Test::More::ok( ( $r->ambiguity_metric() > 1 ), 'ambiguity_metric()');
+Test::More::ok( ( $valuer->is_ambiguous() > 1 ), 'is_ambiguous()');
 }
 
 {
