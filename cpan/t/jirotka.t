@@ -340,7 +340,8 @@ END_OF_AHMS
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $recce->read( \$input );
-my $value_ref = $recce->old_value();
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+my $value_ref = $valuer->value();
 
 Marpa::R3::Test::is( $recce->earley_sets_show(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );
@@ -516,7 +517,7 @@ ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
 
-Marpa::R3::Test::is( $recce->and_nodes_show(),
+Marpa::R3::Test::is( $valuer->and_nodes_show(),
         <<'END_OF_AND_NODES', 'And Nodes' );
 And-node #0: R4:1@0-1S4@0
 And-node #19: R0:1@0-8C2@0
@@ -542,7 +543,7 @@ And-node #11: R19:2@6-8C20@7
 And-node #10: R20:1@7-8S22@7
 END_OF_AND_NODES
 
-Marpa::R3::Test::is( $recce->or_nodes_show(),
+Marpa::R3::Test::is( $valuer->or_nodes_show(),
         <<'END_OF_OR_NODES', 'Or Nodes' );
 R4:1@0-1
 R0:1@0-8

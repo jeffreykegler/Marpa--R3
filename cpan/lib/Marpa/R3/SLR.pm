@@ -1512,42 +1512,10 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::or_nodes_show {
-    my ( $slr, $verbose ) = @_;
-    my $slv = Marpa::R3::Scanless::V->link( { recce => $slr } );
-    return "No or nodes\n" if not $slv;
-    return $slv->or_nodes_show($verbose);
-}
-
-# not to be documented
-sub Marpa::R3::Scanless::R::and_nodes_show {
-    my ( $slr, $verbose ) = @_;
-    my $slv = Marpa::R3::Scanless::V->link( { recce => $slr } );
-    return "No and nodes\n" if not $slv;
-    return $slv->and_nodes_show($verbose);
-}
-
-# not to be documented
 sub Marpa::R3::Scanless::R::regix {
     my ( $slr ) = @_;
     my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
     return $regix;
-}
-
-# TODO Delete after development
-sub Marpa::R3::Scanless::R::bocage_show {
-    my ( $slr, $verbose ) = @_;
-    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
-    return "No bocage\n" if not $slv;
-    return $slv->bocage_show( $verbose);
-}
-
-# TODO Delete after development
-sub Marpa::R3::Scanless::R::tree_show {
-    my ( $slr, $verbose ) = @_;
-    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
-    return "No tree\n" if not $slv;
-    return $slv->tree_show( $verbose);
 }
 
 1;
