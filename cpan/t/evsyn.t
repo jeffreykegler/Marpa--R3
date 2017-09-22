@@ -171,7 +171,7 @@ Events at position 29: "h" test$
 
 # Marpa::R3::Display::End
 
-my $value_ref = $slr->old_value();
+my $value_ref = $slr->value();
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
 
 my $actual_events = join "\n", @event_history, '';

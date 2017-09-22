@@ -91,7 +91,7 @@ for my $input ( q{ (x) }, q{(x) }, q{ (x)})
     Test::More::is( $actual_events, $expected_events,
         qq{Test of two discard types, input="$input"} );
 
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     die "No parse was found\n" if not defined $value_ref;
 
     my $result = ${$value_ref};
@@ -143,7 +143,7 @@ for my $pattern (0 .. 15)
     Test::More::is( $actual_events, $expected_events,
         qq{Test of non-trivial parse, input="$input"} );
 
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     die "No parse was found\n" if not defined $value_ref;
 
     my $result = ${$value_ref};

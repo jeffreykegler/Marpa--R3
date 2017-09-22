@@ -126,7 +126,8 @@ for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
         $lexeme_start += length $word;
     } ## end for my $word ( split q{ }, $data )
 
-    while ( defined( my $value_ref = $recce->old_value() ) ) {
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    while ( defined( my $value_ref = $valuer->value() ) ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         push @actual, $value;
     }

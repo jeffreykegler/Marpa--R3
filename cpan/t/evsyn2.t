@@ -185,7 +185,7 @@ sub do_test {
         $pos = $recce->resume($pos);
     } ## end READ: while (1)
 
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         die "No parse\n";
     }

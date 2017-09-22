@@ -102,7 +102,7 @@ for (
     @events = ();
 } ## end INPUT: for ( my $pos = $recce->read( \$input ); $pos < $input_length...)
 
-my $result = $recce->old_value();
+my $result = $recce->value();
 die 'No parse' if not defined $result;
 my $received = Data::Dumper::Dumper( ${$result} );
 

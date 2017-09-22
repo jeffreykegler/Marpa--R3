@@ -105,7 +105,7 @@ sub my_parser {
             $exhausted_status;
     } ## end if ( not $eval_ok )
 
-    my $value_ref = $recce->old_value($self);
+    my $value_ref = $recce->value($self);
 
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse',
