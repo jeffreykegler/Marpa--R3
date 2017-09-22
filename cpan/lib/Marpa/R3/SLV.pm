@@ -249,7 +249,7 @@ sub Marpa::R3::Scanless::V::value {
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
 
         my $semantics_arg0 = $per_parse_arg // {};
         my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
@@ -376,7 +376,7 @@ sub Marpa::R3::Scanless::V::value {
             handlers  => \%value_handlers
         },
         <<'END_OF_LUA');
-        local slr = ...
+        local slv = ...
         return slv:value()
 END_OF_LUA
 

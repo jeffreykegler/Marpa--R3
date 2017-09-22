@@ -4439,7 +4439,7 @@ the valuator's Lua-level settings.
                     goto NEXT_STEP
                 end
                 if step_type == 'MARPA_STEP_TRACE' then
-                    local msg = slr:trace_valuer_step()
+                    local msg = slv:trace_valuer_step()
                     if msg then coroutine.yield('trace', msg) end
                     goto NEXT_STEP
                 end
@@ -4561,7 +4561,7 @@ or at least the subject of refactoring.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slv.end_of_parse(slv)
+    function _M.class_slv.g1_pos(slv)
         return slv.end_of_parse
     end
 

@@ -366,13 +366,13 @@ END_OF_TEXT
 
 for my $i ( 0 .. $input_length ) {
 
-    $recce->series_restart( { end => $i } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce, end => $i } );
     my $expected = $expected[$i];
 
 # Marpa::R3::Display
 # name: Scanless ambiguity_metric() synopsis
 
-    my $ambiguity_metric = $recce->ambiguity_metric();
+    my $ambiguity_metric = $valuer->ambiguity_metric();
 
 # Marpa::R3::Display::End
 
@@ -412,7 +412,7 @@ And-node #10: R8:2@2-3C9@2
 And-node #9: R9:1@2-3S6@2
 END_OF_TEXT
 
-            Marpa::R3::Test::is( $recce->and_nodes_show(),
+            Marpa::R3::Test::is( $valuer->and_nodes_show(),
                 $and_node_output, 'XS And nodes' );
 
             my $or_node_output = <<'END_OF_TEXT';
@@ -439,7 +439,7 @@ R8:2@2-3
 R9:1@2-3
 END_OF_TEXT
 
-            Marpa::R3::Test::is( $recce->or_nodes_show(),
+            Marpa::R3::Test::is( $valuer->or_nodes_show(),
                 $or_node_output, 'XS Or nodes' );
 
                 my $bocage_output = <<'END_OF_TEXT';
@@ -469,13 +469,13 @@ END_OF_TEXT
 23: 20=R3:2@1-3 R3:1@1-2 R8:2@2-3
 END_OF_TEXT
 
-                Marpa::R3::Test::is( $recce->bocage_show(), $bocage_output,
+                Marpa::R3::Test::is( $valuer->bocage_show(), $bocage_output,
                     'XS Bocage' );
 
         } ## end TESTS_FOLDED_FROM_bocage_t
     }
 
-    while ( my $value_ref = $recce->old_value() ) {
+    while ( my $value_ref = $valuer->value() ) {
 
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         $value //= '[undef]';
@@ -487,7 +487,7 @@ END_OF_TEXT
             Test::More::fail(qq{Unexpected result for length=$i, "$value"});
         }
 
-    } ## end while ( my $value_ref = $recce->old_value() )
+    }
 
     for my $value ( keys %{$expected} ) {
         Test::More::fail(qq{Missing result for length=$i, "$value"});
@@ -496,7 +496,6 @@ END_OF_TEXT
     my $ambiguity_desc = 'No ambiguity';
     if ( $ambiguity_metric > 1 ) {
 
-        $recce->series_restart( { end => $i } );
         my $asf = Marpa::R3::ASF->new( { slr => $recce, end => $i } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);

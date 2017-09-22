@@ -50,7 +50,6 @@ sub ah_extended {
     for my $loc ( 1 .. $n ) {
         my $parse_number = 0;
 
-        $recce->series_restart( { end => $loc } );
         my $asf = Marpa::R3::ASF->new( { slr => $recce , factoring_max => 1000, end => $loc } );
         $parse_counts[$loc] = $asf->traverse(
             {},
