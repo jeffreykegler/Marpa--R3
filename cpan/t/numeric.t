@@ -71,31 +71,25 @@ for my $maximal ( 0, 1 ) {
     my $input        = 'a' x $input_length;
     $recce->read( \$input );
 
+# Marpa::R3::Display
+# name: SLIF recognizer set() synopsis
+
+    $recce->set( { max_parses => 42 } );
+
+# Marpa::R3::Display::End
+
     for my $i ( 0 .. $input_length ) {
         my $expected = $maximal ? \@maximal : \@minimal;
         my $name     = $maximal ? 'maximal' : 'minimal';
 
-# Marpa::R3::Display
-# name: SLIF recognizer series_restart() synopsis
-
-        $recce->series_restart( { end => $i } );
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: SLIF recognizer set() synopsis
-
-        $recce->set( { max_parses => 42 } );
-
-# Marpa::R3::Display::End
-
-        my $result = $recce->old_value();
+        my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce, end => $i } );
+        my $result = $valuer->value();
         die "No parse" if not defined $result;
         Test::More::is( ${$result}, $expected->[$i],
             "$name parse, length=$i" );
-
     } ## end for my $i ( 0 .. $input_length )
-} ## end for my $maximal ( 0, 1 )
+
+}
 
 1;    # In case used as "do" file
 
