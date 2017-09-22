@@ -4362,7 +4362,7 @@ the valuator's Lua-level settings.
                 )
             end
 
-            slr.phase = 'value'
+            if slv.is_r_internal then slr.phase = 'value' end
             local furthest_earleme = g1r:furthest_earleme()
             local last_completed_earleme = g1r:current_earleme()
             if furthest_earleme ~= last_completed_earleme then

@@ -58,9 +58,9 @@ my @parse_counts = (1);
 for my $loc ( 1 .. $n ) {
     my $parse_number = 0;
 
-    $recce->series_restart();
     $recce->resume( undef, 1 );
-    die "No parse" if not my $value_ref = $recce->old_value();
+    my $valuer   = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    die "No parse" if not my $value_ref = $valuer->value();
     local $Data::Dumper::Deepcopy = 1;
     # say STDERR Data::Dumper::Dumper($value_ref);
     my $actual = ${$value_ref};

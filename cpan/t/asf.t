@@ -76,7 +76,6 @@ Test::More::ok( ( $r->ambiguity_metric() > 1 ), 'ambiguity_metric()');
 }
 
 {
-    $r->series_restart();
     my $asf = Marpa::R3::ASF->new( { slr => $r } );
     my $full_result = $asf->traverse( {}, \&full_traverser );
     my $actual = join "\n", @{$full_result}, q{};
