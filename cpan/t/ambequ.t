@@ -358,7 +358,7 @@ while ( defined( my $value = $valuer->value() ) ) {
         Test::More::fail("Unexpected Value $i: $value");
     }
     $i++;
-} ## end while ( defined( my $value = $recce->old_value() ) )
+}
 
 1;    # In case used as "do" file
 

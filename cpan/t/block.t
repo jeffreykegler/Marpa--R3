@@ -83,7 +83,7 @@ sub do_test {
     for my $block (@{$input}) {
         $recce->read(\$block);
     }
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         die "No parse was found, after reading the entire input\n";
     }

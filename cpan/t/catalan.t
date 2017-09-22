@@ -56,7 +56,8 @@ sub do_pairings {
 
     $recce->read( \( 'a' x $n ) );
 
-    while ( my $value_ref = $recce->old_value() ) {
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    while ( my $value_ref = $valuer->value() ) {
         $parse_count++;
     }
     return $parse_count;

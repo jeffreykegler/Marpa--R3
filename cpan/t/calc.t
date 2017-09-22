@@ -240,7 +240,7 @@ sub do_test {
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
     $recce->read(\$input);
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         die "No parse was found, after reading the entire input\n";
     }

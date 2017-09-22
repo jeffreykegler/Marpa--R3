@@ -79,7 +79,7 @@ sub my_parser {
 
     $recce->read($p_input_string);
 
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         die "No parse was found, after reading the entire input\n";
     }
