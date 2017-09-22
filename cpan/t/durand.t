@@ -78,7 +78,8 @@ for my $input_token (qw(2 * 1 + 3 * 4 + 5)) {
 } ## end for my $input_token (qw(2 * 1 + 3 * 4 + 5))
 
 my @values = ();
-while ( my $value_ref = $recce->old_value() ) {
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+while ( my $value_ref = $valuer->value() ) {
     push @values, ${$value_ref};
 }
 

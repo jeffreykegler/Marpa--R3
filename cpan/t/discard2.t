@@ -54,7 +54,7 @@ for my $input ( q{}, ' ', '  ', '   ' ) {
     Test::More::is( $actual_events, $expected_events,
         "Test of $length discarded spaces" );
 
-    my $value_ref = $recce->old_value();
+    my $value_ref = $recce->value();
     die "No parse was found\n" if not defined $value_ref;
 
     my $result = ${$value_ref};

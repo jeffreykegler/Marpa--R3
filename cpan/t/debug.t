@@ -122,7 +122,7 @@ END_OF_TEXT
 # Marpa::R3::Display
 # name: SLIF debug example dump of value
 
-my $value_ref = $recce->old_value();
+my $value_ref = $recce->value();
 my $expected_output = \bless( [
                  bless( [
                           bless( [
@@ -447,7 +447,8 @@ $recce = Marpa::R3::Scanless::R->new(
     { grammar => $grammar } );
 
 die if not defined $recce->read( \$test_input );
-$value_ref = $recce->old_value();
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+$value_ref = $valuer->value();
 my $expected_value_after_fix = \bless(
     [
         bless(

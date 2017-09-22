@@ -46,7 +46,7 @@ $recce->read( \('T' x 20) );
 
 $progress_report = $recce->progress_show();
 
-my $value_ref = $recce->old_value;
+my $value_ref = $recce->value;
 Test::More::ok( $value_ref, 'Parse ok?' );
 
 Marpa::R3::Test::is( $progress_report,

@@ -86,7 +86,7 @@ END_OF_SOURCE
             $test_name .= ' r' . $recce_setting   if $recce_setting;
             Test::More::is( $actual_events, $expected_events, $test_name );
 
-            my $value_ref = $recce->old_value();
+            my $value_ref = $recce->value();
             die "No parse was found\n" if not defined $value_ref;
 
             my $result = ${$value_ref};
@@ -149,7 +149,7 @@ END_OF_SOURCE
             $test_name .= ' r' . $recce_setting   if $recce_setting;
             Test::More::is( $actual_events, $expected_events, $test_name );
 
-            my $value_ref = $recce->old_value();
+            my $value_ref = $recce->value();
             die "No parse was found\n" if not defined $value_ref;
 
             my $result = ${$value_ref};
@@ -251,7 +251,7 @@ END_OF_SOURCE
                     Test::More::is( $actual_events, $expected_events,
                         $test_name );
 
-                    my $value_ref = $recce->old_value();
+                    my $value_ref = $recce->value();
                     die "No parse was found\n" if not defined $value_ref;
 
                     my $result = ${$value_ref};

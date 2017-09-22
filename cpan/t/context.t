@@ -116,7 +116,7 @@ sub do_parse {
     );
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $recce->read( \'abcd' );
-    return $recce->old_value();
+    return $recce->value();
 } ## end sub do_parse
 
 my $value_ref;

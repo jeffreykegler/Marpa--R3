@@ -97,7 +97,7 @@ TOKEN: for my $token_and_value (@tokens) {
 
 $progress_report = $recce->progress_show( 0, -1 );
 
-my $value_ref = $recce->old_value;
+my $value_ref = $recce->value;
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
 
 Test::More::is( $value, 42, 'value' );

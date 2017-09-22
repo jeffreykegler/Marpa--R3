@@ -116,7 +116,8 @@ sub calculate {
         chomp $eval_error;
         die $self->show_last_expression(), "\n", $eval_error, "\n";
     } ## end if ( not defined eval { $event_count = $recce->read...})
-    my $value_ref = $recce->old_value( $self );
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $value_ref = $valuer->value( $self );
     if ( not defined $value_ref ) {
         die $self->show_last_expression(), "\n",
             "No parse was found, after reading the entire input\n";
