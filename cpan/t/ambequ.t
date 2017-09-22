@@ -347,7 +347,8 @@ my %expected_value = (
 $recce->set( { max_parses => 10, } );
 
 my $i = 0;
-while ( defined( my $value = $recce->old_value() ) ) {
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+while ( defined( my $value = $valuer->value() ) ) {
     my $value = ${$value};
     if ( defined $expected_value{$value} ) {
         delete $expected_value{$value};

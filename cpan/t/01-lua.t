@@ -216,7 +216,7 @@ for my $test_data (@tests) {
 
 my $input = '42 * 1 + 7';
 $recce->read( \$input );
-my $value_ref = $recce->old_value();
+my $value_ref = $recce->value();
 Marpa::R3::Test::is( ${$value_ref}, 49, 'Synopsis value test' );
 
 sub do_add       { return $_[1]->[0] + $_[1]->[2] }

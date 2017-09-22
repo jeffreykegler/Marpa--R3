@@ -138,160 +138,6 @@ qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n};
 
 }
 
-our $CONTEXT_EXCEPTION_CLASS = __PACKAGE__ . '::Context_Exception';
-
-sub Marpa::R3::Context::bail {   ## no critic (Subroutines::RequireArgUnpacking)
-    if ( scalar @_ == 1 and ref $_[0] ) {
-        die bless { exception_object => $_[0] }, $CONTEXT_EXCEPTION_CLASS;
-    }
-    my $error_string = join q{}, @_;
-    my ( $package, $filename, $line ) = caller;
-    chomp $error_string;
-    die bless { message => qq{User bailed at line $line in file "$filename"\n}
-          . $error_string
-          . "\n" }, $CONTEXT_EXCEPTION_CLASS;
-} ## end sub Marpa::R3::Context::bail
-## use critic
-
-sub Marpa::R3::Context::g1_range {
-    my $slv = $Marpa::R3::Context::slv;
-    my ( $start, $end ) =
-      $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-local slv = ...
-return slv.this_step.start_es_id, slv.this_step.es_id
-END_OF_LUA
-    return $start, $end;
-} ## end sub Marpa::R3::Context::g1_range
-
-sub Marpa::R3::Context::lc_range {
-    my $slv = $Marpa::R3::Context::slv;
-    my ( $lc_range ) =
-      $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-local slv = ...
-local slr = slv.slr
-local g1_first = slv.this_step.start_es_id
-local g1_last = slv.this_step.es_id - 1
-local l0_first_b, l0_first_p = slr:g1_pos_to_l0_first(g1_first)
-local l0_last_b, l0_last_p = slr:g1_pos_to_l0_last(g1_last)
-return slr:lc_range_brief(l0_first_b, l0_first_p, l0_last_b, l0_last_p)
-END_OF_LUA
-    return $lc_range;
-}
-
-sub Marpa::R3::Context::g1_span {
-    my $slv = $Marpa::R3::Context::slv;
-    my ( $start, $length ) =
-      $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
-local slv = ...
-local start = slv.this_step.start_es_id + 0
-local length = (start - slv.this_step.es_id) + 1
-return start, length
-END_OF_LUA
-    return $start, $length;
-}
-
-sub code_problems {
-    my $args = shift;
-
-    my $grammar;
-    my $fatal_error;
-    my $warnings = [];
-    my $where    = '?where?';
-    my $long_where;
-    my @msg = ();
-    my $eval_value;
-    my $eval_given = 0;
-
-    push @msg, q{=} x 60, "\n";
-  ARG: for my $arg ( keys %{$args} ) {
-        my $value = $args->{$arg};
-        if ( $arg eq 'fatal_error' ) { $fatal_error = $value; next ARG }
-        if ( $arg eq 'grammar' )     { $grammar     = $value; next ARG }
-        if ( $arg eq 'where' )       { $where       = $value; next ARG }
-        if ( $arg eq 'long_where' )  { $long_where  = $value; next ARG }
-        if ( $arg eq 'warnings' )    { $warnings    = $value; next ARG }
-        if ( $arg eq 'eval_ok' ) {
-            $eval_value = $value;
-            $eval_given = 1;
-            next ARG;
-        }
-        push @msg, "Unknown argument to code_problems: $arg";
-    } ## end ARG: for my $arg ( keys %{$args} )
-
-  GIVEN_FATAL_ERROR_REF_TYPE: {
-        my $fatal_error_ref_type = ref $fatal_error;
-        last GIVEN_FATAL_ERROR_REF_TYPE if not $fatal_error_ref_type;
-        if ( $fatal_error_ref_type eq $CONTEXT_EXCEPTION_CLASS ) {
-            my $exception_object = $fatal_error->{exception_object};
-            die $exception_object if defined $exception_object;
-            my $exception_message = $fatal_error->{message};
-            die $exception_message if defined $exception_message;
-            die "Internal error: bad $CONTEXT_EXCEPTION_CLASS object";
-        } ## end if ( $fatal_error_ref_type eq $CONTEXT_EXCEPTION_CLASS)
-        $fatal_error =
-            "Exception thrown as object inside Marpa closure\n"
-          . ( q{ } x 4 )
-          . "This is not allowed\n"
-          . ( q{ } x 4 )
-          . qq{Exception as string is "$fatal_error"};
-    } ## end GIVEN_FATAL_ERROR_REF_TYPE:
-
-    my @problem_line     = ();
-    my $max_problem_line = -1;
-    for my $warning_data ( @{$warnings} ) {
-        my ( $warning, $package, $filename, $problem_line ) = @{$warning_data};
-        $problem_line[$problem_line] = 1;
-        $max_problem_line = List::Util::max $problem_line, $max_problem_line;
-    } ## end for my $warning_data ( @{$warnings} )
-
-    $long_where //= $where;
-
-    my $warnings_count = scalar @{$warnings};
-    {
-        my @problems;
-        my $false_eval = $eval_given && !$eval_value && !$fatal_error;
-        if ($false_eval) {
-            push @problems, '* THE MARPA SEMANTICS RETURNED A PERL FALSE',
-              'Marpa::R3 requires its semantics to return a true value';
-        }
-        if ($fatal_error) {
-            push @problems, '* THE MARPA SEMANTICS PRODUCED A FATAL ERROR';
-        }
-        if ($warnings_count) {
-            push @problems,
-              "* THERE WERE $warnings_count WARNING(S) IN THE MARPA SEMANTICS:",
-              'Marpa treats warnings as fatal errors';
-        }
-        if ( not scalar @problems ) {
-            push @msg, '* THERE WAS A FATAL PROBLEM IN THE MARPA SEMANTICS';
-        }
-        push @msg, ( join "\n", @problems ) . "\n";
-    }
-
-    push @msg, "* THIS IS WHAT MARPA WAS DOING WHEN THE PROBLEM OCCURRED:\n"
-      . $long_where . "\n";
-
-    for my $warning_ix ( 0 .. ( $warnings_count - 1 ) ) {
-        push @msg, "* WARNING MESSAGE NUMBER $warning_ix:\n";
-        my $warning_message = $warnings->[$warning_ix]->[0];
-        $warning_message =~ s/\n*\z/\n/xms;
-        push @msg, $warning_message;
-    } ## end for my $warning_ix ( 0 .. ( $warnings_count - 1 ) )
-
-    if ($fatal_error) {
-        push @msg, "* THIS WAS THE FATAL ERROR MESSAGE:\n";
-        my $fatal_error_message = $fatal_error;
-        $fatal_error_message =~ s/\n*\z/\n/xms;
-        push @msg, $fatal_error_message;
-    } ## end if ($fatal_error)
-
-    Marpa::R3::exception(@msg);
-
-    # this is to keep perlcritic happy
-    return 1;
-
-} ## end sub code_problems
-
 # Dump semantics for diagnostics
 sub Marpa::R3::Scanless::R::show_semantics {
     my ( $slg, @ops ) = @_;
@@ -1391,6 +1237,22 @@ END_OF_LUA
 
 }
 
+sub Marpa::R3::Scanless::R::value {
+    my ( $slr, $per_parse_arg ) = @_;
+    my $slv = Marpa::R3::Scanless::V->new( { recce => $slr } );
+    my $ambiguity_level = $slv->ambiguity_level();
+    return if $ambiguity_level == 0;
+    if ( $ambiguity_level != 1 ) {
+        my $ambiguous_status = $slv->ambiguous();
+        Marpa::R3::exception( "Parse of the input is ambiguous\n",
+            $ambiguous_status );
+    }
+    my $value_ref = $slv->value($per_parse_arg);
+    Marpa::R3::exception("$slr->value(): No parse\n")
+      if not $value_ref;
+    return $value_ref;
+}
+
 # TODO delete after development
 # Returns false if no parse
 sub Marpa::R3::Scanless::R::old_value {
@@ -1465,7 +1327,7 @@ sub Marpa::R3::Scanless::R::old_value {
             } ## end DO_EVAL:
             if ( not $eval_ok or @warnings ) {
                 my $fatal_error = $EVAL_ERROR;
-                code_problems(
+                Marpa::R3::Internal::Scanless::V::code_problems(
                     {
                         fatal_error => $fatal_error,
                         eval_ok     => $eval_ok,
@@ -1498,7 +1360,7 @@ sub Marpa::R3::Scanless::R::old_value {
                 };
                 if ( not $eval_ok or @warnings ) {
                     my $fatal_error = $EVAL_ERROR;
-                    code_problems(
+                    Marpa::R3::Internal::Scanless::V::code_problems(
                         {
                             fatal_error => $fatal_error,
                             eval_ok     => $eval_ok,
