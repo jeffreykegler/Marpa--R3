@@ -422,20 +422,6 @@ sub Marpa::R3::ASF::new {
     Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
     $asf->[Marpa::R3::Internal::ASF::SLV] = $slv;
 
-     $slv->call_by_tag( ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '');
-    local slv = ...
-    if slv.tree_mode then
-        error(
-            "An attempt was made to create an ASF for a SLIF recognizer already in use\n"
-            .. "   The recognizer must be reset first\n"
-            .. string.format('  The current SLIF recognizer mode is $q\n',
-                slv.tree_mode)
-        )
-    end
-    slv.tree_mode = 'forest'
-END_OF_LUA
-
     (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
         $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]
     ) = Marpa::R3::Internal::Value::resolve_grammar( $slg );

@@ -4221,7 +4221,6 @@ This is a registry object.
     class_slv_fields.slr = true
     class_slv_fields.regix = true
     class_slv_fields.is_r_internal = true
-    class_slv_fields.tree_mode = true
     class_slv_fields.this_step = true
     class_slv_fields.lmw_b = true
     class_slv_fields.lmw_o = true
@@ -4354,14 +4353,6 @@ the valuator's Lua-level settings.
         _M.wrap(function ()
             local g1r = slr.g1
 
-            slv.tree_mode = slv.tree_mode or 'tree'
-            if slv.tree_mode ~= 'tree' then
-                error(
-                    "value() called when recognizer is not in tree mode\n"
-                    .. string.format('  The current mode is %q\n', slv.tree_mode)
-                )
-            end
-
             if slv.is_r_internal then slr.phase = 'value' end
             local furthest_earleme = g1r:furthest_earleme()
             local last_completed_earleme = g1r:current_earleme()
@@ -4450,24 +4441,6 @@ the valuator's Lua-level settings.
             local retour = slv:stack_get(1)
             return 'ok', 'ok', retour
         end)
-    end
-```
-
-A function to be called whenever a valuator is reset.
-It should free all memory associated with the valuation.
-
-TODO: Refactoring may eliminate the need for this.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slv.valuation_reset(slv)
-        slv.trace_values = 0;
-        slv.lmw_b = nil
-        slv.lmw_o = nil
-        slv.lmw_t = nil
-        slv.lmw_v = nil
-        slv.tree_mode = nil
-        slv.end_of_parse = nil
     end
 ```
 

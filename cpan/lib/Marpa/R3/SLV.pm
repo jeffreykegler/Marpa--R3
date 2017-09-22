@@ -201,7 +201,6 @@ sub Marpa::R3::Scanless::V::DESTROY {
     local slr = slv.slr
     -- TODO test unnecessary once slr-internal slv is eliminated
     if not slv.is_r_internal then
-        slv:valuation_reset()
         local regix = slv.regix
         _M.unregister(_M.registry, regix)
     end
@@ -698,42 +697,6 @@ sub Marpa::R3::Scanless::V::regix {
     my ( $slv ) = @_;
     my $regix = $slv->[Marpa::R3::Internal::Scanless::V::REGIX];
     return $regix;
-}
-
-# TODO delete after development
-sub Marpa::R3::Scanless::V::series_restart {
-    my ( $slv , @args ) = @_;
-    my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
-    Marpa::R3::exception( sprintf $error_message, '$slv->series_restart()' ) if not $flat_args;
-
-    $flat_args = slv_common_set($slv, $flat_args);
-    my $trace_file_handle =
-      $slv->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    $slv->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 's',
-            args      => [ $flat_args ],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                }
-            }
-        },
-        <<'END_OF_LUA');
-        local slv, flat_args = ...
-        local slr = slv.slr
-        return _M.wrap(function ()
-                if slv.is_r_internal then slr.phase = "read" end
-                slv:valuation_reset()
-                slv:common_set(flat_args, {'end'})
-            end
-        )
-END_OF_LUA
-    return 1;
 }
 
 1;

@@ -474,13 +474,6 @@ sub Marpa::R3::Scanless::G::parse {
     return $value_ref;
 } ## end sub Marpa::R3::Scanless::G::parse
 
-sub Marpa::R3::Scanless::R::series_restart {
-    my ( $slr, @args ) = @_;
-    my $slv    = Marpa::R3::Scanless::V->link({recce => $slr});
-    Marpa::R3::exception("No parse series to restart") if not $slv;
-    return $slv->series_restart( @args );
-}
-
 # Brief description of block/line/column for
 # an L0 range
 sub lc_brief {
