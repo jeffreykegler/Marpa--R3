@@ -66,12 +66,12 @@ my $length_read = $recce->read( \$input );
 die "Read ended after $length_read of ", length $input, " characters"
     if $length_read != length $input;
 
-if ( my $ambiguous_status = $recce->ambiguous() ) {
+my $valuer = Marpa::R3::Scanless::V->new({ recce => $recce });
+if ( my $ambiguous_status = $valuer->ambiguous() ) {
     chomp $ambiguous_status;
     die "Parse is ambiguous\n", $ambiguous_status;
 }
 
-my $valuer = Marpa::R3::Scanless::V->new({ recce => $recce });
 my $value_ref = $valuer->value();
 my $value = ${$value_ref};
 
