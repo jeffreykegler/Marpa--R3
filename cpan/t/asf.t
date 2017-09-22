@@ -73,7 +73,7 @@ Ambiguous symch at Glade=2, Symbol=<Expr>:
   Symch 1 is a rule: Expr ::= Expr '-' Expr
 EOS
 Marpa::R3::Test::is($ambiguous_status, $expected, 'ambiguous_status()');
-Test::More::ok( ( $valuer->is_ambiguous() > 1 ), 'is_ambiguous()');
+Test::More::ok( ( $valuer->ambiguity_level() > 1 ), 'ambiguity_level()');
 }
 
 {

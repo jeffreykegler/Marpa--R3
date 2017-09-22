@@ -76,7 +76,7 @@ PROCESSING: {
 # name: ASF ambiguity reporting
 
     my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
-    if ( $valuer->is_ambiguous() > 1 ) {
+    if ( $valuer->ambiguity_level() > 1 ) {
         my $asf = Marpa::R3::ASF->new( { slr => $recce } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
@@ -133,7 +133,7 @@ else {
 
 } ## end else [ if ( !$is_ambiguous_parse ) ]
 
-# Tests of is_ambiguous() anb ambiguous() across all ranking methods
+# Tests of ambiguity_level() anb ambiguous() across all ranking methods
 $source = \(<<'END_OF_SOURCE');
 
 top ::= unchoice rank => 1
@@ -176,14 +176,14 @@ for my $ranking_method ( 'none', 'rule', 'high_rule_only' ) {
         Test::More::is( $valuer->ambiguous(), '',
             "$ranking_method ranking, single parse, ambiguous status is empty"
         );
-        Test::More::is( $valuer->is_ambiguous(),
+        Test::More::is( $valuer->ambiguity_level(),
             1, "$ranking_method ranking, single parse, ambiguity level is 1" );
     }
     else {
         Test::More::isnt( $valuer->ambiguous(), '',
             "$ranking_method ranking, many parses, ambiguous status isn't empty"
         );
-        Test::More::ok( $valuer->is_ambiguous() > 1,
+        Test::More::ok( $valuer->ambiguity_level() > 1,
             "$ranking_method ranking, many parses, ambiguity level > 1" );
     }
 } ## end for my $ranking_method ...

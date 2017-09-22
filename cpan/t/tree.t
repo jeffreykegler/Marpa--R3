@@ -216,7 +216,7 @@ for my $i ( 0 .. $input_length ) {
     my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce, end => $i } );
     my $expected = $expected[$i];
 
-    my $ambiguity_level = $valuer->is_ambiguous();
+    my $ambiguity_level = $valuer->ambiguity_level();
 
     my $expected_level = ( scalar keys %{$expected} > 1 ? 2 : 1 );
     Test::More::is( $ambiguity_level, $expected_level,

@@ -370,14 +370,14 @@ for my $i ( 0 .. $input_length ) {
     my $expected = $expected[$i];
 
 # Marpa::R3::Display
-# name: Scanless is_ambiguous() synopsis
+# name: Scanless ambiguity_level() synopsis
 
-    my $is_ambiguous = $valuer->is_ambiguous();
+    my $ambiguity_level = $valuer->ambiguity_level();
 
 # Marpa::R3::Display::End
 
     my $expected_metric = ( scalar keys %{$expected} > 1 ? 2 : 1 );
-    Test::More::is( $is_ambiguous, $expected_metric,
+    Test::More::is( $ambiguity_level, $expected_metric,
         "Ambiguity check for length $i" );
 
     if ( $i == 3 ) {
@@ -492,7 +492,7 @@ END_OF_TEXT
     }
 
     my $ambiguity_desc = 'No ambiguity';
-    if ( $is_ambiguous > 1 ) {
+    if ( $ambiguity_level > 1 ) {
 
         my $asf = Marpa::R3::ASF->new( { slr => $recce, end => $i } );
         die 'No ASF' if not defined $asf;

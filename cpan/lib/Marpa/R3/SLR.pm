@@ -462,8 +462,8 @@ sub Marpa::R3::Scanless::G::parse {
             "  The $slr->parse() method does not allow parses to trigger events";
     } ## end if ( $length_read != length $input_length )
     my $slv = Marpa::R3::Scanless::V->new( { recce => $slr });
-    my $is_ambiguous = $slv->is_ambiguous();
-    if ( $is_ambiguous != 1 ) {
+    my $ambiguity_level = $slv->ambiguity_level();
+    if ( $ambiguity_level != 1 ) {
         my $ambiguous_status = $slv->ambiguous();
         Marpa::R3::exception( "Parse of the input is ambiguous\n",
             $ambiguous_status );

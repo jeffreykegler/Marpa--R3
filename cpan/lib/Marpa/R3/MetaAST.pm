@@ -34,7 +34,7 @@ sub new {
       or Marpa::R3::exception( "Parse of BNF/Scanless source failed\n",
         $EVAL_ERROR );
     $valuer = Marpa::R3::Scanless::V->new( { recce => $meta_recce } );
-    my $ambiguity_level = $valuer->is_ambiguous();
+    my $ambiguity_level = $valuer->ambiguity_level();
     if ( $ambiguity_level != 1 ) {
         my $ambiguity_status = $valuer->ambiguous();
         Marpa::R3::exception( "Parse of BNF/Scanless source failed:\n",

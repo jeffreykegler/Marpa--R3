@@ -1406,12 +1406,12 @@ Currently, all failures are thrown.
 
 =head1 Accessors
 
-=head2 is_ambiguous()
+=head2 ambiguity_level()
 
 =for Marpa::R3::Display
-name: Scanless is_ambiguous() synopsis
+name: Scanless ambiguity_level() synopsis
 
-    my $is_ambiguous = $recce->is_ambiguous();
+    my $ambiguity_level = $valuer->ambiguity_level();
 
     TODO: Move this to Scanless::V pod
 

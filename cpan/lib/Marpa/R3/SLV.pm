@@ -654,9 +654,9 @@ END_OF_LUA
 sub Marpa::R3::Scanless::V::ambiguous {
     my ($slv) = @_;
     my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
-    my $is_ambiguous = $slv->is_ambiguous();
-    return q{No parse} if $is_ambiguous <= 0;
-    return q{} if $is_ambiguous == 1;
+    my $ambiguity_level = $slv->ambiguity_level();
+    return q{No parse} if $ambiguity_level <= 0;
+    return q{} if $ambiguity_level == 1;
     # TODO ASF must be created for end location of SLV,
     #   not of SLR!
     my $asf = Marpa::R3::ASF->new( { slr => $slr, end => $slv->g1_pos() } );
@@ -666,7 +666,7 @@ sub Marpa::R3::Scanless::V::ambiguous {
     return Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
 } ## end sub Marpa::R3::Scanless::R::ambiguous
 
-sub Marpa::R3::Scanless::V::is_ambiguous {
+sub Marpa::R3::Scanless::V::ambiguity_level {
     my ($slv) = @_;
 
     my ($metric) = $slv->call_by_tag(
@@ -675,9 +675,9 @@ sub Marpa::R3::Scanless::V::is_ambiguous {
     local slv = ...
     local order = slv:ordering_get()
     if not order then return 0 end
-    local is_ambiguous = order:ambiguity_metric()
-    if is_ambiguous >= 2 then return 2 end
-    return is_ambiguous
+    local ambiguity_level = order:ambiguity_metric()
+    if ambiguity_level >= 2 then return 2 end
+    return ambiguity_level
 END__OF_LUA
 
     return $metric;
