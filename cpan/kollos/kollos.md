@@ -1741,7 +1741,6 @@ This is a registry object.
     class_slr_fields.end_of_lexeme = true
     class_slr_fields.event_queue = true
     class_slr_fields.g1 = true
-    class_slr_fields.has_parse = true
     class_slr_fields.inputs = true
     class_slr_fields.is_external_scanning = true
     class_slr_fields.l0 = true
@@ -4439,41 +4438,33 @@ or at least the subject of refactoring.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.ordering_get(slv)
         local slr = slv.slr
-
         local slg = slr.slg
-        local ranking_method = slg.ranking_method
-        if slr.has_parse == false then return slr.has_parse end
-        local lmw_o = slv.lmw_o
-        if lmw_o then
-            slr.has_parse = true
-            return lmw_o
-        end
+        local g1r = slr.g1
         local end_of_parse = slv.end_of_parse
         if not end_of_parse or end_of_parse < 0 then
-            end_of_parse = slr.g1:latest_earley_set()
+            end_of_parse = g1r:latest_earley_set()
         end
         slv.end_of_parse = end_of_parse
         _M.throw = false
-        local bocage = _M.bocage_new(slr.g1, end_of_parse)
+        local bocage = _M.bocage_new(g1r, end_of_parse)
         _M.throw = true
         slv.lmw_b = bocage
         if not bocage then
-            slr.has_parse = false
             return
         end
 
-        lmw_o = _M.order_new(bocage)
+        local lmw_o = _M.order_new(bocage)
         slv.lmw_o = lmw_o
 
+        local ranking_method = slg.ranking_method
         if ranking_method == 'high_rule_only' then
-            slv.lmw_o:high_rank_only_set(1)
-            slv.lmw_o:rank()
+            lmw_o:high_rank_only_set(1)
+            lmw_o:rank()
         end
         if ranking_method == 'rule' then
-            slv.lmw_o:high_rank_only_set(0)
-            slv.lmw_o:rank()
+            lmw_o:high_rank_only_set(0)
+            lmw_o:rank()
         end
-        slr.has_parse = true
         return lmw_o
     end
 ```
