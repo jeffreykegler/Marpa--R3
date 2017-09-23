@@ -4249,22 +4249,29 @@ which is not kept in the registry.
             return slv
         end
 
+        local function no_parse(slv)
+            slv._ambiguity_level = 0
+            -- clearing the libmarpa objects is
+            -- not necessary, but may ease the burden on
+            -- memory
+            slv.lmw_b = nil
+            slv.lmw_o = nil
+            slv.lmw_t = nil
+            slv.lmw_v = nil
+            return slv_register(slv)
+        end
+
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
-        slv.regix = -1
         slv.trace_values = slr.trace_values or 0
         slv:common_set(flat_args, {'end'})
         local lmw_o = slv:ordering_get()
-        local ambiguity_level = 0
-        if lmw_o  then
-            ambiguity_level = lmw_o:ambiguity_metric()
-            if ambiguity_level >= 2 then
-                ambiguity_level = 2
-            end
-            slv.lmw_t = _M.tree_new(lmw_o)
-        end
+        if not lmw_o then return no_parse(slv) end
+        local ambiguity_level = lmw_o:ambiguity_metric()
+        if ambiguity_level > 2 then ambiguity_level = 2 end
         slv._ambiguity_level = ambiguity_level
+        slv.lmw_t = _M.tree_new(lmw_o)
         return slv_register(slv)
     end
 ```
