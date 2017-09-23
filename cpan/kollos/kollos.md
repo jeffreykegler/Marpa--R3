@@ -1768,9 +1768,6 @@ This is a registry object.
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
-    -- TODO delete after development
-    -- This temporary implementation leak valuers
-    class_slr_fields.slv = true
 ```
 
 *At end of input* field:
@@ -1925,14 +1922,6 @@ together.
         slr.token_is_literal = 2
         slr.token_values[slr.token_is_literal] = glue.sv.undef()
 
-        -- TODO: Eliminate this once "internal" valuator is factored
-        --   away.
-        local slv = slr:slv_new_i({})
-        if slv then
-            slr.slv = slv
-            slr:islv_register()
-        end
-
         return slr
     end
 ```
@@ -2080,8 +2069,6 @@ the recognizer's Lua-level settings.
                 coroutine.yield('trace', 'Setting trace_values option to ' .. value)
             end
             slr.trace_values = value
-            -- TODO hack -- delete after development
-            if slr.slv then slr.slv.trace_values = value end
         end
 
         -- too_many_earley_items named argument --
@@ -4220,7 +4207,6 @@ This is a registry object.
     -- miranda: section+ class_slv field declarations
     class_slv_fields.slr = true
     class_slv_fields.regix = true
-    class_slv_fields.is_r_internal = true
     class_slv_fields.this_step = true
     class_slv_fields.lmw_b = true
     class_slv_fields.lmw_o = true
@@ -4274,7 +4260,6 @@ which is not kept in the registry.
         regix = _M.register(_M.registry, slv)
         -- print("Registered slv as " .. regix)
         slv.regix = regix
-        slv.is_r_internal = true
         return regix
     end
     function _M.class_slr.slv_new(slr, flat_args)
@@ -4353,7 +4338,6 @@ the valuator's Lua-level settings.
         _M.wrap(function ()
             local g1r = slr.g1
 
-            if slv.is_r_internal then slr.phase = 'value' end
             local furthest_earleme = g1r:furthest_earleme()
             local last_completed_earleme = g1r:current_earleme()
             if furthest_earleme ~= last_completed_earleme then

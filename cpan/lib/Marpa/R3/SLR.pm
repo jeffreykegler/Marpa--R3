@@ -291,7 +291,6 @@ sub Marpa::R3::Scanless::R::DESTROY {
     local slr = ...
     local regix = slr.regix
     _M.unregister(_M.registry, regix)
-    _M.unregister(_M.registry, slr.slv.regix)
 END_OF_LUA
 }
 

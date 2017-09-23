@@ -282,12 +282,8 @@ sub Marpa::R3::Scanless::V::DESTROY {
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
     local slv = ...
-    local slr = slv.slr
-    -- TODO test unnecessary once slr-internal slv is eliminated
-    if not slv.is_r_internal then
-        local regix = slv.regix
-        _M.unregister(_M.registry, regix)
-    end
+    local regix = slv.regix
+    _M.unregister(_M.registry, regix)
 END_OF_LUA
 }
 
