@@ -4273,6 +4273,7 @@ which is not kept in the registry.
             if ambiguity_level >= 2 then
                 ambiguity_level = 2
             end
+            slv.lmw_t = _M.tree_new(lmw_o)
         end
         slv._ambiguity_level = ambiguity_level
         local regix = _M.register(_M.registry, slv)
@@ -4361,13 +4362,6 @@ the valuator's Lua-level settings.
                 ))
             end
             local lmw_t = slv.lmw_t
-            if not lmw_t then
-                -- No tree, therefore ordering is not initialized
-                local lmw_o = slv:ordering_get()
-                if not lmw_o then return 'ok', 'undef' end
-                lmw_t = _M.tree_new(lmw_o)
-                slv.lmw_t = lmw_t
-            end
             local lmw_o = slv.lmw_o
 
             local max_parses = slr.max_parses
