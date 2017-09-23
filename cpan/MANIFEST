@@ -217,6 +217,7 @@ pod/Scanless.pod
 pod/Scanless/DSL.pod
 pod/Scanless/G.pod
 pod/Scanless/R.pod
+pod/Scanless/V.pod
 pod/Semantics.pod
 pod/Semantics/Null.pod
 pod/Semantics/Order.pod
