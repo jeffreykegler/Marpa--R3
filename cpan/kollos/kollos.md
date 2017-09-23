@@ -4242,6 +4242,13 @@ which is not kept in the registry.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.slv_new(slr, flat_args)
+
+        local function slv_register(slv)
+            local regix = _M.register(_M.registry, slv)
+            slv.regix = regix
+            return slv
+        end
+
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
@@ -4258,9 +4265,7 @@ which is not kept in the registry.
             slv.lmw_t = _M.tree_new(lmw_o)
         end
         slv._ambiguity_level = ambiguity_level
-        local regix = _M.register(_M.registry, slv)
-        slv.regix = regix
-        return slv
+        return slv_register(slv)
     end
 ```
 
