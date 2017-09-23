@@ -188,7 +188,8 @@ $recce->read( \q{6-----1} );
 # This is for debugging, after all
 $recce->set( { max_parses => 20 } );
 
-while ( my $value_ref = $recce->old_value() ) {
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+while ( my $value_ref = $valuer->value() ) {
     my $value = $value_ref ? ${$value_ref} : 'No parse';
     if ( defined $expected{$value} ) {
         delete $expected{$value};
@@ -197,7 +198,7 @@ while ( my $value_ref = $recce->old_value() ) {
     else {
         Test::More::fail("Unexpected Value $value");
     }
-} ## end while ( my $value_ref = $recce->old_value() )
+}
 
 1;    # In case used as "do" file
 

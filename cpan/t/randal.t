@@ -126,7 +126,8 @@ TEST: for my $test_data (@test_data) {
     $recce->read( \$test_input );
 
     my @parses;
-    while ( defined( my $value_ref = $recce->old_value() ) ) {
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    while ( defined( my $value_ref = $valuer->value() ) ) {
         push @parses, ${$value_ref};
     }
     my $expected_parse_count = scalar @{$test_results};

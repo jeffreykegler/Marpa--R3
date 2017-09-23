@@ -69,12 +69,13 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $recce->read(\'tttt');
 
 my $i = 0;
-while ( my $result = $recce->old_value() ) {
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+while ( my $result = $valuer->value() ) {
     my $got      = ${$result};
     my $expected = reverse $counting_up[$i];
     Test::More::is( $got, $expected, "counting up $i" );
     $i++;
-} ## end while ( my $result = $recce->old_value() )
+}
 
 1;    # In case used as "do" file
 

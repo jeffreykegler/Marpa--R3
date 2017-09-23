@@ -89,7 +89,8 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \$sentence );
 
-while ( defined( my $value_ref = $recce->old_value() ) ) {
+my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+while ( defined( my $value_ref = $valuer->value() ) ) {
     my $value = $value_ref ? ${$value_ref}->bracket() : 'No parse';
     push @actual, $value;
 }
