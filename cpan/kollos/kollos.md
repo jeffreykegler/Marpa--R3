@@ -4263,10 +4263,36 @@ which is not kept in the registry.
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
+        local slg = slr.slg
+        local g1r = slr.g1
+
         slv.trace_values = slr.trace_values or 0
         slv:common_set(flat_args, {'end'})
-        local lmw_o = slv:ordering_get()
-        if not lmw_o then return no_parse(slv) end
+
+        local end_of_parse = slv.end_of_parse
+        if not end_of_parse or end_of_parse < 0 then
+            end_of_parse = g1r:latest_earley_set()
+        end
+        slv.end_of_parse = end_of_parse
+
+        _M.throw = false
+        local bocage = _M.bocage_new(g1r, end_of_parse)
+        _M.throw = true
+        slv.lmw_b = bocage
+        if not bocage then return no_parse(slv) end
+
+        local lmw_o = _M.order_new(bocage)
+        slv.lmw_o = lmw_o
+
+        local ranking_method = slg.ranking_method
+        if ranking_method == 'high_rule_only' then
+            lmw_o:high_rank_only_set(1)
+            lmw_o:rank()
+        end
+        if ranking_method == 'rule' then
+            lmw_o:high_rank_only_set(0)
+            lmw_o:rank()
+        end
         local ambiguity_level = lmw_o:ambiguity_metric()
         if ambiguity_level > 2 then ambiguity_level = 2 end
         slv._ambiguity_level = ambiguity_level
@@ -4423,49 +4449,6 @@ the valuator's Lua-level settings.
             local retour = slv:stack_get(1)
             return 'ok', 'ok', retour
         end)
-    end
-```
-
-Get the Libmarpa ordering object of `slv`,
-creating it if necessary.
-Returns the Libmarpa object if it could "get" one,
-`nil` otherwise
-
-TODO: The new SLV object may make this unnecessary,
-or at least the subject of refactoring.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slv.ordering_get(slv)
-        local slr = slv.slr
-        local slg = slr.slg
-        local g1r = slr.g1
-        local end_of_parse = slv.end_of_parse
-        if not end_of_parse or end_of_parse < 0 then
-            end_of_parse = g1r:latest_earley_set()
-        end
-        slv.end_of_parse = end_of_parse
-        _M.throw = false
-        local bocage = _M.bocage_new(g1r, end_of_parse)
-        _M.throw = true
-        slv.lmw_b = bocage
-        if not bocage then
-            return
-        end
-
-        local lmw_o = _M.order_new(bocage)
-        slv.lmw_o = lmw_o
-
-        local ranking_method = slg.ranking_method
-        if ranking_method == 'high_rule_only' then
-            lmw_o:high_rank_only_set(1)
-            lmw_o:rank()
-        end
-        if ranking_method == 'rule' then
-            lmw_o:high_rank_only_set(0)
-            lmw_o:rank()
-        end
-        return lmw_o
     end
 ```
 
