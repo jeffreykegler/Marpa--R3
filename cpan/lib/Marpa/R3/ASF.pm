@@ -447,7 +447,7 @@ sub Marpa::R3::ASF::new {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '>*' ) ;
     local slv = ...
-    local order = slv:ordering_get()
+    local order = slv.lmw_o
     if not order then
         error( 'Parse failed' )
     end

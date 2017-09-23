@@ -4264,6 +4264,7 @@ which is not kept in the registry.
     end
     function _M.class_slr.slv_new(slr, flat_args)
         local slv = slr:slv_new_i(flat_args)
+        slv:ordering_get()
         local regix = _M.register(_M.registry, slv)
         slv.regix = regix
         return slv
