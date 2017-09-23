@@ -4297,7 +4297,9 @@ which is not kept in the registry.
         if ambiguity_level > 2 then ambiguity_level = 2 end
         slv._ambiguity_level = ambiguity_level
         slv.lmw_t = _M.tree_new(lmw_o)
+
         return slv_register(slv)
+
     end
 ```
 
