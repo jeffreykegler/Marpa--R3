@@ -4214,6 +4214,8 @@ This is a registry object.
     class_slv_fields.lmw_v = true
     class_slv_fields.end_of_parse = true
     class_slv_fields.trace_values = true
+    -- underscore ("_") to prevent override of function of same name
+    class_slv_fields._ambiguity_level = true
 ```
 
 ```
@@ -4264,7 +4266,15 @@ which is not kept in the registry.
     end
     function _M.class_slr.slv_new(slr, flat_args)
         local slv = slr:slv_new_i(flat_args)
-        slv:ordering_get()
+        local lmw_o = slv:ordering_get()
+        local ambiguity_level = 0
+        if lmw_o  then
+            ambiguity_level = lmw_o:ambiguity_metric()
+            if ambiguity_level >= 2 then
+                ambiguity_level = 2
+            end
+        end
+        slv._ambiguity_level = ambiguity_level
         local regix = _M.register(_M.registry, slv)
         slv.regix = regix
         return slv
@@ -4525,6 +4535,10 @@ or at least the subject of refactoring.
 
 ```
 
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.ambiguity_level(slv)
+         return slv._ambiguity_level
+    end
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.trace_valuer_step ( slv )

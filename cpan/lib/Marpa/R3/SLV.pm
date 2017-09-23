@@ -747,13 +747,8 @@ sub Marpa::R3::Scanless::V::ambiguity_level {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END__OF_LUA', '>*' );
     local slv = ...
-    local order = slv.lmw_o
-    if not order then return 0 end
-    local ambiguity_level = order:ambiguity_metric()
-    if ambiguity_level >= 2 then return 2 end
-    return ambiguity_level
+    return slv:ambiguity_level()
 END__OF_LUA
-
     return $metric;
 }
 
