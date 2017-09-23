@@ -90,7 +90,7 @@ READ: while (1) {
     last READ if $pos >= length $input;
     $pos = $recce->resume();
 } ## end READ: while (1)
-my $value_ref = $recce->old_value();
+my $value_ref = $recce->value();
 my $value = $value_ref ? ${$value_ref} : 'No parse';
 Marpa::R3::Test::is( $value,         'aaa',           'Leo SLIF parse' );
 my $event_history = join "\n", @event_history, '';

@@ -132,7 +132,7 @@ my $expected_size = 10;
 Marpa::R3::Test::is( $max_size, $expected_size,
 "Earley set size, got $max_size, expected $expected_size" );
 
-my $value_ref = $recce->old_value();
+my $value_ref = $recce->value();
 my $value = $value_ref ? ${$value_ref} : 'No parse';
 Marpa::R3::Test::is( $value, 'a' x $length, 'Leo p166 parse' );
 

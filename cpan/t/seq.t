@@ -76,7 +76,7 @@ sub run_sequence_test {
         my $input     = join $separator, @input;
         $input .= $separator if $separation eq 'perl5' and $symbol_count > 0;
         $recce->read( \$input );
-        my $value_ref = $recce->old_value();
+        my $value_ref = $recce->value();
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         Test::More::is( $value, $expected, $test_name );
 

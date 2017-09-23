@@ -114,7 +114,7 @@ sub test {
 
 # Marpa::R3::Display::End
 
-    my $ref_value = $recce->old_value();
+    my $ref_value = $recce->value();
     return 'No parse' if not $ref_value;
     if ( ref $ref_value ne 'REF' ) {
         my $ref_type = ref $ref_value;

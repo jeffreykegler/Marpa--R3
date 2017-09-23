@@ -733,7 +733,8 @@ sub my_parser {
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $recce->read( \$string ); 1 ...})
-    my $value_ref = $recce->old_value();
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $value_ref = $valuer->value();
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse';
     }

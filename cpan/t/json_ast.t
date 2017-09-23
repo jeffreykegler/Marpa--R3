@@ -292,14 +292,13 @@ END_OF_SOURCE
 sub parse {
     my ( $parser, $string ) = @_;
 
-    my $re = Marpa::R3::Scanless::R->new(
-        {   grammar           => $parser->{grammar},
-        }
-    );
-    $re->read( \$string );
-    my $ast = ${ $re->old_value() };
-    return $parser->decode ( $ast );
-} ## end sub parse
+    my $recce =
+      Marpa::R3::Scanless::R->new( { grammar => $parser->{grammar}, } );
+    $recce->read( \$string );
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $ast = ${ $valuer->value() };
+    return $parser->decode($ast);
+}
 
 sub decode {
     my $parser = shift;

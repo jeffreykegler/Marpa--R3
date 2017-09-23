@@ -328,7 +328,7 @@ sub parse {
         $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
     } ## end for ( my $pos = $recce->read( \$string ); $pos < $length...)
     my $per_parse_arg = bless {}, 'MarpaX::JSON::Actions';
-    my $value_ref = $recce->old_value($per_parse_arg);
+    my $value_ref = $recce->value($per_parse_arg);
     return ${$value_ref};
 
 # Marpa::R3::Display::End

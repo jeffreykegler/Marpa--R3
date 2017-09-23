@@ -151,7 +151,7 @@ while ($current_position < $length) {
 
 my $actual_events .= join "\n", @actual_events, q{};
 
-my $value_ref = $slr->old_value();
+my $value_ref = $slr->value();
 if ( not defined $value_ref ) {
     die "No parse\n";
 }

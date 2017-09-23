@@ -195,7 +195,7 @@ sub do_test {
         last READ if $pos >= length $input;
         $pos = $slr->resume();
     } ## end READ: while (1)
-    my $value_ref = $slr->old_value();
+    my $value_ref = $slr->value();
     my $value = $value_ref ? ${$value_ref} : 'No parse';
     ( my $expected = $input ) =~ s/\s//gxms;
     Marpa::R3::Test::is( $value, $expected, "Leo SLIF parse of $expected" );

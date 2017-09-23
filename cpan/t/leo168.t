@@ -155,7 +155,7 @@ for my $a_length ( 1 .. 4 ) {
         );
         my $input = ('a' x $a_length) .  ('b' x $b_length);
         $recce->read( \$input );
-        my $value_ref = $recce->old_value();
+        my $value_ref = $recce->value();
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         Marpa::R3::Test::is( $value, $expected{$string}, "Parse of $string" );
 

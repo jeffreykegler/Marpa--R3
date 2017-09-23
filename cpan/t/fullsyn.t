@@ -75,7 +75,7 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 my $input = '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)';
 $recce->read(\$input);
-my $value_ref = $recce->old_value();
+my $value_ref = $recce->value();
 die "No parse was found\n" if not defined $value_ref;
 
 # Result will be something like "86.33... 126 125 16"

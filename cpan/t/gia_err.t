@@ -431,7 +431,7 @@ for my $test_data (@tests_data) {
             $actual_result = $abbreviated_error;
             last PROCESSING;
         } ## end if ( not defined eval { $recce->read( \$input ); 1 })
-        my $value_ref = $recce->old_value();
+        my $value_ref = $recce->value();
         if ( not defined $value_ref ) {
             $actual_value  = 'No parse';
             $actual_result = 'Input read to end but no parse';

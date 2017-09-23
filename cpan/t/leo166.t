@@ -102,7 +102,7 @@ TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
 my $expected_size = 7;
 Marpa::R3::Test::is( $max_size, $expected_size, "Leo test of earley set size" );
 
-my $value_ref = $recce->old_value();
+my $value_ref = $recce->value();
 my $value = $value_ref ? ${$value_ref} : 'No parse';
 Marpa::R3::Test::is( $value, 'a' x $length, 'Leo p166 parse' );
 
