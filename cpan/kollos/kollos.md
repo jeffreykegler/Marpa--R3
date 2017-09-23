@@ -4241,31 +4241,13 @@ which is not kept in the registry.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.slv_new_i(slr, flat_args)
+    function _M.class_slr.slv_new(slr, flat_args)
         local slv = {}
         setmetatable(slv, _M.class_slv)
         slv.slr = slr
         slv.regix = -1
         slv.trace_values = slr.trace_values or 0
         slv:common_set(flat_args, {'end'})
-        return slv
-    end
-    -- TODO islv_register() not needed after development
-    function _M.class_slr.islv_register(slr)
-        local slv = slr.slv
-        local regix = slv.regix
-        if regix >= 0 then
-            _M.userX(
-               "slr:islv_register(): already registered as %s",
-               inspect(regix))
-        end
-        regix = _M.register(_M.registry, slv)
-        -- print("Registered slv as " .. regix)
-        slv.regix = regix
-        return regix
-    end
-    function _M.class_slr.slv_new(slr, flat_args)
-        local slv = slr:slv_new_i(flat_args)
         local lmw_o = slv:ordering_get()
         local ambiguity_level = 0
         if lmw_o  then
