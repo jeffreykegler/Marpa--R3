@@ -525,112 +525,12 @@ may want to use custom logic to reassemble the input
 from the physical input stream.
 The L</"literal()"> method can assist in this process.
 
-=head1 The life cycle of a recognizer
-
-This describes the life cycle of a recognizer
-which has only one parse series.
-Your recognizer has only one parse series
-unless it
-calls the L<C<series_restart()>|"series_restart()"> method.
-Use of multiple parse series is an advanced technique,
-one which most applications will not need.
-Full details about parse series are in
-L<a separate document|Marpa::R3::Semantics::Phases>.
-
-=head2 The Initial Phase
-
-The B<Initial Phase>
-begins when the recognizer is created with the
-calls the L<C<new()>|/"Constructor"> method.
-It ends when
-the L<C<read()>|"read()"> method
-is called.
-It will also end, of course, if
-the recognizer is destroyed,
-but most applications will want to
-continue into the next phase.
-Very little can happen in this phase.
-It is possible to change some recognizer settings
-using the L<C<set()>|/"set()"> method.
-
-=head2 The Reading Phase
-
-The B<Reading Phase> of a recognizer
-begins when
-it calls the L<C<read()>|"read()"> method.
-It ends when it first calls
-the L<C<value()>|"value()"> method.
-The Reading Phase will also end, of course, if
-the recognizer is destroyed,
-but most applications will want to
-continue into the next phase.
-During this phase, it is possible to add other
-input strings to the virtual input,
-by calling
-the L<C<resume()>|"resume()"> method.
-
-=head2 The Evaluation Phase
-
-The B<Evaluation Phase> of a SLIF recognizer
-begins when
-it first calls the L<C<value()>|"value()"> method,
-which returns the result of the first parse tree.
-If there were no parses,
-the L<C<value()>|"value()"> method will return
-a Perl C<undef>.
-
-The L<C<value()>|"value()"> method
-may be called more than once during the Evaluation Phase.
-The second and later calls of
-the L<C<value()>|"value()"> method will return
-the result of the next parse tree.
-When there are no more parse trees,
-the L<C<value()>|"value()"> method will return
-a Perl C<undef>
-The L<C<resume()>|"resume()"> method should
-B<not> be called during Evaluation Phase.
-
-=head2 For more details
-
-In the above, we have described the life cycle for
-recognizers which have
-only one parse series.
-A recognizer will have only one parse series,
-unless it calls
-the L<C<series_restart()>|"series_restart()"> method.
-
-Using multiple parse series,
-an application can run
-the SLIF recognizer several times on the same
-virtual input stream.
-More detail
-about the recognizer's life cycle,
-including a full treatment of parse series,
-is in
-L<a separate document|Marpa::R3::Semantics::Phases>.
-
 =head1 Recognizer settings
 
 The B<recognizer settings> are the named arguments
 accepted by
-the recognizer setting-aware methods.
-The B<recognizer setting-aware methods>
-are the L<C<new()>|/"Constructor">,
-L<C<set()>|/"set()"> and
-L<C<series_restart()>|"series_restart()"> methods.
-Not every recognizer setting-aware method accepts all of the settings.
-The details are given below, by setting.
-
-=head2 end
-
-Most users will not need this setting.
-The L<C<end>|/"end"> setting
-specifies the parse end, as a G1 location.
-The default is for the parse to end where the input did,
-so that the parse returned is of the entire virtual input stream.
-The L<C<end>|/"end"> setting is only allowed in
-the L<C<new()>|/"Constructor">
-and L<C<series_restart()>|"series_restart()"> methods.
+the recognizer's L<C<new()>|/"Constructor">,
+and/or its L<C<set()>|/"set()"> method.
 
 =head2 event_is_active
 
@@ -773,8 +673,9 @@ If it is zero, there will be no
 limit on the number of parse results returned.
 The default is for
 there to be no limit.
-The C<max_parses> setting is valid in all
-calls of the recognizer setting-aware methods.
+The C<max_parses> setting is valid for both
+the recognizer's L<C<new()>|/"Constructor">
+and its L<C<set()>|/"set()"> method.
 
 =head2 too_many_earley_items
 
@@ -819,7 +720,9 @@ rarely be something
 that an application wants to do.
 
 The C<too_many_earley_items> setting is allowed
-in any call of any of the recognizer setting-aware methods.
+by both
+the recognizer's L<C<new()>|/"Constructor">
+and its L<C<set()>|/"set()"> method.
 
 =head2 trace_terminals
 
@@ -830,7 +733,9 @@ This recognizer setting is the best way to follow
 what the L0 parser is doing,
 and it is also very helpful for tracing the G1 parser.
 The C<trace_terminals> setting is allowed
-in any call of any of the recognizer setting-aware methods.
+by both
+the recognizer's L<C<new()>|/"Constructor">
+and its L<C<set()>|/"set()"> method.
 
 =head2 trace_values
 
@@ -841,7 +746,9 @@ are computed in the evaluation stack.  A trace level of 0 turns
 value tracing off, which is the default. Traces are written to the
 trace file handle.
 The C<trace_values> setting is allowed
-in any call of any of the recognizer setting-aware methods.
+by both
+the recognizer's L<C<new()>|/"Constructor">
+and its L<C<set()>|/"set()"> method.
 
 =head2 trace_file_handle
 
@@ -851,7 +758,9 @@ go to the trace file handle.
 By default, the trace file handle is inherited from the
 grammar.
 The C<trace_file_handle> setting is allowed
-in any call of any of the recognizer setting-aware methods.
+by both
+the recognizer's L<C<new()>|/"Constructor">
+and its L<C<set()>|/"set()"> method.
 
 =head1 Constructor
 
@@ -875,47 +784,6 @@ see
 L<the section describing them|/"Recognizer settings">.
 
 =head1 Basic mutators
-
-=head2 ambiguous()
-
-=for Marpa::R3::Display
-name: Tutorial 2 synopsis
-partial: 1
-normalize-whitespace: 1
-
-    if ( my $ambiguous_status = $recce->ambiguous() ) {
-        chomp $ambiguous_status;
-        die "Parse is ambiguous\n", $ambiguous_status;
-    }
-
-    TODO: Move this to Scanless::V pod
-
-=for Marpa::R3::Display::End
-
-This method should be called after the C<read()> method.
-If there is exactly one parse, it returns the empty string.
-If there is no parse, it returns a non-empty string indicating that fact.
-If there are two or more parses,
-it returns a non-empty string describing the ambiguity.
-
-Applications should only test the returned string to see if it is
-empty or non-empty.
-The non-empty strings are intended only for reading by
-humans -- their exact format is subject to change.
-
-When C<ambiguous()> detects an ambiguous parse,
-it puts
-the recognizer into "forest mode",
-so that it can examine the parse.
-As long as the recognizer is in forest mode,
-calls to the L<C<value()>|"value()"> method
-will produce fatal errors.
-Forest mode can be cleared using the
-L<C<series_restart()>|"series_restart()"> method.
-This will start a new parse series in "tree mode",
-which will allow calls to the
-L<C<value()>|"value()"> method
-to succeed.
 
 =head2 read()
 
@@ -989,39 +857,6 @@ A successful call of C<read()>
 may return zero.
 On failure, C<read()> throws an exception.
 
-=head2 series_restart()
-
-=for Marpa::R3::Display
-name: SLIF recognizer series_restart() synopsis
-normalize-whitespace: 1
-
-    $recce->series_restart( { end => $i } );
-
-=for Marpa::R3::Display::End
-
-The C<series_restart()> method ends the current parse series,
-and starts another.
-Parse series are described L<in another document|Marpa::R3::Semantics::Phases>.
-The C<series_restart()> method allows,
-as optional arguments, hashes whose key-value pairs
-are L<recognizer settings|/"Recognizer settings">.
-
-The C<series_restart()> method
-cannot change the C<grammar> recognizer setting.
-If any other recognizer setting is not specified explicitly,
-it is reset to its default.
-If an application wants an explicit recognizer setting to persist
-into a new parse series,
-it must specify that setting explicitly in the new parse series.
-The C<end> named argument 
-can be useful with
-the C<series_restart()> method.
-
-The C<series_restart()> method
-must be called before L<C<value()>|"value()">
-when L<C<ambiguous()>|"ambiguous()">
-detects an ambiguous parse and the application needs to get the parse values.
-
 =head2 set()
 
 =for Marpa::R3::Display
@@ -1051,15 +886,20 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<value> method call evaluates the next parse tree
-in the parse series,
-and returns a reference to the parse result for that parse tree.
-If there are no more parse trees,
+The C<value> method call evaluates the value of
+the parse at the current location,
+and returns a reference to that value.
+If there was no valid parse according to the grammar,
 the C<value> method returns C<undef>.
-There are zero parse trees if there was no valid parse
-of the input according to the grammar.
-There will be more than one parse tree if the parse
-was ambiguous.
+
+If the parse was ambiguous, an error is thrown.
+The error message will describe the ambiguity in detail.
+
+Some applications will not want to treat parse ambiguity
+as an error, and may wish to deal with one or more of the
+parse values.
+They can do this using L<a
+SLIF valuer object|Marpa::R3::Scanless::V>.
 
 The C<value()> method allows one optional argument.
 If provided, the argument
@@ -1405,27 +1245,6 @@ C<resume()> returns a Perl C<undef>.
 Currently, all failures are thrown.
 
 =head1 Accessors
-
-=head2 ambiguity_level()
-
-=for Marpa::R3::Display
-name: Scanless ambiguity_level() synopsis
-
-    my $ambiguity_level = $valuer->ambiguity_level();
-
-    TODO: Move this to Scanless::V pod
-
-=for Marpa::R3::Display::End
-
-Succeeds and
-returns 1 if there was an unambiguous parse,
-in other words if there was exactly one parse tree.
-Succeeds and
-returns 2 if the parse was ambiguous,
-in other words if there was more than one parse tree.
-Succeeds and returns 0 if there are no parse trees,
-because parsing failed.
-All other failures are thrown.
 
 =head2 g1_to_l0_first()
 
