@@ -176,7 +176,7 @@ For more on valuer settings,
 see
 L<the section describing them|/"Valuer settings">.
 
-=head1 Basic mutators
+=head1 Mutators
 
 =head2 set()
 
