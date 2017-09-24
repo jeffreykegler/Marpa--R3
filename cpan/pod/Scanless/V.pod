@@ -86,11 +86,16 @@ Get more than one of the values from an ambiguous parse.
 
 =item *
 
+Set an end-of-parse location
+other than the default.
+
+=item *
+
 Have more than one valuer active at a time.
 
 =item *
 
-Use one of the value-specific methods in this document.
+Use one of the value-specific accessors in this document.
 
 =back
 
@@ -173,32 +178,6 @@ L<the section describing them|/"Valuer settings">.
 
 =head1 Basic mutators
 
-=head2 ambiguous()
-
-=for Marpa::R3::Display
-name: Tutorial 2 synopsis
-partial: 1
-normalize-whitespace: 1
-
-    if ( my $ambiguous_status = $recce->ambiguous() ) {
-        chomp $ambiguous_status;
-        die "Parse is ambiguous\n", $ambiguous_status;
-    }
-
-    TODO: Move this to Scanless::V pod
-
-=for Marpa::R3::Display::End
-
-If there is exactly one parse, it returns the empty string.
-If there is no parse, it returns a non-empty string indicating that fact.
-If there are two or more parses,
-it returns a non-empty string describing the ambiguity.
-
-Applications should only test the returned string to see if it is
-empty or non-empty.
-The non-empty strings are intended only for reading by
-humans -- their exact format is subject to change.
-
 =head2 set()
 
 =for Marpa::R3::Display
@@ -278,6 +257,32 @@ in other words if there was more than one parse tree.
 Succeeds and returns 0 if there are no parse trees,
 because parsing failed.
 All other failures are thrown.
+
+=head2 ambiguous()
+
+=for Marpa::R3::Display
+name: Tutorial 2 synopsis
+partial: 1
+normalize-whitespace: 1
+
+    if ( my $ambiguous_status = $recce->ambiguous() ) {
+        chomp $ambiguous_status;
+        die "Parse is ambiguous\n", $ambiguous_status;
+    }
+
+    TODO: Move this to Scanless::V pod
+
+=for Marpa::R3::Display::End
+
+If there is exactly one parse, it returns the empty string.
+If there is no parse, it returns a non-empty string indicating that fact.
+If there are two or more parses,
+it returns a non-empty string describing the ambiguity.
+
+Applications should only test the returned string to see if it is
+empty or non-empty.
+The non-empty strings are intended only for reading by
+humans -- their exact format is subject to change.
 
 =head2 g1_pos
 
