@@ -20,6 +20,8 @@ name: Scanless valuer synopsis
 partial: 1
 normalize-whitespace: 1
 
+    # TODO: Create a valuer synopsis
+
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     my $self = bless { grammar => $grammar }, 'My_Actions';
     $self->{recce} = $recce;

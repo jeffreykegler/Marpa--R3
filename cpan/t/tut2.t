@@ -14,10 +14,7 @@
 
 # Tutorial 2 synopsis
 
-# VALUATOR: TODO
-
 use 5.010001;
-
 use strict;
 use warnings;
 use POSIX qw(setlocale LC_ALL);
@@ -66,13 +63,7 @@ my $length_read = $recce->read( \$input );
 die "Read ended after $length_read of ", length $input, " characters"
     if $length_read != length $input;
 
-my $valuer = Marpa::R3::Scanless::V->new({ recce => $recce });
-if ( my $ambiguous_status = $valuer->ambiguous() ) {
-    chomp $ambiguous_status;
-    die "Parse is ambiguous\n", $ambiguous_status;
-}
-
-my $value_ref = $valuer->value();
+my $value_ref = $recce->value();
 my $value = ${$value_ref};
 
 sub My_Actions::do_add {
@@ -301,10 +292,9 @@ Marpa::R3::Test::is( $earley_sets_show_output, $expected_earley_sets,
 
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
-$valuer = Marpa::R3::Scanless::V->new({ recce => $recce });
-$valuer->set( { trace_file_handle => $trace_fh, trace_values => 3 } );
-$value_ref = $valuer->value();
-$valuer->set( { trace_file_handle => \*STDOUT, trace_values => 0 } );
+$recce->set( { trace_file_handle => $trace_fh, trace_values => 3 } );
+$value_ref = $recce->value();
+$recce->set( { trace_file_handle => \*STDOUT, trace_values => 0 } );
 close $trace_fh;
 
 $value = $value_ref ? ${$value_ref} : 'No Parse';
@@ -366,8 +356,7 @@ END_TRACE_OUTPUT
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,
     'Implementation Example Trace Output' );
 
-$valuer = Marpa::R3::Scanless::V->new({ recce => $recce });
-$value_ref = $valuer->value();
+$value_ref = $recce->value();
 $value = $value_ref ? ${$value_ref} : 'No Parse';
 Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 3' );
 
