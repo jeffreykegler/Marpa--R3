@@ -34,9 +34,8 @@ mechanism to a callback mechanism.
 A new C<events_handlers> named argument has been added to
 C<< Marpa::R3::Scanless::R::new() >>.
 The
-C<< $slr->events() >> method is severely deprecated
-as of the writing.
-and will soon be eliminated.
+C<< $slr->events() >> method has been
+removed.
 
 =head2 Multiple C<< slr->read() >> calls allowed
 
@@ -180,7 +179,7 @@ of Marpa::R2::Scanless::G named arguments
 have been
 removed in Marpa::R3.
 
-=head2 Marpa::R3::Scanless::G Accessors completely different
+=head2 Marpa::R3::Scanless::G accessors completely different
 
 The grammar accessors changed between Marpa::R2
 and Marpa::R3.
@@ -266,16 +265,6 @@ The second argument is a reference to an array containing
 the values of the child nodes, in lexical order.
 If there were no child nodes visible to the semantics,
 then the second argument is an empty array.
-
-=head2 
-
-Under Marpa::R2,
-the C<events()> method returned events in a specified
-order, by type of event.
-Under Marpa::R3, the order of events
-returned by
-the C<events()> method
-is completely arbitrary.
 
 =head1 COPYRIGHT AND LICENSE
 
