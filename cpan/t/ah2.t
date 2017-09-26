@@ -369,12 +369,7 @@ for my $i ( 0 .. $input_length ) {
     my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce, end => $i } );
     my $expected = $expected[$i];
 
-# Marpa::R3::Display
-# name: Scanless ambiguity_level() synopsis
-
     my $ambiguity_level = $valuer->ambiguity_level();
-
-# Marpa::R3::Display::End
 
     my $expected_metric = ( scalar keys %{$expected} > 1 ? 2 : 1 );
     Test::More::is( $ambiguity_level, $expected_metric,

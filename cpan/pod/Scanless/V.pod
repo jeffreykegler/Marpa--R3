@@ -16,47 +16,64 @@ Marpa::R3::Scanless::V - Scanless interface valuers
 =head1 Synopsis
 
 =for Marpa::R3::Display
-name: Scanless valuer synopsis
+name: Valuer synopsis
 partial: 1
 normalize-whitespace: 1
 
-    # TODO: Create a valuer synopsis
+    use Marpa::R3;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-    my $self = bless { grammar => $grammar }, 'My_Actions';
-    $self->{recce} = $recce;
+    my $dsl = <<'END_OF_DSL';
 
-    if ( not defined eval { $recce->read($p_input_string); 1 }
-        )
-    {
-        ## Add last expression found, and rethrow
-        my $eval_error = $EVAL_ERROR;
-        chomp $eval_error;
-        die $self->show_last_expression(), "\n", $eval_error, "\n";
-    } ## end if ( not defined eval { $event_count = $recce->read...})
+    Calculator ::= Expression action => ::first
 
-    my $value_ref = $recce->value( $self );
-    if ( not defined $value_ref ) {
-        die $self->show_last_expression(), "\n",
-            "No parse was found, after reading the entire input\n";
-    }
+    Factor ::= Number action => ::first
+    Term ::=
+        Term '*' Factor action => do_multiply
+        | Factor action => ::first
+    Expression ::=
+        Expression '+' Term action => do_add
+        | Term action => ::first
+    Number ~ digits
+    digits ~ [\d]+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+    END_OF_DSL
+
+    my $grammar = Marpa::R3::Scanless::G->new(
+        {
+            semantics_package => 'My_Actions',
+            source            => \$dsl
+        }
+    );
+    my $recce       = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $input       = '42 * 1 + 7';
+    my $length_read = $recce->read( \$input );
+
+    die "Read ended after $length_read of ", length $input, " characters"
+        if $length_read != length $input;
+
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $value_ref = $valuer->value();
+    my $value = ${$value_ref};
 
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: Scanless valuer semantics
+name: Valuer semantics
 partial: 1
 normalize-whitespace: 1
 
-    package My_Actions;
-    sub do_parens    { return $_[1]->[1] }
-    sub do_add       { return $_[1]->[0] + $_[1]->[2] }
-    sub do_subtract  { return $_[1]->[0] - $_[1]->[2] }
-    sub do_multiply  { return $_[1]->[0] * $_[1]->[2] }
-    sub do_divide    { return $_[1]->[0] / $_[1]->[2] }
-    sub do_pow       { return $_[1]->[0]**$_[1]->[2] }
-    sub do_first_arg { return $_[1]->[0] }
-    sub do_script    { return join q{ }, @{$_[1]} }
+    sub My_Actions::do_add {
+        my ( undef, $values ) = @_;
+        my ( $t1, undef, $t2 ) = @{$values};
+        return $t1 + $t2;
+    }
+
+    sub My_Actions::do_multiply {
+        my ( undef, $values ) = @_;
+        my ( $t1, undef, $t2 ) = @{$values};
+        return $t1 * $t2;
+    }
 
 =for Marpa::R3::Display::End
 
@@ -160,11 +177,11 @@ L<C<set()>|/"set()"> method.
 =head1 Constructor
 
 =for Marpa::R3::Display
-name: Scanless valuer synopsis
+name: Valuer synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $recce = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
 
 =for Marpa::R3::Display::End
 
@@ -183,10 +200,10 @@ L<the section describing them|/"Valuer settings">.
 =head2 set()
 
 =for Marpa::R3::Display
-name: SLIF valuer set() synopsis
+name: Valuer set() synopsis
 normalize-whitespace: 1
 
-    $recce->set( { end => 42 } );
+    $valuer->set( { end => 42 } );
 
 =for Marpa::R3::Display::End
 
@@ -201,11 +218,11 @@ L<described above|/"Valuer settings">.
 =head2 value()
 
 =for Marpa::R3::Display
-name: Scanless valuer synopsis
+name: Valuer synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $value_ref = $recce->value( $self );
+    my $value_ref = $valuer->value();
 
 =for Marpa::R3::Display::End
 
@@ -244,7 +261,7 @@ require, but which it is not convenient to accumulate bottom-up.
 =head2 ambiguity_level()
 
 =for Marpa::R3::Display
-name: Scanless valuer ambiguity_level() synopsis
+name: Valuer ambiguity_level() synopsis
 
     my $ambiguity_level = $valuer->ambiguity_level();
 
@@ -263,16 +280,13 @@ All other failures are thrown.
 =head2 ambiguous()
 
 =for Marpa::R3::Display
-name: Tutorial 2 synopsis
-partial: 1
-normalize-whitespace: 1
+name: Valuer ambiguous() synopsis
 
-    if ( my $ambiguous_status = $recce->ambiguous() ) {
-        chomp $ambiguous_status;
-        die "Parse is ambiguous\n", $ambiguous_status;
+    $ambiguity_status = $valuer->ambiguous();
+    if ( $ambiguity_status ) {
+        chomp $ambiguity_status;
+        die "Parse is ambiguous\n", $ambiguity_status;
     }
-
-    TODO: Move this to Scanless::V pod
 
 =for Marpa::R3::Display::End
 
@@ -289,7 +303,7 @@ humans -- their exact format is subject to change.
 =head2 g1_pos
 
 =for Marpa::R3::Display
-name: Scanless valuer g1_pos() synopsis
+name: Valuer g1_pos() synopsis
 
     my $g1_pos = $valuer->g1_pos();
 

@@ -19,7 +19,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use lib 'inc';
 use Marpa::R3::Test;
@@ -27,7 +27,7 @@ use Marpa::R3::Test;
 ## no critic (ErrorHandling::RequireCarping);
 
 # Marpa::R3::Display
-# name: Scanless valuer synopsis
+# name: Valuer synopsis
 
 use Marpa::R3;
 
@@ -65,6 +65,11 @@ my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
 my $value_ref = $valuer->value();
 my $value = ${$value_ref};
 
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: Valuer semantics
+
 sub My_Actions::do_add {
     my ( undef, $values ) = @_;
     my ( $t1, undef, $t2 ) = @{$values};
@@ -79,7 +84,31 @@ sub My_Actions::do_multiply {
 
 # Marpa::R3::Display::End
 
-Test::More::is( $value, 49, 'Tutorial 2 synopsis value' );
+Test::More::is( $value, 49, 'synopsis value' );
+
+# Marpa::R3::Display
+# name: Valuer ambiguity_level() synopsis
+
+    my $ambiguity_level = $valuer->ambiguity_level();
+
+# Marpa::R3::Display::End
+
+Test::More::is( $ambiguity_level, 1, 'valuer synopsis ambiguity level' );
+
+my $ambiguity_status;
+
+# Marpa::R3::Display
+# name: Valuer ambiguous() synopsis
+
+    $ambiguity_status = $valuer->ambiguous();
+    if ( $ambiguity_status ) {
+        chomp $ambiguity_status;
+        die "Parse is ambiguous\n", $ambiguity_status;
+    }
+
+# Marpa::R3::Display::End
+
+Test::More::is( $ambiguity_status, "", 'valuer synopsis ambiguity status' );
 
 my $symbols_show_output = $grammar->symbols_show();
 
