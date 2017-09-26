@@ -316,6 +316,7 @@ t/too_many_l0_yims.t
 t/topsyn.t
 t/tree.t
 t/tut2.t
+t/vsyn.t
 t/wall.t
 t/zorro.t
 xs/Makefile.PL
