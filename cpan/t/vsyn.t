@@ -19,7 +19,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 use lib 'inc';
 use Marpa::R3::Test;
@@ -318,10 +318,28 @@ END_EARLEY_SETS
 Marpa::R3::Test::is( $earley_sets_show_output, $expected_earley_sets,
     'Implementation Example Earley Sets' );
 
+# Marpa::R3::Display
+# name: Valuer g1_pos() synopsis
+
+my $end_of_parse = $valuer->g1_pos();
+
+# Marpa::R3::Display::End
+
+Marpa::R3::Test::is( $end_of_parse, 5, 'end of parse' );
+
 $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
-$valuer->set( { trace_file_handle => $trace_fh, trace_values => 3 } );
+$valuer->set( { trace_file_handle => $trace_fh } );
+
+# Marpa::R3::Display
+# name: Valuer set() synopsis
+
+$valuer->set( { trace_values => 3 } );
+
+# Marpa::R3::Display::End
+
 $value_ref = $valuer->value();
 $valuer->set( { trace_file_handle => \*STDOUT, trace_values => 0 } );
 close $trace_fh;

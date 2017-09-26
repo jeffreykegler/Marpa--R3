@@ -142,10 +142,8 @@ The value of the C<recce> setting must be
 a SLIF recognizer object.
 The C<new()> method is required to have
 a C<recognizer> setting.
-The C<recognizer> setting is only allowed
-by the L<C<new() method>|/"Constructor">.
-Once the valuer is created, the recognizer cannot be
-changed.
+The C<recognizer> setting is only allowed in
+L<a valuer's constructor|/"Constructor">.
 
 =head2 trace_values
 
@@ -203,7 +201,7 @@ L<the section describing them|/"Valuer settings">.
 name: Valuer set() synopsis
 normalize-whitespace: 1
 
-    $valuer->set( { end => 42 } );
+    $valuer->set( { trace_values => 3 } );
 
 =for Marpa::R3::Display::End
 
@@ -304,8 +302,9 @@ humans -- their exact format is subject to change.
 
 =for Marpa::R3::Display
 name: Valuer g1_pos() synopsis
+normalize-whitespace: 1
 
-    my $g1_pos = $valuer->g1_pos();
+    my $end_of_parse = $valuer->g1_pos();
 
 =for Marpa::R3::Display::End
 
