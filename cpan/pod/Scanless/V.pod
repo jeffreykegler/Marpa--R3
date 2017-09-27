@@ -210,7 +210,7 @@ This method allows valuer settings to be changed after a SLIF
 grammar is created.
 The arguments to
 C<set()> must be one or more hashes whose key-value pairs
-are recognizer settings and their values.
+are valuer settings and their values.
 The allowed valuer settings are
 L<described above|/"Valuer settings">.
 
@@ -272,9 +272,9 @@ in other words if there was exactly one parse tree.
 Succeeds and
 returns 2 if the parse was ambiguous,
 in other words if there was more than one parse tree.
-Succeeds and returns 0 if there are no parse trees,
-because parsing failed.
-All other failures are thrown.
+Succeeds and returns 0 if there are zero parse trees,
+in other words if no parse was found.
+Failures are thrown.
 
 =head2 ambiguous()
 
@@ -289,15 +289,16 @@ name: Valuer ambiguous() synopsis
 
 =for Marpa::R3::Display::End
 
-If there is exactly one parse, it returns the empty string.
-If there is no parse, it returns a non-empty string indicating that fact.
+If there is exactly one parse, returns the empty string.
+If there is no parse, returns a non-empty string indicating that fact.
 If there are two or more parses,
-it returns a non-empty string describing the ambiguity.
+returns a non-empty string describing the ambiguity.
 
-Applications should only test the returned string to see if it is
-empty or non-empty.
 The non-empty strings are intended only for reading by
 humans -- their exact format is subject to change.
+Applications can rely on the results of automated tests
+only if the test is for
+empty versus non-empty.
 
 =head2 g1_pos
 
