@@ -85,9 +85,9 @@ of Marpa's SLIF (Scanless interface).
 Many applications,
 probably the majority,
 will not need the SLIF valuer class or its methods.
-Instead, they will find the 
-to the L<C<< $recce->value() >> method|/value()> method
-sufficent the for their needs.
+Instead, they will find
+the L<C<< $recce->value() >> method|/value()> method
+sufficent for their needs.
 
 The methods in this document
 will be needed by applications
@@ -114,7 +114,8 @@ Have more than one valuer active at a time.
 
 =item *
 
-Use one of the value-specific accessors in this document.
+Use one of the valuer methods, as described in
+this document.
 
 =back
 
