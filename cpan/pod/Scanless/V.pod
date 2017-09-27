@@ -297,7 +297,8 @@ returns a non-empty string describing the ambiguity.
 The non-empty strings are intended only for reading by
 humans -- their exact format is subject to change.
 Applications can rely on the results of automated tests
-only if the test is for
+of the return value from C<ambiguous()>
+only if that test is for
 empty versus non-empty.
 
 =head2 g1_pos
