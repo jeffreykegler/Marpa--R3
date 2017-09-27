@@ -50,12 +50,7 @@ normalize-whitespace: 1
     die "Read ended after $length_read of ", length $input, " characters"
         if $length_read != length $input;
 
-    if ( my $ambiguous_status = $recce->ambiguous() ) {
-        chomp $ambiguous_status;
-        die "Parse is ambiguous\n", $ambiguous_status;
-    }
-
-    my $value_ref = $recce->value;
+    my $value_ref = $recce->value();
     my $value = ${$value_ref};
 
     sub My_Actions::do_add {
@@ -190,20 +185,6 @@ There are no SLIF parse events, stray or otherwise, in this example.
 But this check is included for completeness,
 and as an example of a cautious programming style.
 
-=head2 Checking for an ambiguous parse
-
-=for Marpa::R3::Display
-name: Tutorial 2 synopsis
-partial: 1
-normalize-whitespace: 1
-
-    if ( my $ambiguous_status = $recce->ambiguous() ) {
-        chomp $ambiguous_status;
-        die "Parse is ambiguous\n", $ambiguous_status;
-    }
-
-=for Marpa::R3::Display::End
-
 Much more likely than stray SLIF parse events are ambiguous parses --
 parses where the input can be parsed in two or more ways.
 Ambiguous parses are not necessarily a problem -- some applications
@@ -218,19 +199,8 @@ only if you understand the kind of ambiguity that exists
 in your grammar,
 and only if you know that ambiguities of that kind
 will not cause trouble.
-The above code uses
-L<the recognizer's C<ambigous()>
-method|Marpa::R3::Scanless::R/"ambiguous()"> to spot ambiguous parses.
-The L<C<ambigous()>
-method|Marpa::R3::Scanless::R/"ambiguous()"> returns the empty string
-if there was exactly one parse.
-If there was no parse,
-the L<C<ambigous()>
-method|Marpa::R3::Scanless::R/"ambiguous()"> returns a string stating that.
-If there were two or more parses,
-the L<C<ambigous()>
-method|Marpa::R3::Scanless::R/"ambiguous()"> returns a string describing
-the ambiguity.
+The above code catches ambiguous parses and reports
+the ambiguity in detail, as we are about to see.
 
 =head2 Marpa::R3::Scanless::R::value
 
@@ -239,7 +209,7 @@ name: Tutorial 2 synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $value_ref = $recce->value;
+    my $value_ref = $recce->value();
     my $value = ${$value_ref};
 
 =for Marpa::R3::Display::End
