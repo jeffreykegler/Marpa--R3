@@ -86,7 +86,7 @@ Many applications,
 probably the majority,
 will not need the SLIF valuer class or its methods.
 Instead, they will find
-the L<C<< $recce->value() >> method|/value()> method
+the L<C<< $recognizer->value() >> method|Marpa::R3::Scanless::R/value()> method
 sufficient for their needs.
 
 The methods in this document
@@ -137,9 +137,9 @@ so that the parse returned is of the entire virtual input stream.
 The L<C<end>|/"end"> setting is only allowed in
 L<a valuer's constructor|/"Constructor">.
 
-=head2 recce
+=head2 recognizer
 
-The value of the C<recce> setting must be
+The value of the C<recognizer> setting must be
 a SLIF recognizer object.
 The C<new()> method is required to have
 a C<recognizer> setting.
@@ -188,7 +188,7 @@ The C<new()> method is the constructor for SLIF valuers.
 The arguments
 to the C<new()> constructor must be one or more hashes of named arguments,
 where each hash key is a valuers setting.
-The L<C<recce>|/"recce"> valuer setting is required.
+The L<C<recognizer>|/"recognizer"> valuer setting is required.
 All other valuer settings are optional.
 For more on valuer settings,
 see
