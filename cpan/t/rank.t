@@ -69,7 +69,7 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $recce->read(\'tttt');
 
 my $i = 0;
-my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 while ( my $result = $valuer->value() ) {
     my $got      = ${$result};
     my $expected = reverse $counting_up[$i];

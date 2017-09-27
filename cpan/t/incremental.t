@@ -59,7 +59,7 @@ for my $loc ( 1 .. $n ) {
     my $parse_number = 0;
 
     $recce->resume( undef, 1 );
-    my $valuer   = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer   = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
     die "No parse" if not my $value_ref = $valuer->value();
     local $Data::Dumper::Deepcopy = 1;
     # say STDERR Data::Dumper::Dumper($value_ref);

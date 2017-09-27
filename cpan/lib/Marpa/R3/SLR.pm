@@ -460,7 +460,7 @@ sub Marpa::R3::Scanless::G::parse {
             "  The cause may be an event\n",
             "  The $slr->parse() method does not allow parses to trigger events";
     } ## end if ( $length_read != length $input_length )
-    my $slv = Marpa::R3::Scanless::V->new( { recce => $slr });
+    my $slv = Marpa::R3::Scanless::V->new( { recognizer => $slr });
     my $ambiguity_level = $slv->ambiguity_level();
     if ( $ambiguity_level != 1 ) {
         my $ambiguous_status = $slv->ambiguous();

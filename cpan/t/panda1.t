@@ -89,7 +89,7 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \$sentence );
 
-my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 while ( defined( my $value_ref = $valuer->value() ) ) {
     my $value = $value_ref ? ${$value_ref}->bracket() : 'No parse';
     push @actual, $value;
@@ -102,7 +102,7 @@ my $panda_grammar = Marpa::R3::Scanless::G->new(
     { bless_package => 'PennTags', source => \$dsl, } );
 my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );
-my $asf = Marpa::R3::ASF->new( { slr=>$panda_recce } );
+my $asf = Marpa::R3::ASF->new( { recognizer => $panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );
 my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 

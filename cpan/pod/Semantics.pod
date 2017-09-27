@@ -759,7 +759,7 @@ normalize-whitespace: 1
     sub do_S {
         my ($per_parse_object) = @_;
         my $production_id         = $Marpa::R3::Context::production_id;
-        my $slg             = $Marpa::R3::Context::slg;
+        my $slg             = $Marpa::R3::Context::grammar;
         my ( $lhs, @rhs ) =
             map { $slg->symbol_display_form($_) } $slg->production_expand($production_id);
         $per_parse_object->{text} =
@@ -779,8 +779,15 @@ to B<context variables>.
 
 =over
 
-=item * C<$Marpa::R3::Context::slg> is set to
+=item * C<$Marpa::R3::Context::grammar> is set to
 L<the SLIF grammar|Marpa::R3::Scanless::G> being parsed.
+
+=item * C<$Marpa::R3::Context::recognizer> is set to
+L<the SLIF recognizer|Marpa::R3::Scanless::R> that did this parse.
+
+=item * C<$Marpa::R3::Context::valuer> is set to
+L<the SLIF valuer|Marpa::R3::Scanless::V> that is doing
+this evaluation.
 
 =item * C<$Marpa::R3::Context::production_id> is the ID of the
 current production.

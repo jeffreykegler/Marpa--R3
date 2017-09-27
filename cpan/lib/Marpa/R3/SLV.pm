@@ -57,7 +57,7 @@ sub Marpa::R3::Context::bail {   ## no critic (Subroutines::RequireArgUnpacking)
 ## use critic
 
 sub Marpa::R3::Context::g1_range {
-    my $slv = $Marpa::R3::Context::slv;
+    my $slv = $Marpa::R3::Context::valuer;
     my ( $start, $end ) =
       $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 local slv = ...
@@ -67,7 +67,7 @@ END_OF_LUA
 } ## end sub Marpa::R3::Context::g1_range
 
 sub Marpa::R3::Context::lc_range {
-    my $slv = $Marpa::R3::Context::slv;
+    my $slv = $Marpa::R3::Context::valuer;
     my ( $lc_range ) =
       $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 local slv = ...
@@ -82,7 +82,7 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Context::g1_span {
-    my $slv = $Marpa::R3::Context::slv;
+    my $slv = $Marpa::R3::Context::valuer;
     my ( $start, $length ) =
       $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ), <<'END_OF_LUA', '>*' );
 local slv = ...
@@ -208,19 +208,19 @@ sub Marpa::R3::Scanless::V::new {
       if not $flat_args;
     $flat_args = slv_common_set( $slv, $flat_args );
 
-    my $slr = $flat_args->{recce};
+    my $slr = $flat_args->{recognizer};
     Marpa::R3::exception(
-        qq{Marpa::R3::Scanless::V::new() called without a "recce" argument} )
+        qq{Marpa::R3::Scanless::V::new() called without a "recognizer" argument} )
       if not defined $slr;
     $slv->[Marpa::R3::Internal::Scanless::V::SLR] = $slr;
-    delete $flat_args->{recce};
+    delete $flat_args->{recognizer};
 
     my $slr_class = 'Marpa::R3::Scanless::R';
     if ( not blessed $slr or not $slr->isa($slr_class) ) {
         my $ref_type = ref $slr;
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
         Marpa::R3::exception(
-            qq{'recce' named argument to new() is $desc\n},
+            qq{'recognizer' named argument to new() is $desc\n},
             "  It should be a ref to $slr_class\n"
         );
     }
@@ -340,9 +340,9 @@ sub Marpa::R3::Scanless::V::value {
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::irlid = undef;
-    local $Marpa::R3::Context::slg = $slg;
-    local $Marpa::R3::Context::slr  = $slr;
-    local $Marpa::R3::Context::slv  = $slv;
+    local $Marpa::R3::Context::grammar = $slg;
+    local $Marpa::R3::Context::recognizer  = $slr;
+    local $Marpa::R3::Context::valuer  = $slv;
 
     my %value_handlers = (
         trace => sub {
@@ -731,9 +731,8 @@ sub Marpa::R3::Scanless::V::ambiguous {
     my $ambiguity_level = $slv->ambiguity_level();
     return q{No parse} if $ambiguity_level <= 0;
     return q{} if $ambiguity_level == 1;
-    # TODO ASF must be created for end location of SLV,
-    #   not of SLR!
-    my $asf = Marpa::R3::ASF->new( { slr => $slr, end => $slv->g1_pos() } );
+    # ASF must be created for end location of SLV (not SLR!)
+    my $asf = Marpa::R3::ASF->new( { recognizer => $slr, end => $slv->g1_pos() } );
     die 'Could not create ASF' if not defined $asf;
     my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
     my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];

@@ -1239,7 +1239,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::value {
     my ( $slr, $per_parse_arg ) = @_;
-    my $slv = Marpa::R3::Scanless::V->new( { recce => $slr } );
+    my $slv = Marpa::R3::Scanless::V->new( { recognizer => $slr } );
     my $ambiguity_level = $slv->ambiguity_level();
     return if $ambiguity_level == 0;
     if ( $ambiguity_level != 1 ) {

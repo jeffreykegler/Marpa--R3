@@ -52,7 +52,7 @@ normalize-whitespace: 1
     die "Read ended after $length_read of ", length $input, " characters"
         if $length_read != length $input;
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
     my $value_ref = $valuer->value();
     my $value = ${$value_ref};
 
@@ -87,7 +87,7 @@ probably the majority,
 will not need the SLIF valuer class or its methods.
 Instead, they will find
 the L<C<< $recce->value() >> method|/value()> method
-sufficent for their needs.
+sufficient for their needs.
 
 The methods in this document
 will be needed by applications
@@ -180,7 +180,7 @@ name: Valuer synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 
 =for Marpa::R3::Display::End
 

@@ -66,7 +66,7 @@ sub My_Actions::do_arg0 { return $_[1]->[0] }
 
 sub My_Actions::show_last_expression {
     my ($self) = @_;
-    my $recce = $self->{recce};
+    my $recce = $self->{recognizer};
     my ( $start, $length ) = $recce->last_completed('Expression');
     return if not defined $start;
     my $last_expression = $recce->g1_literal( $start, $length );
@@ -77,7 +77,7 @@ sub my_parser {
     my ( $grammar, $string ) = @_;
 
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
-    my $self = bless { grammar => $grammar, recce => $recce }, 'My_Actions';
+    my $self = bless { grammar => $grammar, recognizer => $recce }, 'My_Actions';
     my ( $parse_value, $parse_status, $last_expression );
 
     if ( not defined eval { $recce->read( \$string ); 1 } ) {

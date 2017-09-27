@@ -61,7 +61,7 @@ my $length_read = $recce->read( \$input );
 die "Read ended after $length_read of ", length $input, " characters"
     if $length_read != length $input;
 
-my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 my $value_ref = $valuer->value();
 my $value = ${$value_ref};
 
@@ -327,7 +327,7 @@ my $end_of_parse = $valuer->g1_pos();
 
 Marpa::R3::Test::is( $end_of_parse, 5, 'end of parse' );
 
-$valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+$valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
@@ -403,7 +403,7 @@ END_TRACE_OUTPUT
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,
     'Implementation Example Trace Output' );
 
-$valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+$valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 $value_ref = $valuer->value();
 $value = $value_ref ? ${$value_ref} : 'No Parse';
 Marpa::R3::Test::is( 49, $value, 'Implementation Example Value 3' );

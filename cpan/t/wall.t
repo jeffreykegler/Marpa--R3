@@ -118,7 +118,7 @@ for my $n ( 1 .. 12 ) {
     $recce->resume( 1, 1 ) for 1 .. $n;
     $recce->resume( 0, 1 );
     my $parse_count = 0;
-    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
     while ( $valuer->value() ) { $parse_count++; }
     Marpa::R3::Test::is( $expected[$n], $parse_count,
         "Wall Series Number $n" );

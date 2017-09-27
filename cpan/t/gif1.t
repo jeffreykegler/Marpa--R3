@@ -449,14 +449,14 @@ for my $test_data (@tests_data) {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-    if ( not defined eval { $slr->read( \$string ); 1 } ) {
+    if ( not defined eval { $recce->read( \$string ); 1 } ) {
         my $abbreviated_error = $EVAL_ERROR;
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
-    } ## end if ( not defined eval { $slr->read( \$string ); 1 } )
-    my $asf = Marpa::R3::ASF->new( { slr => $slr } );
+    } ## end if ( not defined eval { $recce->read( \$string ); 1 } )
+    my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
     if ( not defined $asf ) {
         return 'No ASF', 'Input read to end but no ASF';
     }

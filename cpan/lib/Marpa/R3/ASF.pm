@@ -389,7 +389,7 @@ sub Marpa::R3::ASF::new {
 
     for my $arg_hash (@arg_hashes) {
         ARG: for my $arg ( keys %{$arg_hash} ) {
-            if ( $arg eq 'slr' ) {
+            if ( $arg eq 'recognizer' ) {
                 $asf->[Marpa::R3::Internal::ASF::SLR] = $slr =
                     $arg_hash->{$arg};
                 next ARG;
@@ -409,14 +409,14 @@ sub Marpa::R3::ASF::new {
     } ## end for my $arg_hash (@arg_hashes)
 
     Marpa::R3::exception(
-        q{The "slr" named argument must be specified with the Marpa::R3::ASF::new method}
+        q{The "recognizer" named argument must be specified with the Marpa::R3::ASF::new method}
     ) if not defined $slr;
     $asf->[Marpa::R3::Internal::ASF::SLR] = $slr;
     $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] //= 42;
 
     my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my %v_args = (recce => $slr);
+    my %v_args = (recognizer => $slr);
     $v_args{end} = $end_of_parse if $end_of_parse;
     my $slv = Marpa::R3::Scanless::V->new(\%v_args);
     Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
@@ -555,11 +555,11 @@ sub Marpa::R3::ASF::grammar {
 } ## end sub Marpa::R3::ASF::grammar
 
 # TODO -- Document this method
-sub Marpa::R3::ASF::recce {
+sub Marpa::R3::ASF::recognizer {
     my ($asf)   = @_;
     my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
     return $slr;
-} ## end sub Marpa::R3::ASF::recce
+}
 
 sub nid_rule_id {
     my ( $asf, $nid ) = @_;

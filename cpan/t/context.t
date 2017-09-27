@@ -38,7 +38,7 @@ my $trace_rules = q{};
 sub no_bail {
     my ($action_object) = @_;
     my $production_id           = $Marpa::R3::Context::production_id;
-    my $slg             = $Marpa::R3::Context::slg;
+    my $slg             = $Marpa::R3::Context::grammar;
     my ( $lhs, @rhs ) =
       map { $slg->symbol_name($_) } $slg->production_expand($production_id);
     $action_object->{text} =

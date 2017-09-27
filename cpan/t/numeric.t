@@ -82,7 +82,7 @@ for my $maximal ( 0, 1 ) {
         my $expected = $maximal ? \@maximal : \@minimal;
         my $name     = $maximal ? 'maximal' : 'minimal';
 
-        my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce, end => $i } );
+        my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce, end => $i } );
         my $result = $valuer->value();
         die "No parse" if not defined $result;
         Test::More::is( ${$result}, $expected->[$i],

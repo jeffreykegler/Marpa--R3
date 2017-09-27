@@ -60,7 +60,7 @@ EOI
 
 my $r = Marpa::R3::Scanless::R->new( { grammar => $g } );
 $r->read( \$input );
-my $valuer = Marpa::R3::Scanless::V->new( { recce => $r } );
+my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $r } );
 
 {
  my $ambiguous_status = $valuer->ambiguous();
@@ -77,7 +77,7 @@ Test::More::ok( ( $valuer->ambiguity_level() > 1 ), 'ambiguity_level()');
 }
 
 {
-    my $asf = Marpa::R3::ASF->new( { slr => $r } );
+    my $asf = Marpa::R3::ASF->new( { recognizer => $r } );
     my $full_result = $asf->traverse( {}, \&full_traverser );
     my $actual = join "\n", @{$full_result}, q{};
     my $expected = <<'EOS';

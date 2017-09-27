@@ -75,9 +75,9 @@ PROCESSING: {
 # Marpa::R3::Display
 # name: ASF ambiguity reporting
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
     if ( $valuer->ambiguity_level() > 1 ) {
-        my $asf = Marpa::R3::ASF->new( { slr => $recce } );
+        my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 
@@ -118,7 +118,7 @@ if ( !$is_ambiguous_parse ) {
     Test::More::fail(qq{glade_g1_span() length});
 }
 else {
-    my $asf = Marpa::R3::ASF->new( { slr => $recce } );
+    my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
     my $glade_id = $asf->peak;
 
 # Marpa::R3::Display
@@ -162,7 +162,7 @@ for my $ranking_method ( 'none', 'rule', 'high_rule_only' ) {
 
     $recce->read( \$input );
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 
     if ( $ranking_method eq 'high_rule_only' ) {
 

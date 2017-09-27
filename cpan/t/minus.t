@@ -188,7 +188,7 @@ $recce->read( \q{6-----1} );
 # This is for debugging, after all
 $recce->set( { max_parses => 20 } );
 
-my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 while ( my $value_ref = $valuer->value() ) {
     my $value = $value_ref ? ${$value_ref} : 'No parse';
     if ( defined $expected{$value} ) {

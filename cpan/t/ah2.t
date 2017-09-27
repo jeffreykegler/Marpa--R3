@@ -366,7 +366,7 @@ END_OF_TEXT
 
 for my $i ( 0 .. $input_length ) {
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce, end => $i } );
+    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce, end => $i } );
     my $expected = $expected[$i];
 
     my $ambiguity_level = $valuer->ambiguity_level();
@@ -489,7 +489,7 @@ END_OF_TEXT
     my $ambiguity_desc = 'No ambiguity';
     if ( $ambiguity_level > 1 ) {
 
-        my $asf = Marpa::R3::ASF->new( { slr => $recce, end => $i } );
+        my $asf = Marpa::R3::ASF->new( { recognizer => $recce, end => $i } );
         die 'No ASF' if not defined $asf;
         my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
 

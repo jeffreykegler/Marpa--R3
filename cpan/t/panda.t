@@ -108,7 +108,7 @@ my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $recce->read( \$sentence );
 
-my $valuer = Marpa::R3::Scanless::V->new( { recce => $recce } );
+my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 while ( defined( my $value_ref = $valuer->value() ) ) {
     my $value = $value_ref ? ${$value_ref}->bracket() : 'No parse';
     push @actual, $value;
@@ -124,7 +124,7 @@ my $panda_grammar = Marpa::R3::Scanless::G->new(
     { source => \$dsl, bless_package => 'PennTags', } );
 my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );
-my $asf = Marpa::R3::ASF->new( { slr=>$panda_recce } );
+my $asf = Marpa::R3::ASF->new( { recognizer => $panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );
 my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 
@@ -290,7 +290,7 @@ sub located_traverser {
 # Marpa::R3::Display::End
 
     my $asf = $glade->asf();
-    my $recce = $asf->recce();
+    my $recce = $asf->recognizer();
     my ( $block1, $pos1 ) = $recce->g1_to_l0_first( $g1_start );
     my ( $block2, $pos2 ) = $recce->g1_to_l0_last( $g1_start + $g1_length - 1 );
     my $location = $recce->lc_brief($block1, $pos1, $block2, $pos2);

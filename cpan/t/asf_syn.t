@@ -50,9 +50,9 @@ END_OF_SOURCE
     }
 );
 
-my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-$slr->read( \'aa' );
-my $asf = Marpa::R3::ASF->new( { slr => $slr } );
+my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+$recce->read( \'aa' );
+my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
 die 'No ASF' if not defined $asf;
 my $output_as_array = asf_to_basic_tree($asf);
 my $actual_output   = array_display($output_as_array);
