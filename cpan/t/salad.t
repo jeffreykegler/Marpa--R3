@@ -19,8 +19,6 @@
 # In the literature, this is called a supersequence
 # search.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

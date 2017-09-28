@@ -12,8 +12,6 @@
 
 # Synopsis for scannerless parsing, main POD page
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

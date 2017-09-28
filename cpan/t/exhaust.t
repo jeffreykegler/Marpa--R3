@@ -13,8 +13,6 @@
 # Tests of scannerless parsing -- some corner cases,
 # including exhaustion at G1 level
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

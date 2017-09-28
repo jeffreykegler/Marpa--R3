@@ -12,8 +12,6 @@
 
 # Note: replacement for catalan.t ...
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 

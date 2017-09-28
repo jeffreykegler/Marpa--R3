@@ -17,8 +17,6 @@
 # which has more than 2 proper nullables
 # This is to test an untested branch of the CHAF logic.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

@@ -19,8 +19,6 @@
 # counter.  A very expensive way to do it, but a
 # good test of the ranking logic.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

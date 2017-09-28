@@ -12,8 +12,6 @@
 
 # Replaces jirotka.t from Marpa::R2
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

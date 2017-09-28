@@ -12,8 +12,6 @@
 
 # Regression tests for several bugs found by Jean-Damien
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

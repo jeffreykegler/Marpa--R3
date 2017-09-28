@@ -19,8 +19,6 @@
 # Non-working code, not kept up to date
 # Kept for reference
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

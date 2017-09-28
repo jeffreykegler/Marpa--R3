@@ -12,8 +12,6 @@
 
 # Note: Converted to SLIF from null_value.t
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

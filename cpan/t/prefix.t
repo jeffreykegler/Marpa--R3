@@ -12,8 +12,6 @@
 
 # Test of scannerless parsing -- prefix addition
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

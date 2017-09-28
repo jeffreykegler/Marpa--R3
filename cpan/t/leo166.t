@@ -14,8 +14,6 @@
 
 # The example from p. 166 of Leo's paper.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

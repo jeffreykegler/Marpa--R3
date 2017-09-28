@@ -13,8 +13,6 @@
 # Test using a JSON parser
 # Inspired by a parser written by Peter Stuifzand
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

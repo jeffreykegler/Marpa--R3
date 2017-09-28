@@ -13,8 +13,6 @@
 # Test of scannerless parsing -- predicted, nulled and completed events with 
 # deactivation and reactivation
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

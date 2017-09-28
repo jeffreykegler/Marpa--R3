@@ -10,8 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use warnings;

@@ -23,8 +23,6 @@
 # secure if the test suite has a non-DSL dependent interface to
 # full facilities of Libmarpa.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

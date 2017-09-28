@@ -16,8 +16,6 @@
 # The intent is that this file will contain tests of the
 # valuator's resolution phase
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

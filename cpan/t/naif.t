@@ -14,8 +14,6 @@
 
 # Regression test of ref to undef as token value
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 

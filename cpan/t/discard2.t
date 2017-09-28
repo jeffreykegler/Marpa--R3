@@ -12,8 +12,6 @@
 
 # Tests of the SLIF's discard events
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

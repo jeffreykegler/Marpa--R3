@@ -12,8 +12,6 @@
 
 # Tests of Marpa's Lua interpreter
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

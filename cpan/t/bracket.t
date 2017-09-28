@@ -19,8 +19,6 @@
 # alternatives are rejected at a location.  (The default is for this to
 # be a fatal error.)
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

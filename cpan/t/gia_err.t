@@ -15,8 +15,6 @@
 #
 # Uses include tests of parsing of the SLIF DSL itself.
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

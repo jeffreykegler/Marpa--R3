@@ -12,8 +12,6 @@
 
 # Example for synopsis in POD for overview of SLIF parse events
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

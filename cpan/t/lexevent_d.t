@@ -13,8 +13,6 @@
 # This is the displays-focused version of the test of
 # named lexeme events deactivation and reactivation
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;

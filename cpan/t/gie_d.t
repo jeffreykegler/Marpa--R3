@@ -13,8 +13,6 @@
 # A display-focused test.
 # Examples of event handler usage
 
-# VALUATOR: TODO
-
 use 5.010001;
 
 use strict;
