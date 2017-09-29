@@ -467,62 +467,69 @@ a message
         local block = slr.inputs[block_id]
         local block_length = #block
         if not block_offset_arg then return l0_pos end
-        local new_current_pos = math.tointeger(block_offset_arg)
-        if not new_current_pos then
+        local new_block_offset = math.tointeger(block_offset_arg)
+        if not new_block_offset then
             return nil, string.format('Bad current position argument %s', block_offset_arg)
         end
-        if new_current_pos < 0 then
-            new_current_pos = block_length + new_current_pos
+        if new_block_offset < 0 then
+            new_block_offset = block_length + new_block_offset
         end
-        if new_current_pos < 0 then
+        if new_block_offset < 0 then
             return nil, string.format('Current position is before start of block: %s', block_offset_arg)
         end
-        if new_current_pos > block_length then
+        if new_block_offset > block_length then
             return nil, string.format('Current position is after end of block: %s', block_offset_arg)
         end
-        return new_current_pos
+        return new_block_offset
     end
 
     -- assumes valid block_id, block_offset
     -- returns:
-    --     end-of_block, if eoread_arg == nil
-    --     end-of-read, converted to integer, if eoread_arg valid and non-nil
+    --     end-of-block, if length_arg == nil
+    --     end-of-read, based on length_arg, if length_arg valid and non-nil
     --     nil, error-message, otherwise
     -- Note: negative block_offset is converted as offset
     --     from physical end-of-block
     -- Note: uses the `block_offset` in its arguments, *not* the one actually
     --     in the block
-    function glue.check_block_length(slr, block_id, block_offset, eoread_arg)
+    function glue.check_block_length(slr, block_id, block_offset, length_arg)
         local block = slr.inputs[block_id]
         local block_length = #block
 
-        if not eoread_arg then return block_length end
-        local eoread = math.tointeger(eoread_arg)
-        if not eoread then
-            return nil, string.format('Bad length argument %s', eoread_arg)
+        if not length_arg then return block_length end
+        local longueur = math.tointeger(length_arg)
+        if not longueur then
+            return nil, string.format('Bad length argument %s', length_arg)
         end
-        local new_end_pos = eoread >= 0 and block_offset + eoread or
-            block_length + eoread + 1
-        if new_end_pos < 0 then
-            return nil, string.format('Last position is before start of block: %s', eoread_arg)
+        local eoread = longueur >= 0 and block_offset + longueur or
+            block_length + longueur + 1
+        if eoread < 0 then
+            return nil, string.format('Last position is before start of block: %s', length_arg)
         end
-        if new_end_pos > block_length then
-            return nil, string.format('Last position is after end of block: %s', eoread_arg)
+        if eoread > block_length then
+            return nil, string.format('Last position is after end of block: %s', length_arg)
         end
-        return new_end_pos
+        return eoread
     end
 
-    function glue.check_block_range(slr, block_id_arg, current_pos_arg, length_arg)
+    -- assumes nothing about arguments
+    -- block_id defaults to current block if block_id_arg == nil
+    -- block_offset defaults to current offset in current block
+    --     if block_offset_arg == nil
+    -- eoread defaults to end-of-block if length_arg == nil
+    -- returns block_offset, eoread on success
+    -- returns nil, error-message otherwise
+    function glue.check_block_range(slr, block_id_arg, block_offset_arg, length_arg)
         local block_id, erreur
-            = glue.check_block_id(slr, block_id_arg, current_pos_arg)
+            = glue.check_block_id(slr, block_id_arg, block_offset_arg)
         if not block_id then return nil, erreur end
-        local new_current_pos, erreur
-            = glue.check_block_offset(slr, block_id, current_pos_arg)
-        if not new_current_pos then return nil, erreur end
-        local new_end_pos, erreur
-            = glue.check_block_length(slr, block_id, new_current_pos, length_arg)
-        if not new_end_pos then return nil, erreur end
-        return new_current_pos, new_end_pos
+        local new_block_offset, erreur
+            = glue.check_block_offset(slr, block_id, block_offset_arg)
+        if not new_block_offset then return nil, erreur end
+        local eoread, erreur
+            = glue.check_block_length(slr, block_id, new_block_offset, length_arg)
+        if not eoread then return nil, erreur end
+        return new_block_offset, eoread
     end
 ```
 <!--
