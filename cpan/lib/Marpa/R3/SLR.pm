@@ -71,16 +71,16 @@ END_OF_LUA
 
 # Substring in terms of locations in the input stream
 # This is the one users will be most interested in.
-# TODO - Document block_ix parameter
+# TODO - Document block_id parameter
 sub Marpa::R3::Scanless::R::literal {
-    my ( $slr, $l0_start, $l0_count, $block_ix ) = @_;
+    my ( $slr, $l0_start, $l0_count, $block_id ) = @_;
 
     my ($literal) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'iii', $l0_start, $l0_count, ($block_ix // -1));
-    local slr, l0_start, l0_count, block_ix = ...
-    if block_ix <= 0 then block_ix = nil end
-    return slr:l0_literal(l0_start, l0_count, block_ix)
+    <<'END_OF_LUA', 'iii', $l0_start, $l0_count, ($block_id // -1));
+    local slr, l0_start, l0_count, block_id = ...
+    if block_id <= 0 then block_id = nil end
+    return slr:l0_literal(l0_start, l0_count, block_id)
 END_OF_LUA
 
     return $literal;
@@ -339,8 +339,8 @@ sub Marpa::R3::Scanless::R::read {
     }
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
-    my $block_ix = $slr->block_new($p_string);
-    $slr->block_set($block_ix);
+    my $block_id = $slr->block_new($p_string);
+    $slr->block_set($block_id);
     $slr->block_move($start_pos, $length);
     return $slr->resume( $start_pos, $length );
 
@@ -877,7 +877,7 @@ END_OF_LUA
     return $line_no, $column_no;
 } ## end sub Marpa::R3::Scanless::R::line_column
 
-# TODO -- Document block_ix result
+# TODO -- Document block_id result
 # TODO -- Delete this in favor of block_where()?
 sub Marpa::R3::Scanless::R::pos {
     my ($slr) = @_;
@@ -917,7 +917,7 @@ sub Marpa::R3::Scanless::R::block_new {
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
 
     my $coro_arg = undef;
-    my ($block_ix) = $slr->coro_by_tag(
+    my ($block_id) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 's',
@@ -971,39 +971,39 @@ qq{Registering character $char_desc as symbol $symbol_id: },
         },
         <<'END_OF_LUA');
             local slr, input_string = ...
-            local new_block_ix
+            local new_block_id
             _M.wrap(function()
-                    new_block_ix = slr:block_new(input_string)
-                    return 'ok', new_block_ix
+                    new_block_id = slr:block_new(input_string)
+                    return 'ok', new_block_id
                 end
             )
 END_OF_LUA
 
-    return $block_ix;
+    return $block_id;
 }
 
 # TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_where {
-    my ($slr, $block_ix) = @_;
+    my ($slr, $block_id) = @_;
     my ($l0_pos, $l0_end);
-    ($block_ix, $l0_pos, $l0_end)
+    ($block_id, $l0_pos, $l0_end)
         = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $block_ix );
-        local slr, block_ix_arg = ...
-        local block_ix, erreur = glue.check_block_id(slr, block_ix_arg)
-        if not block_ix then
+            <<'END_OF_LUA', 'i', $block_id );
+        local slr, block_id_arg = ...
+        local block_id, erreur = glue.check_block_id(slr, block_id_arg)
+        if not block_id then
            error(erreur)
         end
         local l0_pos, l0_end
-        block_ix, l0_pos, l0_end = slr:block_where(block_ix)
-        return block_ix, l0_pos, l0_end
+        block_id, l0_pos, l0_end = slr:block_where(block_id)
+        return block_id, l0_pos, l0_end
 END_OF_LUA
-    return $block_ix, $l0_pos, $l0_end;
+    return $block_id, $l0_pos, $l0_end;
 }
 
 # TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_set {
-    my ($slr, $block_ix) = @_;
+    my ($slr, $block_id) = @_;
     if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->block_set() called from inside a handler\n",
@@ -1014,47 +1014,50 @@ sub Marpa::R3::Scanless::R::block_set {
         );
     }
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $block_ix );
-        local slr, block_ix_arg = ...
-        local block_ix, erreur = glue.check_block_id(slr, block_ix_arg)
-        if not block_ix then
+            <<'END_OF_LUA', 'i', $block_id );
+        local slr, block_id_arg = ...
+        local block_id, erreur = glue.check_block_id(slr, block_id_arg)
+        if not block_id then
            error(erreur)
         end
-        return slr:block_set(block_ix)
+        return slr:block_set(block_id)
 END_OF_LUA
     return;
 }
 
+# block_id defaults to current block
+# block_offset defaults to current offset of current block
+# length defaults to -1
 sub Marpa::R3::Scanless::R::block_move {
-    my ($slr, $current_pos, $length, $block_ix) = @_;
+    my ($slr, $block_offset, $length, $block_id) = @_;
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'iii', $block_ix, $current_pos, $length );
-        local slr, block_ix_arg, current_pos_arg, length_arg = ...
-        local block_ix, erreur
-        if block_ix_arg then
-            block_ix, erreur = glue.check_block_id(slr, block_ix_arg)
-            if not block_ix then error(erreur) end
+            <<'END_OF_LUA', 'iii', $block_id, $block_offset, $length );
+        local slr, block_id_arg, block_offset_arg, length_arg = ...
+        local block_id, erreur
+        if block_id_arg then
+            block_id, erreur = glue.check_block_id(slr, block_id_arg)
+            if not block_id then error(erreur) end
         end
-        local new_current_pos, retour2
-            = glue.check_block_range(slr, block_ix_arg, current_pos_arg, length_arg)
-        if not new_current_pos then
+        local new_block_offset, retour2
+            = glue.check_block_range(slr, block_id_arg, block_offset_arg, length_arg)
+        if not new_block_offset then
            -- retour2 is error message
            error(retour2)
         end
         -- retour2 is end position
-        return slr:block_move(new_current_pos, retour2, block_ix)
+        return slr:block_move(new_block_offset, retour2, block_id)
 END_OF_LUA
     return;
 }
 
-# TODO -- Document block_ix argument
+# TODO -- Document block_id argument
 sub Marpa::R3::Scanless::R::input_length {
-    my ( $slr, $block_ix ) = @_;
+    my ( $slr, $block_id ) = @_;
     my ($length) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'i', ($block_ix // -1));
-        local slr, block_ix  = ...
-        local block = block_ix > 0 and slr.inputs[block_ix] or slr.current_block
+    <<'END_OF_LUA', 'i', ($block_id // -1));
+        local slr, block_id  = ...
+        local block = block_id > 0 and slr.inputs[block_id] or slr.current_block
         return #block
 END_OF_LUA
 
