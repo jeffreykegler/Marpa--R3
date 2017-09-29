@@ -342,14 +342,6 @@ sub Marpa::R3::Scanless::R::read {
     my $block_ix = $slr->block_new($p_string);
     $slr->block_set($block_ix);
     $slr->block_move($start_pos, $length);
-    $slr->call_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '');
-            local slr = ...
-            slr.phase = 'read'
-            return 'ok'
-END_OF_LUA
-
     return $slr->resume( $start_pos, $length );
 
 } ## end sub Marpa::R3::Scanless::R::read
@@ -392,13 +384,7 @@ sub Marpa::R3::Scanless::R::resume {
                 )
             end
 
-            if slr.phase ~= 'read' then
-                if slr.phase == 'value' then
-                    error(
-                        "Attempt to resume an SLIF slr while the parse is being evaluated\n"
-                        .. '   The resume() method is not allowed once value() is called'
-                    )
-                end
+            if not slr.current_block then
                 error(
                     "Attempt to resume an SLIF slr which is not in the Read Phase\n"
                     .. '   The resume() method is only allowed in the Read Phase'
@@ -1039,7 +1025,6 @@ END_OF_LUA
     return;
 }
 
-# TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_move {
     my ($slr, $current_pos, $length, $block_ix) = @_;
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

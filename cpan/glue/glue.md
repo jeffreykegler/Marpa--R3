@@ -443,6 +443,9 @@ a message
         glue.sv_dump(element)
     end
 
+    -- returns: current block, if block_ix_arg is nil,
+    --    block_ix_arg, if block_ix_arg is non-nil and valid
+    --    nil, message if block_ix_arg is non-nil and invalid
     function glue.check_perl_l0_block_ix(slr, block_ix_arg)
         local block_ix, l0_pos, end_pos = slr:block_where(block_ix_arg)
         if not block_ix then
@@ -451,11 +454,14 @@ a message
         return block_ix
     end
 
+    -- assumes block_ix is valid or nil
+    -- returns:
+    -- TODO finish comment documenting this
     function glue.check_perl_l0_current_pos(slr, block_ix, current_pos_arg)
         local block_ix, l0_pos, end_pos = slr:block_where(block_ix)
         local block = slr.inputs[block_ix]
         local block_length = #block
-        local current_pos = current_pos_arg or l0_pos or 0
+        local current_pos = current_pos_arg or l0_pos
         local new_current_pos = math.tointeger(current_pos)
         if not new_current_pos then
             return nil, string.format('Bad current position argument %s', current_pos_arg)

@@ -1763,7 +1763,6 @@ This is a registry object.
     class_slr_fields.trace_values = true
     class_slr_fields.trailers = true
     -- TODO delete after development
-    class_slr_fields.phase = true
     class_slr_fields.has_event_handlers = true
     class_slr_fields.end_of_pause_lexeme = true
     class_slr_fields.start_of_pause_lexeme = true
@@ -1819,7 +1818,6 @@ together.
     function _M.class_slg.slr_new(slg, flat_args)
         local slr = {}
         setmetatable(slr, _M.class_slr)
-        slr.phase = 'initial'
         slr.slg = slg
         slr.regix = _M.register(_M.registry, slr)
 

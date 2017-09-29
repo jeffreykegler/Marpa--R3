@@ -921,6 +921,65 @@ the tree.
 Symbol tables are one example of the kind of data which parses often
 require, but which it is not convenient to accumulate bottom-up.
 
+=head1 Block methods
+
+There are methods for external scanning which allow control
+of the input on the block level.
+
+=head2 block_move ()
+
+=for Marpa::R3::Display
+name: block_move() synopsis
+normalize-whitespace: 1
+
+    TODO
+
+=for Marpa::R3::Display::End
+
+Moves the current physical position to
+block offset C<offset> in the block with index
+C<block_ix>.
+The end of read is set to C<length>.
+
+If C<block_ix> is omitted, it defaults to the current
+block.
+If the C<length> is omitted it defaults to the
+length of the remainder of the block
+after the current offset.
+
+=head2 block_new ()
+
+
+=for Marpa::R3::Display
+name: block_new() synopsis
+normalize-whitespace: 1
+
+    TODO
+
+=for Marpa::R3::Display::End
+
+=head2 block_set ()
+
+
+=for Marpa::R3::Display
+name: block_set() synopsis
+normalize-whitespace: 1
+
+    TODO
+
+=for Marpa::R3::Display::End
+
+=head2 block_where ()
+
+
+=for Marpa::R3::Display
+name: block_where() synopsis
+normalize-whitespace: 1
+
+    TODO
+
+=for Marpa::R3::Display::End
+
 =head1 Mutators for external scanning
 
 =head2 activate()
