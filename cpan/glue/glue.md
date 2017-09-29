@@ -456,32 +456,43 @@ a message
 
     -- assumes block_ix is valid or nil
     -- returns:
-    -- TODO finish comment documenting this
-    function glue.check_perl_l0_current_pos(slr, block_ix, current_pos_arg)
+    --    current block offset of current block if block_offset_arg == nil
+    --    block_offset_arg as an integer if block_offset_arg is non-nil
+    --        and it converts to a valid integer
+    --    nil, error-message otherwise
+    -- note: negative block_offset_arg is converted as offset
+    -- from physical end-of-block
+    function glue.check_perl_l0_current_pos(slr, block_ix, block_offset_arg)
         local block_ix, l0_pos, end_pos = slr:block_where(block_ix)
         local block = slr.inputs[block_ix]
         local block_length = #block
-        local current_pos = current_pos_arg or l0_pos
-        local new_current_pos = math.tointeger(current_pos)
+        if not block_offset_arg then return l0_pos end
+        local new_current_pos = math.tointeger(block_offset_arg)
         if not new_current_pos then
-            return nil, string.format('Bad current position argument %s', current_pos_arg)
+            return nil, string.format('Bad current position argument %s', block_offset_arg)
         end
         if new_current_pos < 0 then
             new_current_pos = block_length + new_current_pos
         end
         if new_current_pos < 0 then
-            return nil, string.format('Current position is before start of block: %s', current_pos_arg)
+            return nil, string.format('Current position is before start of block: %s', block_offset_arg)
         end
         if new_current_pos > block_length then
-            return nil, string.format('Current position is after end of block: %s', current_pos_arg)
+            return nil, string.format('Current position is after end of block: %s', block_offset_arg)
         end
         return new_current_pos
     end
 
-    -- Note: uses a hypothetical `current_pos`, not the one actually
-    -- in the block
-    function glue.check_perl_l0_length(slr, block_ix, current_pos, length_arg)
-        local block = slr.inputs[block_ix]
+    -- assumes valid block_id, block_offset
+    -- returns:
+    --     end-of-read, converted to integer, if valid
+    --     nil, error-message, otherwise
+    -- Note: negative block_offset is converted as offset
+    --     from physical end-of-block
+    -- Note: uses the `block_offset` in its arguments, *not* the one actually
+    --     in the block
+    function glue.check_perl_l0_length(slr, block_id, block_offset, length_arg)
+        local block = slr.inputs[block_id]
         local block_length = #block
 
         local longueur = length_arg or -1
@@ -489,7 +500,7 @@ a message
         if not longueur then
             return nil, string.format('Bad length argument %s', length_arg)
         end
-        local new_end_pos = longueur >= 0 and current_pos + longueur or
+        local new_end_pos = longueur >= 0 and block_offset + longueur or
             block_length + longueur + 1
         if new_end_pos < 0 then
             return nil, string.format('Last position is before start of block: %s', length_arg)
