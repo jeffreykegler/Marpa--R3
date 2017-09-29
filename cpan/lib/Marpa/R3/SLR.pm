@@ -393,7 +393,7 @@ sub Marpa::R3::Scanless::R::resume {
 
 
            local new_current_pos, new_end_pos
-               = glue.check_perl_l0_range(slr, nil, current_pos_arg, length_arg)
+               = glue.check_block_range(slr, nil, current_pos_arg, length_arg)
            if not new_current_pos then
                -- if `new_current_pos = nil` then 2nd return value
                -- is an error message
@@ -990,7 +990,7 @@ sub Marpa::R3::Scanless::R::block_where {
         = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $block_ix );
         local slr, block_ix_arg = ...
-        local block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+        local block_ix, erreur = glue.check_block_id(slr, block_ix_arg)
         if not block_ix then
            error(erreur)
         end
@@ -1016,7 +1016,7 @@ sub Marpa::R3::Scanless::R::block_set {
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $block_ix );
         local slr, block_ix_arg = ...
-        local block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+        local block_ix, erreur = glue.check_block_id(slr, block_ix_arg)
         if not block_ix then
            error(erreur)
         end
@@ -1032,11 +1032,11 @@ sub Marpa::R3::Scanless::R::block_move {
         local slr, block_ix_arg, current_pos_arg, length_arg = ...
         local block_ix, erreur
         if block_ix_arg then
-            block_ix, erreur = glue.check_perl_l0_block_ix(slr, block_ix_arg)
+            block_ix, erreur = glue.check_block_id(slr, block_ix_arg)
             if not block_ix then error(erreur) end
         end
         local new_current_pos, retour2
-            = glue.check_perl_l0_range(slr, block_ix_arg, current_pos_arg, length_arg)
+            = glue.check_block_range(slr, block_ix_arg, current_pos_arg, length_arg)
         if not new_current_pos then
            -- retour2 is error message
            error(retour2)

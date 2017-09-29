@@ -443,18 +443,18 @@ a message
         glue.sv_dump(element)
     end
 
-    -- returns: current block, if block_ix_arg is nil,
-    --    block_ix_arg, if block_ix_arg is non-nil and valid
-    --    nil, message if block_ix_arg is non-nil and invalid
-    function glue.check_perl_l0_block_ix(slr, block_ix_arg)
-        local block_ix, l0_pos, end_pos = slr:block_where(block_ix_arg)
-        if not block_ix then
-            return nil, string.format('Bad block index' .. block_ix_arg)
+    -- returns: current block, if block_id_arg is nil,
+    --    block_id_arg, if block_id_arg is non-nil and valid
+    --    nil, message if block_id_arg is non-nil and invalid
+    function glue.check_block_id(slr, block_id_arg)
+        local block_id, l0_pos, end_pos = slr:block_where(block_id_arg)
+        if not block_id then
+            return nil, string.format('Bad block index' .. block_id_arg)
         end
-        return block_ix
+        return block_id
     end
 
-    -- assumes block_ix is valid or nil
+    -- assumes block_id is valid or nil
     -- returns:
     --    current block offset of current block if block_offset_arg == nil
     --    block_offset_arg as an integer if block_offset_arg is non-nil
@@ -462,9 +462,9 @@ a message
     --    nil, error-message otherwise
     -- note: negative block_offset_arg is converted as offset
     -- from physical end-of-block
-    function glue.check_perl_l0_current_pos(slr, block_ix, block_offset_arg)
-        local block_ix, l0_pos, end_pos = slr:block_where(block_ix)
-        local block = slr.inputs[block_ix]
+    function glue.check_block_offset(slr, block_id, block_offset_arg)
+        local block_id, l0_pos, end_pos = slr:block_where(block_id)
+        local block = slr.inputs[block_id]
         local block_length = #block
         if not block_offset_arg then return l0_pos end
         local new_current_pos = math.tointeger(block_offset_arg)
@@ -485,41 +485,42 @@ a message
 
     -- assumes valid block_id, block_offset
     -- returns:
-    --     end-of-read, converted to integer, if valid
+    --     end-of_block, if eoread_arg == nil
+    --     end-of-read, converted to integer, if eoread_arg valid and non-nil
     --     nil, error-message, otherwise
     -- Note: negative block_offset is converted as offset
     --     from physical end-of-block
     -- Note: uses the `block_offset` in its arguments, *not* the one actually
     --     in the block
-    function glue.check_perl_l0_length(slr, block_id, block_offset, length_arg)
+    function glue.check_block_length(slr, block_id, block_offset, eoread_arg)
         local block = slr.inputs[block_id]
         local block_length = #block
 
-        local longueur = length_arg or -1
-        longueur = math.tointeger(longueur)
-        if not longueur then
-            return nil, string.format('Bad length argument %s', length_arg)
+        if not eoread_arg then return block_length end
+        local eoread = math.tointeger(eoread_arg)
+        if not eoread then
+            return nil, string.format('Bad length argument %s', eoread_arg)
         end
-        local new_end_pos = longueur >= 0 and block_offset + longueur or
-            block_length + longueur + 1
+        local new_end_pos = eoread >= 0 and block_offset + eoread or
+            block_length + eoread + 1
         if new_end_pos < 0 then
-            return nil, string.format('Last position is before start of block: %s', length_arg)
+            return nil, string.format('Last position is before start of block: %s', eoread_arg)
         end
         if new_end_pos > block_length then
-            return nil, string.format('Last position is after end of block: %s', length_arg)
+            return nil, string.format('Last position is after end of block: %s', eoread_arg)
         end
         return new_end_pos
     end
 
-    function glue.check_perl_l0_range(slr, block_ix_arg, current_pos_arg, length_arg)
-        local block_ix, erreur
-            = glue.check_perl_l0_block_ix(slr, block_ix_arg, current_pos_arg)
-        if not block_ix then return nil, erreur end
+    function glue.check_block_range(slr, block_id_arg, current_pos_arg, length_arg)
+        local block_id, erreur
+            = glue.check_block_id(slr, block_id_arg, current_pos_arg)
+        if not block_id then return nil, erreur end
         local new_current_pos, erreur
-            = glue.check_perl_l0_current_pos(slr, block_ix, current_pos_arg)
+            = glue.check_block_offset(slr, block_id, current_pos_arg)
         if not new_current_pos then return nil, erreur end
         local new_end_pos, erreur
-            = glue.check_perl_l0_length(slr, block_ix, new_current_pos, length_arg)
+            = glue.check_block_length(slr, block_id, new_current_pos, length_arg)
         if not new_end_pos then return nil, erreur end
         return new_current_pos, new_end_pos
     end
