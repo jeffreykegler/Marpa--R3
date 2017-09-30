@@ -1738,7 +1738,7 @@ one for each subgrammar.
     class_blk_fields.text = true
     class_blk_fields.index = true
     -- change these
-    class_blk_fields.end_pos = true
+    class_blk_fields.eoread = true
     class_blk_fields.l0_pos = true
 ```
 
@@ -1990,7 +1990,7 @@ the `codepoint` command.
             new_block[#new_block+1] = vlq
         end
         new_block.l0_pos = 0
-        new_block.end_pos = #new_block
+        new_block.eoread = #new_block
         return this_index
     end
 ```
@@ -2007,20 +2007,20 @@ the `codepoint` command.
         end
         if not block then return 0, 0, 0 end
         return block.index, block.l0_pos,
-            block.end_pos
+            block.eoread
     end
     function _M.class_slr.block_set(slr, block_ix)
         local block = slr.inputs[block_ix]
         slr.current_block = block
     end
-    function _M.class_slr.block_move(slr, l0_pos, end_pos, block_ix)
+    function _M.class_slr.block_move(slr, l0_pos, eoread, block_ix)
         local block =
             block_ix and slr.inputs[block_ix] or slr.current_block
         if l0_pos then
             block.l0_pos = l0_pos
         end
-        if end_pos then
-            block.end_pos = end_pos
+        if eoread then
+            block.eoread = eoread
         end
     end
 ```
@@ -2491,8 +2491,8 @@ if there is some way to continue it),
         slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
         while true do
-            local _, l0_pos, end_pos = slr:block_where()
-            if l0_pos >= end_pos then
+            local _, l0_pos, eoread = slr:block_where()
+            if l0_pos >= eoread then
                 -- a 'normal' return
                 return false
             end
@@ -2649,8 +2649,8 @@ otherwise `false` and a status string.
             slr:l0r_new()
         end
         while true do
-            local block_ix, l0_pos, end_pos = slr:block_where()
-            if l0_pos >= end_pos then
+            local block_ix, l0_pos, eoread = slr:block_where()
+            if l0_pos >= eoread then
                 return true
             end
             -- +1 because codepoints array is 1-based
@@ -3186,13 +3186,13 @@ lexer.
         end
         slr:block_move(start_pos)
         do
-            local end_pos
+            local eoread
             if longueur < 0 then
-               end_pos = input_length + longueur + 1
+               eoread = input_length + longueur + 1
             else
-               end_pos = start_pos + longueur
+               eoread = start_pos + longueur
             end
-            if end_pos < 0 or end_pos > input_length then
+            if eoread < 0 or eoread > input_length then
                 error(string.format(
                    'Bad length in lexeme_complete(): %s', length_arg
                ))
