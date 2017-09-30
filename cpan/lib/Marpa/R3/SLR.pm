@@ -845,7 +845,6 @@ END_OF_LUA
     return $l0_pos;
 }
 
-# TODO -- Document this
 sub Marpa::R3::Scanless::R::block_new {
     my ( $slr, $p_string ) = @_;
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];

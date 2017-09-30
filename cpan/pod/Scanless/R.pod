@@ -949,7 +949,6 @@ after the current offset.
 
 =head2 block_new ()
 
-
 =for Marpa::R3::Display
 name: block_new() synopsis
 normalize-whitespace: 1
@@ -958,8 +957,27 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=head2 block_set ()
+Creates a new block and returns its block id.
+The first, required, argument is C<$input_string>,
+which becomes the input string for the block.
 
+It is important to note that C<block_new()>
+does B<not> set the current block to the block it creates.
+Many applications create input blocks
+in sets, for later use,
+and this behavior is convenient for them.
+
+=head2 block_read ()
+
+=for Marpa::R3::Display
+name: block_read() synopsis
+normalize-whitespace: 1
+
+    TODO
+
+=for Marpa::R3::Display::End
+
+=head2 block_set ()
 
 =for Marpa::R3::Display
 name: block_set() synopsis
@@ -970,7 +988,6 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =head2 block_where ()
-
 
 =for Marpa::R3::Display
 name: block_where() synopsis
