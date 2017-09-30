@@ -359,55 +359,10 @@ sub Marpa::R3::Scanless::R::resume {
     }
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
-
-    $slr->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 'ii',
-            args => [ $start_pos, $length ],
-            handlers => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-                event => gen_app_event_handler($slr),
-            }
-        },
-        <<'END_OF_LUA');
-            local slr, block_offset_arg, length_arg = ...
-
-            if #slr.inputs <= 0 then
-                error(
-                    "Attempt to resume an SLIF recce which has no string set\n"
-                    .. '  The string should be set first using read()'
-                )
-            end
-
-            if not slr.current_block then
-                error(
-                    "Attempt to resume an SLIF slr which is not in the Read Phase\n"
-                    .. '   The resume() method is only allowed in the Read Phase'
-                )
-            end
-
-
-           local new_block_offset, new_end_pos
-               = glue.check_block_range(slr, nil, block_offset_arg, length_arg)
-           if not new_block_offset then
-               -- if `new_block_offset = nil` then 2nd return value
-               -- is an error message
-               error('slr->resume(): ' .. new_end_pos)
-           end
-           slr:block_move(new_block_offset, new_end_pos)
-           _M.wrap(function ()
-               return slr:block_read()
-           end
-      )
-END_OF_LUA
-
+    $slr->block_move( $start_pos, $length );
+    $slr->block_read();
     return $slr->pos();
-} ## end sub Marpa::R3::Scanless::R::resume
+}
 
 sub character_describe {
     my ($slr, $codepoint) = @_;
