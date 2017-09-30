@@ -342,9 +342,9 @@ sub Marpa::R3::Scanless::R::read {
     my $block_id = $slr->block_new($p_string);
     $slr->block_set($block_id);
     $slr->block_move($start_pos, $length);
-    return $slr->resume( $start_pos, $length );
-
-} ## end sub Marpa::R3::Scanless::R::read
+    $slr->block_read();
+    return $slr->pos();
+}
 
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
@@ -375,7 +375,7 @@ sub Marpa::R3::Scanless::R::resume {
             }
         },
         <<'END_OF_LUA');
-            local slr, current_pos_arg, length_arg = ...
+            local slr, block_offset_arg, length_arg = ...
 
             if #slr.inputs <= 0 then
                 error(
@@ -392,14 +392,14 @@ sub Marpa::R3::Scanless::R::resume {
             end
 
 
-           local new_current_pos, new_end_pos
-               = glue.check_block_range(slr, nil, current_pos_arg, length_arg)
-           if not new_current_pos then
-               -- if `new_current_pos = nil` then 2nd return value
+           local new_block_offset, new_end_pos
+               = glue.check_block_range(slr, nil, block_offset_arg, length_arg)
+           if not new_block_offset then
+               -- if `new_block_offset = nil` then 2nd return value
                -- is an error message
                error('slr->resume(): ' .. new_end_pos)
            end
-           slr:block_move(new_current_pos, new_end_pos)
+           slr:block_move(new_block_offset, new_end_pos)
            _M.wrap(function ()
                return slr:block_read()
            end
@@ -1046,6 +1046,34 @@ sub Marpa::R3::Scanless::R::block_move {
         end
         -- retour2 is end position
         return slr:block_move(new_block_offset, retour2, block_id)
+END_OF_LUA
+    return;
+}
+
+sub Marpa::R3::Scanless::R::block_read {
+    my ($slr ) = @_;
+    $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args => [],
+            handlers => {
+                trace => sub {
+                    my ($msg) = @_;
+                    my $trace_file_handle =
+                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+                event => gen_app_event_handler($slr),
+            }
+        },
+        <<'END_OF_LUA');
+        local slr = ...
+        _M.wrap(function ()
+                return slr:block_read()
+            end
+        )
 END_OF_LUA
     return;
 }
