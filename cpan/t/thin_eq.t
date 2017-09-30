@@ -17,11 +17,12 @@
 #     is up to the up.
 # 2.  Use only Libmarpa with an "as thin as reasonably possible"
 #     Lua interface.
-#
-# At present, I'm not sure exactly if this interface will ever
-# have a formal specification.  I keep it because I feel more
-# secure if the test suite has a non-DSL dependent interface to
-# full facilities of Libmarpa.
+
+# Fri Sep 29 20:02:16 PDT 2017
+# At of this timestamp, I expect that the interface in this test
+# will *not* be the basis of a new "thin interface".  There may not
+# be a new "thin IF".   If there is, I expect that
+# it will be created from scratch.
 
 use 5.010001;
 

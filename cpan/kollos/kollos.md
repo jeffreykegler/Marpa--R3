@@ -22,6 +22,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 # The Kollos code
 
 # Table of contents
+<!--
+cd kollos && ../lua/lua toc.lua < kollos.md
+-->
 * [About Kollos](#about-kollos)
 * [Abbreviations](#abbreviations)
 * [Development Notes](#development-notes)
@@ -119,7 +122,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 * [Libmarpa valuer wrapper class](#libmarpa-valuer-wrapper-class)
   * [Adjust metal tables](#adjust-metal-tables)
   * [Get a value from a valuator](#get-a-value-from-a-valuator)
-  * [Reset a valuator](#reset-a-valuator)
 * [Libmarpa interface](#libmarpa-interface)
   * [Standard template methods](#standard-template-methods)
   * [Libmarpa class constructors](#libmarpa-class-constructors)
@@ -1727,6 +1729,363 @@ one for each subgrammar.
     end
 ```
 
+## Block class
+
+### SLR fields
+
+```
+    -- miranda: section+ class_blk field declarations
+    class_blk_fields.text = true
+    class_blk_fields.index = true
+    -- change these
+    class_blk_fields.end_pos = true
+    class_blk_fields.l0_pos = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_blk = {}
+    -- miranda: section+ populate metatables
+    local class_blk_fields = {}
+    -- miranda: insert class_blk field declarations
+    declarations(_M.class_blk, class_blk_fields, 'blk')
+    do
+        local old_new_index = _M.class_blk.__newindex
+        -- allow integer keys
+        _M.class_blk.__newindex = function (t, n, v)
+            if type(n) == 'number' then return rawset(t, n, v) end
+            return old_new_index(t, n, v)
+            end
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_literal(slr, l0_start, l0_length, block_ix)
+        if not block_ix then block_ix = slr.current_block.index end
+        local block = slr.inputs[block_ix]
+        local start_byte_p = slr:per_pos(block_ix, l0_start)
+        local end_byte_p = slr:per_pos(block_ix, l0_start + l0_length)
+        local text = block.text
+        return text:sub(start_byte_p, end_byte_p - 1)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_literal(slr, g1_start, g1_count)
+        -- io.stderr:write(string.format("g1_literal(%d, %d)\n",
+            -- g1_start, g1_count
+        -- ))
+
+        if g1_count <= 0 then return '' end
+        local pieces = {}
+        local inputs = slr.inputs
+        for block_ix, start, len in
+            sweep_range(slr, g1_start, g1_start+g1_count-1)
+        do
+            local start_byte_p = slr:per_pos(block_ix, start)
+            local end_byte_p = slr:per_pos(block_ix, start + len)
+            local block = inputs[block_ix]
+            local text = block.text
+            local piece = text:sub(start_byte_p, end_byte_p - 1)
+            pieces[#pieces+1] = piece
+        end
+        return table.concat(pieces)
+    end
+
+    function _M.class_slr.g1_span_l0_length(slr, g1_start, g1_count)
+        if g1_count == 0 then return 0 end
+        local inputs = slr.inputs
+        local length = 0;
+        for _, _, sweep_length in
+            sweep_range(slr, g1_start, g1_start+g1_count-1)
+        do
+            length = length + sweep_length
+        end
+        return length
+    end
+```
+
+The current position in L0 terms -- a kind of "end of parse" location.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.l0_current_pos(slr)
+        local per_es = slr.per_es
+        local this_sweep = per_es[#per_es]
+        local end_block = this_sweep[#this_sweep-2]
+        local end_pos = this_sweep[#this_sweep-1]
+        local end_len = this_sweep[#this_sweep]
+        return end_block, end_pos + end_len
+    end
+```
+
+Takes a g1 position,
+call it `g1_pos`,
+and returns
+L0 position where the g1 position starts
+as a `block, pos` duple.
+As a special case,
+when `g1_pos` is one after the last actual
+g1 position,
+treats it as
+an "end of parse" location,
+and returns the current L0 position.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_pos_to_l0_first(slr, g1_pos)
+        local per_es = slr.per_es
+        if g1_pos == #per_es then
+            return slr:l0_current_pos()
+        end
+        local this_sweep = per_es[g1_pos+1]
+        if not this_sweep then
+            error(string.format(
+                "slr:g1_pos_to_l0_first(%d): bad argument\n\z
+                \u{20}   Allowed values are %d-%d\n",
+                g1_pos, 0, #per_es-1
+            ))
+        end
+        local start_block = this_sweep[1]
+        local start_pos = this_sweep[2]
+        return start_block, start_pos
+    end
+```
+
+Takes a g1 position and returns
+the last actual L0 position of the g1 position
+as a `block, pos` duple.
+The position is "actual" in the sense that
+there is actually a codepoint at that position.
+Allows for the possible future, where the per-es sweep
+contains more than one L0 span.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.g1_pos_to_l0_last(slr, g1_pos)
+        local per_es = slr.per_es
+        local this_sweep = per_es[g1_pos+1]
+        if not this_sweep then
+            error(string.format(
+                "slr:g1_pos_to_l0_last(%d): bad argument\n\z
+                \u{20}   Allowed values are %d-%d\n",
+                g1_pos, 0, #per_es-1
+            ))
+        end
+        local end_block = this_sweep[#this_sweep-2]
+        local end_pos = this_sweep[#this_sweep-1]
+        local end_len = this_sweep[#this_sweep]
+        return end_block, end_pos + end_len - 1
+    end
+```
+
+# Brief description of block/line/column for
+# an L0 range
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lc_brief(slr, block, l0_pos)
+        if not block then block = slr.current_block.index end
+        local _, line_no, column_no = slr:per_pos(block, l0_pos)
+        return string.format("B%dL%dc%d",
+            block, line_no, column_no)
+    end
+}
+```
+
+Brief description of block/line/column for
+an L0 range
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lc_range_brief(slr, block1, l0_pos1, block2, l0_pos2)
+        local _, line1, column1 = slr:per_pos(block1, l0_pos1)
+        local _, line2, column2 = slr:per_pos(block2, l0_pos2)
+        if block1 ~= block2 then
+           return string.format("B%dL%dc%d-B%dL%dc%d",
+             block1, line1, column1, block2, line2, column2)
+        end
+        if line1 ~= line2 then
+           return string.format("B%dL%dc%d-L%dc%d",
+             block1, line1, column1, line2, column2)
+        end
+        if column1 ~= column2 then
+           return string.format("B%dL%dc%d-%d",
+             block1, line1, column1, column2)
+        end
+       return string.format("B%dL%dc%d",
+             block1, line1, column1)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lc_table_brief(slr, locations)
+        table.sort(locations, _M.cmp_seq)
+        local block1, l0_pos1 = table.unpack(locations[1])
+        local block2, l0_pos2 = table.unpack(locations[#locations])
+        return slr:lc_range_brief(block1, l0_pos1, block2, l0_pos2)
+    end
+```
+
+`block_new` must be called in a coroutine which handles
+the `codepoint` command.
+
+```
+    -- miranda: section+ most Lua function definitions
+    local eols = {
+        [0x0A] = 0x0A,
+        [0x0D] = 0x0D,
+        [0x0085] = 0x0085,
+        [0x000B] = 0x000B,
+        [0x000C] = 0x000C,
+        [0x2028] = 0x2028,
+        [0x2029] = 0x2029
+    }
+
+    function _M.class_slr.block_new(slr, input_string)
+        local trace_terminals = slr.trace_terminals
+        local inputs = slr.inputs
+        local new_block = setmetatable({}, _M.class_blk)
+        local this_index = #inputs + 1
+        inputs[this_index] = new_block
+        new_block.text = input_string
+        new_block.index = #inputs
+        local ix = 1
+
+        local eol_seen = false
+        local line_no = 1
+        local column_no = 0
+        local per_codepoint = slr.slg.per_codepoint
+        for byte_p, codepoint in utf8.codes(input_string) do
+
+            if not per_codepoint[codepoint] then
+               local new_codepoint = {}
+               per_codepoint[codepoint] = new_codepoint
+               local codepoint_data = coroutine.yield('codepoint', codepoint, trace_terminals)
+               -- print('coro_ret: ', inspect(codepoint_data) )
+               if codepoint_data.is_graphic == 'true' then
+                   new_codepoint.is_graphic = true
+               end
+               local symbols = codepoint_data.symbols or {}
+               for ix = 1, #symbols do
+                   new_codepoint[ix] = math.tointeger(symbols[ix])
+               end
+               -- print('new_codepoint:', inspect(new_codepoint))
+            end
+
+            -- line numbering logic
+            if eol_seen and
+               (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
+               eol_seen = false
+               line_no = line_no + 1
+               column_no = 0
+            end
+            column_no = column_no + 1
+            eol_seen = eols[codepoint]
+
+            local vlq = _M.to_vlq({ byte_p, line_no, column_no })
+            new_block[#new_block+1] = vlq
+        end
+        new_block.l0_pos = 0
+        new_block.end_pos = #new_block
+        return this_index
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.block_where(slr, block_ix)
+        local block
+        if block_ix then
+            block = slr.inputs[block_ix]
+            if not block then return end
+        else
+            block = slr.current_block
+        end
+        if not block then return 0, 0, 0 end
+        return block.index, block.l0_pos,
+            block.end_pos
+    end
+    function _M.class_slr.block_set(slr, block_ix)
+        local block = slr.inputs[block_ix]
+        slr.current_block = block
+    end
+    function _M.class_slr.block_move(slr, l0_pos, end_pos, block_ix)
+        local block =
+            block_ix and slr.inputs[block_ix] or slr.current_block
+        if l0_pos then
+            block.l0_pos = l0_pos
+        end
+        if end_pos then
+            block.end_pos = end_pos
+        end
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.block_read(slr)
+        local events = {}
+        local event_status
+        while true do
+            local alive = slr:read()
+            event_status, events = slr:convert_libmarpa_events()
+            if not alive or #events > 0 or event_status == 'pause' then
+                break
+            end
+        end
+        return 'ok', events
+    end
+```
+
+Returns byte position, line and column of `pos`
+in block with index `block_ix`.
+Caller must ensure `block` and `pos` are valid.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.per_pos(slr, block_ix, pos)
+        local block = slr.inputs[block_ix]
+        -- codepoints array is 1-based
+        local codepoint_ix = pos+1
+        local text = block.text
+        if codepoint_ix > #block then
+            -- It is useful to have an "end of block"
+            -- position.  No codepoint, but line is
+            -- last line and byte_p and column are one
+            -- after the end
+            if codepoint_ix == #block + 1 then
+                local vlq = block[#block]
+                local last_byte_p, last_line_no, last_column_no
+                    = table.unpack(_M.from_vlq(vlq))
+                return #text+1, last_line_no, last_column_no+1
+            end
+            error(string.format(
+                "Internal error: invalid block,pos: %d, %d\n\z
+                \u{20}   pos must be from 0-%d\n",
+                block_ix, pos, #block))
+        end
+        local vlq = block[codepoint_ix]
+        -- print(inspect(_M.from_vlq(vlq)))
+        return table.unpack(_M.from_vlq(vlq))
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.codepoint_from_pos(slr, block, pos)
+        local byte_p = slr:per_pos(block, pos)
+        local input = slr.inputs[block]
+        local text = input.text
+        if byte_p > #text then return end
+        return utf8.codepoint(text, byte_p)
+    end
+
+```
+
 ## SLIF recognizer (SLR) class
 
 This is a registry object.
@@ -3085,333 +3444,6 @@ TODO: Allow for leading trailer, final trailer.
             result.value = slr.token_values[value_ix]
         end
         return result
-    end
-
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_literal(slr, l0_start, l0_length, block_ix)
-        if not block_ix then block_ix = slr.current_block.index end
-        local block = slr.inputs[block_ix]
-        local start_byte_p = slr:per_pos(block_ix, l0_start)
-        local end_byte_p = slr:per_pos(block_ix, l0_start + l0_length)
-        local text = block.text
-        return text:sub(start_byte_p, end_byte_p - 1)
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_literal(slr, g1_start, g1_count)
-        -- io.stderr:write(string.format("g1_literal(%d, %d)\n",
-            -- g1_start, g1_count
-        -- ))
-
-        if g1_count <= 0 then return '' end
-        local pieces = {}
-        local inputs = slr.inputs
-        for block_ix, start, len in
-            sweep_range(slr, g1_start, g1_start+g1_count-1)
-        do
-            local start_byte_p = slr:per_pos(block_ix, start)
-            local end_byte_p = slr:per_pos(block_ix, start + len)
-            local block = inputs[block_ix]
-            local text = block.text
-            local piece = text:sub(start_byte_p, end_byte_p - 1)
-            pieces[#pieces+1] = piece
-        end
-        return table.concat(pieces)
-    end
-
-    function _M.class_slr.g1_span_l0_length(slr, g1_start, g1_count)
-        if g1_count == 0 then return 0 end
-        local inputs = slr.inputs
-        local length = 0;
-        for _, _, sweep_length in
-            sweep_range(slr, g1_start, g1_start+g1_count-1)
-        do
-            length = length + sweep_length
-        end
-        return length
-    end
-```
-
-The current position in L0 terms -- a kind of "end of parse" location.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_current_pos(slr)
-        local per_es = slr.per_es
-        local this_sweep = per_es[#per_es]
-        local end_block = this_sweep[#this_sweep-2]
-        local end_pos = this_sweep[#this_sweep-1]
-        local end_len = this_sweep[#this_sweep]
-        return end_block, end_pos + end_len
-    end
-```
-
-Takes a g1 position,
-call it `g1_pos`,
-and returns
-L0 position where the g1 position starts
-as a `block, pos` duple.
-As a special case,
-when `g1_pos` is one after the last actual
-g1 position,
-treats it as
-an "end of parse" location,
-and returns the current L0 position.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_pos_to_l0_first(slr, g1_pos)
-        local per_es = slr.per_es
-        if g1_pos == #per_es then
-            return slr:l0_current_pos()
-        end
-        local this_sweep = per_es[g1_pos+1]
-        if not this_sweep then
-            error(string.format(
-                "slr:g1_pos_to_l0_first(%d): bad argument\n\z
-                \u{20}   Allowed values are %d-%d\n",
-                g1_pos, 0, #per_es-1
-            ))
-        end
-        local start_block = this_sweep[1]
-        local start_pos = this_sweep[2]
-        return start_block, start_pos
-    end
-```
-
-Takes a g1 position and returns
-the last actual L0 position of the g1 position
-as a `block, pos` duple.
-The position is "actual" in the sense that
-there is actually a codepoint at that position.
-Allows for the possible future, where the per-es sweep
-contains more than one L0 span.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_pos_to_l0_last(slr, g1_pos)
-        local per_es = slr.per_es
-        local this_sweep = per_es[g1_pos+1]
-        if not this_sweep then
-            error(string.format(
-                "slr:g1_pos_to_l0_last(%d): bad argument\n\z
-                \u{20}   Allowed values are %d-%d\n",
-                g1_pos, 0, #per_es-1
-            ))
-        end
-        local end_block = this_sweep[#this_sweep-2]
-        local end_pos = this_sweep[#this_sweep-1]
-        local end_len = this_sweep[#this_sweep]
-        return end_block, end_pos + end_len - 1
-    end
-```
-
-# Brief description of block/line/column for
-# an L0 range
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lc_brief(slr, block, l0_pos)
-        if not block then block = slr.current_block.index end
-        local _, line_no, column_no = slr:per_pos(block, l0_pos)
-        return string.format("B%dL%dc%d",
-            block, line_no, column_no)
-    end
-}
-```
-
-Brief description of block/line/column for
-an L0 range
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lc_range_brief(slr, block1, l0_pos1, block2, l0_pos2)
-        local _, line1, column1 = slr:per_pos(block1, l0_pos1)
-        local _, line2, column2 = slr:per_pos(block2, l0_pos2)
-        if block1 ~= block2 then
-           return string.format("B%dL%dc%d-B%dL%dc%d",
-             block1, line1, column1, block2, line2, column2)
-        end
-        if line1 ~= line2 then
-           return string.format("B%dL%dc%d-L%dc%d",
-             block1, line1, column1, line2, column2)
-        end
-        if column1 ~= column2 then
-           return string.format("B%dL%dc%d-%d",
-             block1, line1, column1, column2)
-        end
-       return string.format("B%dL%dc%d",
-             block1, line1, column1)
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lc_table_brief(slr, locations)
-        table.sort(locations, _M.cmp_seq)
-        local block1, l0_pos1 = table.unpack(locations[1])
-        local block2, l0_pos2 = table.unpack(locations[#locations])
-        return slr:lc_range_brief(block1, l0_pos1, block2, l0_pos2)
-    end
-```
-
-`block_new` must be called in a coroutine which handles
-the `codepoint` command.
-
-```
-    -- miranda: section+ most Lua function definitions
-    local eols = {
-        [0x0A] = 0x0A,
-        [0x0D] = 0x0D,
-        [0x0085] = 0x0085,
-        [0x000B] = 0x000B,
-        [0x000C] = 0x000C,
-        [0x2028] = 0x2028,
-        [0x2029] = 0x2029
-    }
-
-    function _M.class_slr.block_new(slr, input_string)
-        local trace_terminals = slr.trace_terminals
-        local inputs = slr.inputs
-        local new_block = {}
-        local this_index = #inputs + 1
-        inputs[this_index] = new_block
-        new_block.text = input_string
-        new_block.index = #inputs
-        local ix = 1
-
-        local eol_seen = false
-        local line_no = 1
-        local column_no = 0
-        local per_codepoint = slr.slg.per_codepoint
-        for byte_p, codepoint in utf8.codes(input_string) do
-
-            if not per_codepoint[codepoint] then
-               local new_codepoint = {}
-               per_codepoint[codepoint] = new_codepoint
-               local codepoint_data = coroutine.yield('codepoint', codepoint, trace_terminals)
-               -- print('coro_ret: ', inspect(codepoint_data) )
-               if codepoint_data.is_graphic == 'true' then
-                   new_codepoint.is_graphic = true
-               end
-               local symbols = codepoint_data.symbols or {}
-               for ix = 1, #symbols do
-                   new_codepoint[ix] = math.tointeger(symbols[ix])
-               end
-               -- print('new_codepoint:', inspect(new_codepoint))
-            end
-
-            -- line numbering logic
-            if eol_seen and
-               (eol_seen ~= 0x0D or codepoint ~= 0x0A) then
-               eol_seen = false
-               line_no = line_no + 1
-               column_no = 0
-            end
-            column_no = column_no + 1
-            eol_seen = eols[codepoint]
-
-            local vlq = _M.to_vlq({ byte_p, line_no, column_no })
-            new_block[#new_block+1] = vlq
-        end
-        new_block.l0_pos = 0
-        new_block.end_pos = #new_block
-        return this_index
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.block_where(slr, block_ix)
-        local block
-        if block_ix then
-            block = slr.inputs[block_ix]
-            if not block then return end
-        else
-            block = slr.current_block
-        end
-        if not block then return 0, 0, 0 end
-        return block.index, block.l0_pos,
-            block.end_pos
-    end
-    function _M.class_slr.block_set(slr, block_ix)
-        local block = slr.inputs[block_ix]
-        slr.current_block = block
-    end
-    function _M.class_slr.block_move(slr, l0_pos, end_pos, block_ix)
-        local block =
-            block_ix and slr.inputs[block_ix] or slr.current_block
-        if l0_pos then
-            block.l0_pos = l0_pos
-        end
-        if end_pos then
-            block.end_pos = end_pos
-        end
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.block_read(slr)
-        local events = {}
-        local event_status
-        while true do
-            local alive = slr:read()
-            event_status, events = slr:convert_libmarpa_events()
-            if not alive or #events > 0 or event_status == 'pause' then
-                break
-            end
-        end
-        return 'ok', events
-    end
-```
-
-Returns byte position, line and column of `pos`
-in block with index `block_ix`.
-Caller must ensure `block` and `pos` are valid.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.per_pos(slr, block_ix, pos)
-        local block = slr.inputs[block_ix]
-        -- codepoints array is 1-based
-        local codepoint_ix = pos+1
-        local text = block.text
-        if codepoint_ix > #block then
-            -- It is useful to have an "end of block"
-            -- position.  No codepoint, but line is
-            -- last line and byte_p and column are one
-            -- after the end
-            if codepoint_ix == #block + 1 then
-                local vlq = block[#block]
-                local last_byte_p, last_line_no, last_column_no
-                    = table.unpack(_M.from_vlq(vlq))
-                return #text+1, last_line_no, last_column_no+1
-            end
-            error(string.format(
-                "Internal error: invalid block,pos: %d, %d\n\z
-                \u{20}   pos must be from 0-%d\n",
-                block_ix, pos, #block))
-        end
-        local vlq = block[codepoint_ix]
-        -- print(inspect(_M.from_vlq(vlq)))
-        return table.unpack(_M.from_vlq(vlq))
-    end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.codepoint_from_pos(slr, block, pos)
-        local byte_p = slr:per_pos(block, pos)
-        local input = slr.inputs[block]
-        local text = input.text
-        if byte_p > #text then return end
-        return utf8.codepoint(text, byte_p)
     end
 
 ```
