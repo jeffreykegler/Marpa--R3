@@ -80,18 +80,29 @@ for my $ix ( 0 .. ( length $suffix ) - 1 ) {
 }
 
 my %matching      = ();
+my %matching_char      = ();
 my %literal_match = ();
 for my $pair (qw% () [] {} %) {
     my ( $left, $right ) = split //xms, $pair;
     $matching{$left}       = $tokens{$right};
+    $matching_char{$left}  = $right;
     $literal_match{$left}  = $right;
     $matching{$right}      = $tokens{$left};
+    $matching_char{$right} = $left;
     $literal_match{$right} = $left;
-} ## end for my $pair (qw% () [] {} %)
+}
 my %token_by_name = (
     rcurly  => $tokens{'}'},
     rsquare => $tokens{']'},
     rparen  => $tokens{')'},
+);
+my %char_by_token_name = (
+    lcurly  => '{',
+    lsquare => '[',
+    lparen  => '(',
+    rcurly  => '}',
+    rsquare => ']',
+    rparen  => ')',
 );
 
 my $g = Marpa::R3::Scanless::G->new(
@@ -200,8 +211,19 @@ sub test {
         $recce_debug_args
     );
 
+    my $main_block = $recce->block_new( \$string );
+
+    my %blk_by_bracket =  ();
+    for my $ix ( 0 .. ( length $suffix ) - 1 ) {
+        my $char = substr $suffix, $ix, 1;
+        $blk_by_bracket{$char} = $recce->block_new( \$char );
+    }
+
+    $recce->block_set( $main_block );
     # Note that we make sure only to read the "real input"
-    $pos = $recce->read( \$string, $pos, $input_length );
+    $recce->block_move( $pos, $input_length );
+    $recce->block_read();
+    $pos = $recce->pos();
 
     # For the entire input string ...
     READ: while ( $pos < $input_length ) {
@@ -209,8 +231,11 @@ sub test {
         # Then just start up again
         if ( not $rejection ) {
 
+            $recce->block_set( $main_block );
             # Note that we make sure we don't try to read the suffix
-            $pos = $recce->resume( $pos, $input_length - $pos );
+            $recce->block_move( $pos, $input_length - $pos );
+            $recce->block_read();
+            $pos = $recce->pos();
             next READ;
 
         } ## end if ( not $rejection )
@@ -222,11 +247,20 @@ sub test {
         my @expected = @{ $recce->terminals_expected() };
 
         # Find, at random, one of these tokens that is a closing bracket.
+        my ($token_char) =
+            grep {defined}
+            map  { $char_by_token_name{$_} } @{ $recce->terminals_expected() };
+        if (not $token_char) {
+            my $nextchar = substr $string, $pos, 1;
+            $token_char = $matching_char{$nextchar};
+        }
+        my $token_blk = $blk_by_bracket{$token_char};
+
         my ($token) =
             grep {defined}
             map  { $token_by_name{$_} } @{ $recce->terminals_expected() };
 
-        # If there is no expected closing bracket, then what we need A
+        # If there is no expected closing bracket, then we need
         # a new opening bracket in order to continue.  Find out which one.
         my $opening = not defined $token;
         if ($opening) {
