@@ -1737,9 +1737,8 @@ one for each subgrammar.
     -- miranda: section+ class_blk field declarations
     class_blk_fields.text = true
     class_blk_fields.index = true
-    -- change these
+    class_blk_fields.offset = true
     class_blk_fields.eoread = true
-    class_blk_fields.l0_pos = true
 ```
 
 ```
@@ -1886,9 +1885,9 @@ contains more than one L0 span.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lc_brief(slr, block, l0_pos)
+    function _M.class_slr.lc_brief(slr, block, offset)
         if not block then block = slr.current_block.index end
-        local _, line_no, column_no = slr:per_pos(block, l0_pos)
+        local _, line_no, column_no = slr:per_pos(block, offset)
         return string.format("B%dL%dc%d",
             block, line_no, column_no)
     end
@@ -1900,9 +1899,9 @@ an L0 range
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lc_range_brief(slr, block1, l0_pos1, block2, l0_pos2)
-        local _, line1, column1 = slr:per_pos(block1, l0_pos1)
-        local _, line2, column2 = slr:per_pos(block2, l0_pos2)
+    function _M.class_slr.lc_range_brief(slr, block1, offset1, block2, offset2)
+        local _, line1, column1 = slr:per_pos(block1, offset1)
+        local _, line2, column2 = slr:per_pos(block2, offset2)
         if block1 ~= block2 then
            return string.format("B%dL%dc%d-B%dL%dc%d",
              block1, line1, column1, block2, line2, column2)
@@ -1924,9 +1923,9 @@ an L0 range
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lc_table_brief(slr, locations)
         table.sort(locations, _M.cmp_seq)
-        local block1, l0_pos1 = table.unpack(locations[1])
-        local block2, l0_pos2 = table.unpack(locations[#locations])
-        return slr:lc_range_brief(block1, l0_pos1, block2, l0_pos2)
+        local block1, offset1 = table.unpack(locations[1])
+        local block2, offset2 = table.unpack(locations[#locations])
+        return slr:lc_range_brief(block1, offset1, block2, offset2)
     end
 ```
 
@@ -1989,7 +1988,7 @@ the `codepoint` command.
             local vlq = _M.to_vlq({ byte_p, line_no, column_no })
             new_block[#new_block+1] = vlq
         end
-        new_block.l0_pos = 0
+        new_block.offset = 0
         new_block.eoread = #new_block
         return this_index
     end
@@ -2006,18 +2005,18 @@ the `codepoint` command.
             block = slr.current_block
         end
         if not block then return 0, 0, 0 end
-        return block.index, block.l0_pos,
+        return block.index, block.offset,
             block.eoread
     end
     function _M.class_slr.block_set(slr, block_ix)
         local block = slr.inputs[block_ix]
         slr.current_block = block
     end
-    function _M.class_slr.block_move(slr, l0_pos, eoread, block_ix)
+    function _M.class_slr.block_move(slr, offset, eoread, block_ix)
         local block =
             block_ix and slr.inputs[block_ix] or slr.current_block
-        if l0_pos then
-            block.l0_pos = l0_pos
+        if offset then
+            block.offset = offset
         end
         if eoread then
             block.eoread = eoread
@@ -2287,7 +2286,7 @@ together.
     function _M.class_slr.l0r_new(slr)
         local l0r = _M.recce_new(slr.slg.l0)
 
-        local block_ix, l0_pos = slr:block_where()
+        local block_ix, offset = slr:block_where()
         local g1g = slr.slg.g1
 
         if not l0r then
@@ -2332,7 +2331,7 @@ together.
                     coroutine.yield('trace', string.format(
                         "Expected lexeme %s at %s; assertion ID = %d",
                         display_form,
-                        slr:lc_brief(nil, l0_pos),
+                        slr:lc_brief(nil, offset),
                         assertion
                     ))
                 end
@@ -2491,18 +2490,18 @@ if there is some way to continue it),
         slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
         while true do
-            local _, l0_pos, eoread = slr:block_where()
-            if l0_pos >= eoread then
+            local _, offset, eoread = slr:block_where()
+            if offset >= eoread then
                 -- a 'normal' return
                 return false
             end
-            if l0_pos >= 0 then
-                slr.start_of_lexeme = l0_pos
+            if offset >= 0 then
+                slr.start_of_lexeme = offset
                 slr.l0 = nil
                 if slr.trace_terminals >= 1 then
                     coroutine.yield('trace', string.format(
                         'Restarted recognizer at %s',
-                        slr:lc_brief(nil, l0_pos)
+                        slr:lc_brief(nil, offset)
                     ))
                 end
             end
@@ -2561,7 +2560,7 @@ which will be 1 or 0.
         local l0g = slr.slg.l0
         local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
-        local _, l0_pos = slr:block_where()
+        local _, offset = slr:block_where()
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if slr.trace_terminals >= 1 then
                 coroutine.yield('trace', string.format(
@@ -2569,7 +2568,7 @@ which will be 1 or 0.
                     utf8.char(codepoint),
                     codepoint,
                     l0g:symbol_display_form(symbol_id),
-                    slr:lc_brief(nil, l0_pos)
+                    slr:lc_brief(nil, offset)
                 ))
             end
             return 0
@@ -2581,7 +2580,7 @@ which will be 1 or 0.
                     utf8.char(codepoint),
                     codepoint,
                     l0g:symbol_display_form(symbol_id),
-                    slr:lc_brief(nil, l0_pos)
+                    slr:lc_brief(nil, offset)
                 ))
             end
             return 1
@@ -2590,7 +2589,7 @@ which will be 1 or 0.
              Problem alternative() failed at char ix %d; symbol id %d; codepoint 0x%x
              Problem in l0_read(), alternative() failed: %s
         ]],
-            l0_pos, symbol_id, codepoint, l0r:error_description()
+            offset, symbol_id, codepoint, l0r:error_description()
         ))
     end
 
@@ -2617,12 +2616,12 @@ Otherwise returns `false` and a status string.
         end
 
         if slr.trace_terminals >= 1 then
-           local _, l0_pos = slr:block_where()
+           local _, offset = slr:block_where()
            coroutine.yield('trace', string.format(
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
                codepoint,
-               slr:lc_brief(nil, l0_pos)
+               slr:lc_brief(nil, offset)
            ))
         end
         local tokens_accepted = 0
@@ -2649,18 +2648,18 @@ otherwise `false` and a status string.
             slr:l0r_new()
         end
         while true do
-            local block_ix, l0_pos, eoread = slr:block_where()
-            if l0_pos >= eoread then
+            local block_ix, offset, eoread = slr:block_where()
+            if offset >= eoread then
                 return true
             end
             -- +1 because codepoints array is 1-based
-            slr.codepoint = slr:codepoint_from_pos(block_ix, l0_pos)
+            slr.codepoint = slr:codepoint_from_pos(block_ix, offset)
             local alive, status = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
             if eager then return true end
             if not alive then return false, status end
-            slr:block_move(l0_pos + 1)
+            slr:block_move(offset + 1)
         end
         error('Unexpected fall through in l0_read()')
     end
@@ -3086,11 +3085,11 @@ Read alternatives into the G1 grammar.
             end
             if return_value ~= _M.err.NONE then
                 local l0r = slr.l0
-                local _, l0_pos  = slr:block_where()
+                local _, offset  = slr:block_where()
                 error(string.format([[
                      'Problem SLR->read() failed on symbol id %d at position %d: %s'
                 ]],
-                    g1_lexeme, l0_pos, l0r:error_description()
+                    g1_lexeme, offset, l0r:error_description()
                 ))
                 goto NEXT_EVENT
             end
@@ -3144,14 +3143,14 @@ lexer.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
-        local block_ix, l0_pos = slr:block_where()
+        local block_ix, offset = slr:block_where()
         local longueur = 0
         do
             if length_arg then
                 longueur = length_arg
                 goto LONGUEUR_IS_SET
             end
-            if l0_pos == slr.start_of_pause_lexeme then
+            if offset == slr.start_of_pause_lexeme then
                 longueur = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
                 goto LONGUEUR_IS_SET
            end
@@ -3167,7 +3166,7 @@ lexer.
         end
 
         local input_length = #slr.current_block
-        local start_pos = start_arg or l0_pos
+        local start_pos = start_arg or offset
         start_pos = math.tointeger(start_pos)
         if not start_pos then
             error(string.format(
@@ -3208,9 +3207,9 @@ lexer.
             local latest_earley_set = g1r:latest_earley_set()
             slr.per_es[latest_earley_set] =
                 { slr.current_block.index, start_pos, longueur }
-            local new_l0_pos = start_pos + longueur
-            slr:block_move(new_l0_pos)
-            return new_l0_pos
+            local new_offset = start_pos + longueur
+            slr:block_move(new_offset)
+            return new_offset
         end
         if result == -2 then
             -- Current, we do nothing with an exhausted error code
@@ -3454,7 +3453,7 @@ TODO: Allow for leading trailer, final trailer.
     -- miranda: section+ most Lua function definitions
 
     function _M.class_slr.g1_convert_events(slr)
-        local _, l0_pos = slr:block_where()
+        local _, offset = slr:block_where()
         local g1g = slr.slg.g1
         local q = slr.event_queue
         local events = g1g:events()
@@ -3479,7 +3478,7 @@ TODO: Allow for leading trailer, final trailer.
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
                 coroutine.yield('trace', string.format(
                     'G1 exceeded earley item threshold at pos %d: %d Earley items',
-                    l0_pos, event_value))
+                    offset, event_value))
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]
@@ -3497,7 +3496,7 @@ TODO: Allow for leading trailer, final trailer.
 
     function _M.class_slr.l0_convert_events(slr)
         local l0g = slr.slg.l0
-        local _, l0_pos = slr:block_where()
+        local _, offset = slr:block_where()
         local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
@@ -3509,7 +3508,7 @@ TODO: Allow for leading trailer, final trailer.
             if event_type == _M.event["EARLEY_ITEM_THRESHOLD"] then
                 coroutine.yield('trace', string.format(
                     'L0 exceeded earley item threshold at pos %d: %d Earley items',
-                    l0_pos, event_value))
+                    offset, event_value))
                 goto NEXT_EVENT
             end
             local event_data = _M.event[event_type]
@@ -4091,9 +4090,9 @@ It is designed to be convenient for use as a tail call.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.throw_at_pos(slr, desc, block_ix, pos)
       desc = desc or ''
-      local current_block_ix, l0_pos = slr:block_where()
+      local current_block_ix, offset = slr:block_where()
       block_ix = block_ix or current_block_ix
-      pos = pos or l0_pos
+      pos = pos or offset
       local codepoint = slr:codepoint_from_pos(block_ix, pos)
       return _M.userX(
              "Error in SLIF parse: %s\n\z
