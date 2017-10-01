@@ -280,6 +280,10 @@ sub test {
             next READ;
         }
 
+        # We have closed all brackets, if we have also
+        # read all of the input, then we are finished.
+        last READ if $pos >= $input_length;
+
         my $nextchar = substr $string, $pos, 1;
         $token_literal = $literal_match{$nextchar};
         my $token_blk = $blk_by_bracket{$token_literal};
@@ -297,7 +301,6 @@ sub test {
         $recce->block_move( 0, -1 );
         $recce->block_read();
 
-        $rejection_is_fatal = undef;
         $recce->block_set( $main_block );
 
         # Used for testing
