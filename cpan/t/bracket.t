@@ -13,12 +13,6 @@
 # This utility searches for mismatched braces --
 # curly, square and round.
 
-# TODO: Two not yet documented (but supported) features of Marpa::R3 are used.
-#
-# The 'rejection' recognizer setting causes an event to occur when all
-# alternatives are rejected at a location.  (The default is for this to
-# be a fatal error.)
-
 use 5.010001;
 
 use strict;
@@ -181,8 +175,6 @@ sub test {
 
     # Record the length of the "real input"
     my $input_length = length $string;
-    my $pos          = 0;
-
     # For Ruby Slippers, put a set of matching brackets into a suffix
     # of the input.
     # We wil carefully set our lengths when reading,
@@ -194,7 +186,7 @@ sub test {
     state $recce_debug_args = {};
 
     my $rejection_is_fatal = undef;
-    my $rejection = undef;
+    my $stalled = undef;
 
     my $recce = Marpa::R3::Scanless::R->new(
         {
@@ -203,7 +195,7 @@ sub test {
                 "'rejected" => sub () {
                     die "Rejection at end of string"
                       if $rejection_is_fatal;
-                    $rejection = 1;
+                    $stalled = 1;
                     'pause';
                 }
             }
@@ -212,6 +204,7 @@ sub test {
     );
 
     my $main_block = $recce->block_new( \$string );
+    my $pos = 0;
 
     my %blk_by_bracket =  ();
     for my $ix ( 0 .. ( length $suffix ) - 1 ) {
@@ -219,17 +212,11 @@ sub test {
         $blk_by_bracket{$char} = $recce->block_new( \$char );
     }
 
-    $recce->block_set( $main_block );
-    # Note that we make sure only to read the "real input"
-    $recce->block_move( $pos, $input_length );
-    $recce->block_read();
-    $pos = $recce->pos();
-
     # For the entire input string ...
     READ: while ( $pos < $input_length ) {
 
         # Then just start up again
-        if ( not $rejection ) {
+        if ( not $stalled ) {
 
             $recce->block_set( $main_block );
             # Note that we make sure we don't try to read the suffix
@@ -238,8 +225,8 @@ sub test {
             $pos = $recce->pos();
             next READ;
 
-        } ## end if ( not $rejection )
-        $rejection = undef;
+        }
+        $stalled = undef;
 
         # If here, we rejected the next input token
 
