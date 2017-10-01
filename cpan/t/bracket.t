@@ -279,13 +279,9 @@ sub test {
             push @fixes, "$pos$token_literal" if $fixes;
             next READ;
         }
-        my $missing_opening;
 
-        if (not $token_literal) {
-            my $nextchar = substr $string, $pos, 1;
-            $token_literal = $literal_match{$nextchar};
-            $missing_opening = 1;
-        }
+        my $nextchar = substr $string, $pos, 1;
+        $token_literal = $literal_match{$nextchar};
         my $token_blk = $blk_by_bracket{$token_literal};
 
         # If $token is not defined, we rejected the last set of tokens;
@@ -314,23 +310,18 @@ sub test {
         my ( $pos_line, $pos_column ) = $recce->line_column($pos);
 
         # Report the error if it was a case of a missing open bracket.
-        if ($missing_opening) {
-            my $problem = join "\n",
-                "* Line $pos_line, column $pos_column: Missing open $token_literal",
-                marked_line(
-                (   substr $string,
-                    $pos - ( $pos_column - 1 )
-                ),
-                $pos_column - 1
-                );
-            push @problems, [ $pos_line, $pos_column, $problem ];
-            diagnostic(
+        my $problem = join "\n",
+            "* Line $pos_line, column $pos_column: Missing open $token_literal",
+            marked_line(
+            (   substr $string,
+                $pos - ( $pos_column - 1 )
+            ),
+            $pos_column - 1
+            );
+        push @problems, [ $pos_line, $pos_column, $problem ];
+        diagnostic(
                 "* Line $pos_line, column $pos_column: Missing open $token_literal"
             ) if $verbose;
-            next READ;
-        } ## end if ($opening)
-
-        report_missing_close_bracket( $recce, $string, $token_literal, \@problems );
 
     } ## end READ: while ( $pos < $input_length )
 
