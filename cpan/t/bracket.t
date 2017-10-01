@@ -248,7 +248,7 @@ sub test {
     }
 
     # For the entire input string ...
-    READ: while ( $pos < $input_length ) {
+    READ: while ( 1 ) {
 
         # Then just start up again
         if ( not $stalled and $pos < $input_length ) {
@@ -326,58 +326,7 @@ sub test {
                 "* Line $pos_line, column $pos_column: Missing open $token_literal"
             ) if $verbose;
 
-    } ## end READ: while ( $pos < $input_length )
-
-    # At this point we have finished the input.
-    # Now we must deal with opening brackets which
-    # were never closed.
-    # The logic here is a simplified version of that of the main
-    # reading loop.
-
-    TRAILER: while (1) {
-
-        # Programming note: this is so similar to the code of the
-        # main reading loop, it is tempting to combine them and use
-        # a flag.
-        # But there are quite a few small differences,
-        # so that would be much less readable.
-        # And for efficiency purposes, this is a kind of "hand-unrolling"
-        # of a loop, with optimization of the code.
-
-        $rejection_is_fatal = 1;
-
-        my @expected = @{ $recce->terminals_expected() };
-
-        my ($token_literal) =
-            grep {defined}
-            map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
-
-        last TRAILER if not defined $token_literal;
-
-        my $token_blk = $blk_by_bracket{$token_literal};
-
-        $recce->block_set( $token_blk );
-        $recce->block_move( 0, -1 );
-        $recce->block_read();
-
-        # Used for testing
-        push @fixes, "$pos$token_literal" if $fixes;
-
-        my ($opening_bracket) = $recce->last_completed('balanced');
-        my ( $bracket_block, $bracket_l0_pos ) = $recce->g1_to_l0_first( $opening_bracket );
-        my ( $line, $column ) = $recce->line_column($bracket_l0_pos, $bracket_block );
-        my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
-
-        my $problem = join "\n",
-              "* Line $line, column $column: Opening " . q{'}
-            . $literal_match{$token_literal}
-            . q{' never closed, problem detected at end of string},
-            marked_line(
-            substr( $string, $opening_column0 ),
-            $column - 1 );
-        push @problems, [ $line, $column, $problem ];
-
-    } ## end TRAILER: while (1)
+    }
 
     # For testing
     if ( ref $fixes ) {
