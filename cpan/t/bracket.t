@@ -66,27 +66,14 @@ rsquare ~ ']'
 
 === GRAMMAR ===
 
-my $suffix = '(){}[]';
-my %tokens = ();
-for my $ix ( 0 .. ( length $suffix ) - 1 ) {
-    my $char = substr $suffix, $ix, 1;
-    $tokens{$char} = [ $ix, 1 ];
-}
+my $brackets = '(){}[]';
 
-my %matching_char      = ();
 my %literal_match = ();
 for my $pair (qw% () [] {} %) {
     my ( $left, $right ) = split //xms, $pair;
-    $matching_char{$left}  = $right;
     $literal_match{$left}  = $right;
-    $matching_char{$right} = $left;
     $literal_match{$right} = $left;
 }
-my %token_by_name = (
-    rcurly  => $tokens{'}'},
-    rsquare => $tokens{']'},
-    rparen  => $tokens{')'},
-);
 my %closing_char_by_name = (
     rcurly  => '}',
     rsquare => ']',
@@ -169,12 +156,6 @@ sub test {
 
     # Record the length of the "real input"
     my $input_length = length $string;
-    # For Ruby Slippers, put a set of matching brackets into a suffix
-    # of the input.
-    # We wil carefully set our lengths when reading,
-    # so that we don't treat to accidentally read this, while reading
-    # the "real input".
-    $string .= $suffix;
 
     # state $recce_debug_args = { trace_terminals => 1, trace_values => 1 };
     state $recce_debug_args = {};
@@ -201,8 +182,8 @@ sub test {
     my $pos = 0;
 
     my %blk_by_bracket =  ();
-    for my $ix ( 0 .. ( length $suffix ) - 1 ) {
-        my $char = substr $suffix, $ix, 1;
+    for my $ix ( 0 .. ( length $brackets ) - 1 ) {
+        my $char = substr $brackets, $ix, 1;
         $blk_by_bracket{$char} = $recce->block_new( \$char );
     }
 
@@ -214,7 +195,7 @@ sub test {
 
             $recce->block_set( $main_block );
             # Note that we make sure we don't try to read the suffix
-            $recce->block_move( $pos, $input_length - $pos );
+            $recce->block_move( $pos, -1 );
             $recce->block_read();
             $pos = $recce->pos();
             next READ;
@@ -235,7 +216,7 @@ sub test {
             map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
         if (not $token_char) {
             my $nextchar = substr $string, $pos, 1;
-            $token_char = $matching_char{$nextchar};
+            $token_char = $literal_match{$nextchar};
             $missing_opening = 1;
         }
         my $token_blk = $blk_by_bracket{$token_char};
@@ -250,8 +231,7 @@ sub test {
 
         $rejection_is_fatal = 1;
         $recce->block_set( $token_blk );
-        # Note that we make sure we don't try to read the suffix
-        $recce->block_move( 0, - 1 );
+        $recce->block_move( 0, -1 );
         $recce->block_read();
 
         $rejection_is_fatal = undef;
@@ -275,8 +255,7 @@ sub test {
                 "* Line $pos_line, column $pos_column: Missing open $token_literal",
                 marked_line(
                 (   substr $string,
-                    $pos - ( $pos_column - 1 ),
-                    -( length $suffix ) + 1
+                    $pos - ( $pos_column - 1 )
                 ),
                 $pos_column - 1
                 );
@@ -294,7 +273,7 @@ sub test {
         # beginning.
         my ($opening_bracket) = $recce->last_completed('balanced');
         my ( $bracket_block, $bracket_l0_pos ) = $recce->g1_to_l0_first( $opening_bracket );
-        my ( $line, $column ) = $recce->line_column($opening_bracket, $bracket_block );
+        my ( $line, $column ) = $recce->line_column($bracket_l0_pos, $bracket_block );
         my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
 
         if ( $line == $pos_line ) {
@@ -307,8 +286,7 @@ sub test {
                 marked_line(
                 substr(
                     $string,
-                    $pos - ( $pos_column - 1 ),
-                    -( length $suffix ) + 1
+                    $pos - ( $pos_column - 1 )
                 ),
                 $column - 1,
                 $pos_column - 1
@@ -322,7 +300,7 @@ sub test {
                 . q{'}
                 . $literal_match{$token_literal} . q{', },
                 marked_line(
-                substr( $string, $opening_column0, -( length $suffix ) + 1 ),
+                substr( $string, $opening_column0  ),
                 $column - 1
                 ),
                 , "*   Problem detected at line $pos_line, column $pos_column:",
@@ -330,7 +308,6 @@ sub test {
                 substr(
                     $string,
                     $pos - ( $pos_column - 1 ),
-                    -( length $suffix ) + 1
                 ),
                 $pos_column - 1
                 );
@@ -374,8 +351,7 @@ sub test {
         my $token_blk = $blk_by_bracket{$token_char};
 
         $recce->block_set( $token_blk );
-        # Note that we make sure we don't try to read the suffix
-        $recce->block_move( 0, - 1 );
+        $recce->block_move( 0, -1 );
         $recce->block_read();
 
         my $token_literal = $token_char;
@@ -393,7 +369,7 @@ sub test {
             . $literal_match{$token_literal}
             . q{' never closed, problem detected at end of string},
             marked_line(
-            substr( $string, $opening_column0, -( length $suffix ) + 1 ),
+            substr( $string, $opening_column0 ),
             $column - 1 );
         push @problems, [ $line, $column, $problem ];
 
