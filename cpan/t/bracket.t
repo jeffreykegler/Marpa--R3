@@ -73,15 +73,12 @@ for my $ix ( 0 .. ( length $suffix ) - 1 ) {
     $tokens{$char} = [ $ix, 1 ];
 }
 
-my %matching      = ();
 my %matching_char      = ();
 my %literal_match = ();
 for my $pair (qw% () [] {} %) {
     my ( $left, $right ) = split //xms, $pair;
-    $matching{$left}       = $tokens{$right};
     $matching_char{$left}  = $right;
     $literal_match{$left}  = $right;
-    $matching{$right}      = $tokens{$left};
     $matching_char{$right} = $left;
     $literal_match{$right} = $left;
 }
@@ -230,6 +227,8 @@ sub test {
         # What terminals do we expect?
         my @expected = @{ $recce->terminals_expected() };
 
+        my $missing_opening;
+
         # Find, at random, one of these tokens that is a closing bracket.
         my ($token_char) =
             grep {defined}
@@ -237,20 +236,9 @@ sub test {
         if (not $token_char) {
             my $nextchar = substr $string, $pos, 1;
             $token_char = $matching_char{$nextchar};
+            $missing_opening = 1;
         }
         my $token_blk = $blk_by_bracket{$token_char};
-
-        my ($token) =
-            grep {defined}
-            map  { $token_by_name{$_} } @{ $recce->terminals_expected() };
-
-        # If there is no expected closing bracket, then we need
-        # a new opening bracket in order to continue.  Find out which one.
-        my $opening = not defined $token;
-        if ($opening) {
-            my $nextchar = substr $string, $pos, 1;
-            $token = $matching{$nextchar};
-        }
 
         # If $token is not defined, we rejected the last set of tokens;
         # we do we not expect a closing bracket;
@@ -258,10 +246,7 @@ sub test {
         # This is something that should not happen.
         # All we can do is abend.
         die "Rejection at pos $pos: ", substr( $string, $pos, 10 )
-            if not defined $token;
-
-        # Concoct a "Ruby Slippers token" and read it from the
-        # suffix
+            if not defined $token_blk;
 
         $rejection_is_fatal = 1;
         $recce->block_set( $token_blk );
@@ -285,7 +270,7 @@ sub test {
         my $problem;
 
         # Report the error if it was a case of a missing open bracket.
-        if ($opening) {
+        if ($missing_opening) {
             $problem = join "\n",
                 "* Line $pos_line, column $pos_column: Missing open $token_literal",
                 marked_line(
@@ -380,18 +365,20 @@ sub test {
 
         my @expected = @{ $recce->terminals_expected() };
 
-        my ($token) =
+        my ($token_char) =
             grep {defined}
-            map  { $token_by_name{$_} } @{ $recce->terminals_expected() };
+            map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
 
-        last TRAILER if not defined $token;
+        last TRAILER if not defined $token_char;
 
-        my ( $token_start, $token_length ) = @{$token};
-        $token_start += $input_length;
-        my $token_literal = substr $string, $token_start, $token_length;
-        my $result = $recce->resume( $token_start, $token_length );
-        die "Read of Ruby slippers token failed"
-            if $result != $token_start + $token_length;
+        my $token_blk = $blk_by_bracket{$token_char};
+
+        $recce->block_set( $token_blk );
+        # Note that we make sure we don't try to read the suffix
+        $recce->block_move( 0, - 1 );
+        $recce->block_read();
+
+        my $token_literal = $token_char;
 
         # Used for testing
         push @fixes, "$pos$token_literal" if $fixes;
