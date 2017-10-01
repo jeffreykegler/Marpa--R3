@@ -987,19 +987,19 @@ sub Marpa::R3::Scanless::R::block_move {
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'iii', $block_id, $block_offset, $length );
         local slr, block_id_arg, block_offset_arg, length_arg = ...
+        local longueur = length_arg or -1
         local block_id, erreur
         if block_id_arg then
             block_id, erreur = glue.check_block_id(slr, block_id_arg)
             if not block_id then error(erreur) end
         end
-        local new_block_offset, retour2
-            = glue.check_block_range(slr, block_id_arg, block_offset_arg, length_arg)
+        local new_block_offset, eoread
+            = glue.check_block_range(slr, block_id_arg, block_offset_arg, longueur)
         if not new_block_offset then
-           -- retour2 is error message
-           error(retour2)
+           -- eoread is error message
+           error(eoread)
         end
-        -- retour2 is end position
-        return slr:block_move(new_block_offset, retour2, block_id)
+        return slr:block_move(new_block_offset, eoread, block_id)
 END_OF_LUA
     return;
 }

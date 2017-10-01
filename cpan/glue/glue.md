@@ -463,10 +463,10 @@ a message
     -- note: negative block_offset_arg is converted as offset
     -- from physical end-of-block
     function glue.check_block_offset(slr, block_id, block_offset_arg)
-        local block_id, l0_pos, end_pos = slr:block_where(block_id)
+        local block_id, offset, end_pos = slr:block_where(block_id)
         local block = slr.inputs[block_id]
         local block_length = #block
-        if not block_offset_arg then return l0_pos end
+        if not block_offset_arg then return offset end
         local new_block_offset = math.tointeger(block_offset_arg)
         if not new_block_offset then
             return nil, string.format('Bad current position argument %s', block_offset_arg)
@@ -485,7 +485,7 @@ a message
 
     -- assumes valid block_id, block_offset
     -- returns:
-    --     end-of-block, if length_arg == nil
+    --     current eoread, if length_arg == nil
     --     end-of-read, based on length_arg, if length_arg valid and non-nil
     --     nil, error-message, otherwise
     -- Note: negative block_offset is converted as offset
@@ -496,7 +496,10 @@ a message
         local block = slr.inputs[block_id]
         local block_length = #block
 
-        if not length_arg then return block_length end
+        if not length_arg then
+            local _, _, eoread = slr:block_where(block_id)
+            return eoread
+        end
         local longueur = math.tointeger(length_arg)
         if not longueur then
             return nil, string.format('Bad length argument %s', length_arg)
