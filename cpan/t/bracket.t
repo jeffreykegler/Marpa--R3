@@ -90,10 +90,7 @@ my %token_by_name = (
     rsquare => $tokens{']'},
     rparen  => $tokens{')'},
 );
-my %char_by_token_name = (
-    lcurly  => '{',
-    lsquare => '[',
-    lparen  => '(',
+my %closing_char_by_name = (
     rcurly  => '}',
     rsquare => ']',
     rparen  => ')',
@@ -236,7 +233,7 @@ sub test {
         # Find, at random, one of these tokens that is a closing bracket.
         my ($token_char) =
             grep {defined}
-            map  { $char_by_token_name{$_} } @{ $recce->terminals_expected() };
+            map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
         if (not $token_char) {
             my $nextchar = substr $string, $pos, 1;
             $token_char = $matching_char{$nextchar};
@@ -265,12 +262,17 @@ sub test {
 
         # Concoct a "Ruby Slippers token" and read it from the
         # suffix
-        my ( $token_start, $token_length ) = @{$token};
-        $token_start += $input_length;
-        my $token_literal = substr $string, $token_start, $token_length;
-        my $result = $recce->resume( $token_start, $token_length );
-        die "Read of Ruby slippers token failed"
-            if $result != $token_start + $token_length;
+
+        $rejection_is_fatal = 1;
+        $recce->block_set( $token_blk );
+        # Note that we make sure we don't try to read the suffix
+        $recce->block_move( 0, - 1 );
+        $recce->block_read();
+
+        $rejection_is_fatal = undef;
+        $recce->block_set( $main_block );
+
+        my $token_literal = $token_char;
 
         # Used for testing
         push @fixes, "$pos$token_literal" if $fixes;
@@ -377,8 +379,6 @@ sub test {
         $rejection_is_fatal = 1;
 
         my @expected = @{ $recce->terminals_expected() };
-
-        # say STDERR join " ", "terminals expected:", @expected;
 
         my ($token) =
             grep {defined}
