@@ -66,10 +66,8 @@ rsquare ~ ']'
 
 === GRAMMAR ===
 
-my $brackets = '(){}[]';
-
 my %literal_match = ();
-for my $pair (qw% () [] {} %) {
+for my $pair (qw= () [] {} =) {
     my ( $left, $right ) = split //xms, $pair;
     $literal_match{$left}  = $right;
     $literal_match{$right} = $left;
@@ -242,65 +240,79 @@ sub test {
     my $pos = 0;
 
     my %blk_by_bracket =  ();
-    for my $ix ( 0 .. ( length $brackets ) - 1 ) {
-        my $char = substr $brackets, $ix, 1;
+    for my $char ( keys %literal_match ) {
         $blk_by_bracket{$char} = $recce->block_new( \$char );
     }
 
-    # For the entire input string ...
-    READ: while ( 1 ) {
+    # While we have unread input or unclosed brackets ...
+    MAIN_LOOP: while ( 1 ) {
 
-        # Then just start up again
+        # If we're not stalled, just read from the main block
         if ( not $stalled and $pos < $input_length ) {
 
             $rejection_is_fatal = undef;
             $recce->block_set( $main_block );
-            # Note that we make sure we don't try to read the suffix
             $recce->block_move( $pos, -1 );
             $recce->block_read();
             $pos = $recce->pos();
-            next READ;
+            next MAIN_LOOP;
 
         }
         $stalled = undef;
 
-        # Find, at random, one of these tokens that is a closing bracket.
+        # If here we are stalled, or are at end-of-input with unclosed brackets.
+        # Either way, first thing we want to know is: are there any unclosed
+        # brackets?
+
+        # Find, at random, one of the expected tokens that is a closing bracket.
+        # (There should be only one.)
         my ($token_literal ) =
             grep {defined}
             map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
 
+        # If there is an unclosed bracket, use Ruby Slippers to close it,
+        # report the fix,
+        # and start the read loop again.
         if ($token_literal) {
             my $token_blk = $blk_by_bracket{$token_literal};
             $rejection_is_fatal = 1;
             $recce->block_set( $token_blk );
             $recce->block_move( 0, -1 );
             $recce->block_read();
+            $recce->block_set( $main_block );
             report_missing_close_bracket( $recce, $string, $token_literal, \@problems );
             push @fixes, "$pos$token_literal" if $fixes;
-            next READ;
+            next MAIN_LOOP;
         }
 
-        # We have closed all brackets, if we have also
-        # read all of the input, then we are finished.
-        last READ if $pos >= $input_length;
+        # If we are here
+        # we have closed all brackets.
+        # If we have also read all of the input,
+        # then we have finished finished.
+        last MAIN_LOOP if $pos >= $input_length;
 
+        # If we are here, we are stalled but not because of a missing
+        # close bracket.
+        # The only remaining possibility is the opposite issue:
+        # an extra close bracket, one which does not match any
+        # opening bracket.
+        # We will use the Ruby Slippers to insert
+        # an open bracket to fix the problem.
         my $nextchar = substr $string, $pos, 1;
         $token_literal = $literal_match{$nextchar};
-        my $token_blk = $blk_by_bracket{$token_literal};
 
-        # If $token is not defined, we rejected the last set of tokens;
-        # we do we not expect a closing bracket;
-        # and an opening bracket won't fix the problem either.
-        # This is something that should not happen.
+        # If the next character in input is not an close bracket,
+        # something strange has happened.
         # All we can do is abend.
         die "Rejection at pos $pos: ", substr( $string, $pos, 10 )
-            if not defined $token_blk;
+            if not defined $token_literal;
+
+        my $token_blk = $blk_by_bracket{$token_literal};
 
         $rejection_is_fatal = 1;
         $recce->block_set( $token_blk );
         $recce->block_move( 0, -1 );
         $recce->block_read();
-
         $recce->block_set( $main_block );
 
         # Used for testing
