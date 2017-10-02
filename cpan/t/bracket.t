@@ -146,8 +146,46 @@ sub marked_line {
     return join "\n", $output_line, $pointer_line;
 } ## end sub marked_line
 
-sub report_missing_close_bracket {
-    my ( $recce, $string, $token_literal, $problems ) = @_;
+sub test {
+    my ( $g, $string, $fixes ) = @_;
+    my @problems = ();
+    my @fixes    = ();
+    diagnostic( "Input: ", substr( $string, 0, 60 ) ) if $verbose;
+
+    # Record the length of the "real input"
+    my $input_length = length $string;
+
+    # state $recce_debug_args = { trace_terminals => 1, trace_values => 1 };
+    state $recce_debug_args = {};
+
+    my $rejection_is_fatal = undef;
+    my $stalled = undef;
+
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $g,
+            event_handlers => {
+                "'rejected" => sub () {
+                    die "Rejection at end of string"
+                      if $rejection_is_fatal;
+                    $stalled = 1;
+                    'pause';
+                }
+            }
+        },
+        $recce_debug_args
+    );
+
+    my $main_block = $recce->block_new( \$string );
+    my $pos = 0;
+
+    my %blk_by_bracket =  ();
+    for my $char ( keys %literal_match ) {
+        $blk_by_bracket{$char} = $recce->block_new( \$char );
+    }
+
+my $report_missing_close_bracket = sub {
+    my ( $token_literal ) = @_;
         # Report the error if it was a case of a missing close bracket.
 
         # We've created a properly bracketed span of the input, using
@@ -199,50 +237,12 @@ sub report_missing_close_bracket {
         } ## end else [ if ( $line == $pos_line ) ]
 
         # Add our report to the list of problems.
-        push @{$problems}, [ $line, $column, $problem ];
+        push @problems, [ $line, $column, $problem ];
         diagnostic(
             "* Line $line, column $column: Missing close $token_literal, ",
             "problem detected at line $pos_line, column $pos_column"
         ) if $verbose;
-}
-
-sub test {
-    my ( $g, $string, $fixes ) = @_;
-    my @problems = ();
-    my @fixes    = ();
-    diagnostic( "Input: ", substr( $string, 0, 60 ) ) if $verbose;
-
-    # Record the length of the "real input"
-    my $input_length = length $string;
-
-    # state $recce_debug_args = { trace_terminals => 1, trace_values => 1 };
-    state $recce_debug_args = {};
-
-    my $rejection_is_fatal = undef;
-    my $stalled = undef;
-
-    my $recce = Marpa::R3::Scanless::R->new(
-        {
-            grammar        => $g,
-            event_handlers => {
-                "'rejected" => sub () {
-                    die "Rejection at end of string"
-                      if $rejection_is_fatal;
-                    $stalled = 1;
-                    'pause';
-                }
-            }
-        },
-        $recce_debug_args
-    );
-
-    my $main_block = $recce->block_new( \$string );
-    my $pos = 0;
-
-    my %blk_by_bracket =  ();
-    for my $char ( keys %literal_match ) {
-        $blk_by_bracket{$char} = $recce->block_new( \$char );
-    }
+};
 
     # While we have unread input or unclosed brackets ...
     MAIN_LOOP: while ( 1 ) {
@@ -280,7 +280,7 @@ sub test {
             $recce->block_move( 0, -1 );
             $recce->block_read();
             $recce->block_set( $main_block );
-            report_missing_close_bracket( $recce, $string, $token_literal, \@problems );
+            $report_missing_close_bracket->( $token_literal );
             push @fixes, "$pos$token_literal" if $fixes;
             next MAIN_LOOP;
         }
