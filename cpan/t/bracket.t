@@ -192,15 +192,19 @@ sub test {
     # that where we want to read more input from the
     # main block
     my $main_block_read = sub {
-            $rejection_is_fatal = undef;
-            $recce->block_set($main_block);
-            $recce->block_move( $pos, -1 );
-            $recce->block_read();
-            $pos = $recce->pos();
-            };
+        $rejection_is_fatal = undef;
+        $recce->block_set($main_block);
+        $recce->block_move( $pos, -1 );
+        $recce->block_read();
+        $pos = $recce->pos();
+    };
 
     # Local closure to
     # deal with the case of a missing close bracket
+    #
+    # Returns Perl true on success,
+    # Perl false and undef if the case is inapplicable
+    # Perl false and an error message on failure
     my $missing_close_bracket_handle = sub {
         my ($token_literal) = @_;
         my $token_blk = $blk_by_bracket{$token_literal};
@@ -256,56 +260,29 @@ sub test {
             "* Line $line, column $column: Missing close $token_literal, ",
             "problem detected at line $pos_line, column $pos_column"
         ) if $verbose;
+        return 1;
     };
 
-    # While we have unread input or unclosed brackets ...
-  MAIN_LOOP: while (1) {
+    # Local closure:
+    # Deal with # an extra close bracket,
+    # one which does not match any
+    # opening bracket.
+    # We will use the Ruby Slippers to insert
+    # an open bracket to fix the problem.
+    #
+    # Returns Perl true on success,
+    # Perl false and an error message on failure
+    my $extra_close_bracket_handle = sub {
+        my ($token_literal) = @_;
 
-        # If we're not stalled, just read from the main block
-        if ( not $stalled and $pos < $input_length ) {
-            $main_block_read->();
-            next MAIN_LOOP;
-        }
-        $stalled = undef;
-
-        # If here we are stalled, or are at end-of-input with unclosed brackets.
-        # Either way, first thing we want to know is: are there any unclosed
-        # brackets?
-
-        # Find, at random, one of the expected tokens that is a closing bracket.
-        # (There should be only one.)
-        my ($token_literal) =
-          grep { defined }
-          map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
-
-        # If there is an unclosed bracket, use Ruby Slippers to close it,
-        # report the fix,
-        # and start the read loop again.
-        if ($token_literal) {
-            $missing_close_bracket_handle->($token_literal);
-            next MAIN_LOOP;
-        }
-
-        # If we are here
-        # we have closed all brackets.
-        # If we have also read all of the input,
-        # then we have finished finished.
-        last MAIN_LOOP if $pos >= $input_length;
-
-        # If we are here, we are stalled but not because of a missing
-        # close bracket.
         # The only remaining possibility is the opposite issue:
-        # an extra close bracket, one which does not match any
-        # opening bracket.
-        # We will use the Ruby Slippers to insert
-        # an open bracket to fix the problem.
         my $nextchar = substr $string, $pos, 1;
         $token_literal = $literal_match{$nextchar};
 
         # If the next character in input is not an close bracket,
         # something strange has happened.
         # All we can do is abend.
-        die "Rejection at pos $pos: ", substr( $string, $pos, 10 )
+        return undef, "Rejection at pos $pos: ", substr( $string, $pos, 10 )
           if not defined $token_literal;
 
         my $token_blk = $blk_by_bracket{$token_literal};
@@ -334,7 +311,55 @@ sub test {
         diagnostic(
             "* Line $pos_line, column $pos_column: Missing open $token_literal"
         ) if $verbose;
+        return 1;
+    };
 
+    # While we have unread input or unclosed brackets ...
+  MAIN_LOOP: while (1) {
+
+        my ($ok, $error);
+
+        # If we're not stalled, just read from the main block
+        if ( not $stalled and $pos < $input_length ) {
+            $main_block_read->();
+            next MAIN_LOOP;
+        }
+        $stalled = undef;
+
+        # If here we are stalled, or are at end-of-input with unclosed brackets.
+        # Either way, first thing we want to know is: are there any unclosed
+        # brackets?
+
+        # Find, at random, one of the expected tokens that is a closing bracket.
+        # (There should be only one.)
+        my ($token_literal) =
+          grep { defined }
+          map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
+
+        # If there is an unclosed bracket, use Ruby Slippers to close it,
+        # report the fix,
+        # and start the read loop again.
+        if ($token_literal) {
+            ($ok, $error) = $missing_close_bracket_handle->($token_literal);
+            next MAIN_LOOP;
+        }
+
+        # If we are here
+        # we have closed all brackets.
+        # If we have also read all of the input,
+        # then we have finished finished.
+        last MAIN_LOOP if $pos >= $input_length;
+
+        # If we are here, we are stalled,
+        # with input remaining,
+        # and not because of a missing close bracket.
+        # The only possibility left is that
+        # we have an extra close bracket in
+        # the input.
+        # To fix it, we "Ruby Slippers" up an opening bracket to
+        # match it.
+        ($ok, $error) = $extra_close_bracket_handle->();
+        die $error if not $ok;
     }
 
     # For testing
@@ -349,6 +374,6 @@ sub test {
     my @result = map { $_->[-1] } @sorted_problems;
     return \@result;
 
-} ## end sub test
+}
 
 # vim: expandtab shiftwidth=4:
