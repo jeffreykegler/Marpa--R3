@@ -159,7 +159,7 @@ sub test {
     state $recce_debug_args = {};
 
     my $rejection_is_fatal = undef;
-    my $stalled = undef;
+    my $stalled            = undef;
 
     my $recce = Marpa::R3::Scanless::R->new(
         {
@@ -177,81 +177,83 @@ sub test {
     );
 
     my $main_block = $recce->block_new( \$string );
-    my $pos = 0;
+    my $pos        = 0;
 
-    my %blk_by_bracket =  ();
+    my %blk_by_bracket = ();
     for my $char ( keys %literal_match ) {
         $blk_by_bracket{$char} = $recce->block_new( \$char );
     }
 
-my $report_missing_close_bracket = sub {
-    my ( $token_literal ) = @_;
-        # Report the error if it was a case of a missing close bracket.
+    # I define a local closure for each of the main cases.
+    # After they are defined, the main loop will call them
+
+    # Local closure to
+    # deal with the case of a missing close bracket
+    my $missing_close_bracket_handle = sub {
+        my ($token_literal) = @_;
+        my $token_blk = $blk_by_bracket{$token_literal};
+        $rejection_is_fatal = 1;
+        $recce->block_set($token_blk);
+        $recce->block_move( 0, -1 );
+        $recce->block_read();
+        $recce->block_set($main_block);
 
         # We've created a properly bracketed span of the input, using
         # the Ruby Slippers token.  Use Marpa's tables to find its
         # beginning.
         my ($opening_bracket) = $recce->last_completed('balanced');
-        my ( $bracket_block, $bracket_l0_pos ) = $recce->g1_to_l0_first( $opening_bracket );
-        my ( $line, $column ) = $recce->line_column($bracket_l0_pos, $bracket_block );
+        my ( $bracket_block, $bracket_l0_pos ) =
+          $recce->g1_to_l0_first($opening_bracket);
+        my ( $line, $column ) =
+          $recce->line_column( $bracket_l0_pos, $bracket_block );
         my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
 
         my $problem = q{};
-        my $pos = $recce->pos();
+        my $pos     = $recce->pos();
         my ( $pos_line, $pos_column ) = $recce->line_column($pos);
         if ( $line == $pos_line ) {
 
             # Report a missing close bracket for cases contained in
             # a single text line
             $problem = join "\n",
-                "* Line $line, column $column: Missing close $token_literal, "
-                . "problem detected at line $pos_line, column $pos_column",
-                marked_line(
-                substr(
-                    $string,
-                    $pos - ( $pos_column - 1 )
-                ),
+              "* Line $line, column $column: Missing close $token_literal, "
+              . "problem detected at line $pos_line, column $pos_column",
+              marked_line(
+                substr( $string, $pos - ( $pos_column - 1 ) ),
                 $column - 1,
                 $pos_column - 1
-                );
+              );
         } ## end if ( $line == $pos_line )
         else {
             # Report a missing close bracket for cases that span
             # two or more text lines
             $problem = join "\n",
-                  "* Line $line, column $column: No matching bracket for "
-                . q{'}
-                . $literal_match{$token_literal} . q{', },
-                marked_line(
-                substr( $string, $opening_column0  ),
-                $column - 1
-                ),
-                , "*   Problem detected at line $pos_line, column $pos_column:",
-                marked_line(
-                substr(
-                    $string,
-                    $pos - ( $pos_column - 1 ),
-                ),
-                $pos_column - 1
-                );
+                "* Line $line, column $column: No matching bracket for "
+              . q{'}
+              . $literal_match{$token_literal} . q{', },
+              marked_line( substr( $string, $opening_column0 ), $column - 1 ),
+              , "*   Problem detected at line $pos_line, column $pos_column:",
+              marked_line( substr( $string, $pos - ( $pos_column - 1 ), ),
+                $pos_column - 1 );
         } ## end else [ if ( $line == $pos_line ) ]
 
         # Add our report to the list of problems.
         push @problems, [ $line, $column, $problem ];
+        push @fixes, "$pos$token_literal" if $fixes;
         diagnostic(
             "* Line $line, column $column: Missing close $token_literal, ",
             "problem detected at line $pos_line, column $pos_column"
         ) if $verbose;
-};
+    };
 
     # While we have unread input or unclosed brackets ...
-    MAIN_LOOP: while ( 1 ) {
+  MAIN_LOOP: while (1) {
 
         # If we're not stalled, just read from the main block
         if ( not $stalled and $pos < $input_length ) {
 
             $rejection_is_fatal = undef;
-            $recce->block_set( $main_block );
+            $recce->block_set($main_block);
             $recce->block_move( $pos, -1 );
             $recce->block_read();
             $pos = $recce->pos();
@@ -266,22 +268,15 @@ my $report_missing_close_bracket = sub {
 
         # Find, at random, one of the expected tokens that is a closing bracket.
         # (There should be only one.)
-        my ($token_literal ) =
-            grep {defined}
-            map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
+        my ($token_literal) =
+          grep { defined }
+          map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
 
         # If there is an unclosed bracket, use Ruby Slippers to close it,
         # report the fix,
         # and start the read loop again.
         if ($token_literal) {
-            my $token_blk = $blk_by_bracket{$token_literal};
-            $rejection_is_fatal = 1;
-            $recce->block_set( $token_blk );
-            $recce->block_move( 0, -1 );
-            $recce->block_read();
-            $recce->block_set( $main_block );
-            $report_missing_close_bracket->( $token_literal );
-            push @fixes, "$pos$token_literal" if $fixes;
+            $missing_close_bracket_handle->($token_literal);
             next MAIN_LOOP;
         }
 
@@ -305,15 +300,15 @@ my $report_missing_close_bracket = sub {
         # something strange has happened.
         # All we can do is abend.
         die "Rejection at pos $pos: ", substr( $string, $pos, 10 )
-            if not defined $token_literal;
+          if not defined $token_literal;
 
         my $token_blk = $blk_by_bracket{$token_literal};
 
         $rejection_is_fatal = 1;
-        $recce->block_set( $token_blk );
+        $recce->block_set($token_blk);
         $recce->block_move( 0, -1 );
         $recce->block_read();
-        $recce->block_set( $main_block );
+        $recce->block_set($main_block);
 
         # Used for testing
         push @fixes, "$pos$token_literal" if $fixes;
@@ -326,17 +321,13 @@ my $report_missing_close_bracket = sub {
 
         # Report the error if it was a case of a missing open bracket.
         my $problem = join "\n",
-            "* Line $pos_line, column $pos_column: Missing open $token_literal",
-            marked_line(
-            (   substr $string,
-                $pos - ( $pos_column - 1 )
-            ),
-            $pos_column - 1
-            );
+          "* Line $pos_line, column $pos_column: Missing open $token_literal",
+          marked_line( ( substr $string, $pos - ( $pos_column - 1 ) ),
+            $pos_column - 1 );
         push @problems, [ $pos_line, $pos_column, $problem ];
         diagnostic(
-                "* Line $pos_line, column $pos_column: Missing open $token_literal"
-            ) if $verbose;
+            "* Line $pos_line, column $pos_column: Missing open $token_literal"
+        ) if $verbose;
 
     }
 
@@ -348,7 +339,7 @@ my $report_missing_close_bracket = sub {
     # The problems do not necessarily occur in lexical order.
     # Sort them so that they can be reported that way.
     my @sorted_problems =
-        sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] } @problems;
+      sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] } @problems;
     my @result = map { $_->[-1] } @sorted_problems;
     return \@result;
 
