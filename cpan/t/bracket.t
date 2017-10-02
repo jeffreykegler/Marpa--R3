@@ -188,6 +188,18 @@ sub test {
     # After they are defined, the main loop will call them
 
     # Local closure to
+    # deal with the main case --
+    # that where we want to read more input from the
+    # main block
+    my $main_block_read = sub {
+            $rejection_is_fatal = undef;
+            $recce->block_set($main_block);
+            $recce->block_move( $pos, -1 );
+            $recce->block_read();
+            $pos = $recce->pos();
+            };
+
+    # Local closure to
     # deal with the case of a missing close bracket
     my $missing_close_bracket_handle = sub {
         my ($token_literal) = @_;
@@ -251,14 +263,8 @@ sub test {
 
         # If we're not stalled, just read from the main block
         if ( not $stalled and $pos < $input_length ) {
-
-            $rejection_is_fatal = undef;
-            $recce->block_set($main_block);
-            $recce->block_move( $pos, -1 );
-            $recce->block_read();
-            $pos = $recce->pos();
+            $main_block_read->();
             next MAIN_LOOP;
-
         }
         $stalled = undef;
 
