@@ -193,6 +193,7 @@ sub test {
     # main block
     my $main_block_read = sub {
         $rejection_is_fatal = undef;
+        $stalled = undef;
         $recce->block_set($main_block);
         $recce->block_move( $pos, -1 );
         $recce->block_read();
@@ -206,9 +207,22 @@ sub test {
     # Perl false and undef if the case is inapplicable
     # Perl false and an error message on failure
     my $missing_close_bracket_handle = sub {
-        my ($token_literal) = @_;
+        # Find, at random, one of the expected tokens that is a closing bracket.
+        # (There should be only one.)
+        my ($token_literal) =
+          grep { defined }
+          map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
+
+        # The case is inapplicable if there is no closing bracket expected
+        return undef, undef if not $token_literal;
+
+        # If there is an missing close bracket,
+        # use Ruby Slippers to close it,
+        # report the fix,
+        # and start the read loop again.
         my $token_blk = $blk_by_bracket{$token_literal};
         $rejection_is_fatal = 1;
+        $stalled = undef;
         $recce->block_set($token_blk);
         $recce->block_move( 0, -1 );
         $recce->block_read();
@@ -287,6 +301,7 @@ sub test {
 
         my $token_blk = $blk_by_bracket{$token_literal};
 
+        $stalled = undef;
         $rejection_is_fatal = 1;
         $recce->block_set($token_blk);
         $recce->block_move( 0, -1 );
@@ -329,20 +344,8 @@ sub test {
         # If here we are stalled, or are at end-of-input with unclosed brackets.
         # Either way, first thing we want to know is: are there any unclosed
         # brackets?
-
-        # Find, at random, one of the expected tokens that is a closing bracket.
-        # (There should be only one.)
-        my ($token_literal) =
-          grep { defined }
-          map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
-
-        # If there is an unclosed bracket, use Ruby Slippers to close it,
-        # report the fix,
-        # and start the read loop again.
-        if ($token_literal) {
-            ($ok, $error) = $missing_close_bracket_handle->($token_literal);
-            next MAIN_LOOP;
-        }
+        ($ok, $error) = $missing_close_bracket_handle->();
+        next MAIN_LOOP if $ok;
 
         # If we are here
         # we have closed all brackets.
