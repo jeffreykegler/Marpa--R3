@@ -41,7 +41,7 @@ usage() if @ARGV;
 
 Test::More::plan tests => 5 if $TESTING;
 
-my $grammar = << '=== GRAMMAR ===';
+my $dsl = << '=== GRAMMAR ===';
 lexeme default = action => [ name, value ] # to add token names to ast
 
 text ::= pieces
@@ -80,7 +80,7 @@ my %closing_char_by_name = (
 
 my $g = Marpa::R3::Scanless::G->new(
     {
-        source => \($grammar),
+        source => \($dsl),
         ## Ask Marpa to generate an event on rejection
         rejection => 'event',
     }
@@ -147,13 +147,10 @@ sub marked_line {
 } ## end sub marked_line
 
 sub test {
-    my ( $g, $string, $fixes ) = @_;
+    my ( $grammar, $string, $fixes ) = @_;
     my @problems = ();
     my @fixes    = ();
     diagnostic( "Input: ", substr( $string, 0, 60 ) ) if $verbose;
-
-    # Record the length of the "real input"
-    my $input_length = length $string;
 
     # state $recce_debug_args = { trace_terminals => 1, trace_values => 1 };
     state $recce_debug_args = {};
@@ -163,7 +160,7 @@ sub test {
 
     my $recce = Marpa::R3::Scanless::R->new(
         {
-            grammar        => $g,
+            grammar        => $grammar,
             event_handlers => {
                 "'rejected" => sub () {
                     die "Rejection at end of string"
@@ -191,13 +188,17 @@ sub test {
     # deal with the main case --
     # that where we want to read more input from the
     # main block
+    # Returns Perl true on success,
+    # Perl false if the case is inapplicable
     my $main_block_read = sub {
+        return if $stalled;
+        return if $pos >= length $string;
         $rejection_is_fatal = undef;
-        $stalled = undef;
         $recce->block_set($main_block);
         $recce->block_move( $pos, -1 );
         $recce->block_read();
         $pos = $recce->pos();
+        return 1;
     };
 
     # Local closure to
@@ -214,7 +215,9 @@ sub test {
           map  { $closing_char_by_name{$_} } @{ $recce->terminals_expected() };
 
         # The case is inapplicable if there is no closing bracket expected
+        ## no critic (Subroutines::ProhibitExplicitReturnUndef)
         return undef, undef if not $token_literal;
+        ## use critic
 
         # If there is an missing close bracket,
         # use Ruby Slippers to close it,
@@ -239,7 +242,7 @@ sub test {
         my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
 
         my $problem = q{};
-        my $pos     = $recce->pos();
+        $pos     = $recce->pos();
         my ( $pos_line, $pos_column ) = $recce->line_column($pos);
         if ( $line == $pos_line ) {
 
@@ -285,19 +288,25 @@ sub test {
     # an open bracket to fix the problem.
     #
     # Returns Perl true on success,
+    # Perl false and undef if the case is inapplicable
     # Perl false and an error message on failure
     my $extra_close_bracket_handle = sub {
-        my ($token_literal) = @_;
+
+        ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+        return undef, undef if $pos >= length $string;
+        ## use critic
 
         # The only remaining possibility is the opposite issue:
         my $nextchar = substr $string, $pos, 1;
-        $token_literal = $literal_match{$nextchar};
+        my $token_literal = $literal_match{$nextchar};
 
         # If the next character in input is not an close bracket,
         # something strange has happened.
         # All we can do is abend.
+        ## no critic (Subroutines::ProhibitExplicitReturnUndef)
         return undef, "Rejection at pos $pos: ", substr( $string, $pos, 10 )
           if not defined $token_literal;
+        ## use critic
 
         my $token_blk = $blk_by_bracket{$token_literal};
 
@@ -332,37 +341,25 @@ sub test {
     # While we have unread input or unclosed brackets ...
   MAIN_LOOP: while (1) {
 
-        my ($ok, $error);
+        # Try to read from the main block
+        my ($ok, $error) = $main_block_read->();
+        next MAIN_LOOP if $ok;
 
-        # If we're not stalled, just read from the main block
-        if ( not $stalled and $pos < $input_length ) {
-            $main_block_read->();
-            next MAIN_LOOP;
-        }
-        $stalled = undef;
-
-        # If here we are stalled, or are at end-of-input with unclosed brackets.
-        # Either way, first thing we want to know is: are there any unclosed
-        # brackets?
+        # Next, try to deal with unclosed brackets, if any
         ($ok, $error) = $missing_close_bracket_handle->();
         next MAIN_LOOP if $ok;
 
-        # If we are here
-        # we have closed all brackets.
-        # If we have also read all of the input,
-        # then we have finished finished.
-        last MAIN_LOOP if $pos >= $input_length;
-
-        # If we are here, we are stalled,
-        # with input remaining,
-        # and not because of a missing close bracket.
+        # If we are here, we have unread input,
+        # but no brackets to close.
         # The only possibility left is that
         # we have an extra close bracket in
         # the input.
         # To fix it, we "Ruby Slippers" up an opening bracket to
         # match it.
         ($ok, $error) = $extra_close_bracket_handle->();
-        die $error if not $ok;
+        next MAIN_LOOP if $ok;
+        last MAIN_LOOP if not $error;
+        die $error;
     }
 
     # For testing

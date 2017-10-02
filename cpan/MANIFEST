@@ -272,7 +272,7 @@ t/gabend.t
 t/gia.t
 t/gia_err.t
 t/gie.t
-t/gie_d.t
+t/50d-gie.t
 t/gif1.t
 t/gires.t
 t/gsyn.t
