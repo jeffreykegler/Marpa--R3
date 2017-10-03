@@ -33,20 +33,35 @@ target ::= 'a' 'b' 'c' 'a' 'b' 'c'
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \($dsl) } );
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-
 sub hi_level_read {
-   my ($recce, $p_string) = @_;
-   $recce->read($p_string);
+   my ($recce, $p_string, $offset, $length) = @_;
+   $recce->read($p_string, $offset, $length);
 }
 
 sub hi_level_resume {
-   my ($recce, $p_string) = @_;
-   $recce->resume(0);
+   my ($recce, $offset, $length) = @_;
+   $recce->resume($offset, $length);
+}
+
+sub lo_level_read {
+    my ($recce, $p_string, $offset, $length) = @_;
+    my $block_id = $recce->block_new($p_string);
+    $recce->block_set($block_id);
+    $recce->block_move($offset, $length);
+    $recce->block_read();
+    return $recce->pos();
+}
+
+sub lo_level_resume {
+    my ($recce, $offset, $length) = @_;
+    $recce->block_move( $offset, $length );
+    $recce->block_read();
+    return $recce->pos();
 }
 
 sub test {
-    my ( $recce, $string, $read_fn, $resume_fn, $test_name ) = @_;
+    my ( $grammar, $string, $read_fn, $resume_fn, $test_name ) = @_;
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     my $expected_result = 'Parse OK';
     my $expected_value  = \[qw(target a b c a b c)];
     my $actual_result   = "Actual result not set";
@@ -76,7 +91,8 @@ sub test {
         qq{Result of $test_name} );
 }
 
-test($recce, "abc", \&hi_level_read, \&hi_level_resume, 'hi level');
+test($grammar, "abc", \&hi_level_read, \&hi_level_resume, 'hi level');
+test($grammar, "abc", \&lo_level_read, \&lo_level_resume, 'lo level');
 
 # my $main_block = $recce->block_new( \$string );
 
