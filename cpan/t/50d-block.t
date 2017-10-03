@@ -25,7 +25,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 9;
+use Test::More tests => 6;
 
 my $dsl = << '=== GRAMMAR ===';
 target ::= 'a' 'b' 'c' 'a' 'b' 'c'
@@ -59,11 +59,12 @@ sub lo_level_resume {
     return $recce->pos();
 }
 
+my $expected_result = 'Parse OK';
+my $expected_value  = \[qw(target a b c a b c)];
+
 sub test {
     my ( $grammar, $string, $read_fn, $resume_fn, $test_name ) = @_;
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-    my $expected_result = 'Parse OK';
-    my $expected_value  = \[qw(target a b c a b c)];
     my $actual_result   = "Actual result not set";
     my $actual_value    = "Actual value not set";
   SET_RESULT: {
@@ -85,15 +86,42 @@ sub test {
     Test::More::is(
         Data::Dumper::Dumper( $actual_value ),
         Data::Dumper::Dumper( $expected_value ),
-        qq{Value of $test_name}
+        qq{Value for $test_name}
     );
     Test::More::is( $actual_result, $expected_result,
-        qq{Result of $test_name} );
+        qq{Result for $test_name} );
 }
 
-test($grammar, "abc", \&hi_level_read, \&hi_level_resume, 'hi level');
-test($grammar, "abc", \&lo_level_read, \&lo_level_resume, 'lo level');
+test( $grammar, "abc", \&hi_level_read, \&hi_level_resume, 'hi level methods' );
+test( $grammar, "abc", \&lo_level_read, \&lo_level_resume, 'lo level methods' );
 
-# my $main_block = $recce->block_new( \$string );
+# This block for displays of individual methods
+if (
+    not defined eval {
+        my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+        my $block_id = $recce->block_new(\"abc");
+        $recce->block_set($block_id);
+        $recce->block_move( 0, -1 );
+        $recce->block_read();
+        $recce->block_move(0);
+        $recce->block_read();
+        my $actual_value = $recce->value();
+        Test::More::is(
+            Data::Dumper::Dumper($actual_value),
+            Data::Dumper::Dumper($expected_value),
+            qq{Value for individual methods}
+        );
+        1;
+    }
+  )
+{
+    my $actual_result = $EVAL_ERROR;
+    chomp $actual_result;
+    Test::More::is( $actual_result, $expected_result,
+        qq{Result for individual methods} );
+}
+else {
+    Test::More::pass(qq{Result for individual methods});
+}
 
 # vim: expandtab shiftwidth=4:
