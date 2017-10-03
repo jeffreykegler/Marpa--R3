@@ -857,6 +857,24 @@ A successful call of C<read()>
 may return zero.
 On failure, C<read()> throws an exception.
 
+The C<read()> method is 
+the approximate equivalent of
+
+=for Marpa::R3::Display
+name: Block level read() equivalent
+normalize-whitespace: 1
+
+    sub block_level_read {
+        my ($recce, $p_string, $offset, $length) = @_;
+        my $block_id = $recce->block_new($p_string);
+        $recce->block_set($block_id);
+        $recce->block_move($offset, $length);
+        $recce->block_read();
+        return $recce->pos();
+    }
+
+=for Marpa::R3::Display::End
+
 =head2 set()
 
 =for Marpa::R3::Display
@@ -932,7 +950,7 @@ of the input on the block level.
 name: block_move() synopsis
 normalize-whitespace: 1
 
-    TODO
+    $recce->block_move( 0, -1 );
 
 =for Marpa::R3::Display::End
 
@@ -953,7 +971,7 @@ after the current offset.
 name: block_new() synopsis
 normalize-whitespace: 1
 
-    TODO
+    my $main_block_id = $recce->block_new(\"abc");
 
 =for Marpa::R3::Display::End
 
@@ -973,7 +991,7 @@ and this behavior is convenient for them.
 name: block_read() synopsis
 normalize-whitespace: 1
 
-    TODO
+    $recce->block_read();
 
 =for Marpa::R3::Display::End
 
@@ -983,7 +1001,7 @@ normalize-whitespace: 1
 name: block_set() synopsis
 normalize-whitespace: 1
 
-    TODO
+    $recce->block_set($main_block_id);
 
 =for Marpa::R3::Display::End
 
@@ -993,7 +1011,15 @@ normalize-whitespace: 1
 name: block_where() synopsis
 normalize-whitespace: 1
 
-    TODO
+    my ($block_id, $offset, $eoread) = $recce->block_where( );
+
+=for Marpa::R3::Display::End
+
+=for Marpa::R3::Display
+name: block_where() synopsis 2
+normalize-whitespace: 1
+
+    ($block_id, $offset, $eoread) = $recce->block_where( $main_block_id );
 
 =for Marpa::R3::Display::End
 
@@ -1319,6 +1345,22 @@ the new current location.
 On unthrown failure,
 C<resume()> returns a Perl C<undef>.
 Currently, all failures are thrown.
+
+The C<resume()> method is 
+the approximate equivalent of
+
+=for Marpa::R3::Display
+name: Block level resume() equivalent
+normalize-whitespace: 1
+
+    sub block_level_resume {
+        my ($recce, $offset, $length) = @_;
+        $recce->block_move( $offset, $length );
+        $recce->block_read();
+        return $recce->pos();
+    }
+
+=for Marpa::R3::Display::End
 
 =head1 Accessors
 

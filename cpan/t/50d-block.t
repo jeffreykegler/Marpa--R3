@@ -25,7 +25,9 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 6;
+use Test::More tests => 8;
+use lib 'inc';
+use Marpa::R3::Test;
 
 my $dsl = << '=== GRAMMAR ===';
 target ::= 'a' 'b' 'c' 'a' 'b' 'c'
@@ -43,7 +45,10 @@ sub hi_level_resume {
    $recce->resume($offset, $length);
 }
 
-sub lo_level_read {
+# Marpa::R3::Display
+# name: Block level read() equivalent
+
+sub block_level_read {
     my ($recce, $p_string, $offset, $length) = @_;
     my $block_id = $recce->block_new($p_string);
     $recce->block_set($block_id);
@@ -52,12 +57,19 @@ sub lo_level_read {
     return $recce->pos();
 }
 
-sub lo_level_resume {
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: Block level resume() equivalent
+
+sub block_level_resume {
     my ($recce, $offset, $length) = @_;
     $recce->block_move( $offset, $length );
     $recce->block_read();
     return $recce->pos();
 }
+
+# Marpa::R3::Display::End
 
 my $expected_result = 'Parse OK';
 my $expected_value  = \[qw(target a b c a b c)];
@@ -93,18 +105,69 @@ sub test {
 }
 
 test( $grammar, "abc", \&hi_level_read, \&hi_level_resume, 'hi level methods' );
-test( $grammar, "abc", \&lo_level_read, \&lo_level_resume, 'lo level methods' );
+test( $grammar, "abc", \&block_level_read, \&block_level_resume, 'block level methods' );
 
 # This block for displays of individual methods
 if (
     not defined eval {
         my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-        my $block_id = $recce->block_new(\"abc");
-        $recce->block_set($block_id);
+
+# Marpa::R3::Display
+# name: block_new() synopsis
+
+        my $main_block_id = $recce->block_new(\"abc");
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: block_set() synopsis
+
+        $recce->block_set($main_block_id);
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: block_move() synopsis
+
         $recce->block_move( 0, -1 );
+
+# Marpa::R3::Display::End
+
         $recce->block_read();
+
+# Marpa::R3::Display
+# name: block_where() synopsis
+
+        my ($block_id, $offset, $eoread) = $recce->block_where( );
+
+# Marpa::R3::Display::End
+
+        Marpa::R3::Test::is(
+            [ $block_id, $offset, $eoread ], [ 1, 3, 3 ],
+            qq{test 1 of block_where()}
+        );
+
         $recce->block_move(0);
+
+# Marpa::R3::Display
+# name: block_where() synopsis 2
+
+        ($block_id, $offset, $eoread) = $recce->block_where( $main_block_id );
+
+# Marpa::R3::Display::End
+
+        Marpa::R3::Test::is(
+            [ $block_id, $offset, $eoread ], [ 1, 0, 3 ],
+            qq{test 2 of block_where()}
+        );
+
+# Marpa::R3::Display
+# name: block_read() synopsis
+
         $recce->block_read();
+
+# Marpa::R3::Display::End
+
         my $actual_value = $recce->value();
         Test::More::is(
             Data::Dumper::Dumper($actual_value),
