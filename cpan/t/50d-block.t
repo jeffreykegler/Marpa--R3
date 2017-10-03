@@ -28,12 +28,55 @@ POSIX::setlocale(LC_ALL, "C");
 use Test::More tests => 9;
 
 my $dsl = << '=== GRAMMAR ===';
-target ::= 'abcabc'
+target ::= 'a' 'b' 'c' 'a' 'b' 'c'
 === GRAMMAR ===
 
 my $grammar = Marpa::R3::Scanless::G->new( { source => \($dsl) } );
 
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+
+sub hi_level_read {
+   my ($recce, $p_string) = @_;
+   $recce->read($p_string);
+}
+
+sub hi_level_resume {
+   my ($recce, $p_string) = @_;
+   $recce->resume(0);
+}
+
+sub test {
+    my ( $recce, $string, $read_fn, $resume_fn, $test_name ) = @_;
+    my $expected_result = 'Parse OK';
+    my $expected_value  = \[qw(target a b c a b c)];
+    my $actual_result   = "Actual result not set";
+    my $actual_value    = "Actual value not set";
+  SET_RESULT: {
+        if ( not defined eval { $read_fn->( $recce, \$string ); 1 } ) {
+            $actual_result = $EVAL_ERROR;
+            chomp $actual_result;
+            $actual_value = 'Problem in initial read test';
+            last SET_RESULT;
+        }
+        if ( not defined eval { $resume_fn->( $recce, 0 ); 1 } ) {
+            $actual_result = $EVAL_ERROR;
+            chomp $actual_result;
+            $actual_value = 'Problem in resumption test';
+            last SET_RESULT;
+        }
+        $actual_result = 'Parse OK';
+        $actual_value  = $recce->value();
+    }
+    Test::More::is(
+        Data::Dumper::Dumper( $actual_value ),
+        Data::Dumper::Dumper( $expected_value ),
+        qq{Value of $test_name}
+    );
+    Test::More::is( $actual_result, $expected_result,
+        qq{Result of $test_name} );
+}
+
+test($recce, "abc", \&hi_level_read, \&hi_level_resume, 'hi level');
 
 # my $main_block = $recce->block_new( \$string );
 
