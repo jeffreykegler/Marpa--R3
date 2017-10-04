@@ -1547,6 +1547,8 @@ name: SLIF trace example
 partial: 1
 normalize-whitespace: 1
 
+    TODO document block parameter ??
+
     my ( $start, $span_length ) = $recce->pause_span();
     my ( $line,  $column )      = $recce->line_column($start);
 

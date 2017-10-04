@@ -817,7 +817,6 @@ END_OF_LUA
     return $desc;
 }
 
-# TODO -- Document $block parameter
 sub Marpa::R3::Scanless::R::line_column {
     my ( $slr, $pos, $block ) = @_;
     $pos //= $slr->pos();
@@ -833,19 +832,6 @@ END_OF_LUA
 
     return $line_no, $column_no;
 } ## end sub Marpa::R3::Scanless::R::line_column
-
-# TODO -- Document block_id result
-# TODO -- Delete this in favor of block_where()?
-sub Marpa::R3::Scanless::R::pos {
-    my ($slr) = @_;
-    my ($l0_pos) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', '' );
-        local slr = ...
-        local _, l0_pos = slr:block_where()
-        return l0_pos
-END_OF_LUA
-    return $l0_pos;
-}
 
 sub Marpa::R3::Scanless::R::block_new {
     my ( $slr, $p_string ) = @_;
@@ -938,7 +924,6 @@ END_OF_LUA
     return $block_id;
 }
 
-# TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_where {
     my ($slr, $block_id) = @_;
     my ($l0_pos, $l0_end);
@@ -957,7 +942,6 @@ END_OF_LUA
     return $block_id, $l0_pos, $l0_end;
 }
 
-# TODO -- Document this method
 sub Marpa::R3::Scanless::R::block_set {
     my ($slr, $block_id) = @_;
     if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
@@ -1034,7 +1018,6 @@ END_OF_LUA
     return;
 }
 
-# TODO -- Document block_id argument
 sub Marpa::R3::Scanless::R::input_length {
     my ( $slr, $block_id ) = @_;
     my ($length) = $slr->call_by_tag(
