@@ -17,7 +17,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -402,15 +402,6 @@ END_OF_OUTPUT
 # Marpa::R3::Display::End
 
     Test::More::is( $g1_pos, 11, qq{Scanless g1_pos()} );
-
-# Marpa::R3::Display
-# name: SLIF pos() example
-
-    my $pos = $recce->pos();
-
-# Marpa::R3::Display::End
-
-    Test::More::is( $pos, 19, qq{Scanless pos()} );
 
 # Marpa::R3::Display
 # name: SLIF input_length() example

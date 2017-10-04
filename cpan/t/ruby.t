@@ -102,7 +102,7 @@ sub test {
     $pos = $recce->read( \$suffixed_string, 0, $original_length );
 
     READ_LOOP: while (1) {
-        $pos       = $recce->pos();
+        (undef, $pos) = $recce->block_where();
         last READ_LOOP if not $rejection;
         $recce->resume( $original_length, 1 );
         diag("I fixed it for you.  Now you owe me.") if $verbose;

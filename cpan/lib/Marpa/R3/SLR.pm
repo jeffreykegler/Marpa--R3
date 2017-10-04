@@ -343,7 +343,8 @@ sub Marpa::R3::Scanless::R::read {
     $slr->block_set($block_id);
     $slr->block_move($start_pos, $length);
     $slr->block_read();
-    return $slr->pos();
+    my (undef, $offset) = $slr->block_where();
+    return $offset;
 }
 
 sub Marpa::R3::Scanless::R::resume {

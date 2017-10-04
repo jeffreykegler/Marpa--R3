@@ -54,7 +54,8 @@ sub block_level_read {
     $recce->block_set($block_id);
     $recce->block_move($offset, $length);
     $recce->block_read();
-    return $recce->pos();
+    my (undef, $new_offset) = $recce->block_where();
+    return $new_offset;
 }
 
 # Marpa::R3::Display::End
@@ -66,7 +67,8 @@ sub block_level_resume {
     my ($recce, $offset, $length) = @_;
     $recce->block_move( $offset, $length );
     $recce->block_read();
-    return $recce->pos();
+    my (undef, $new_offset) = $recce->block_where();
+    return $new_offset;
 }
 
 # Marpa::R3::Display::End

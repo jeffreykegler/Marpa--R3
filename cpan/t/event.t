@@ -135,7 +135,8 @@ sub do_test {
             event_handlers => {
                 "'default" => sub () {
                      my ($slr, $event_name) = @_;
-                     my $pos = $slr->pos();
+                     my (undef, $pos) = $slr->block_where();
+                     $pos //= 0;
                      $actual_events[$pos]{$event_name} = 1;
                      'ok';
                 }

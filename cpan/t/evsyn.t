@@ -143,7 +143,7 @@ READ: while (1) {
 
     if ($next_lexeme) {
         $slr->lexeme_read(@{$next_lexeme});
-        $pos = $slr->pos();
+        (undef, $pos) = $slr->block_where();
         $next_lexeme = undef;
         next READ;
     }
