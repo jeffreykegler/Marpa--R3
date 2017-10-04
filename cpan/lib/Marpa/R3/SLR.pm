@@ -361,7 +361,8 @@ sub Marpa::R3::Scanless::R::resume {
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     $slr->block_move( $start_pos, $length );
     $slr->block_read();
-    return $slr->pos();
+    my (undef, $offset) = $slr->block_where();
+    return $offset;
 }
 
 sub character_describe {
