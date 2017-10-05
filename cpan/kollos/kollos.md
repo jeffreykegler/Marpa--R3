@@ -2122,8 +2122,6 @@ This is a registry object.
     class_slr_fields.trailers = true
     -- TODO delete after development
     class_slr_fields.has_event_handlers = true
-    class_slr_fields.end_of_pause_lexeme = true
-    class_slr_fields.start_of_pause_lexeme = true
 ```
 
 *At end of input* field:
@@ -2211,8 +2209,6 @@ together.
         slr.trace_terminals = 0
         slr.start_of_lexeme = 0
         slr.end_of_lexeme = 0
-        slr.start_of_pause_lexeme = -1
-        slr.end_of_pause_lexeme = -1
         slr.is_external_scanning = false
 
         local g_l0_rules = slg.l0.irls
@@ -2486,8 +2482,6 @@ if there is some way to continue it),
         if slr.block_mode then
            _M.userX( 'unpermitted use of slr.read() in block mode' )
         end
-        slr.start_of_pause_lexeme = -1
-        slr.end_of_pause_lexeme = -1
         slr.event_queue = {}
         while true do
             local _, offset, eoread = slr:block_where()
@@ -2998,8 +2992,6 @@ Returns `true` is there was one,
                     'before lexeme', g1_lexeme, lexeme_block, lexeme_start,
                     lexeme_end - lexeme_start
                 }
-                slr.start_of_pause_lexeme = lexeme_start
-                slr.end_of_pause_lexeme = lexeme_end
                 local start_of_lexeme = slr.start_of_lexeme
                 slr:block_move(start_of_lexeme)
                 return true
@@ -3110,8 +3102,6 @@ Read alternatives into the G1 grammar.
                     end
                 end
 
-                slr.start_of_pause_lexeme = lexeme_start
-                slr.end_of_pause_lexeme = lexeme_end
                 local pause_after_active = slr.g1_isys[g1_lexeme].pause_after_active
                 if pause_after_active then
                     local display_form = g1g:symbol_display_form(g1_lexeme)
@@ -3144,19 +3134,7 @@ lexer.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
         local block_ix, offset = slr:block_where()
-        local longueur = 0
-        do
-            if length_arg then
-                longueur = length_arg
-                goto LONGUEUR_IS_SET
-            end
-            if offset == slr.start_of_pause_lexeme then
-                longueur = slr.end_of_pause_lexeme - slr.start_of_pause_lexeme
-                goto LONGUEUR_IS_SET
-           end
-            longueur = 0
-        end
-        ::LONGUEUR_IS_SET::
+        local longueur = length_arg or 0
         longueur = math.tointeger(longueur)
         if not longueur then
             error(string.format(

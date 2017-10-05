@@ -718,7 +718,7 @@ The index of the block containing the lexeme.
 
 =item *
 
-The start position of the discarded text,
+The start position of the lexeme,
 as a zero-based offset from the start of the
 block.
 
@@ -776,7 +776,7 @@ The index of the block containing the lexeme.
 
 =item *
 
-The start position of the discarded text,
+The start position of the lexeme,
 as a zero-based offset from the start of the
 block.
 

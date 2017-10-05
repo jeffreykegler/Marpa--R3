@@ -202,14 +202,7 @@ G1 variants
 have C<g1> somewhere in their name.
 Accordingly,
 C<< $slr->substring() >> has been renamed
-C<< $slr->g1_literal() >>;
-and
-C<< $slr->current_g1_location() >>
-is now
-C<< $slr->g1_pos() >>.
-
-The C<< $slr->ambiguous() >> method has been
-moved -- it is a method of the new valuer object.
+C<< $slr->g1_literal() >>.
 
 =head2 Marpa::R2::Scanless::R methods removed in Marpa::R3
 
@@ -226,6 +219,16 @@ The C<Marpa::R2::Scanless::R::ambiguity_metric()> method
 has been removed.
 Its purpose is now served by the 
 C<Marpa::R2::Scanless::V::ambiguity_level()> method.
+
+The C<Marpa::R2::Scanless::R::ambiguous()> method
+has been removed.
+Its purpose is now served by the 
+C<Marpa::R2::Scanless::V::ambiguous()> method.
+
+The C<Marpa::R2::Scanless::R::current_g1_location()> method
+has been removed.
+Its purpose is now served by the 
+C<Marpa::R2::Scanless::V::block_where()> method.
 
 =head2 Marpa::R2::Scanless::R::progress() changed
 

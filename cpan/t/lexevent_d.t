@@ -102,16 +102,14 @@ my @actual_events = ();
 my $current_position;
 
 my $before_handler = sub () {
-   my ($slr, $event_name) = @_;
-   my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
+   my ( $slr, $event_name, undef, undef, $start_of_lexeme, $length_of_lexeme ) = @_;
    $current_position = $start_of_lexeme + $length_of_lexeme;
    push @actual_events, "$start_of_lexeme $event_name";
    'pause';
 };
 
 my $after_handler = sub () {
-   my ($slr, $event_name) = @_;
-   my ( $start_of_lexeme, $length_of_lexeme ) = $slr->pause_span();
+   my ( $slr, $event_name, undef, undef, $start_of_lexeme, $length_of_lexeme ) = @_;
    $current_position = $start_of_lexeme + $length_of_lexeme;
    push @actual_events, "$current_position $event_name";
    'pause';

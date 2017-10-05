@@ -116,9 +116,8 @@ my $next_lexeme;
 my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
     event_handlers => {
         "'default" => sub () {
-            my ($slr, $event_name) = @_;
+            my ($slr, $event_name, undef, undef, undef, $length) = @_;
             if ($event_name eq 'insert d') {
-               my (undef, $length) = $slr->pause_span();
                $next_lexeme = ['real d', undef, $length];
             }
             push @events, $event_name;

@@ -305,11 +305,15 @@ sub parse {
 # Marpa::R3::Display
 # name: SLIF read/resume example
 
+    my @pause_location;
     my $recce = Marpa::R3::Scanless::R->new(
         {
             grammar        => $parser->{grammar},
             event_handlers => {
-                'before lstring' => sub () { 'pause' },
+                'before lstring' => sub () {
+                    (undef, undef, undef, @pause_location) = @_;
+                    'pause';
+                },
             }
         }
     );
@@ -320,7 +324,8 @@ sub parse {
         $pos = $recce->resume()
         )
     {
-        my ( $start, $length ) = $recce->pause_span();
+        my $start = $pause_location[1];
+        my $length = $pause_location[2];
         my $value = substr $string, $start + 1, $length - 2;
         $value = decode_string($value) if -1 != index $value, '\\';
         $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
@@ -345,18 +350,23 @@ sub trace_json {
 # Marpa::R3::Display
 # name: SLIF trace example
 
+        my @pause_location;
         my $recce = Marpa::R3::Scanless::R->new(
             {
                 grammar        => $parser->{grammar},
                 event_handlers => {
-                    'before lstring' => sub () { 'pause' },
+                    'before lstring' => sub () {
+                        (undef, undef, undef, @pause_location) = @_;
+                        'pause'
+                    },
                 }
             }
         );
         my $length = length $string;
         my $pos    = $recce->read( \$string );
         while ( $pos < $length ) {
-            my ( $start, $span_length ) = $recce->pause_span();
+            my  $start = $pause_location[1];
+            my  $span_length = $pause_location[2];
             my ( $line,  $column )      = $recce->line_column($start);
             my $lexeme = 'lstring';
             my $literal_string = $recce->literal( $start, $span_length );
