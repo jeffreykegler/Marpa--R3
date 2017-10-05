@@ -27,9 +27,8 @@ partial: 1
     my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
         event_handlers => {
             "'default" => sub () {
-                my ($slr, $event_name) = @_;
+                my ($slr, $event_name, undef, undef, undef, $length) = @_;
                 if ($event_name eq 'insert d') {
-                   my (undef, $length) = $slr->pause_span();
                    $next_lexeme = ['real d', undef, $length];
                 }
                 push @events, $event_name;
@@ -54,7 +53,7 @@ partial: 1
 
         if ($next_lexeme) {
             $slr->lexeme_read(@{$next_lexeme});
-            $pos = $slr->pos();
+            (undef, $pos) = $slr->block_progress();
             $next_lexeme = undef;
             next READ;
         }
@@ -807,7 +806,7 @@ normalize-whitespace: 1
         my %event_handlers1 = (
               'target' => sub {
                    my ($slr) = @_;
-                   my $pos = $slr->pos();
+                   my (undef, $pos) = $slr->block_progress();
                    @shortest_span = $slr->last_completed('target');
                    diag(
                        "Preliminary target at $pos: ",
@@ -937,7 +936,7 @@ normalize-whitespace: 1
     $pos = $recce->read( \$suffixed_string, 0, $original_length );
 
     READ_LOOP: while (1) {
-        $pos       = $recce->pos();
+        (undef, $pos) = $recce->block_progress();
         last READ_LOOP if not $rejection;
         $recce->resume( $original_length, 1 );
         diag("I fixed it for you.  Now you owe me.") if $verbose;
@@ -1777,7 +1776,8 @@ normalize-whitespace: 1
             event_handlers => {
                 "'default" => sub () {
                     my ( $slr, @event_data ) = @_;
-                    my $pos = $slr->pos();
+                    my (undef, $pos) = $slr->block_progress();
+                    $pos //= 0;
                     push @{$results[$pos]}, \@event_data;
                     'ok';
                 },
@@ -1893,9 +1893,8 @@ normalize-whitespace: 1
     my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
         event_handlers => {
             "'default" => sub () {
-                my ($slr, $event_name) = @_;
+                my ($slr, $event_name, undef, undef, undef, $length) = @_;
                 if ($event_name eq 'insert d') {
-                   my (undef, $length) = $slr->pause_span();
                    $next_lexeme = ['real d', undef, $length];
                 }
                 push @events, $event_name;
@@ -1920,7 +1919,7 @@ normalize-whitespace: 1
 
         if ($next_lexeme) {
             $slr->lexeme_read(@{$next_lexeme});
-            $pos = $slr->pos();
+            (undef, $pos) = $slr->block_progress();
             $next_lexeme = undef;
             next READ;
         }

@@ -870,7 +870,8 @@ normalize-whitespace: 1
         $recce->block_set($block_id);
         $recce->block_move($offset, $length);
         $recce->block_read();
-        return $recce->pos();
+        my (undef, $new_offset) = $recce->block_progress();
+        return $new_offset;
     }
 
 =for Marpa::R3::Display::End
@@ -1284,11 +1285,16 @@ name: SLIF read/resume example
 partial: 1
 normalize-whitespace: 1
 
+    my @pause_location;
     my $recce = Marpa::R3::Scanless::R->new(
         {
             grammar        => $parser->{grammar},
             event_handlers => {
-                'before lstring' => sub () { 'pause' },
+                'before lstring' => sub () {
+                    ( undef, undef, undef, @pause_location ) = @_;
+                    'pause';
+                },
+
             }
         }
     );
@@ -1299,7 +1305,8 @@ normalize-whitespace: 1
         $pos = $recce->resume()
         )
     {
-        my ( $start, $length ) = $recce->pause_span();
+        my $start = $pause_location[1];
+        my $length = $pause_location[2];
         my $value = substr $string, $start + 1, $length - 2;
         $value = decode_string($value) if -1 != index $value, '\\';
         $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
@@ -1357,7 +1364,8 @@ normalize-whitespace: 1
         my ($recce, $offset, $length) = @_;
         $recce->block_move( $offset, $length );
         $recce->block_read();
-        return $recce->pos();
+        my (undef, $new_offset) = $recce->block_progress();
+        return $new_offset;
     }
 
 =for Marpa::R3::Display::End
@@ -1640,20 +1648,6 @@ If omitted, the current input block is used.
 The C<literal()> method
 returns the substring of the input stream
 corresponding to that span.
-
-=head2 pos()
-
-=for Marpa::R3::Display
-name: SLIF pos() example
-partial: 1
-normalize-whitespace: 1
-
-    my $pos = $recce->pos();
-
-=for Marpa::R3::Display::End
-
-The C<pos()> method accepts no arguments,
-and returns the current physical input stream location.
 
 =head2 progress()
 

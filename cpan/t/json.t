@@ -311,7 +311,7 @@ sub parse {
             grammar        => $parser->{grammar},
             event_handlers => {
                 'before lstring' => sub () {
-                    (undef, undef, undef, @pause_location) = @_;
+                    ( undef, undef, undef, @pause_location ) = @_;
                     'pause';
                 },
             }
