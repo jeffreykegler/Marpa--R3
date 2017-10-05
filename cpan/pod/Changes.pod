@@ -230,6 +230,12 @@ has been removed.
 Its purpose is now served by the 
 C<Marpa::R2::Scanless::V::block_where()> method.
 
+The C<Marpa::R2::Scanless::R::pause_span()> method
+has been removed.
+Event location information is now available
+as arguments to the
+event handlers.
+
 =head2 Marpa::R2::Scanless::R::progress() changed
 
 C<Marpa::R2::Scanless::R::progress()> reported

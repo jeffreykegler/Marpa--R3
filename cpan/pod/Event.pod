@@ -632,8 +632,6 @@ When a pre-lexeme event triggers,
 its event location
 is set to the location where the lexeme starts,
 which will be before the trigger location.
-A pre-lexeme event also sets the
-L<C<pause span>|"Pause span">.
 
 The SLIF recognizer will B<not> have
 read the lexeme
@@ -749,8 +747,6 @@ When a post-lexeme event triggers,
 its event location
 is set to the current location,
 which will also be the location where the lexeme ends.
-A post-lexeme event also sets the
-L<C<pause span>|"Pause span">.
 
 A post-lexeme event passes
 the following arguments to its event handler,
@@ -1013,23 +1009,6 @@ post-lexeme events from triggering at the same location.)
 Marpa allows ambiguous lexemes and,
 even after all the above criteria have been applied,
 there may be more than one lexeme event at a location.
-
-=head2 Pause span
-
-When a lexeme event triggers, it will set
-the B<pause span> to the start physical input stream location
-and length of the triggering lexeme.
-The pause span is
-originally undefined.
-Every call
-to the L<C<read()>|Marpa::R3::Scanless::R/"read()">
-or the L<C<resume()>|Marpa::R3::Scanless::R/"resume()">
-methods resets
-the pause span to undefined.
-The pause span may be accessed directly
-with the
-L<C<< $slr->pause_span() >>
-method|Marpa::R3::Scanless::R/"pause_span()">.
 
 =head2 Non-lexeme events
 

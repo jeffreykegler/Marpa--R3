@@ -1641,27 +1641,6 @@ The C<literal()> method
 returns the substring of the input stream
 corresponding to that span.
 
-=head2 pause_span()
-
-=for Marpa::R3::Display
-name: SLIF read/resume example
-partial: 1
-normalize-whitespace: 1
-
-    my ( $start, $length ) = $recce->pause_span();
-
-=for Marpa::R3::Display::End
-
-The C<pause_span()> method accepts no arguments,
-and returns
-the pause span
-as a 2-element array: start and length.
-The "pause span" is
-described in detail
-L<in another document|Marpa::R3::Event/"Pause span">.
-C<pause_span()> returns a Perl C<undef> if
-the pause span is undefined.
-
 =head2 pos()
 
 =for Marpa::R3::Display

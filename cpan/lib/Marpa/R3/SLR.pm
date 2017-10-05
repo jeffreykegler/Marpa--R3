@@ -198,8 +198,7 @@ sub Marpa::R3::Scanless::R::new {
             "  whose values are code refs\n"
         );
     }
-    # TODO -- restore after development
-    # delete $flat_args->{event_handlers};
+    delete $flat_args->{event_handlers};
 
     my $slg_class = 'Marpa::R3::Scanless::G';
     if ( not blessed $slg or not $slg->isa($slg_class) ) {
