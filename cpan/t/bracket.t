@@ -197,7 +197,7 @@ sub test {
         $recce->block_set($main_block);
         $recce->block_move( $pos, -1 );
         $recce->block_read();
-        (undef, $pos) = $recce->block_where();
+        (undef, $pos) = $recce->block_progress();
         return 1;
     };
 
@@ -242,7 +242,7 @@ sub test {
         my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
 
         my $problem = q{};
-        (undef, $pos) = $recce->block_where();
+        (undef, $pos) = $recce->block_progress();
         my ( $pos_line, $pos_column ) = $recce->line_column($pos);
         if ( $line == $pos_line ) {
 

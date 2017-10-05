@@ -142,7 +142,7 @@ sub test {
         my %event_handlers1 = (
               'target' => sub {
                    my ($slr) = @_;
-                   my (undef, $pos) = $slr->block_where();
+                   my (undef, $pos) = $slr->block_progress();
                    @shortest_span = $slr->last_completed('target');
                    diag(
                        "Preliminary target at $pos: ",

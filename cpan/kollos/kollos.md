@@ -1996,7 +1996,7 @@ the `codepoint` command.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.block_where(slr, block_ix)
+    function _M.class_slr.block_progress(slr, block_ix)
         local block
         if block_ix then
             block = slr.inputs[block_ix]
@@ -2282,7 +2282,7 @@ together.
     function _M.class_slr.l0r_new(slr)
         local l0r = _M.recce_new(slr.slg.l0)
 
-        local block_ix, offset = slr:block_where()
+        local block_ix, offset = slr:block_progress()
         local g1g = slr.slg.g1
 
         if not l0r then
@@ -2484,7 +2484,7 @@ if there is some way to continue it),
         end
         slr.event_queue = {}
         while true do
-            local _, offset, eoread = slr:block_where()
+            local _, offset, eoread = slr:block_progress()
             if offset >= eoread then
                 -- a 'normal' return
                 return false
@@ -2554,7 +2554,7 @@ which will be 1 or 0.
         local l0g = slr.slg.l0
         local codepoint = slr.codepoint
         local result = l0r:alternative(symbol_id, 1, 1)
-        local _, offset = slr:block_where()
+        local _, offset = slr:block_progress()
         if result == _M.err.UNEXPECTED_TOKEN_ID then
             if slr.trace_terminals >= 1 then
                 coroutine.yield('trace', string.format(
@@ -2610,7 +2610,7 @@ Otherwise returns `false` and a status string.
         end
 
         if slr.trace_terminals >= 1 then
-           local _, offset = slr:block_where()
+           local _, offset = slr:block_progress()
            coroutine.yield('trace', string.format(
                'Reading codepoint %q 0x%04x at %s',
                utf8.char(codepoint),
@@ -2642,7 +2642,7 @@ otherwise `false` and a status string.
             slr:l0r_new()
         end
         while true do
-            local block_ix, offset, eoread = slr:block_where()
+            local block_ix, offset, eoread = slr:block_progress()
             if offset >= eoread then
                 return true
             end
@@ -3077,7 +3077,7 @@ Read alternatives into the G1 grammar.
             end
             if return_value ~= _M.err.NONE then
                 local l0r = slr.l0
-                local _, offset  = slr:block_where()
+                local _, offset  = slr:block_progress()
                 error(string.format([[
                      'Problem SLR->read() failed on symbol id %d at position %d: %s'
                 ]],
@@ -3133,7 +3133,7 @@ lexer.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
-        local block_ix, offset = slr:block_where()
+        local block_ix, offset = slr:block_progress()
         local longueur = length_arg or 0
         longueur = math.tointeger(longueur)
         if not longueur then
@@ -3431,7 +3431,7 @@ TODO: Allow for leading trailer, final trailer.
     -- miranda: section+ most Lua function definitions
 
     function _M.class_slr.g1_convert_events(slr)
-        local _, offset = slr:block_where()
+        local _, offset = slr:block_progress()
         local g1g = slr.slg.g1
         local q = slr.event_queue
         local events = g1g:events()
@@ -3474,7 +3474,7 @@ TODO: Allow for leading trailer, final trailer.
 
     function _M.class_slr.l0_convert_events(slr)
         local l0g = slr.slg.l0
-        local _, offset = slr:block_where()
+        local _, offset = slr:block_progress()
         local q = slr.event_queue
         local events = l0g:events()
         for i = 1, #events, 2 do
@@ -4068,7 +4068,7 @@ It is designed to be convenient for use as a tail call.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.throw_at_pos(slr, desc, block_ix, pos)
       desc = desc or ''
-      local current_block_ix, offset = slr:block_where()
+      local current_block_ix, offset = slr:block_progress()
       block_ix = block_ix or current_block_ix
       pos = pos or offset
       local codepoint = slr:codepoint_from_pos(block_ix, pos)

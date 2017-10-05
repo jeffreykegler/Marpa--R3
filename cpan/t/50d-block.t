@@ -54,7 +54,7 @@ sub block_level_read {
     $recce->block_set($block_id);
     $recce->block_move($offset, $length);
     $recce->block_read();
-    my (undef, $new_offset) = $recce->block_where();
+    my (undef, $new_offset) = $recce->block_progress();
     return $new_offset;
 }
 
@@ -67,7 +67,7 @@ sub block_level_resume {
     my ($recce, $offset, $length) = @_;
     $recce->block_move( $offset, $length );
     $recce->block_read();
-    my (undef, $new_offset) = $recce->block_where();
+    my (undef, $new_offset) = $recce->block_progress();
     return $new_offset;
 }
 
@@ -138,29 +138,29 @@ if (
         $recce->block_read();
 
 # Marpa::R3::Display
-# name: block_where() synopsis
+# name: block_progress() synopsis
 
-        my ($block_id, $offset, $eoread) = $recce->block_where( );
+        my ($block_id, $offset, $eoread) = $recce->block_progress( );
 
 # Marpa::R3::Display::End
 
         Marpa::R3::Test::is(
             [ $block_id, $offset, $eoread ], [ 1, 3, 3 ],
-            qq{test 1 of block_where()}
+            qq{test 1 of block_progress()}
         );
 
         $recce->block_move(0);
 
 # Marpa::R3::Display
-# name: block_where() synopsis 2
+# name: block_progress() synopsis 2
 
-        ($block_id, $offset, $eoread) = $recce->block_where( $main_block_id );
+        ($block_id, $offset, $eoread) = $recce->block_progress( $main_block_id );
 
 # Marpa::R3::Display::End
 
         Marpa::R3::Test::is(
             [ $block_id, $offset, $eoread ], [ 1, 0, 3 ],
-            qq{test 2 of block_where()}
+            qq{test 2 of block_progress()}
         );
 
 # Marpa::R3::Display

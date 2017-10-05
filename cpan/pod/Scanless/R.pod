@@ -1005,21 +1005,21 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=head2 block_where ()
+=head2 block_progress ()
 
 =for Marpa::R3::Display
-name: block_where() synopsis
+name: block_progress() synopsis
 normalize-whitespace: 1
 
-    my ($block_id, $offset, $eoread) = $recce->block_where( );
+    my ($block_id, $offset, $eoread) = $recce->block_progress( );
 
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: block_where() synopsis 2
+name: block_progress() synopsis 2
 normalize-whitespace: 1
 
-    ($block_id, $offset, $eoread) = $recce->block_where( $main_block_id );
+    ($block_id, $offset, $eoread) = $recce->block_progress( $main_block_id );
 
 =for Marpa::R3::Display::End
 

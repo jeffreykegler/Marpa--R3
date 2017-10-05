@@ -342,7 +342,7 @@ sub Marpa::R3::Scanless::R::read {
     $slr->block_set($block_id);
     $slr->block_move($start_pos, $length);
     $slr->block_read();
-    my (undef, $offset) = $slr->block_where();
+    my (undef, $offset) = $slr->block_progress();
     return $offset;
 }
 
@@ -361,7 +361,7 @@ sub Marpa::R3::Scanless::R::resume {
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     $slr->block_move( $start_pos, $length );
     $slr->block_read();
-    my (undef, $offset) = $slr->block_where();
+    my (undef, $offset) = $slr->block_progress();
     return $offset;
 }
 
@@ -907,7 +907,7 @@ END_OF_LUA
     return $block_id;
 }
 
-sub Marpa::R3::Scanless::R::block_where {
+sub Marpa::R3::Scanless::R::block_progress {
     my ($slr, $block_id) = @_;
     my ($l0_pos, $l0_end);
     ($block_id, $l0_pos, $l0_end)
@@ -919,7 +919,7 @@ sub Marpa::R3::Scanless::R::block_where {
            error(erreur)
         end
         local l0_pos, l0_end
-        block_id, l0_pos, l0_end = slr:block_where(block_id)
+        block_id, l0_pos, l0_end = slr:block_progress(block_id)
         return block_id, l0_pos, l0_end
 END_OF_LUA
     return $block_id, $l0_pos, $l0_end;

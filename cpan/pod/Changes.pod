@@ -228,7 +228,7 @@ C<Marpa::R2::Scanless::V::ambiguous()> method.
 The C<Marpa::R2::Scanless::R::current_g1_location()> method
 has been removed.
 Its purpose is now served by the 
-C<Marpa::R2::Scanless::V::block_where()> method.
+C<Marpa::R2::Scanless::V::block_progress()> method.
 
 The C<Marpa::R2::Scanless::R::pause_span()> method
 has been removed.

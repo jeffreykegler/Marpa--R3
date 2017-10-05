@@ -90,7 +90,7 @@ my $dummy_input = join q{}, map { $_->[1] } @tokens;
 $recce->read( \$dummy_input, 0, 0);
 TOKEN: for my $token_and_value (@tokens) {
     my ($name, $value) = @{$token_and_value};
-    my (undef, $offset) = $recce->block_where();
+    my (undef, $offset) = $recce->block_progress();
     last TOKEN if not defined $recce->lexeme_read( $name, $offset, (length $value), $value );
 }
 

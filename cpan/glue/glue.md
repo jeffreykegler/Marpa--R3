@@ -447,7 +447,7 @@ a message
     --    block_id_arg, if block_id_arg is non-nil and valid
     --    nil, message if block_id_arg is non-nil and invalid
     function glue.check_block_id(slr, block_id_arg)
-        local block_id, l0_pos, end_pos = slr:block_where(block_id_arg)
+        local block_id, l0_pos, end_pos = slr:block_progress(block_id_arg)
         if not block_id then
             return nil, string.format('Bad block index' .. block_id_arg)
         end
@@ -463,7 +463,7 @@ a message
     -- note: negative block_offset_arg is converted as offset
     -- from physical end-of-block
     function glue.check_block_offset(slr, block_id, block_offset_arg)
-        local block_id, offset, end_pos = slr:block_where(block_id)
+        local block_id, offset, end_pos = slr:block_progress(block_id)
         local block = slr.inputs[block_id]
         local block_length = #block
         if not block_offset_arg then return offset end
@@ -497,7 +497,7 @@ a message
         local block_length = #block
 
         if not length_arg then
-            local _, _, eoread = slr:block_where(block_id)
+            local _, _, eoread = slr:block_progress(block_id)
             return eoread
         end
         local longueur = math.tointeger(length_arg)

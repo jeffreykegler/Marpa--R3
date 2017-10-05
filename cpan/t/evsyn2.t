@@ -157,7 +157,7 @@ sub do_test {
          event_handlers => {
              "'default" => sub () {
                  my ($recce, $event_name) = @_;
-                 my (undef, $pos) = $recce->block_where();
+                 my (undef, $pos) = $recce->block_progress();
                  $pos //= 0;
                  push @{$actual_events[$pos]}, $event_name;
                  'ok';

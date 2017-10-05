@@ -331,7 +331,7 @@ $recce = Marpa::R3::Scanless::R->new(
         event_handlers => {
             "'default" => sub () {
                 my ( $slr, @event_data ) = @_;
-                my (undef, $pos) = $slr->block_where();
+                my (undef, $pos) = $slr->block_progress();
                 $pos //= 0;
                 push @{$results[$pos]}, \@event_data;
                 'ok';
