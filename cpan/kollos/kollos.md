@@ -1762,7 +1762,7 @@ one for each subgrammar.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.l0_literal(slr, l0_start, l0_length, block_ix)
+    function _M.class_slr.literal(slr, block_ix, l0_start, l0_length)
         if not block_ix then block_ix = slr.current_block.index end
         local block = slr.inputs[block_ix]
         local start_byte_p = slr:per_pos(block_ix, l0_start)
@@ -3033,7 +3033,7 @@ events into real trace events.
                                  priority was %d, but %d is required",
                                 slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                                 xsy:display_form(),
-                                slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix ),
+                                slr:literal( block_ix, lexeme_start,  lexeme_end - lexeme_start ),
                                 priority, high_lexeme_priority
                             ))
                         end
@@ -3157,7 +3157,7 @@ Read alternatives into the G1 grammar.
                         slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                         working_earley_set,
                         xsy:display_form(),
-                        slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
+                        slr:literal( block_ix, lexeme_start,  lexeme_end - lexeme_start )
                     ))
                 end
             end
@@ -3175,7 +3175,7 @@ Read alternatives into the G1 grammar.
                         'Rejected as duplicate lexeme %s: %s; value=%q',
                         slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                         xsy:display_form(),
-                        slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
+                        slr:literal( block_ix, lexeme_start,  lexeme_end - lexeme_start )
                     ))
                 end
                 goto NEXT_EVENT
@@ -3202,7 +3202,7 @@ Read alternatives into the G1 grammar.
                             slr:lc_range_brief(block_ix, lexeme_start, block_ix, lexeme_end - 1),
                             working_earley_set,
                             display_form,
-                            slr:l0_literal( lexeme_start,  lexeme_end - lexeme_start, block_ix )
+                            slr:literal( block_ix, lexeme_start,  lexeme_end - lexeme_start )
                         ))
                     end
                 end

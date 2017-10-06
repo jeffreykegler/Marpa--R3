@@ -80,7 +80,7 @@ sub Marpa::R3::Scanless::R::literal {
     <<'END_OF_LUA', 'iii', $l0_start, $l0_count, ($block_id // -1));
     local slr, l0_start, l0_count, block_id = ...
     if block_id <= 0 then block_id = nil end
-    return slr:l0_literal(l0_start, l0_count, block_id)
+    return slr:literal(block_id, l0_start, l0_count)
 END_OF_LUA
 
     return $literal;
