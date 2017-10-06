@@ -955,17 +955,27 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Moves the current physical position to
-block offset C<offset> in the current block.
-The end of read is set to C<length>.
+C<block_move()> takes 2 optional arguments:
+call them C<$offset> and C<$length>.
+If C<$offset> is defined,
+C<block_move()>
+sets the current offset of the current block
+C<$offset>.
+If C<$offset> is omitted,
+the current offset of the current block
+is not changed.
 
-If the C<length> is omitted,
-it defaults to the
-end of the current block,
-minus the current offset:
-In other words,
-the default to set eoread to the end of
-the block.
+If length is non-negative,
+C<block_move()>
+sets eoread (end of read) in the current block
+to C<$offset> + C<$length>.
+If C<$length> is negative, eoread is
+set to C<$eob> + C<$length> + 1,
+where C<$eob> is the physical end of
+the current block.
+If C<$length> is omitted,
+the eoread of the current block
+is not changed.
 
 =head2 block_new ()
 

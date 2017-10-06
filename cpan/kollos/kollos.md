@@ -4478,32 +4478,34 @@ the valuator's Lua-level settings.
 ```
     -- miranda: section+ valuator Libmarpa wrapper Lua functions
     function _M.class_slv.value(slv)
-        if slv._ambiguity_level <= 0 then return end
-        local slr = slv.slr
-        local slg = slr.slg
-        local g1r = slr.g1
+        _M.wrap(function ()
+            if slv._ambiguity_level <= 0 then
+                return 'ok', 'undef'
+            end
+            local slr = slv.slr
+            local slg = slr.slg
+            local g1r = slr.g1
 
-        local furthest_earleme = g1r:furthest_earleme()
-        local last_completed_earleme = g1r:current_earleme()
-        if furthest_earleme ~= last_completed_earleme then
-            error(string.format(
-                "Attempt to evaluate incompletely recognized parse:\n"
-                .. "  Last token ends at location %d\n"
-                .. "  Recognition done only as far as location %d\n",
-                furthest_earleme,
-                last_completed_earleme
-            ))
-        end
-        local lmw_t = slv.lmw_t
-        local lmw_o = slv.lmw_o
+            local furthest_earleme = g1r:furthest_earleme()
+            local last_completed_earleme = g1r:current_earleme()
+            if furthest_earleme ~= last_completed_earleme then
+                error(string.format(
+                    "Attempt to evaluate incompletely recognized parse:\n"
+                    .. "  Last token ends at location %d\n"
+                    .. "  Recognition done only as far as location %d\n",
+                    furthest_earleme,
+                    last_completed_earleme
+                ))
+            end
+            local lmw_t = slv.lmw_t
+            local lmw_o = slv.lmw_o
 
-        local max_parses = slr.max_parses
-        local parse_count = lmw_t:parse_count()
-        if max_parses and parse_count > max_parses then
-            error(string.format("Maximum parse count (%d) exceeded", max_parses));
+            local max_parses = slr.max_parses
+            local parse_count = lmw_t:parse_count()
+            if max_parses and parse_count > max_parses then
+                error(string.format("Maximum parse count (%d) exceeded", max_parses));
             end
 
-        _M.wrap(function ()
             local result = lmw_t:next()
             if not result then return 'ok', 'undef' end
             slv.lmw_v = _M.value_new(lmw_t)
@@ -6484,18 +6486,6 @@ Libmarpa wrapper class.
     _M.metal._marpa_b_or_node_irl = _M.class_bocage._or_node_irl
     _M.class_bocage._or_node_nrl = _M.class_bocage._or_node_irl
     _M.class_bocage._or_node_irl = nil
-```
-
-### Get a value from a valuator
-
-TODO: Move to SLV and delete
-
-```
-    -- miranda: section+ valuator Libmarpa wrapper Lua functions
-    function _M.class_slr.value(slr)
-        local slv = slr.slv
-        return slv:value()
-    end
 ```
 
 ## Libmarpa interface

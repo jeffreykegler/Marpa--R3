@@ -359,6 +359,7 @@ sub Marpa::R3::Scanless::R::resume {
     }
     my $trace_file_handle =
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+    $length //= -1;
     $slr->block_move( $start_pos, $length );
     $slr->block_read();
     my (undef, $offset) = $slr->block_progress();
@@ -949,21 +950,24 @@ END_OF_LUA
 }
 
 # block_id defaults to current block
-# block_offset defaults to current offset of current block
-# length defaults to -1
+# block_offset defaults to don't set offset
+# length defaults to don't set eoread
 sub Marpa::R3::Scanless::R::block_move {
-    my ($slr, $block_offset, $length) = @_;
+    my ($slr, $offset, $length) = @_;
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $block_offset, $length );
-        local slr, block_offset_arg, length_arg = ...
-        local longueur = length_arg or -1
-        local _, new_block_offset, eoread
-            = slr:block_check_range(nil, block_offset_arg, longueur)
-        if not new_block_offset then
-           -- eoread is error message
-           error(eoread)
+            <<'END_OF_LUA', 'ii', $offset, $length );
+        local slr, offset_arg, length_arg = ...
+        local ok, offset, eoread
+            = slr:block_check_range(nil, offset_arg, length_arg)
+        if not ok then
+           -- new_block_offset is error message
+           error(block_offset)
         end
-        return slr:block_move(new_block_offset, eoread)
+        -- we don't set offset if the arg was nil
+        local new_offset = offset_arg and offset or nil
+        -- we don't set eoread if the length arg was nil
+        local new_eoread = length_arg and eoread or nil
+        return slr:block_move(new_offset, new_eoread)
 END_OF_LUA
     return;
 }
