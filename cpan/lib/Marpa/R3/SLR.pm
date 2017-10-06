@@ -73,18 +73,16 @@ END_OF_LUA
 # This is the one users will be most interested in.
 # TODO - Document block_id parameter
 sub Marpa::R3::Scanless::R::literal {
-    my ( $slr, $block_id, $l0_start, $l0_count ) = @_;
-
-    my ($literal) = $slr->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', 'iii', $l0_start, $l0_count, ($block_id // -1));
-    local slr, l0_start, l0_count, block_id = ...
-    if block_id <= 0 then block_id = nil end
-    return slr:literal(block_id, l0_start, l0_count)
+    my ( $slr, $block_id, $offset, $length ) = @_;
+    my ($literal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iii', $block_id, $offset, $length );
+    local slr, block_id_arg, offset_arg, length_arg = ...
+    local block_id, offset, eoread
+        = slr:block_check_range(block_id_arg, offset_arg, length_arg)
+    return slr:literal(block_id, offset, eoread-offset)
 END_OF_LUA
-
     return $literal;
-} ## end sub Marpa::R3::Scanless::R::literal
+}
 
 sub Marpa::R3::Internal::Scanless::meta_recce {
     my ($hash_args) = @_;
