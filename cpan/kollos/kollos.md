@@ -2108,7 +2108,7 @@ and block-related methods.
     --    nil, error-message otherwise
     -- note: negative block_offset_arg is converted as offset
     -- from physical end-of-block
-    function _M.class_slr.block_check_offset(slr, block_id, block_offset_arg)
+    function _M.class_slr.block_check_offset_i(slr, block_id, block_offset_arg)
         local block_id, offset, end_pos = slr:block_progress(block_id)
         local block = slr.inputs[block_id]
         local block_length = #block
@@ -2161,24 +2161,32 @@ and block-related methods.
         return eoread
     end
 
+    function _M.class_slr.block_check_offset(slr, block_id_arg, block_offset_arg)
+        local block_id, erreur
+            = _M.class_slr.block_check_id(slr, block_id_arg, block_offset_arg)
+        if not block_id then return nil, erreur end
+        local new_block_offset, erreur
+            = _M.class_slr.block_check_offset_i(slr, block_id, block_offset_arg)
+        if not new_block_offset then return nil, erreur end
+        return block_id, new_block_offset
+    end
+
     -- assumes nothing about arguments
     -- block_id defaults to current block if block_id_arg == nil
     -- block_offset defaults to current offset in current block
     --     if block_offset_arg == nil
     -- eoread defaults to end-of-block if length_arg == nil
-    -- returns block_offset, eoread on success
+    -- returns block_id, block_offset, eoread on success
     -- returns nil, error-message otherwise
     function _M.class_slr.block_check_range(slr, block_id_arg, block_offset_arg, length_arg)
-        local block_id, erreur
-            = _M.class_slr.block_check_id(slr, block_id_arg, block_offset_arg)
-        if not block_id then return nil, erreur end
-        local new_block_offset, erreur
-            = _M.class_slr.block_check_offset(slr, block_id, block_offset_arg)
-        if not new_block_offset then return nil, erreur end
+        local block_id, block_offset
+            = _M.class_slr.block_check_offset(slr, block_id_arg, block_offset_arg)
+        -- block offset is error when block_id == nil
+        if not block_id then return nil, block_offset end
         local eoread, erreur
-            = _M.class_slr.block_check_length(slr, block_id, new_block_offset, length_arg)
+            = _M.class_slr.block_check_length(slr, block_id, block_offset, length_arg)
         if not eoread then return nil, erreur end
-        return new_block_offset, eoread
+        return block_id, block_offset, eoread
     end
 ```
 

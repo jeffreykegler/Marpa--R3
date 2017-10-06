@@ -957,7 +957,7 @@ sub Marpa::R3::Scanless::R::block_move {
             <<'END_OF_LUA', 'ii', $block_offset, $length );
         local slr, block_offset_arg, length_arg = ...
         local longueur = length_arg or -1
-        local new_block_offset, eoread
+        local _, new_block_offset, eoread
             = slr:block_check_range(nil, block_offset_arg, longueur)
         if not new_block_offset then
            -- eoread is error message
