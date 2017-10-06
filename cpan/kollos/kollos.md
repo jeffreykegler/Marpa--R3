@@ -3238,7 +3238,7 @@ It assumes that the caller checked the args.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.ext_lexeme_complete(slr, block_id, offset, longueur)
+    function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
         slr:block_move(offset)
         local g1r = slr.g1
         slr.event_queue = {}

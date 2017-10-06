@@ -695,7 +695,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
       local slr, block_id_arg, offset_arg, length_arg = ...
       local block_id, offset, eoread
           = slr:block_check_range(block_id_arg, offset_arg, length_arg)
-      local complete_val = slr:ext_lexeme_complete(block_id, offset, eoread-offset)
+      local complete_val = slr:lexeme_complete(block_id, offset, eoread-offset)
       if complete_val == 0 then
           local slg = slr.slg
           slg.g1.error()
