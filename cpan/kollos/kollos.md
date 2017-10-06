@@ -3232,54 +3232,14 @@ Read alternatives into the G1 grammar.
 These functions are for "external" reading of tokens --
 that is reading tokens by a means other than Marpa's own
 lexer.
+It assumes that the caller checked the args.
 
 ##### Methods
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.ext_lexeme_complete(slr, start_arg, length_arg)
-        local block_ix, offset = slr:block_progress()
-        local longueur = length_arg or 0
-        longueur = math.tointeger(longueur)
-        if not longueur then
-            error(string.format(
-                'Bad length in lexeme_complete(): %s',
-                    length_arg
-            ))
-        end
-
-        local input_length = #slr.current_block
-        local start_pos = start_arg or offset
-        start_pos = math.tointeger(start_pos)
-        if not start_pos then
-            error(string.format(
-                'Bad length in lexeme_complete(): %s',
-                    start_pos
-            ))
-        end
-        if start_pos < 0 then
-            start_pos = input_length + start_pos
-        end
-        if start_pos < 0 or start_pos > input_length then
-            error(string.format(
-                'Bad start position in lexeme_complete(): %s',
-                    start_arg
-            ))
-        end
-        slr:block_move(start_pos)
-        do
-            local eoread
-            if longueur < 0 then
-               eoread = input_length + longueur + 1
-            else
-               eoread = start_pos + longueur
-            end
-            if eoread < 0 or eoread > input_length then
-                error(string.format(
-                   'Bad length in lexeme_complete(): %s', length_arg
-               ))
-            end
-        end
+    function _M.class_slr.ext_lexeme_complete(slr, block_id, offset, longueur)
+        slr:block_move(offset)
         local g1r = slr.g1
         slr.event_queue = {}
         slr.is_external_scanning = false
@@ -3289,8 +3249,8 @@ lexer.
             local g1r = slr.g1
             local latest_earley_set = g1r:latest_earley_set()
             slr.per_es[latest_earley_set] =
-                { slr.current_block.index, start_pos, longueur }
-            local new_offset = start_pos + longueur
+                { block_id, offset, longueur }
+            local new_offset = offset + longueur
             slr:block_move(new_offset)
             return new_offset
         end
