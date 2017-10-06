@@ -85,6 +85,8 @@ sub my_parser {
 
 # Marpa::R3::Display::End
 
+    my ($main_block) = $recce->block_progress();
+
     my $length = length $string;
     pos $string = 0;
     TOKEN: while (1) {
@@ -105,7 +107,7 @@ sub my_parser {
                     substr( $string, $start_of_lexeme, 40 ), q{"};
             }
             next TOKEN
-                if $recce->lexeme_complete( $start_of_lexeme,
+                if $recce->lexeme_complete( $main_block, $start_of_lexeme,
                         ( length $lexeme ) );
 
 # Marpa::R3::Display::End

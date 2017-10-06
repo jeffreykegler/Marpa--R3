@@ -115,12 +115,13 @@ for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
 
     my $lexeme_start = 0;
     $recce->read( \$data, 0, 0 );
+    my ($main_block) = $recce->block_progress();
     for my $word ( split q{ }, $data ) {
         for my $type ( @{ $vocabulary{$word} } ) {
             $recce->lexeme_alternative( $type, \$word )
                 or die 'Recognition failed';
         }
-        $recce->lexeme_complete($lexeme_start, length $word);
+        $recce->lexeme_complete($main_block, $lexeme_start, length $word);
         $lexeme_start += length $word;
     } ## end for my $word ( split q{ }, $data )
 

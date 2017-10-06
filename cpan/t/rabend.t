@@ -90,7 +90,7 @@ $recce->read( \'abcd', 0, 0 );
 sub duplicate_terminal_1 {
     $recce->lexeme_alternative( 'a', \42 );
     $recce->lexeme_alternative( 'a', \711 );
-    $recce->lexeme_complete( 0, 1 );
+    $recce->lexeme_complete( undef, 0, 1 );
     return 1;
 } ## end sub duplicate_terminal_1
 
@@ -108,7 +108,7 @@ sub duplicate_terminal_2 {
       or return 'alternative a at 0 failed';
     $recce->lexeme_alternative( 'b', \12 )
       or return 'alternative b at 0 failed';
-    $recce->lexeme_complete( 0, 1 );
+    $recce->lexeme_complete( undef, 0, 1 );
 
     $recce->lexeme_alternative( 'd', \42 )
       or return 'first alternative d at 2 failed';

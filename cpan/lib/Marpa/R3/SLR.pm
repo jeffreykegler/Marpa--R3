@@ -663,7 +663,7 @@ END_OF_LUA
 
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
-    my ( $slr, $start, $length ) = @_;
+    my ( $slr, $block, $offset, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->lexeme_complete() called from inside a handler\n",
@@ -680,8 +680,8 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
     my ($return_value) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
-           signature => 'ii',
-           args => [ $start, $length ],
+           signature => 'iii',
+           args => [ $block, $offset, $length ],
            handlers => {
                trace => sub {
                     my ($msg) = @_;
@@ -692,9 +692,9 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
            }
         },
         <<'END_OF_LUA');
-      local slr, offset_arg, length_arg = ...
+      local slr, block_id_arg, offset_arg, length_arg = ...
       local block_id, offset, eoread
-          = slr:block_check_range(nil, offset_arg, length_arg)
+          = slr:block_check_range(block_id_arg, offset_arg, length_arg)
       local complete_val = slr:ext_lexeme_complete(block_id, offset, eoread-offset)
       if complete_val == 0 then
           local slg = slr.slg
@@ -725,7 +725,7 @@ sub Marpa::R3::Scanless::R::lexeme_read {
         );
     }
     return if not $slr->lexeme_alternative( $symbol_name, @value );
-    return $slr->lexeme_complete( $start, $length );
+    return $slr->lexeme_complete( undef, $start, $length );
 }
 
 # TODO -- Document this method

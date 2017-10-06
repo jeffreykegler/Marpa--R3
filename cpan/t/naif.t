@@ -43,9 +43,9 @@ my $rec = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $rec->read( \'zz', 0, 0);
 $rec->lexeme_alternative('x',\undef);
-$rec->lexeme_complete(undef, 1);
+$rec->lexeme_complete(undef, undef, 1);
 $rec->lexeme_alternative('y',\"some");
-$rec->lexeme_complete(undef, 1);
+$rec->lexeme_complete(undef, undef, 1);
 
 my $value_ref = $rec->value();
 die if not defined $value_ref;
