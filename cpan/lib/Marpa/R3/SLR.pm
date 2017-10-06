@@ -914,7 +914,7 @@ sub Marpa::R3::Scanless::R::block_progress {
         = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $block_id );
         local slr, block_id_arg = ...
-        local block_id, erreur = glue.check_block_id(slr, block_id_arg)
+        local block_id, erreur = slr:block_check_id(block_id_arg)
         if not block_id then
            error(erreur)
         end
@@ -939,7 +939,7 @@ sub Marpa::R3::Scanless::R::block_set {
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'i', $block_id );
         local slr, block_id_arg = ...
-        local block_id, erreur = glue.check_block_id(slr, block_id_arg)
+        local block_id, erreur = slr:block_check_id(block_id_arg)
         if not block_id then
            error(erreur)
         end
@@ -952,23 +952,18 @@ END_OF_LUA
 # block_offset defaults to current offset of current block
 # length defaults to -1
 sub Marpa::R3::Scanless::R::block_move {
-    my ($slr, $block_offset, $length, $block_id) = @_;
+    my ($slr, $block_offset, $length) = @_;
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'iii', $block_id, $block_offset, $length );
-        local slr, block_id_arg, block_offset_arg, length_arg = ...
+            <<'END_OF_LUA', 'ii', $block_offset, $length );
+        local slr, block_offset_arg, length_arg = ...
         local longueur = length_arg or -1
-        local block_id, erreur
-        if block_id_arg then
-            block_id, erreur = glue.check_block_id(slr, block_id_arg)
-            if not block_id then error(erreur) end
-        end
         local new_block_offset, eoread
-            = glue.check_block_range(slr, block_id_arg, block_offset_arg, longueur)
+            = slr:block_check_range(nil, block_offset_arg, longueur)
         if not new_block_offset then
            -- eoread is error message
            error(eoread)
         end
-        return slr:block_move(new_block_offset, eoread, block_id)
+        return slr:block_move(new_block_offset, eoread)
 END_OF_LUA
     return;
 }

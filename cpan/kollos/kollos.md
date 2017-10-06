@@ -47,8 +47,10 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [Mutators](#mutators)
   * [Hash to runtime processing](#hash-to-runtime-processing)
     * [Add a G1 rule](#add-a-g1-rule)
-* [SLIF recognizer (SLR) class](#slif-recognizer-slr-class)
+* [Block class](#block-class)
   * [SLR fields](#slr-fields)
+* [SLIF recognizer (SLR) class](#slif-recognizer-slr-class)
+  * [SLR fields](#slr-fields-DUP)
   * [SLR constructors](#slr-constructors)
   * [Reading](#reading)
     * [External reading](#external-reading)
@@ -2012,15 +2014,10 @@ the `codepoint` command.
         local block = slr.inputs[block_ix]
         slr.current_block = block
     end
-    function _M.class_slr.block_move(slr, offset, eoread, block_ix)
-        local block =
-            block_ix and slr.inputs[block_ix] or slr.current_block
-        if offset then
-            block.offset = offset
-        end
-        if eoread then
-            block.eoread = eoread
-        end
+    function _M.class_slr.block_move(slr, offset, eoread)
+        local block = slr.current_block
+        if offset then block.offset = offset end
+        if eoread then block.eoread = eoread end
     end
 ```
 
@@ -2083,6 +2080,106 @@ Caller must ensure `block` and `pos` are valid.
         return utf8.codepoint(text, byte_p)
     end
 
+```
+
+### Block checking methods
+
+These methods are for checking arguments of block
+and block-related methods.
+
+```
+    -- miranda: section+ most Lua function definitions
+    -- returns: current block, if block_id_arg is nil,
+    --    block_id_arg, if block_id_arg is non-nil and valid
+    --    nil, message if block_id_arg is non-nil and invalid
+    function _M.class_slr.block_check_id(slr, block_id_arg)
+        local block_id, l0_pos, end_pos = slr:block_progress(block_id_arg)
+        if not block_id then
+            return nil, string.format('Bad block index' .. block_id_arg)
+        end
+        return block_id
+    end
+
+    -- assumes block_id is valid or nil
+    -- returns:
+    --    current block offset of current block if block_offset_arg == nil
+    --    block_offset_arg as an integer if block_offset_arg is non-nil
+    --        and it converts to a valid integer
+    --    nil, error-message otherwise
+    -- note: negative block_offset_arg is converted as offset
+    -- from physical end-of-block
+    function _M.class_slr.block_check_offset(slr, block_id, block_offset_arg)
+        local block_id, offset, end_pos = slr:block_progress(block_id)
+        local block = slr.inputs[block_id]
+        local block_length = #block
+        if not block_offset_arg then return offset end
+        local new_block_offset = math.tointeger(block_offset_arg)
+        if not new_block_offset then
+            return nil, string.format('Bad current position argument %s', block_offset_arg)
+        end
+        if new_block_offset < 0 then
+            new_block_offset = block_length + new_block_offset
+        end
+        if new_block_offset < 0 then
+            return nil, string.format('Current position is before start of block: %s', block_offset_arg)
+        end
+        if new_block_offset > block_length then
+            return nil, string.format('Current position is after end of block: %s', block_offset_arg)
+        end
+        return new_block_offset
+    end
+
+    -- assumes valid block_id, block_offset
+    -- returns:
+    --     current eoread, if length_arg == nil
+    --     end-of-read, based on length_arg, if length_arg valid and non-nil
+    --     nil, error-message, otherwise
+    -- Note: negative block_offset is converted as offset
+    --     from physical end-of-block
+    -- Note: uses the `block_offset` in its arguments, *not* the one actually
+    --     in the block
+    function _M.class_slr.block_check_length(slr, block_id, block_offset, length_arg)
+        local block = slr.inputs[block_id]
+        local block_length = #block
+
+        if not length_arg then
+            local _, _, eoread = slr:block_progress(block_id)
+            return eoread
+        end
+        local longueur = math.tointeger(length_arg)
+        if not longueur then
+            return nil, string.format('Bad length argument %s', length_arg)
+        end
+        local eoread = longueur >= 0 and block_offset + longueur or
+            block_length + longueur + 1
+        if eoread < 0 then
+            return nil, string.format('Last position is before start of block: %s', length_arg)
+        end
+        if eoread > block_length then
+            return nil, string.format('Last position is after end of block: %s', length_arg)
+        end
+        return eoread
+    end
+
+    -- assumes nothing about arguments
+    -- block_id defaults to current block if block_id_arg == nil
+    -- block_offset defaults to current offset in current block
+    --     if block_offset_arg == nil
+    -- eoread defaults to end-of-block if length_arg == nil
+    -- returns block_offset, eoread on success
+    -- returns nil, error-message otherwise
+    function _M.class_slr.block_check_range(slr, block_id_arg, block_offset_arg, length_arg)
+        local block_id, erreur
+            = _M.class_slr.block_check_id(slr, block_id_arg, block_offset_arg)
+        if not block_id then return nil, erreur end
+        local new_block_offset, erreur
+            = _M.class_slr.block_check_offset(slr, block_id, block_offset_arg)
+        if not new_block_offset then return nil, erreur end
+        local eoread, erreur
+            = _M.class_slr.block_check_length(slr, block_id, new_block_offset, length_arg)
+        if not eoread then return nil, erreur end
+        return new_block_offset, eoread
+    end
 ```
 
 ## SLIF recognizer (SLR) class

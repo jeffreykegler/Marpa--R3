@@ -956,15 +956,16 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Moves the current physical position to
-block offset C<offset> in the block with index
-C<block_ix>.
+block offset C<offset> in the current block.
 The end of read is set to C<length>.
 
-If C<block_ix> is omitted, it defaults to the current
-block.
-If the C<length> is omitted it defaults to the
-length of the remainder of the block
-after the current offset.
+If the C<length> is omitted,
+it defaults to the
+end of the current block,
+minus the current offset:
+In other words,
+the default to set eoread to the end of
+the block.
 
 =head2 block_new ()
 
