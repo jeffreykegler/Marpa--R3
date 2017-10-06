@@ -801,7 +801,7 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Scanless::R::line_column {
-    my ( $slr, $pos, $block ) = @_;
+    my ( $slr, $block, $pos, ) = @_;
     $pos //= $slr->pos();
     $block //= -1;
 

@@ -1556,17 +1556,25 @@ name: SLIF trace example
 partial: 1
 normalize-whitespace: 1
 
-    TODO document block parameter ??
-
-    my ( $start, $span_length ) = $recce->pause_span();
-    my ( $line,  $column )      = $recce->line_column($start);
+    my $block_id = $pause_location[0];
+    my $start = $pause_location[1];
+    my $span_length = $pause_location[2];
+    my ( $line, $column ) = $recce->line_column($block_id, $start);
 
 =for Marpa::R3::Display::End
 
-The C<line_column()> method accepts one, optional, argument:
-a location in the input stream.
-The location defaults to the current location.
-C<line_column()> returns the corresponding line and column position,
+The C<line_column()> method accepts two optional arguments:
+a block id, call it C<$id> and a block offset,
+call it C<$offset>.
+If $<id> is not defined, the selected block is
+the current block;
+otherwise the selected block is the block whose id
+is C<$id>.
+If C<$offset> is not defined, the selected offset
+is the current offset of the selected block;
+otherwise the selected offset is C<$offset>.
+C<line_column()> returns the line and column position
+of the selected offset in the selected block,
 as a 2-element array.
 The first element of the array is the line position,
 and the second element is the column position.

@@ -238,12 +238,13 @@ sub test {
         my ( $bracket_block, $bracket_l0_pos ) =
           $recce->g1_to_l0_first($opening_bracket);
         my ( $line, $column ) =
-          $recce->line_column( $bracket_l0_pos, $bracket_block );
+          $recce->line_column( $bracket_block, $bracket_l0_pos );
         my $opening_column0 = $bracket_l0_pos - ( $column - 1 );
 
         my $problem = q{};
-        (undef, $pos) = $recce->block_progress();
-        my ( $pos_line, $pos_column ) = $recce->line_column($pos);
+        my $this_block;
+        ($this_block, $pos) = $recce->block_progress();
+        my ( $pos_line, $pos_column ) = $recce->line_column($this_block, $pos);
         if ( $line == $pos_line ) {
 
             # Report a missing close bracket for cases contained in
@@ -324,7 +325,7 @@ sub test {
         # continue reading.
         # But first we want to report the error.
 
-        my ( $pos_line, $pos_column ) = $recce->line_column($pos);
+        my ( $pos_line, $pos_column ) = $recce->line_column($main_block, $pos);
 
         # Report the error if it was a case of a missing open bracket.
         my $problem = join "\n",

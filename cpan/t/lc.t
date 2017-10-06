@@ -45,10 +45,11 @@ my $r = Marpa::R3::Scanless::R->new({grammar => $g});
 
 # We do not need to actually read the input
 $r->read(\$input, 0, 0);
+my ($block_id) = $r->block_progress();
 
 my @actual = ();
 for my $i (0 .. length $input) {
-   my ($line, $column) = $r->line_column($i);
+   my ($line, $column) = $r->line_column($block_id, $i);
    if ($VERBOSE) {
    my $text = substr $input, $i, 20;
     $text =~ s/\n/\\n/g;

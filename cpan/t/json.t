@@ -365,9 +365,10 @@ sub trace_json {
         my $length = length $string;
         my $pos    = $recce->read( \$string );
         while ( $pos < $length ) {
+            my  $block_id = $pause_location[0];
             my  $start = $pause_location[1];
             my  $span_length = $pause_location[2];
-            my ( $line,  $column )      = $recce->line_column($start);
+            my ( $line,  $column )      = $recce->line_column($block_id, $start);
             my $lexeme = 'lstring';
             my $literal_string = $recce->literal( $start, $span_length );
             $trace_desc .=
