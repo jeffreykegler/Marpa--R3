@@ -73,7 +73,7 @@ END_OF_LUA
 # This is the one users will be most interested in.
 # TODO - Document block_id parameter
 sub Marpa::R3::Scanless::R::literal {
-    my ( $slr, $l0_start, $l0_count, $block_id ) = @_;
+    my ( $slr, $block_id, $l0_start, $l0_count ) = @_;
 
     my ($literal) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -774,7 +774,7 @@ sub Marpa::R3::Scanless::R::g1_to_l0_last {
 END_OF_LUA
 }
 
-# TODO -- Document this method
+# TODO -- Document this method ??
 sub Marpa::R3::Scanless::R::lc_brief {
     my ( $slr, $first_block, $first_pos, $last_block, $last_pos ) = @_;
     my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),

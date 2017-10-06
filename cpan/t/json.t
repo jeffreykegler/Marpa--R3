@@ -370,7 +370,7 @@ sub trace_json {
             my  $span_length = $pause_location[2];
             my ( $line,  $column )      = $recce->line_column($block_id, $start);
             my $lexeme = 'lstring';
-            my $literal_string = $recce->literal( $start, $span_length );
+            my $literal_string = $recce->literal( $block_id, $start, $span_length );
             $trace_desc .=
                 qq{Line $line, column $column, lexeme <$lexeme>, literal "$literal_string"\n};
             my $value = substr $string, $start + 1, $span_length - 2;

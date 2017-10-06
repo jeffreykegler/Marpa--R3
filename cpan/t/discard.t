@@ -144,11 +144,11 @@ sub round_value {
 }
 
 sub display_event {
-    my ( $recce, $event_name, $block_ix, $start, $length ) = @_;
+    my ( $recce, $event_name, $block_id, $start, $length ) = @_;
     if ( $event_name eq 'ws' ) {
         return "ws of length " . $length;
     }
-    my $literal = $recce->literal( $start, $length );
+    my $literal = $recce->literal( $block_id, $start, $length );
     $literal =~ s/\n/\\n/xmsg;
     return qq{$event_name: "$literal"};
 }

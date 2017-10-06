@@ -50,7 +50,8 @@ sub new {
 sub Marpa::R3::Internal::MetaAST::Parse::substring {
     my ( $parse, $start, $length ) = @_;
     my $meta_slr      = $parse->{meta_recce};
-    my $string        = $meta_slr->literal( $start, $length );
+    my ($block_id) = $meta_slr->block_progress();
+    my $string        = $meta_slr->literal( $block_id, $start, $length );
     chomp $string;
     return $string;
 } ## end sub Marpa::R3::Internal::MetaAST::Parse::substring
