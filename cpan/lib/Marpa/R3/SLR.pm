@@ -692,22 +692,10 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
            }
         },
         <<'END_OF_LUA');
-      local slr, start_arg, length_arg = ...
-      local start = start_arg
-      if start then
-         start = math.tointeger(start)
-         if not start then
-             error("lexeme_complete(): %s is not an integer", start_arg)
-         end
-      end
-      local longueur = length_arg
-      if longueur then
-          longueur = math.tointeger(longueur)
-          if not longueur then
-              error("lexeme_complete(): %s is not an integer", length_arg)
-          end
-      end
-      local complete_val = slr:ext_lexeme_complete(start, longueur)
+      local slr, offset_arg, length_arg = ...
+      local block_id, offset, eoread
+          = slr:block_check_range(nil, offset_arg, length_arg)
+      local complete_val = slr:ext_lexeme_complete(offset, eoread-offset)
       if complete_val == 0 then
           local slg = slr.slg
           slg.g1.error()
