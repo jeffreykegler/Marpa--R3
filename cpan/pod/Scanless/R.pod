@@ -219,6 +219,12 @@ and the span C<[-3, 1]>.
 
 =back
 
+=head1 Block spans
+
+TODO:
+Arguments are often "block spans".
+Describe these, especially the defaults.
+
 =head1 Internal scanning
 
 The virtual input stream is a series of input strings.
@@ -1132,7 +1138,7 @@ partial: 1
 normalize-whitespace: 1
 
             next TOKEN
-                if $recce->lexeme_complete( $start_of_lexeme,
+                if $recce->lexeme_complete( $main_block, $start_of_lexeme,
                         ( length $lexeme ) );
 
 =for Marpa::R3::Display::End
@@ -1147,9 +1153,15 @@ Most applications
 will prefer the simpler L<C<lexeme_read()>|/"lexeme_read()"> method.
 
 The C<lexeme_complete()> method
-requires two arguments,
-which represent the start and length parameters of
-a span in the physical input stream.
+requires three arguments.
+Call them, in order,
+C<$block_id>, C<$offset> and C<$length>.
+Every lexeme must have a span in the physical input,
+and
+C<$block_id>, C<$offset> and C<$length>
+represent that block span.
+The span is necessary, for example, to allow sensible
+error reporting.
 The span is interpreted,
 and G1 location and current input stream location
 are adjusted,
@@ -1258,7 +1270,7 @@ is roughly equivalent to
 ignore: 1
 
     $recce->lexeme_alternative($symbol, $value)
-    $recce->lexeme_complete($start, $length)
+    $recce->lexeme_complete(undef, $start, $length)
 
 =for Marpa::R3::Display::End
 
@@ -1653,17 +1665,12 @@ name: SLIF trace example
 partial: 1
 normalize-whitespace: 1
 
-    my $literal_string = $recce->literal( $start, $span_length );
+    my $literal_string = $recce->literal( $block_id, $start, $span_length );
 
 =for Marpa::R3::Display::End
 
 The C<literal()> method accepts three arguments,
-the last of them optional.
-The first two arguments are the start location and length of a span in the
-physical input stream.
-The last, optional, argument is the index of an input block.
-If omitted, the current input block is used.
-
+representing a block span.
 The C<literal()> method
 returns the substring of the input stream
 corresponding to that span.

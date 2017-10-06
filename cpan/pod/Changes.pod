@@ -51,16 +51,19 @@ longer adequately identify a location,
 which necessitates many changes.
 
 New parameters:
-The
-C< $slr->input_length() >> and
-C< $slr->literal() >>
-calls allow a new,
-optional parameter: the block index.
+The arguments of
+C< $recce->lexeme_complete() >>,
+C< $recce->input_length() >>,
+and
+C< $recce->literal() >>
+have changed,
+in a way which is not compatible with Marpa::R2.
+Their first parameter now is the block id.
 
 Deleted calls:
 The
-C< $slr->g1_location_to_span() >> and
-C< $slr->last_completed_span() >>
+C< $recce->g1_location_to_span() >> and
+C< $recce->last_completed_span() >>
 methods has been removed.
 
 =head2 New valuer object

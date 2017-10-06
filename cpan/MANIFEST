@@ -226,12 +226,13 @@ pod/Tracing.pod
 pod/Tutorial2.pod
 t/00-load.t
 t/01-lua.t
+t/25_ah2.t
 t/50d-block.t
 t/50d-gie.t
+t/50d-lexevent.t
 t/action.t
 t/action2.t
 t/advent.t
-t/ah2.t
 t/ambequ.t
 t/ambig.t
 t/amon.t
@@ -291,7 +292,6 @@ t/leo3.t
 t/leo_example.t
 t/leo_unit.t
 t/lexevent.t
-t/lexevent_d.t
 t/minus.t
 t/naif.t
 t/null_example.t
