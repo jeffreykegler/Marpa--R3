@@ -2727,9 +2727,8 @@ Otherwise returns `false` and a status string.
         local op_count = ops and #ops or -1
 
         if op_count <= 0 then
-            error( string.format(
-                "Internal error: registered codepoint %d, but no ops\n", codepoint
-            ))
+            _M.userX( 'Character in input is not in alphabet of grammar: %s',
+              slr:character_describe(codepoint))
         end
 
         if slr.trace_terminals >= 1 then

@@ -90,8 +90,7 @@ my $dummy_input = join q{}, map { $_->[1] } @tokens;
 $recce->read( \$dummy_input, 0, 0);
 TOKEN: for my $token_and_value (@tokens) {
     my ($name, $value) = @{$token_and_value};
-    my (undef, $offset) = $recce->block_progress();
-    last TOKEN if not defined $recce->lexeme_read( $name, $offset, (length $value), $value );
+    last TOKEN if not defined $recce->lexeme_read_string( $name, $value );
 }
 
 $progress_report = $recce->progress_show( 0, -1 );
@@ -108,21 +107,21 @@ P1 B1L1c1 [:start:] ::= . Expression
 P2 B1L1c1 Expression ::= . Factor
 P4 B1L1c1 Factor ::= . Number
 P6 B1L1c1 Factor ::= . Factor Multiply Factor
-=== Earley set 1 at B1L1c3 ===
-R6:1 B1L1c1 Factor ::= Factor . Multiply Factor
-F1 B1L1c1 [:start:] ::= Expression .
-F2 B1L1c1 Expression ::= Factor .
-F4 B1L1c1 Factor ::= Number .
-=== Earley set 2 at B1L1c4 ===
-P4 B1L1c4 Factor ::= . Number
-P6 B1L1c4 Factor ::= . Factor Multiply Factor
-R6:2 B1L1c1 Factor ::= Factor Multiply . Factor
-=== Earley set 3 at B1L1c5 ===
-R6:1 x2 B1L1c1-4 Factor ::= Factor . Multiply Factor
-F1 B1L1c1 [:start:] ::= Expression .
-F2 B1L1c1 Expression ::= Factor .
-F4 B1L1c4 Factor ::= Number .
-F6 B1L1c1 Factor ::= Factor Multiply Factor .
+=== Earley set 1 at B3L1c1 ===
+R6:1 B2L1c1 Factor ::= Factor . Multiply Factor
+F1 B2L1c1 [:start:] ::= Expression .
+F2 B2L1c1 Expression ::= Factor .
+F4 B2L1c1 Factor ::= Number .
+=== Earley set 2 at B4L1c1 ===
+P4 B4L1c1 Factor ::= . Number
+P6 B4L1c1 Factor ::= . Factor Multiply Factor
+R6:2 B2L1c1 Factor ::= Factor Multiply . Factor
+=== Earley set 3 at B4L1c9 ===
+R6:1 x2 B2L1c1-B4L1c1 Factor ::= Factor . Multiply Factor
+F1 B2L1c1 [:start:] ::= Expression .
+F2 B2L1c1 Expression ::= Factor .
+F4 B4L1c1 Factor ::= Number .
+F6 B2L1c1 Factor ::= Factor Multiply Factor .
 END_PROGRESS_REPORT
 
 $Data::Dumper::Indent = 0;

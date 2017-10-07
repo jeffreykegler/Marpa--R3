@@ -675,7 +675,7 @@ sub Marpa::R3::Scanless::R::lexeme_read {
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_string {
-    my ( $recce, $symbol_name, $start, $length, @value ) = @_;
+    my ( $recce, $symbol_name, @value ) = @_;
     if ( $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$recce->lexeme_read() called from inside a handler\n",
@@ -685,9 +685,12 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
             "\n",
         );
     }
+    my ($old_block) = $recce->block_progress();
     my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
     return if not $recce->lexeme_alternative( $symbol_name, @value );
-    return $recce->lexeme_complete( $lexeme_block );
+    my $return_value = $recce->lexeme_complete( $lexeme_block );
+    $recce->block_set($old_block);
+    return $return_value;
 }
 
 # TODO -- Document this method
@@ -830,12 +833,6 @@ qq{Registering character $char_desc as symbol $symbol_id: },
                         } ## end if ( $character =~ $re )
                     } ## end for my $entry ( @{$character_class_table} )
 
-                    if ( not scalar @symbols ) {
-                        my $char_desc = character_describe( $slr, $codepoint );
-                        Marpa::R3::exception(
-"Character in input is not in alphabet of grammar: $char_desc\n"
-                        );
-                    }
                     $coro_arg = { symbols => \@symbols };
                     $coro_arg->{is_graphic} = 'true' if $is_graphic;
                     return 'ok', $coro_arg;
