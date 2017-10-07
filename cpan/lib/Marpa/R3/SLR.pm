@@ -578,10 +578,11 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::lexeme_alternative {
     my ( $slr, $symbol_name, @value ) = @_;
 
-    if (Scalar::Util::tainted($value[1])) {
+    if ( Scalar::Util::tainted( $value[1] ) ) {
         Marpa::R3::exception(
-              "Problem in Marpa::R3: Attempt to use a tainted token value\n",
-              "Marpa::R3 is insecure for use with tainted data\n");
+            "Problem in Marpa::R3: Attempt to use a tainted token value\n",
+            "Marpa::R3 is insecure for use with tainted data\n"
+        );
     }
 
     Marpa::R3::exception(
@@ -589,16 +590,14 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         "    The symbol name cannot be undefined\n"
     ) if not defined $symbol_name;
 
-    my $result;
-  DO_ALTERNATIVE: {
-        my $value_type = 'literal';
-        my $value;
-        if (scalar @value != 0) {
-            $value = $value[0];
-            $value_type = defined $value ? 'explicit' : 'undef';
-        }
-        ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'ssS', $symbol_name, $value_type, $value );
+    my $value_type = 'literal';
+    my $value;
+    if ( scalar @value != 0 ) {
+        $value = $value[0];
+        $value_type = defined $value ? 'explicit' : 'undef';
+    }
+    my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'ssS', $symbol_name, $value_type, $value );
         local slr, symbol_name, value_type, token_sv = ...
         local slg = slr.slg
         local xsy = slg.xsys[symbol_name]
@@ -626,22 +625,16 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
-        if return_value == _M.err.NONE then
-            return return_value
-        elseif return_value == _M.err.UNEXPECTED_TOKEN_ID then
-            return return_value
-        elseif return_value == _M.err.NO_TOKEN_EXPECTED_HERE then
-            return return_value
-        elseif return_value == _M.err.INACCESSIBLE_TOKEN then
-            return return_value
-        end
+        if return_value == _M.err.NONE then return 1 end
+        if return_value == _M.err.UNEXPECTED_TOKEN_ID then return end
+        if return_value == _M.err.NO_TOKEN_EXPECTED_HERE then return end
+        if return_value == _M.err.INACCESSIBLE_TOKEN then return end
         local error_description = slg.g1:error_description()
-        _M.userX( 'Problem reading symbol "%s": %s',
+        return _M.userX( 'Problem reading symbol "%s": %s',
             symbol_name, error_description
         );
 END_OF_LUA
-    }
-    return 1 if $result == $Marpa::R3::Error::NONE;
+    return 1 if $ok;
     return;
 }
 
