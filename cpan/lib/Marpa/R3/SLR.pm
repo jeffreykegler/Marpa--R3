@@ -612,36 +612,24 @@ END_OF_LUA
 
     my $result;
   DO_ALTERNATIVE: {
-        if ( scalar @value == 0 ) {
-            ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'i', $g1_token_id );
-        local slr, symbol_id = ...
-        local token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
-        local g1r = slr.g1
-        slr.is_external_scanning = true
-        local return_value = g1r:alternative(symbol_id, token_ix, 1)
-        return return_value
-END_OF_LUA
-            last DO_ALTERNATIVE;
+        my $value_type = 'literal';
+        my $value;
+        if (scalar @value != 0) {
+            $value = $value[0];
+            $value_type = defined $value ? 'explicit' : 'undef';
         }
-        my $value = $value[0];
-        if ( not defined $value ) {
-            ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'i', $g1_token_id );
-        local slr, symbol_id = ...
-        local token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
-        local g1r = slr.g1
-        slr.is_external_scanning = true
-        local return_value = g1r:alternative(symbol_id, token_ix, 1)
-        return return_value
-END_OF_LUA
-            last DO_ALTERNATIVE;
-        }
-            ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'iS', $g1_token_id, $value );
-        local slr, symbol_id, token_sv = ...
-        local token_ix = #slr.token_values + 1
-        slr.token_values[token_ix] = token_sv
+        ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'isS', $g1_token_id, $value_type, $value );
+        local slr, symbol_id, value_type, token_sv = ...
+        local token_ix
+        if value_type == 'undef' then
+            token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
+        elseif value_type == 'literal' then
+            token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
+        else
+            token_ix = #slr.token_values + 1
+            slr.token_values[token_ix] = token_sv
+        end
         local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
