@@ -589,11 +589,17 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         "    The symbol name cannot be undefined\n"
     ) if not defined $symbol_name;
 
-    my $slg        = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my ($g1_token_id) = 
-             $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 's', $symbol_name );
-        local slr, symbol_name = ...
+    my $result;
+  DO_ALTERNATIVE: {
+        my $value_type = 'literal';
+        my $value;
+        if (scalar @value != 0) {
+            $value = $value[0];
+            $value_type = defined $value ? 'explicit' : 'undef';
+        }
+        ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ssS', $symbol_name, $value_type, $value );
+        local slr, symbol_name, value_type, token_sv = ...
         local slg = slr.slg
         local xsy = slg.xsys[symbol_name]
         if not xsy then
@@ -607,20 +613,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
                 "slr->lexeme_alternative(): symbol %q is not a lexeme",
                 symbol_name)
         end
-        return lexeme.g1_isy.id
-END_OF_LUA
-
-    my $result;
-  DO_ALTERNATIVE: {
-        my $value_type = 'literal';
-        my $value;
-        if (scalar @value != 0) {
-            $value = $value[0];
-            $value_type = defined $value ? 'explicit' : 'undef';
-        }
-        ($result) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'isS', $g1_token_id, $value_type, $value );
-        local slr, symbol_id, value_type, token_sv = ...
+        local symbol_id = lexeme.g1_isy.id
         local token_ix
         if value_type == 'undef' then
             token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
@@ -645,6 +638,7 @@ END_OF_LUA
             || $result == $Marpa::R3::Error::NO_TOKEN_EXPECTED_HERE
             || $result == $Marpa::R3::Error::INACCESSIBLE_TOKEN;
 
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my ($error_description)
     = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         'local grammar = ...; return grammar.g1:error_description()', '');
