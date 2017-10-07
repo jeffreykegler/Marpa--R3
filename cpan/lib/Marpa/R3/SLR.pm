@@ -599,40 +599,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
     my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ssS', $symbol_name, $value_type, $value );
         local slr, symbol_name, value_type, token_sv = ...
-        local slg = slr.slg
-        local xsy = slg.xsys[symbol_name]
-        if not xsy then
-            _M.userX(
-                "slr->lexeme_alternative(): symbol %q does not exist",
-                symbol_name)
-        end
-        local lexeme = xsy.lexeme
-        if not lexeme then
-            _M.userX(
-                "slr->lexeme_alternative(): symbol %q is not a lexeme",
-                symbol_name)
-        end
-        local symbol_id = lexeme.g1_isy.id
-        local token_ix
-        if value_type == 'undef' then
-            token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
-        elseif value_type == 'literal' then
-            token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
-        else
-            token_ix = #slr.token_values + 1
-            slr.token_values[token_ix] = token_sv
-        end
-        local g1r = slr.g1
-        slr.is_external_scanning = true
-        local return_value = g1r:alternative(symbol_id, token_ix, 1)
-        if return_value == _M.err.NONE then return 1 end
-        if return_value == _M.err.UNEXPECTED_TOKEN_ID then return end
-        if return_value == _M.err.NO_TOKEN_EXPECTED_HERE then return end
-        if return_value == _M.err.INACCESSIBLE_TOKEN then return end
-        local error_description = slg.g1:error_description()
-        return _M.userX( 'Problem reading symbol "%s": %s',
-            symbol_name, error_description
-        );
+        return slr:lexeme_alternative(symbol_name, value_type, token_sv)
 END_OF_LUA
     return 1 if $ok;
     return;

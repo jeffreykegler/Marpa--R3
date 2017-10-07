@@ -948,6 +948,24 @@ Lowest ISYID is 0.
         return slg:lmg_symbol_display_form('l0', symbol_id)
     end
 
+    function _M.class_slg.symbol_angled_form(slg, xsyid)
+        local xsy = slg.xsys[xsyid]
+        if not xsy then
+            return '<bad xsyid ' .. xsyid .. '>'
+        end
+        return xsy:angled_form();
+    end
+    function _M.class_slg.lmg_symbol_angled_form(slg, subg_name, symbol_id)
+        local subg = slg[subg_name]
+        return subg:symbol_angled_form(symbol_id)
+    end
+    function _M.class_slg.g1_symbol_angled_form(slg, symbol_id)
+        return slg:lmg_symbol_angled_form('g1', symbol_id)
+    end
+    function _M.class_slg.l0_symbol_angled_form(slg, symbol_id)
+        return slg:lmg_symbol_angled_form('l0', symbol_id)
+    end
+
     function _M.class_slg.symbol_diag_form(slg, xsyid)
         local xsy = slg.xsys[xsyid]
         if not xsy then
@@ -3236,8 +3254,54 @@ It assumes that the caller checked the args.
 
 ##### Methods
 
+`value_type` arg is "literal", "explicit" or "undef".
+In the Perl interface, the `token` arg is always an SV.
+
+Returns 1 if read OK, `nil` on soft error.
+Other errors are thrown.
+
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lexeme_alternative(slr, symbol_name, value_type, token)
+        local slg = slr.slg
+        local xsy = slg.xsys[symbol_name]
+        if not xsy then
+            _M.userX(
+                "slr->lexeme_alternative(): symbol %q does not exist",
+                symbol_name)
+        end
+        local lexeme = xsy.lexeme
+        if not lexeme then
+            _M.userX(
+                "slr->lexeme_alternative(): symbol %q is not a lexeme",
+                symbol_name)
+        end
+        local symbol_id = lexeme.g1_isy.id
+        local token_ix
+        if value_type == 'undef' then
+            token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
+        elseif value_type == 'literal' then
+            token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
+        else
+            token_ix = #slr.token_values + 1
+            slr.token_values[token_ix] = token
+        end
+        local g1r = slr.g1
+        slr.is_external_scanning = true
+        local return_value = g1r:alternative(symbol_id, token_ix, 1)
+        if return_value == _M.err.NONE then return 1 end
+        if return_value == _M.err.UNEXPECTED_TOKEN_ID then return end
+        -- Soft failure on last two error codes
+        -- is perhaps unnecessary or arguable,
+        -- but it preserves compatibility with Marpa::XS
+        if return_value == _M.err.NO_TOKEN_EXPECTED_HERE then return end
+        if return_value == _M.err.INACCESSIBLE_TOKEN then return end
+        local error_description = slg.g1:error_description()
+        return _M.userX( 'Problem reading symbol "%s": %s',
+            symbol_name, error_description
+        );
+    end
+
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
         slr:block_move(offset)
         local g1r = slr.g1
@@ -5986,6 +6050,10 @@ to set and discover various Lua values.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_xsy.angled_form(xsy)
+        local form1 = xsy.dsl_form or xsy.name
+        return '<' .. form1 .. '>'
+    end
     function _M.class_xsy.display_form(xsy)
         local form1 = xsy.dsl_form or xsy.name
         if form1:find(' ', 1, true) then
@@ -6332,6 +6400,13 @@ necessarily unique.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_grammar.symbol_angled_form(grammar, isyid)
+        local xsy = grammar.xsys[isyid]
+        if xsy then return xsy:angled_form() end
+        local isy = grammar.isys[isyid]
+        if isy then return isy:angled_form() end
+        return '<bad isyid ' .. isyid .. '>'
+    end
     function _M.class_grammar.symbol_display_form(grammar, isyid)
         local xsy = grammar.xsys[isyid]
         if xsy then return xsy:display_form() end

@@ -1682,6 +1682,11 @@ kwgen(__LINE__, qw(lmg_symbol_display_form lmg_symbol_display_form si));
 kwgen(__LINE__, qw(g1_symbol_display_form g1_symbol_display_form i));
 kwgen(__LINE__, qw(l0_symbol_display_form l0_symbol_display_form i));
 
+kwgen(__LINE__, qw(symbol_angled_form symbol_angled_form i));
+kwgen(__LINE__, qw(lmg_symbol_angled_form lmg_symbol_angled_form si));
+kwgen(__LINE__, qw(g1_symbol_angled_form g1_symbol_angled_form i));
+kwgen(__LINE__, qw(l0_symbol_angled_form l0_symbol_angled_form i));
+
 kwgen(__LINE__, qw(symbol_dsl_form symbol_dsl_form i));
 kwgen(__LINE__, qw(lmg_symbol_dsl_form lmg_symbol_dsl_form si));
 kwgen(__LINE__, qw(g1_symbol_dsl_form g1_symbol_dsl_form i));
