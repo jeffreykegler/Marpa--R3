@@ -672,6 +672,24 @@ sub Marpa::R3::Scanless::R::lexeme_read {
     return $slr->lexeme_complete( undef, $start, $length );
 }
 
+# Returns 0 on unthrown failure, current location on success,
+# undef if lexeme not accepted.
+sub Marpa::R3::Scanless::R::lexeme_read_string {
+    my ( $recce, $symbol_name, $start, $length, @value ) = @_;
+    if ( $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$recce->lexeme_read() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
+    my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
+    return if not $recce->lexeme_alternative( $symbol_name, @value );
+    return $recce->lexeme_complete( $lexeme_block );
+}
+
 # TODO -- Document this method
 sub Marpa::R3::Scanless::R::g1_to_l0_first {
     my ( $slr, $g1_pos ) = @_;

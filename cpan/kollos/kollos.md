@@ -3303,6 +3303,7 @@ Other errors are thrown.
     end
 
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
+        slr:block_set(block_id)
         slr:block_move(offset)
         local g1r = slr.g1
         slr.event_queue = {}
