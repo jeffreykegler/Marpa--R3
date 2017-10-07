@@ -223,6 +223,9 @@ sub Marpa::R3::Scanless::R::new {
             signature => 's',
             args      => [$flat_args],
             handlers  => {
+                perl_undef => sub {
+                    return 'sig', [ 'S', undef ];
+                },
                 trace => sub {
                     my ($msg) = @_;
                     say {$trace_file_handle} $msg;

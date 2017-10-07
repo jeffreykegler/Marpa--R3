@@ -2371,12 +2371,12 @@ together.
         end
         slr.token_values = {}
         slr.token_is_undef = 1
-        slr.token_values[slr.token_is_undef] = glue.sv.undef()
+        slr.token_values[slr.token_is_undef] = coroutine.yield('perl_undef')
 
         -- token is literal is a pseudo-index, and the SV undef
         -- is just a place holder
         slr.token_is_literal = 2
-        slr.token_values[slr.token_is_literal] = glue.sv.undef()
+        slr.token_values[slr.token_is_literal] = coroutine.yield('perl_undef')
 
         return slr
     end

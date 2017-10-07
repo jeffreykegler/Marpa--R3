@@ -652,14 +652,6 @@ static void glue_sv_sv_noinc (lua_State* L, SV* sv) {
 #define MARPA_SV_SV(L, sv) \
     (glue_sv_sv_noinc((L), (sv)), SvREFCNT_inc_simple_void_NN (sv))
 
-static int glue_sv_undef (lua_State* L) {
-    dTHX;
-    /* [] */
-    glue_sv_sv_noinc( L, newSV(0) );
-    /* [sv_userdata] */
-    return 1;
-}
-
 static int glue_sv_finalize_meth (lua_State* L) {
     dTHX;
     /* Is this check necessary after development? */
@@ -725,7 +717,6 @@ static const struct luaL_Reg glue_sv_meths[] = {
 };
 
 static const struct luaL_Reg glue_sv_funcs[] = {
-    {"undef", glue_sv_undef},
     {"svaddr", glue_sv_svaddr_meth},
     {"addr", glue_sv_addr_meth},
     {NULL, NULL},
