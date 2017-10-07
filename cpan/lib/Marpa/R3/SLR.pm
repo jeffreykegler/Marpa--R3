@@ -626,25 +626,24 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
-        return return_value
+        if return_value == _M.err.NONE then
+            return return_value
+        elseif return_value == _M.err.UNEXPECTED_TOKEN_ID then
+            return return_value
+        elseif return_value == _M.err.NO_TOKEN_EXPECTED_HERE then
+            return return_value
+        elseif return_value == _M.err.INACCESSIBLE_TOKEN then
+            return return_value
+        end
+        local error_description = slg.g1:error_description()
+        _M.userX( 'Problem reading symbol "%s": %s',
+            symbol_name, error_description
+        );
 END_OF_LUA
     }
     return 1 if $result == $Marpa::R3::Error::NONE;
-
-    # The last two are perhaps unnecessary or arguable,
-    # but they preserve compatibility with Marpa::XS
-    return
-        if $result == $Marpa::R3::Error::UNEXPECTED_TOKEN_ID
-            || $result == $Marpa::R3::Error::NO_TOKEN_EXPECTED_HERE
-            || $result == $Marpa::R3::Error::INACCESSIBLE_TOKEN;
-
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
-    my ($error_description)
-    = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        'local grammar = ...; return grammar.g1:error_description()', '');
-    Marpa::R3::exception( qq{Problem reading symbol "$symbol_name": },
-        $error_description );
-} ## end sub Marpa::R3::Scanless::R::lexeme_alternative
+    return;
+}
 
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
