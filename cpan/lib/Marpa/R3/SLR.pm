@@ -592,23 +592,6 @@ END_OF_LUA
     return;
 }
 
-sub Marpa::R3::Scanless::R::lexeme_alternative_undef {
-    my ( $slr, $symbol_name ) = @_;
-
-    Marpa::R3::exception(
-        "slr->alternative(): symbol name is undefined\n",
-        "    The symbol name cannot be undefined\n"
-    ) if not defined $symbol_name;
-
-    my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_name);
-        local slr, symbol_name = ...
-        return slr:lexeme_alternative_undef(symbol_name)
-END_OF_LUA
-    return 1 if $ok;
-    return;
-}
-
 sub Marpa::R3::Scanless::R::lexeme_alternative {
     my ( $slr, $symbol_name, $value ) = @_;
 
@@ -624,11 +607,21 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         "    The symbol name cannot be undefined\n"
     ) if not defined $symbol_name;
 
-    my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    my $ok;
+    if (defined $value) {
+    ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'sS', $symbol_name, $value );
         local slr, symbol_name, token_sv = ...
         return slr:lexeme_alternative(symbol_name, token_sv)
 END_OF_LUA
+    } else {
+    ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_name );
+        local slr, symbol_name = ...
+        return slr:lexeme_alternative_undef(symbol_name )
+END_OF_LUA
+    }
+
     return 1 if $ok;
     return;
 }
