@@ -693,7 +693,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_block {
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_string {
-    my ( $recce, $symbol_name, @value ) = @_;
+    my ( $recce, $symbol_name, $value ) = @_;
     if ( $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$recce->lexeme_read() called from inside a handler\n",
@@ -705,7 +705,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
     }
     my ($old_block) = $recce->block_progress();
     my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
-    return if not $recce->lexeme_alternative( $symbol_name, @value );
+    return if not $recce->lexeme_alternative( $symbol_name, $value );
     my $return_value = $recce->lexeme_complete( $lexeme_block );
     $recce->block_set($old_block);
     return $return_value;

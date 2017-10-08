@@ -3261,7 +3261,7 @@ Other errors are thrown.
 
 ```
     -- miranda: section+ most Lua function definitions
-    local function lexeme_alternative_i(slr, symbol_name, value_type, token_ix)
+    local function lexeme_alternative_i(slr, symbol_name, token_ix)
         local slg = slr.slg
         local xsy = slg.xsys[symbol_name]
         if not xsy then
@@ -3291,6 +3291,12 @@ Other errors are thrown.
             symbol_name, error_description
         );
     end
+    function _M.class_slr.lexeme_alternative_literal(slr, symbol_name)
+        return lexeme_alternative_i(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
+    end
+    function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
+        return lexeme_alternative_i(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
+    end
     function _M.class_slr.lexeme_alternative(slr, symbol_name, value_type, token)
         local token_ix
         if value_type == 'undef' then
@@ -3301,7 +3307,7 @@ Other errors are thrown.
             token_ix = #slr.token_values + 1
             slr.token_values[token_ix] = token
         end
-        return lexeme_alternative_i(slr, symbol_name, value_type, token_ix)
+        return lexeme_alternative_i(slr, symbol_name, token_ix)
     end
 
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
