@@ -575,6 +575,40 @@ END_OF_LUA
     return $earleme;
 }
 
+sub Marpa::R3::Scanless::R::lexeme_alternative_literal {
+    my ( $slr, $symbol_name ) = @_;
+
+    Marpa::R3::exception(
+        "slr->alternative_literal(): symbol name is undefined\n",
+        "    The symbol name cannot be undefined\n"
+    ) if not defined $symbol_name;
+
+    my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_name);
+        local slr, symbol_name = ...
+        return slr:lexeme_alternative_literal(symbol_name)
+END_OF_LUA
+    return 1 if $ok;
+    return;
+}
+
+sub Marpa::R3::Scanless::R::lexeme_alternative_undef {
+    my ( $slr, $symbol_name ) = @_;
+
+    Marpa::R3::exception(
+        "slr->alternative(): symbol name is undefined\n",
+        "    The symbol name cannot be undefined\n"
+    ) if not defined $symbol_name;
+
+    my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $symbol_name);
+        local slr, symbol_name = ...
+        return slr:lexeme_alternative_undef(symbol_name)
+END_OF_LUA
+    return 1 if $ok;
+    return;
+}
+
 sub Marpa::R3::Scanless::R::lexeme_alternative {
     my ( $slr, $symbol_name, @value ) = @_;
 
@@ -596,6 +630,7 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         $value = $value[0];
         $value_type = defined $value ? 'explicit' : 'undef';
     }
+    # die if $value_type ne 'explicit';
     my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'ssS', $symbol_name, $value_type, $value );
         local slr, symbol_name, value_type, token_sv = ...
@@ -658,8 +693,8 @@ END_OF_LUA
 # TODO -- Delete this
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
-sub Marpa::R3::Scanless::R::lexeme_read {
-    my ( $slr, $symbol_name, $start, $length, @value ) = @_;
+sub Marpa::R3::Scanless::R::lexeme_read_literal {
+    my ( $slr, $symbol_name, $block_id, $start, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->lexeme_read() called from inside a handler\n",
@@ -669,8 +704,8 @@ sub Marpa::R3::Scanless::R::lexeme_read {
             "\n",
         );
     }
-    return if not $slr->lexeme_alternative( $symbol_name, @value );
-    return $slr->lexeme_complete( undef, $start, $length );
+    return if not $slr->lexeme_alternative_literal( $symbol_name );
+    return $slr->lexeme_complete( $block_id, $start, $length );
 }
 
 # Returns 0 on unthrown failure, current location on success,

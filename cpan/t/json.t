@@ -328,7 +328,7 @@ sub parse {
         my $length = $pause_location[2];
         my $value = substr $string, $start + 1, $length - 2;
         $value = decode_string($value) if -1 != index $value, '\\';
-        $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
+        $recce->lexeme_read_block( 'lstring', $value, undef, $start, $length ) // die;
     } ## end for ( my $pos = $recce->read( \$string ); $pos < $length...)
     my $per_parse_arg = bless {}, 'MarpaX::JSON::Actions';
     my $value_ref = $recce->value($per_parse_arg);
@@ -375,7 +375,7 @@ sub trace_json {
                 qq{Line $line, column $column, lexeme <$lexeme>, literal "$literal_string"\n};
             my $value = substr $string, $start + 1, $span_length - 2;
             $value = decode_string($value) if -1 != index $value, q{\\};
-            $recce->lexeme_read( $lexeme, $start, $span_length, $value ) // die;
+            $recce->lexeme_read_block( $lexeme, $value, undef, $start, $span_length ) // die;
             $pos = $recce->resume();
         }
         return $trace_desc;

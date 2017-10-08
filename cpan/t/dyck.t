@@ -74,18 +74,15 @@ my $input = 'A2(A2(S3(Hey)S13(Hello, World!))S5(Ciao!))';
 
 my $last_string_length;
 my $input_length = length $input;
+my $pos = $recce->read( \$input );
+my ($main_block) = $recce->block_progress();
 INPUT:
-for (
-    my $pos = $recce->read( \$input );
-    $pos < $input_length;
-    $pos = $recce->resume($pos)
-    )
-{
+for (; $pos < $input_length; $pos = $recce->resume($pos)) {
     EVENT: for my $event ( @events ) {
         my ($name, @event_data) = @{$event};
         if ( $name eq 'expecting text' ) {
             my $text_length = $last_string_length;
-            $recce->lexeme_read( 'text', $pos, $text_length );
+            $recce->lexeme_read_literal( 'text', $main_block, $pos, $text_length );
             $pos += $text_length;
             next EVENT;
         } ## end if ( $name eq 'expecting text' )

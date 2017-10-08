@@ -111,14 +111,14 @@ my $grammar = Marpa::R3::Scanless::G->new(
 
 my @events = ();
 my @event_history = ();
-my $next_lexeme;
+my $next_lexeme_length = undef;
 
 my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
     event_handlers => {
         "'default" => sub () {
             my ($slr, $event_name, undef, undef, undef, $length) = @_;
             if ($event_name eq 'insert d') {
-               $next_lexeme = ['real d', undef, $length];
+               $next_lexeme_length = $length;
             }
             push @events, $event_name;
             'pause';
@@ -140,10 +140,10 @@ READ: while (1) {
        if @events;
     @events = ();
 
-    if ($next_lexeme) {
-        $slr->lexeme_read(@{$next_lexeme});
+    if (defined $next_lexeme_length) {
+        $slr->lexeme_read_literal('real d', undef, undef, $next_lexeme_length);
         (undef, $pos) = $slr->block_progress();
-        $next_lexeme = undef;
+        $next_lexeme_length = undef;
         next READ;
     }
     if ($pos < $length) {

@@ -91,7 +91,7 @@ my $g1_pos = $recce->g1_pos();
 
 my $max_size = $recce->earley_set_size($g1_pos);
 TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
-    $recce->lexeme_read( 'a', undef, 1, (substr $input, $i, 1) );
+    $recce->lexeme_read_literal( 'a', undef, $i, 1 );
     $g1_pos = $recce->g1_pos();
     my $size = $recce->earley_set_size($g1_pos);
     $max_size = $size > $max_size ? $size : $max_size;

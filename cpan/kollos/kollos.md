@@ -3299,6 +3299,7 @@ Other errors are thrown.
     end
     function _M.class_slr.lexeme_alternative(slr, symbol_name, value_type, token)
         local token_ix
+        -- TODO delete this logic in favor of the methods lexeme_alternative_*
         if value_type == 'undef' then
             token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
         elseif value_type == 'literal' then
