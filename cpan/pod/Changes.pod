@@ -193,7 +193,7 @@ would be essentially be a repetition of
 L<their
 documentation|Marpa::R3::Scanless::G/"Accessors">.
 
-=head2 Marpa::R2::Scanless::R methods renamed in Marpa::R3
+=head2 Marpa::R2::Scanless::R methods changed in Marpa::R3
 
 For historical reasons,
 the methods dealing with input and G1 parse location in Marpa::R2
@@ -207,8 +207,6 @@ Accordingly,
 C<< $slr->substring() >> has been renamed
 C<< $slr->g1_literal() >>.
 
-=head2 Marpa::R2::Scanless::R methods removed in Marpa::R3
-
 The
 C<Marpa::R2::Scanless::R::event()> method,
 C<Marpa::R2::Scanless::R::last_completed_range()> method,
@@ -217,6 +215,15 @@ and the
 C<Marpa::R2::Scanless::R::range_to_string()> method,
 discouraged in Marpa::R2,
 have been eliminated in Marpa::R3.
+
+The C<Marpa::R2::Scanless::R::lexeme_read()> method
+has been removed.
+Its function is provided by the new
+C<Marpa::R2::Scanless::R::lexeme_read_block()>
+and C<Marpa::R2::Scanless::R::lexeme_read_string()>
+methods.
+C<Marpa::R2::Scanless::R::lexeme_read()> may reappear
+in a non-backward-compatible form.
 
 The C<Marpa::R2::Scanless::R::ambiguity_metric()> method
 has been removed.

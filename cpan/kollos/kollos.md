@@ -3261,7 +3261,7 @@ Other errors are thrown.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lexeme_alternative(slr, symbol_name, value_type, token)
+    local function lexeme_alternative_i(slr, symbol_name, value_type, token_ix)
         local slg = slr.slg
         local xsy = slg.xsys[symbol_name]
         if not xsy then
@@ -3276,15 +3276,6 @@ Other errors are thrown.
                 symbol_name)
         end
         local symbol_id = lexeme.g1_isy.id
-        local token_ix
-        if value_type == 'undef' then
-            token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
-        elseif value_type == 'literal' then
-            token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
-        else
-            token_ix = #slr.token_values + 1
-            slr.token_values[token_ix] = token
-        end
         local g1r = slr.g1
         slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
@@ -3299,6 +3290,18 @@ Other errors are thrown.
         return _M.userX( 'Problem reading symbol "%s": %s',
             symbol_name, error_description
         );
+    end
+    function _M.class_slr.lexeme_alternative(slr, symbol_name, value_type, token)
+        local token_ix
+        if value_type == 'undef' then
+            token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
+        elseif value_type == 'literal' then
+            token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
+        else
+            token_ix = #slr.token_values + 1
+            slr.token_values[token_ix] = token
+        end
+        return lexeme_alternative_i(slr, symbol_name, value_type, token_ix)
     end
 
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)

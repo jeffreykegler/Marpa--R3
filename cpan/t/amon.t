@@ -65,7 +65,7 @@ Test::More::is( (join q{ }, @events), q{ev_token}, 'before' );
 # Now look where the bug occurred.
 # The problem was that the "ev_token" from the previous
 # check for events was not cleared.
-$recce->lexeme_read(TOKEN => 0, 1, "_");
+$recce->lexeme_read_string('TOKEN', "_");
 Test::More::is( (join q{ }, @events), q{ev_other_token}, 'after' );
 
 # vim: expandtab shiftwidth=4:

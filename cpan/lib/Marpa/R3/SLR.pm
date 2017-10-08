@@ -655,6 +655,7 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::lexeme_complete
 
+# TODO -- Delete this
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read {
@@ -670,6 +671,23 @@ sub Marpa::R3::Scanless::R::lexeme_read {
     }
     return if not $slr->lexeme_alternative( $symbol_name, @value );
     return $slr->lexeme_complete( undef, $start, $length );
+}
+
+# Returns 0 on unthrown failure, current location on success,
+# undef if lexeme not accepted.
+sub Marpa::R3::Scanless::R::lexeme_read_block {
+    my ( $slr, $symbol_name, $value, $block_id, $offset, $length ) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->lexeme_read() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            "\n",
+        );
+    }
+    return if not $slr->lexeme_alternative( $symbol_name, $value );
+    return $slr->lexeme_complete( $block_id, $offset, $length );
 }
 
 # Returns 0 on unthrown failure, current location on success,

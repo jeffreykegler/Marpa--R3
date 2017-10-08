@@ -65,14 +65,15 @@ $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 $input = '2*1+3*4+5';
 $pos   = 0;
 $recce->read( \$input, 0, 0 );
+my ($main_block) = $recce->block_progress();
 for my $input_token (qw(2 * 1 + 3 * 4 + 5)) {
     my $token_type =
           $input_token eq '+' ? 'Add'
         : $input_token eq '*' ? 'Multiply'
         :                       'Number';
-    my $return_value = $recce->lexeme_read( $token_type, $pos, 1, $input_token );
+    my $return_value = $recce->lexeme_read_block( $token_type, $input_token, $main_block, $pos, 1 );
     $pos++;
-    Test::More::is( $return_value, $pos, "Return value of lexeme_read() is $pos" );
+    Test::More::is( $return_value, $pos, "Return value of lexeme_read_block() is $pos" );
 } ## end for my $input_token (qw(2 * 1 + 3 * 4 + 5))
 
 my @values = ();

@@ -302,7 +302,10 @@ L<a separate document|Marpa::R3::Semantics>.
 =head1 External scanning
 
 External scanning is usually performed by reading lexemes using the
-L<C<< $recce->lexeme_read() >> method|/"lexeme_read()">, which
+L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
+and
+L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
+which
 allows the reading of unambiguous lexemes.
 If ambiguous lexemes are needed, then
 the L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
@@ -332,6 +335,8 @@ are required to correspond to a span of the input stream.
 An external scanner
 must set up a relationship to the input stream,
 even if that relationship is completely artificial.
+
+TODO: rewrite this.
 
 Here is
 one very general way to deal with external lexemes
@@ -1106,7 +1111,9 @@ The C<lexeme_alternative()> method
 allows an external scanner to read
 ambiguous tokens.
 Most applications
-will prefer the simpler L<C<lexeme_read()>|/"lexeme_read()">.
+will prefer the simpler
+L<C<lexeme_read_string()>|/"lexeme_read_string()">
+and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
 C<lexeme_alternative()> takes one or two arguments.
 The first argument,
@@ -1150,7 +1157,9 @@ one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
 method
 at a G1 location.
 Most applications
-will prefer the simpler L<C<lexeme_read()>|/"lexeme_read()"> method.
+will prefer the simpler
+L<C<lexeme_read_string()>|/"lexeme_read_string()">
+and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
 The C<lexeme_complete()> method
 requires three arguments.
@@ -1166,12 +1175,12 @@ The span is interpreted,
 and G1 location and current input stream location
 are adjusted,
 as described for
-L<the C<lexeme_read()> method|/"lexeme_read()">.
+L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
 
 SLIF parse events may occur during
 the L<C<lexeme_complete()>|/"lexeme_complete()"> method,
 as described for
-L<the C<lexeme_read()> method|/"lexeme_read()">.
+L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
 
 B<Return value:>
 On success, C<lexeme_complete()>
@@ -1203,12 +1212,14 @@ to switch lexers.
 On success, returns the old priority value.
 Failure is thrown.
 
-=head2 lexeme_read()
+=head2 lexeme_read_block()
 
 =for Marpa::R3::Display
 name: SLIF read/resume example
 partial: 1
 normalize-whitespace: 1
+
+    TODO Document lexeme_read_block
 
     $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
 
@@ -1300,6 +1311,17 @@ This will never be location zero, because lexemes cannot be zero length.
 If the token was rejected,
 C<lexeme_read()> returns a Perl C<undef>.
 Failure is thrown as an exception.
+
+=head2 lexeme_read_string()
+
+=for Marpa::R3::Display
+name: SLIF read/resume example
+partial: 1
+normalize-whitespace: 1
+
+    TODO Document lexeme_read_string
+
+=for Marpa::R3::Display::End
 
 =head2 resume()
 
