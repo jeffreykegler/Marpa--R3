@@ -37,35 +37,6 @@ The
 C<< $slr->events() >> method has been
 removed.
 
-=head2 Multiple C<< slr->read() >> calls allowed
-
-The C<< slr->read() >> method may now called multiple
-times during a parse. each time with a new string.
-These strings will be called B<input blocks>.
-The <input block> read by the I<n>'th 
-call of the C<< slr->read() >> method during a parse
-has block index I<n>.
-
-This change makes the previous L0 positions no
-longer adequately identify a location, 
-which necessitates many changes.
-
-New parameters:
-The arguments of
-C< $recce->lexeme_complete() >>,
-C< $recce->input_length() >>,
-and
-C< $recce->literal() >>
-have changed,
-in a way which is not compatible with Marpa::R2.
-Their first parameter now is the block id.
-
-Deleted calls:
-The
-C< $recce->g1_location_to_span() >> and
-C< $recce->last_completed_span() >>
-methods has been removed.
-
 =head2 New valuer object
 
 There is a new valuer object,
@@ -194,6 +165,45 @@ L<their
 documentation|Marpa::R3::Scanless::G/"Accessors">.
 
 =head2 Marpa::R2::Scanless::R methods changed in Marpa::R3
+
+=head3 Multiple C<< slr->read() >> calls allowed
+
+The interface to
+the C<< $recce->read() >> method has changed in major ways.
+One important change is that
+the C<< slr->read() >> method may now called multiple
+times during a parse,
+each time with a new string.
+These strings will be called B<input blocks>.
+The <input block> read by the I<n>'th 
+call of the C<< slr->read() >> method during a parse
+has block index I<n>.
+
+This change makes the previous L0 positions no
+longer adequately identify a location, 
+which necessitates many changes.
+
+The interface to 
+C< $recce->lexeme_alternative() >>
+has changed.
+Some of its functionality is taken over
+by the new
+C< $recce->lexeme_alternative_literal() >>
+method.
+
+The arguments of
+C< $recce->lexeme_complete() >>,
+C< $recce->input_length() >>,
+and
+C< $recce->literal() >>
+have changed,
+in a way which is not compatible with Marpa::R2.
+Their first parameter now is the block id.
+
+The
+C< $recce->g1_location_to_span() >> and
+C< $recce->last_completed_span() >>
+methods has been removed.
 
 For historical reasons,
 the methods dealing with input and G1 parse location in Marpa::R2

@@ -3297,17 +3297,9 @@ Other errors are thrown.
     function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
         return lexeme_alternative_i(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
     end
-    function _M.class_slr.lexeme_alternative(slr, symbol_name, value_type, token)
-        local token_ix
-        -- TODO delete this logic in favor of the methods lexeme_alternative_*
-        if value_type == 'undef' then
-            token_ix = _M.defines.TOKEN_VALUE_IS_UNDEF
-        elseif value_type == 'literal' then
-            token_ix = _M.defines.TOKEN_VALUE_IS_LITERAL
-        else
-            token_ix = #slr.token_values + 1
-            slr.token_values[token_ix] = token
-        end
+    function _M.class_slr.lexeme_alternative(slr, symbol_name, token)
+        local token_ix = #slr.token_values + 1
+        slr.token_values[token_ix] = token
         return lexeme_alternative_i(slr, symbol_name, token_ix)
     end
 

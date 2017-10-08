@@ -99,9 +99,9 @@ sub my_parser {
             my $lexeme = $1;
 
 # Marpa::R3::Display
-# name: SLIF lexeme_alternative() example
+# name: SLIF lexeme_alternative_literal() example
 
-            if ( not defined $recce->lexeme_alternative($token_name) ) {
+            if ( not defined $recce->lexeme_alternative_literal($token_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
                     substr( $string, $start_of_lexeme, 40 ), q{"};

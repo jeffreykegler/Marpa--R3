@@ -610,9 +610,9 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Scanless::R::lexeme_alternative {
-    my ( $slr, $symbol_name, @value ) = @_;
+    my ( $slr, $symbol_name, $value ) = @_;
 
-    if ( Scalar::Util::tainted( $value[1] ) ) {
+    if ( Scalar::Util::tainted( $value ) ) {
         Marpa::R3::exception(
             "Problem in Marpa::R3: Attempt to use a tainted token value\n",
             "Marpa::R3 is insecure for use with tainted data\n"
@@ -624,17 +624,10 @@ sub Marpa::R3::Scanless::R::lexeme_alternative {
         "    The symbol name cannot be undefined\n"
     ) if not defined $symbol_name;
 
-    my $value_type = 'literal';
-    my $value;
-    if ( scalar @value != 0 ) {
-        $value = $value[0];
-        $value_type = defined $value ? 'explicit' : 'undef';
-    }
-    # die if $value_type ne 'explicit';
     my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ssS', $symbol_name, $value_type, $value );
-        local slr, symbol_name, value_type, token_sv = ...
-        return slr:lexeme_alternative(symbol_name, value_type, token_sv)
+        <<'END_OF_LUA', 'sS', $symbol_name, $value );
+        local slr, symbol_name, token_sv = ...
+        return slr:lexeme_alternative(symbol_name, token_sv)
 END_OF_LUA
     return 1 if $ok;
     return;
