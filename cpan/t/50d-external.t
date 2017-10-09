@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More tests => 2;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -75,11 +75,8 @@ my @terminals = (
 );
 
 sub lo_literal_reader {
-    my ( $recce, $p_string, $token_name, $regex, $long_name ) = @_;
-    my $start_of_lexeme = pos $$p_string;
-    my ($main_block) = $recce->block_progress();
-    return if not $$p_string =~ m/\G($regex)/gcxms;
-    my $lexeme = $1;
+    my ( $recce, $start_of_lexeme, $lexeme_length, $token_name, $long_name ) = @_;
+    my ($main_block, $offset, $eoread) = $recce->block_progress();
 
 # Marpa::R3::Display
 # name: SLIF lexeme_alternative_literal() example
@@ -89,14 +86,36 @@ sub lo_literal_reader {
 qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
           $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
     }
-    return
-      if $recce->lexeme_complete( $main_block, $start_of_lexeme,
-        ( length $lexeme ) );
+    if (
+        not $recce->lexeme_complete(
+            $main_block, $start_of_lexeme, $lexeme_length
+        )
+      )
+    {
+        die qq{No token found at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
 
 # Marpa::R3::Display::End
 
-    die qq{No token found at position $start_of_lexeme, before "},
-      substr( $$p_string, pos $$p_string, 40 ), q{"};
+
+}
+
+sub hi_literal_reader {
+    my ( $recce, $start_of_lexeme, $lexeme_length, $token_name, $long_name ) = @_;
+    my ($main_block, $offset, $eoread) = $recce->block_progress();
+
+# Marpa::R3::Display
+# name: SLIF lexeme_read_literal() synopsis
+
+    if ( not defined $recce->lexeme_read_literal($token_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
+
+# Marpa::R3::Display::End
+
 
 }
 
@@ -120,7 +139,12 @@ sub my_parser {
         last TOKEN if $start_of_lexeme >= $length;
         next TOKEN if $string =~ m/\G\s+/gcxms;    # skip whitespace
         TOKEN_TYPE: for my $t (@terminals) {
-            $reader-> ( $recce, \$string, @{$t} );
+            my ( $token_name, $regex, $long_name ) = @{$t};
+            my $start_of_lexeme = pos $string;
+            next TOKEN_TYPE if not $string =~ m/\G($regex)/gcxms;
+            my $lexeme = $1;
+            my $lexeme_length = length $lexeme;
+            $reader-> ( $recce, $start_of_lexeme, $lexeme_length, $token_name, $long_name );
         }
     } ## end TOKEN: while (1)
     my $value_ref = $recce->value();
@@ -131,7 +155,8 @@ sub my_parser {
 }
 
 my $value = my_parser( $grammar, \&lo_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-
+Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
+$value = my_parser( $grammar, \&hi_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
 Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
 
 sub My_Nodes::script::doit {
