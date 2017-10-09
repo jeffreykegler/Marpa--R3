@@ -1377,20 +1377,11 @@ normalize-whitespace: 1
 =head2 lexeme_read_string()
 
 =for Marpa::R3::Display
-name: lexeme_read_literal() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    TODO Document lexeme_read_string
-
-=for Marpa::R3::Display::End
-
-=for Marpa::R3::Display
 name: lexeme_read_string() synopsis
 partial: 1
 normalize-whitespace: 1
 
-     TODO lexeme_read_string() equivalent
+    TODO Document lexeme_read_string
 
 =for Marpa::R3::Display::End
 

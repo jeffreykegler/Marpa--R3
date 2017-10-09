@@ -71,7 +71,6 @@ END_OF_LUA
 
 # Substring in terms of locations in the input stream
 # This is the one users will be most interested in.
-# TODO - Document block_id parameter
 sub Marpa::R3::Scanless::R::literal {
     my ( $slr, $block_id, $offset, $length ) = @_;
     my ($literal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -676,7 +675,6 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::Scanless::R::lexeme_complete
 
-# TODO -- Delete this
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_literal {
@@ -732,7 +730,6 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
     return $return_value;
 }
 
-# TODO -- Document this method
 sub Marpa::R3::Scanless::R::g1_to_block_first {
     my ( $slr, $g1_pos ) = @_;
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -748,7 +745,6 @@ sub Marpa::R3::Scanless::R::g1_to_block_first {
 END_OF_LUA
 }
 
-# TODO -- Document this method
 sub Marpa::R3::Scanless::R::g1_to_block_last {
     my ( $slr, $g1_pos ) = @_;
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
