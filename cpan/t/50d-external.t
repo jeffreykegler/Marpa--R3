@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -75,8 +75,9 @@ my @terminals = (
 );
 
 sub lo_literal_reader {
-    my ( $recce, $start_of_lexeme, $lexeme_length, $token_name, $long_name ) = @_;
+    my ( $recce, $start_of_lexeme, $lexeme, $token_name, $long_name ) = @_;
     my ($main_block, $offset, $eoread) = $recce->block_progress();
+    my $lexeme_length = length $lexeme;
 
 # Marpa::R3::Display
 # name: SLIF lexeme_alternative_literal() example
@@ -102,8 +103,9 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
 }
 
 sub hi_literal_reader {
-    my ( $recce, $start_of_lexeme, $lexeme_length, $token_name, $long_name ) = @_;
+    my ( $recce, $start_of_lexeme, $lexeme, $token_name, $long_name ) = @_;
     my ($main_block, $offset, $eoread) = $recce->block_progress();
+    my $lexeme_length = length $lexeme;
 
 # Marpa::R3::Display
 # name: SLIF lexeme_read_literal() synopsis
@@ -116,6 +118,23 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
 
 # Marpa::R3::Display::End
 
+
+}
+
+sub hi_read_reader {
+    my ( $recce, $start_of_lexeme, $lexeme, $token_name, $long_name ) = @_;
+    my ($main_block, $offset, $eoread) = $recce->block_progress();
+
+# Marpa::R3::Display
+# name: SLIF lexeme_read_literal() synopsis
+
+    if ( not defined $recce->lexeme_read_string($token_name, $lexeme )) {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
+
+# Marpa::R3::Display::End
 
 }
 
@@ -143,8 +162,8 @@ sub my_parser {
             my $start_of_lexeme = pos $string;
             next TOKEN_TYPE if not $string =~ m/\G($regex)/gcxms;
             my $lexeme = $1;
-            my $lexeme_length = length $lexeme;
-            $reader-> ( $recce, $start_of_lexeme, $lexeme_length, $token_name, $long_name );
+            $reader-> ( $recce, $start_of_lexeme, $lexeme, $token_name, $long_name );
+            $recce->block_move($start_of_lexeme + length $lexeme);
         }
     } ## end TOKEN: while (1)
     my $value_ref = $recce->value();
@@ -157,6 +176,8 @@ sub my_parser {
 my $value = my_parser( $grammar, \&lo_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
 Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
 $value = my_parser( $grammar, \&hi_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
+Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
+$value = my_parser( $grammar, \&hi_read_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
 Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
 
 sub My_Nodes::script::doit {
