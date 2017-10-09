@@ -1461,49 +1461,52 @@ normalize-whitespace: 1
 
 =head1 Accessors
 
-=head2 g1_to_l0_first()
+=head2 g1_to_block_first()
 
 =for Marpa::R3::Display
-name: Scanless g1_to_l0_first() synopsis
+name: Scanless g1_to_block_first() synopsis
 
-        my ( $first_block, $first_l0_pos ) =
-            $recce->g1_to_l0_first($g1_location);
+        my ( $first_block, $first_offset ) =
+            $recce->g1_to_block_first($g1_location);
 
 =for Marpa::R3::Display::End
 
-C<g1_to_l0_first()> takes an G1 position as its
+C<g1_to_block_first()> takes an G1 position as its
 only argument.
 It returns two arguments:
-the block index and the L0 position
-of the first L0 position that
+the block index and the block offset
+of the first block position that
 corresponds to the G1 position.
 Failure is always thrown.
 
-=head2 g1_to_l0_last()
+=head2 g1_to_block_last()
 
 =for Marpa::R3::Display
-name: Scanless g1_to_l0_last() synopsis
+name: Scanless g1_to_block_last() synopsis
 
-        my ( $last_block, $last_l0_pos ) =
-            $recce->g1_to_l0_last($g1_location);
+        my ( $last_block, $last_offset ) =
+            $recce->g1_to_block_last($g1_location);
 
 =for Marpa::R3::Display::End
 
-C<g1_to_l0_last()> takes an G1 position as its
+C<g1_to_block_last()> takes an G1 position as its
 only argument.
 It returns two arguments:
-the block index and the L0 position
-of the last L0 position that
+the block index and block offset
+of the last block position that
 corresponds to the G1 position.
 Failure is always thrown.
 
+The block position returned by C<g1_to_block_last()>
+will be an "actual" position,
+in the sense that there actually is a codepoint there.
 For most apps,
 the return values
-of C<g1_to_l0_first()>
+of C<g1_to_block_first()>
 and 
-C<g1_to_l0_last()>
+C<g1_to_block_last()>
 will be the elements of an
-L0 span which corresponds exactly
+block range which corresponds exactly
 to the G1 position.
 But note that apps are allowed to use
 inputs which
@@ -1514,11 +1517,11 @@ forward monotonically,
 and which may contain overlaps.
 For these apps, 
 the return values of
-C<g1_to_l0_first()>
+C<g1_to_block_first()>
 and 
-C<g1_to_l0_last()>
+C<g1_to_block_last()>
 will not be sufficient to
-describe the L0 locations that correspond
+describe the block locations that correspond
 to a G1 location.
 
 =head2 g1_literal()

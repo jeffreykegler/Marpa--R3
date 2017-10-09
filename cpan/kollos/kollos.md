@@ -1854,7 +1854,7 @@ and returns the current L0 position.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_pos_to_l0_first(slr, g1_pos)
+    function _M.class_slr.g1_to_block_first(slr, g1_pos)
         local per_es = slr.per_es
         if g1_pos == #per_es then
             return slr:l0_current_pos()
@@ -1862,7 +1862,7 @@ and returns the current L0 position.
         local this_sweep = per_es[g1_pos+1]
         if not this_sweep then
             error(string.format(
-                "slr:g1_pos_to_l0_first(%d): bad argument\n\z
+                "slr:g1_to_block_first(%d): bad argument\n\z
                 \u{20}   Allowed values are %d-%d\n",
                 g1_pos, 0, #per_es-1
             ))
@@ -1883,12 +1883,12 @@ contains more than one L0 span.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.g1_pos_to_l0_last(slr, g1_pos)
+    function _M.class_slr.g1_to_block_last(slr, g1_pos)
         local per_es = slr.per_es
         local this_sweep = per_es[g1_pos+1]
         if not this_sweep then
             error(string.format(
-                "slr:g1_pos_to_l0_last(%d): bad argument\n\z
+                "slr:g1_to_block_last(%d): bad argument\n\z
                 \u{20}   Allowed values are %d-%d\n",
                 g1_pos, 0, #per_es-1
             ))
@@ -4109,7 +4109,7 @@ TODO: Make `collected_progress_items a local, after development.
         else
             local l0_locations = {}
             for _, g1_location in pairs(origins) do
-                l0_locations[#l0_locations+1] = { slr:g1_pos_to_l0_first(g1_location) }
+                l0_locations[#l0_locations+1] = { slr:g1_to_block_first(g1_location) }
             end
             pcs[#pcs+1] = slr:lc_table_brief(l0_locations)
         end
@@ -4152,7 +4152,7 @@ TODO: Make `collected_progress_items a local, after development.
       local function earley_set_header(earley_set_id)
         local location = 'B1L1c1'
         if earley_set_id > 0 then
-          local block, pos = slr:g1_pos_to_l0_first(earley_set_id)
+          local block, pos = slr:g1_to_block_first(earley_set_id)
           location = slr:lc_brief(block, pos)
         end
         return string.format('=== Earley set %d at %s ===', earley_set_id, location)
@@ -4307,14 +4307,14 @@ part of a "Pure Lua" implementation.
             goto HAVE_RANGE
         end
         if dotted_type == 'P' then
-            local block, pos = slr:g1_pos_to_l0_first(current_ordinal)
+            local block, pos = slr:g1_to_block_first(current_ordinal)
             pcs[#pcs+1] = slr:lc_brief(block, pos)
             goto HAVE_RANGE
         end
         do
             local l0_locations = {}
             for _, g1_location in pairs(origins) do
-                l0_locations[#l0_locations+1] = { slr:g1_pos_to_l0_first(g1_location) }
+                l0_locations[#l0_locations+1] = { slr:g1_to_block_first(g1_location) }
             end
             pcs[#pcs+1] = slr:lc_table_brief(l0_locations)
             goto HAVE_RANGE

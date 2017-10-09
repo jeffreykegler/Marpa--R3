@@ -744,7 +744,7 @@ sub Marpa::R3::Scanless::R::g1_to_l0_first {
                 "g1_to_l0_first(%s): argument must be an integer",
                 g1_pos)
         end
-        return slr:g1_pos_to_l0_first(g1_pos)
+        return slr:g1_to_block_first(g1_pos)
 END_OF_LUA
 }
 
@@ -760,7 +760,7 @@ sub Marpa::R3::Scanless::R::g1_to_l0_last {
                 "g1_to_l0_last(%s): argument must be an integer",
                 g1_pos)
         end
-        return slr:g1_pos_to_l0_last(g1_pos)
+        return slr:g1_to_block_last(g1_pos)
 END_OF_LUA
 }
 
