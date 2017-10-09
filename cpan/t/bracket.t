@@ -236,7 +236,7 @@ sub test {
         # beginning.
         my ($opening_bracket) = $recce->last_completed('balanced');
         my ( $bracket_block, $bracket_l0_pos ) =
-          $recce->g1_to_l0_first($opening_bracket);
+          $recce->g1_to_block_first($opening_bracket);
         my ( $line, $column ) =
           $recce->line_column( $bracket_block, $bracket_l0_pos );
         my $opening_column0 = $bracket_l0_pos - ( $column - 1 );

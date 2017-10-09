@@ -1357,8 +1357,8 @@ sub Marpa::R3::Internal::ASF::ambiguities_show {
 
             my $l0_length = $asf->glade_L0_length($glade);
             my ( $g1_start, $g1_length )       = $asf->glade_g1_span($glade);
-            my ( $l0_block1,      $l0_pos1 )       = $slr->g1_to_l0_first($g1_start);
-            my ( $l0_block2,      $l0_pos2 )       = $slr->g1_to_l0_last($g1_start + $g1_length -1);
+            my ( $l0_block1,      $l0_pos1 )       = $slr->g1_to_block_first($g1_start);
+            my ( $l0_block2,      $l0_pos2 )       = $slr->g1_to_block_last($g1_start + $g1_length -1);
             my $l0_range = $slr->lc_brief($l0_block1, $l0_pos1, $l0_block2, $l0_pos2);
             my $display_length = List::Util::min( $l0_length, 60 );
             $result
@@ -1420,8 +1420,8 @@ END_OF_LUA
                     $asf->glade_g1_span($first_downglade);
                 my $g1_last = $g1_length > 0 ? ($g1_start + $g1_length - 1) : $g1_start;
 
-                my ( $l0_block1,      $l0_pos1 )       = $slr->g1_to_l0_first($g1_start);
-                my ( $l0_block2,      $l0_pos2 )       = $slr->g1_to_l0_last($g1_last);
+                my ( $l0_block1,      $l0_pos1 )       = $slr->g1_to_block_first($g1_start);
+                my ( $l0_block2,      $l0_pos2 )       = $slr->g1_to_block_last($g1_last);
                 my $l0_range = $slr->lc_brief($l0_block1, $l0_pos1, $l0_block2, $l0_pos2);
 
                 my $first_length = $asf->glade_L0_length($first_downglade);
@@ -1464,7 +1464,7 @@ END_OF_LUA
                     }
 
                     my ( $g1_start, $g1_length ) = $asf->glade_g1_span($glade_id);
-                    my ( $l0_block,      $l0_pos )       = $slr->g1_to_l0_last($g1_start + $g1_length -1);
+                    my ( $l0_block,      $l0_pos )       = $slr->g1_to_block_last($g1_start + $g1_length -1);
                     my $l0_location = $slr->lc_brief($l0_block, $l0_pos);
 
                     $result

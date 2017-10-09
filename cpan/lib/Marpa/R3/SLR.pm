@@ -733,7 +733,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
 }
 
 # TODO -- Document this method
-sub Marpa::R3::Scanless::R::g1_to_l0_first {
+sub Marpa::R3::Scanless::R::g1_to_block_first {
     my ( $slr, $g1_pos ) = @_;
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $g1_pos  );
@@ -741,7 +741,7 @@ sub Marpa::R3::Scanless::R::g1_to_l0_first {
         g1_pos = math.tointeger(g1_pos)
         if not g1_pos then
             _M.userX(
-                "g1_to_l0_first(%s): argument must be an integer",
+                "g1_to_block_first(%s): argument must be an integer",
                 g1_pos)
         end
         return slr:g1_to_block_first(g1_pos)
@@ -749,7 +749,7 @@ END_OF_LUA
 }
 
 # TODO -- Document this method
-sub Marpa::R3::Scanless::R::g1_to_l0_last {
+sub Marpa::R3::Scanless::R::g1_to_block_last {
     my ( $slr, $g1_pos ) = @_;
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $g1_pos  );
@@ -757,7 +757,7 @@ sub Marpa::R3::Scanless::R::g1_to_l0_last {
         g1_pos = math.tointeger(g1_pos)
         if not g1_pos then
             _M.userX(
-                "g1_to_l0_last(%s): argument must be an integer",
+                "g1_to_block_last(%s): argument must be an integer",
                 g1_pos)
         end
         return slr:g1_to_block_last(g1_pos)

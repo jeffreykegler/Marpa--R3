@@ -175,7 +175,7 @@ sub test {
         # completed <target>.  This will be our longest match.
 
         diag( join q{ }, @shortest_span ) if $verbose;
-        my (undef, $prefix_end) = $recce->g1_to_l0_first($shortest_span[0]);
+        my (undef, $prefix_end) = $recce->g1_to_block_first($shortest_span[0]);
 
         my %event_handlers2 = (
               q{'exhausted} => sub {
@@ -214,7 +214,7 @@ sub test {
         # Move the search location forward,
         # in preparation for looking for the next target
 
-        ( undef, $target_start ) = $recce->g1_to_l0_last(
+        ( undef, $target_start ) = $recce->g1_to_block_last(
              $longest_span[0] + $longest_span[1] - 1);
          $target_start += 1;
 

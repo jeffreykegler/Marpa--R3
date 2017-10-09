@@ -868,7 +868,7 @@ A successful call of C<read()>
 may return zero.
 On failure, C<read()> throws an exception.
 
-The C<read()> method is 
+The C<read()> method is
 the approximate equivalent of
 
 =for Marpa::R3::Display
@@ -1309,7 +1309,8 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
-ignore: 1
+name: lexeme_read() equivalent
+normalize-whitespace: 1
 
     $recce->lexeme_alternative($symbol, $value)
     $recce->lexeme_complete(undef, $start, $length)
@@ -1356,14 +1357,40 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=for Marpa::R3::Display
+ignore: 1
+
+    $recce->lexeme_read_literal($symbol, $start, $length, $value)
+
+=for Marpa::R3::Display::End
+
+is roughly equivalent to
+
+=for Marpa::R3::Display
+name: lexeme_read_literal() equivalent
+normalize-whitespace: 1
+
+     TODO lexeme_read_literal() equivalent
+
+=for Marpa::R3::Display::End
+
 =head2 lexeme_read_string()
+
+=for Marpa::R3::Display
+name: lexeme_read_literal() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    TODO Document lexeme_read_string
+
+=for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
 name: lexeme_read_string() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    TODO Document lexeme_read_string
+     TODO lexeme_read_string() equivalent
 
 =for Marpa::R3::Display::End
 
@@ -1398,7 +1425,7 @@ normalize-whitespace: 1
         my $length = $pause_location[2];
         my $value = substr $string, $start + 1, $length - 2;
         $value = decode_string($value) if -1 != index $value, '\\';
-        $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
+        $recce->lexeme_read_block( 'lstring', $value, undef, $start, $length ) // die;
     } ## end for ( my $pos = $recce->read( \$string ); $pos < $length...)
     my $per_parse_arg = bless {}, 'MarpaX::JSON::Actions';
     my $value_ref = $recce->value($per_parse_arg);
@@ -1442,7 +1469,7 @@ On unthrown failure,
 C<resume()> returns a Perl C<undef>.
 Currently, all failures are thrown.
 
-The C<resume()> method is 
+The C<resume()> method is
 the approximate equivalent of
 
 =for Marpa::R3::Display
@@ -1503,7 +1530,7 @@ in the sense that there actually is a codepoint there.
 For most apps,
 the return values
 of C<g1_to_block_first()>
-and 
+and
 C<g1_to_block_last()>
 will be the elements of an
 block range which corresponds exactly
@@ -1515,10 +1542,10 @@ which are not continuous,
 which do not move
 forward monotonically,
 and which may contain overlaps.
-For these apps, 
+For these apps,
 the return values of
 C<g1_to_block_first()>
-and 
+and
 C<g1_to_block_last()>
 will not be sufficient to
 describe the block locations that correspond

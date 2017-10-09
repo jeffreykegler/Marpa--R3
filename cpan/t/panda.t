@@ -289,8 +289,8 @@ sub located_traverser {
 
     my $asf = $glade->asf();
     my $recce = $asf->recognizer();
-    my ( $block1, $pos1 ) = $recce->g1_to_l0_first( $g1_start );
-    my ( $block2, $pos2 ) = $recce->g1_to_l0_last( $g1_start + $g1_length - 1 );
+    my ( $block1, $pos1 ) = $recce->g1_to_block_first( $g1_start );
+    my ( $block2, $pos2 ) = $recce->g1_to_block_last( $g1_start + $g1_length - 1 );
     my $location = $recce->lc_brief($block1, $pos1, $block2, $pos2);
 
     # Remove clutter in the display:
