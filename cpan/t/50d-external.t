@@ -74,8 +74,34 @@ my @terminals = (
     [ 'op comma'    => qr/[,]/xms,  'Comma operator' ],
 );
 
+sub lo_literal_reader {
+    my ( $recce, $p_string, $token_name, $regex, $long_name ) = @_;
+    my $start_of_lexeme = pos $$p_string;
+    my ($main_block) = $recce->block_progress();
+    return if not $$p_string =~ m/\G($regex)/gcxms;
+    my $lexeme = $1;
+
+# Marpa::R3::Display
+# name: SLIF lexeme_alternative_literal() example
+
+    if ( not defined $recce->lexeme_alternative_literal($token_name) ) {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
+    return
+      if $recce->lexeme_complete( $main_block, $start_of_lexeme,
+        ( length $lexeme ) );
+
+# Marpa::R3::Display::End
+
+    die qq{No token found at position $start_of_lexeme, before "},
+      substr( $$p_string, pos $$p_string, 40 ), q{"};
+
+}
+
 sub my_parser {
-    my ( $grammar, $string ) = @_;
+    my ( $grammar, $reader, $string ) = @_;
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 # Marpa::R3::Display
@@ -94,36 +120,17 @@ sub my_parser {
         last TOKEN if $start_of_lexeme >= $length;
         next TOKEN if $string =~ m/\G\s+/gcxms;    # skip whitespace
         TOKEN_TYPE: for my $t (@terminals) {
-            my ( $token_name, $regex, $long_name ) = @{$t};
-            next TOKEN_TYPE if not $string =~ m/\G($regex)/gcxms;
-            my $lexeme = $1;
-
-# Marpa::R3::Display
-# name: SLIF lexeme_alternative_literal() example
-
-            if ( not defined $recce->lexeme_alternative_literal($token_name) ) {
-                die
-                    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    substr( $string, $start_of_lexeme, 40 ), q{"};
-            }
-            next TOKEN
-                if $recce->lexeme_complete( $main_block, $start_of_lexeme,
-                        ( length $lexeme ) );
-
-# Marpa::R3::Display::End
-
-        } ## end TOKEN_TYPE: for my $t (@terminals)
-        die qq{No token found at position $start_of_lexeme, before "},
-            substr( $string, pos $string, 40 ), q{"};
+            $reader-> ( $recce, \$string, @{$t} );
+        }
     } ## end TOKEN: while (1)
     my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         die "No parse was found, after reading the entire input\n";
     }
     return ${$value_ref}->doit();
-} ## end sub my_parser
+}
 
-my $value = my_parser( $grammar, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
+my $value = my_parser( $grammar, \&lo_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
 
 Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
 

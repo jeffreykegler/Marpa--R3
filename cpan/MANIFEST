@@ -228,6 +228,7 @@ t/00-load.t
 t/01-lua.t
 t/25_ah2.t
 t/50d-block.t
+t/50d-external.t
 t/50d-gie.t
 t/50d-lexevent.t
 t/action.t
@@ -263,7 +264,6 @@ t/evinit.t
 t/evsyn.t
 t/evsyn2.t
 t/exhaust.t
-t/external1.t
 t/final_nn.t
 t/flies.t
 t/flies_ast.t
