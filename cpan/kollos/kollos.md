@@ -207,6 +207,9 @@ It is not fully settled -- items may be added.
 
 * Document new valuator object.
 
+* Re-read the docs from beginning to end,
+to make sure they're consistent and consistently up to date.
+
 * Change DSL "hide" syntax from
 `( <a> <b> <c>)`
 to `(- <a> <b> <c>-)`.
