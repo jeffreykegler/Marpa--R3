@@ -197,6 +197,23 @@ Readers trying to familiarize themselves with Kollos
 may want to skip it or skim it
 in their first readings.
 
+### Preparing for beta release
+
+The following is a checklist of things to do before beta.
+It is not fully settled -- items may be added.
+
+* Document multi-block methods.
+
+* Document new valuator object.
+
+* Change DSL "hide" syntax from
+`( <a> <b> <c>)`
+to `(- <a> <b> <c>-)`.
+
+* Rename grammar, recognizer methods, classes.
+
+* Change lexeme priorities from per-location to absolute.
+
 ### To Do
 
 #### TODO notes
