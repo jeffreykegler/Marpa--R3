@@ -404,7 +404,7 @@ END_OF_OUTPUT
     Test::More::is( $g1_pos, 11, qq{Scanless g1_pos()} );
 
 # Marpa::R3::Display
-# name: SLIF input_length() example
+# name: recognizer input_length() synopsis
 
     my $input_length = $recce->input_length();
 
@@ -413,7 +413,7 @@ END_OF_OUTPUT
     Test::More::is( $input_length, 19, qq{Scanless input_length()} );
 
 # Marpa::R3::Display
-# name: SLIF input_length() 1-arg example
+# name: recognizer input_length() 1-arg synopsis
 
     $input_length = $recce->input_length(1);
 

@@ -722,11 +722,11 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
             "\n",
         );
     }
-    my ($old_block) = $recce->block_progress();
+    my ($save_block) = $recce->block_progress();
     my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
     return if not $recce->lexeme_alternative( $symbol_name, $value );
     my $return_value = $recce->lexeme_complete( $lexeme_block );
-    $recce->block_set($old_block);
+    $recce->block_set($save_block);
     return $return_value;
 }
 

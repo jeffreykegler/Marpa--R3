@@ -303,7 +303,7 @@ sub parse {
     my ( $parser, $string ) = @_;
 
 # Marpa::R3::Display
-# name: SLIF read/resume example
+# name: recognizer read/resume synopsis
 
     my @pause_location;
     my $recce = Marpa::R3::Scanless::R->new(

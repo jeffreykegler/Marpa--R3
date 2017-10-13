@@ -116,7 +116,7 @@ my $after_handler = sub () {
 };
 
 # Marpa::R3::Display
-# name: SLIF recce event_is_active named arg example
+# name: recognizer event_is_active named arg synopsis
 
 my $slr = Marpa::R3::Scanless::R->new(
     {

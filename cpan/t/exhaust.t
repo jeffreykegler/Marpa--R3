@@ -90,7 +90,7 @@ sub my_parser {
     my $eval_error = $EVAL_ERROR;
 
 # Marpa::R3::Display
-# name: $recce->exhausted example
+# name: recognizer exhausted() synopsis
 
     my $exhausted_status = $recce->exhausted();
 

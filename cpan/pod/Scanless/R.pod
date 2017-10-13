@@ -317,7 +317,7 @@ so that, in a pedantic sense, scanning always begins with internal scanning.
 But the first input string may be zero length:
 
 =for Marpa::R3::Display
-name: SLIF external read example
+name: recognizer read() synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -546,7 +546,7 @@ and/or its L<C<set()>|/"set()"> method.
 =head2 event_is_active
 
 =for Marpa::R3::Display
-name: SLIF recce event_is_active named arg example
+name: recognizer event_is_active named arg synopsis
 normalize-whitespace: 1
 
     my $slr = Marpa::R3::Scanless::R->new(
@@ -808,7 +808,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF external read example
+name: recognizer read() synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1099,7 +1099,7 @@ name: lexeme_alternative() synopsis
 partial: 1
 normalize-whitespace: 1
 
-            if ( not defined $recce->lexeme_alternative($token_name) ) {
+            if ( not defined $recce->lexeme_alternative($symbol_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
                     $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
@@ -1115,7 +1115,7 @@ normalize-whitespace: 1
             TODO synopsis of lexeme_alternative with undefined value
             Also -- implement it!
 
-            if ( not defined $recce->lexeme_alternative($token_name) ) {
+            if ( not defined $recce->lexeme_alternative($symbol_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
                     $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
@@ -1156,11 +1156,11 @@ Failures are thrown as exceptions.
 =head2 lexeme_alternative_literal()
 
 =for Marpa::R3::Display
-name: SLIF lexeme_alternative_literal() example
+name: recognizer lexeme_alternative_literal() synopsis
 partial: 1
 normalize-whitespace: 1
 
-            if ( not defined $recce->lexeme_alternative_literal($token_name) ) {
+            if ( not defined $recce->lexeme_alternative_literal($symbol_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
                     $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
@@ -1171,7 +1171,7 @@ normalize-whitespace: 1
 =head2 lexeme_complete()
 
 =for Marpa::R3::Display
-name: SLIF lexeme_alternative() example
+name: recognizer lexeme_complete() synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1377,18 +1377,58 @@ normalize-whitespace: 1
 =head2 lexeme_read_string()
 
 =for Marpa::R3::Display
-name: lexeme_read_string() synopsis
+name: recognizer lexeme_read_string() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    TODO Document lexeme_read_string
+    if ( not defined $recce->lexeme_read_string( $symbol_name, $lexeme ) ) {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
+
+=for Marpa::R3::Display::End
+
+The C<lexeme_read_string()> method takes 2 arguments, both required.
+Call them, in order, C<$symbol_name> and C<$string>.
+C<$symbol_name>
+is the symbol name of a token
+to be read.
+C<$string>
+is a string which is both the value of the token
+and its literal representation.
+
+TODO: Complete this.
+
+=for Marpa::R3::Display
+ignore: 1
+
+    $recce->lexeme_read_string($symbol, $string)
+
+=for Marpa::R3::Display::End
+
+is roughly equivalent to
+
+=for Marpa::R3::Display
+name: lexeme_read_string() equivalent
+normalize-whitespace: 1
+
+    sub read_string_equivalent {
+        my ($recce, $symbol_name, $string) = @_;
+        my ($save_block) = $recce->block_progress();
+        my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
+        return if not $recce->lexeme_alternative( $symbol_name, $value );
+        my $return_value = $recce->lexeme_complete( $lexeme_block );
+        $recce->block_set($save_block);
+        return $return_value;
+    }
 
 =for Marpa::R3::Display::End
 
 =head2 resume()
 
 =for Marpa::R3::Display
-name: SLIF read/resume example
+name: recognizer read/resume synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1580,7 +1620,7 @@ Returns the current G1 location.
 =head2 exhausted()
 
 =for Marpa::R3::Display
-name: $recce->exhausted example
+name: recognizer exhausted() synopsis
 
     my $exhausted_status = $recce->exhausted();
 
@@ -1600,7 +1640,7 @@ L<a separate document|Marpa::R3::Exhaustion>.
 =head2 input_length()
 
 =for Marpa::R3::Display
-name: SLIF input_length() example
+name: recognizer input_length() synopsis
 normalize-whitespace: 1
 
     my $input_length = $recce->input_length();
@@ -1608,7 +1648,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF input_length() 1-arg example
+name: recognizer input_length() 1-arg synopsis
 normalize-whitespace: 1
 
     $input_length = $recce->input_length(1);
@@ -1748,7 +1788,7 @@ a PS (paragraph separator, U+2029).
 =head2 literal()
 
 =for Marpa::R3::Display
-name: SLIF trace example
+name: recognizer literal() synopsis
 partial: 1
 normalize-whitespace: 1
 
