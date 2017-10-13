@@ -1102,7 +1102,7 @@ normalize-whitespace: 1
             if ( not defined $recce->lexeme_alternative($token_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    substr( $string, $start_of_lexeme, 40 ), q{"};
+                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
             }
 
 =for Marpa::R3::Display::End
@@ -1118,7 +1118,7 @@ normalize-whitespace: 1
             if ( not defined $recce->lexeme_alternative($token_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    substr( $string, $start_of_lexeme, 40 ), q{"};
+                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
             }
 
 =for Marpa::R3::Display::End
@@ -1163,7 +1163,7 @@ normalize-whitespace: 1
             if ( not defined $recce->lexeme_alternative_literal($token_name) ) {
                 die
                     qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    substr( $string, $start_of_lexeme, 40 ), q{"};
+                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
             }
 
 =for Marpa::R3::Display::End

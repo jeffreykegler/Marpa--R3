@@ -108,7 +108,7 @@ sub hi_literal_reader {
     my $lexeme_length = length $lexeme;
 
 # Marpa::R3::Display
-# name: SLIF lexeme_read_literal() synopsis
+# name: recognizer lexeme_read_literal() synopsis
 
     if ( not defined $recce->lexeme_read_literal($token_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
         die
@@ -126,7 +126,7 @@ sub hi_read_reader {
     my ($main_block, $offset, $eoread) = $recce->block_progress();
 
 # Marpa::R3::Display
-# name: SLIF lexeme_read_literal() synopsis
+# name: recognizer lexeme_read_string() synopsis
 
     if ( not defined $recce->lexeme_read_string($token_name, $lexeme )) {
         die
