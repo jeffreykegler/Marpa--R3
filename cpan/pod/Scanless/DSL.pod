@@ -942,8 +942,11 @@ A symbol name.
 The SLIF's event-triggering methods are
 L<the Scanless recognizer's read()|Marpa::R3::Scanless::R/"read()">,
 L<resume()|Marpa::R3::Scanless::R/"resume()">,
-L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">,
-and L<lexeme_read()|Marpa::R3::Scanless::R/"lexeme_read()">.
+L<C<lexeme_read_block()>|Marpa::R3::Scanless::R/"lexeme_read_block()">,
+L<C<lexeme_read_literal()>|Marpa::R3::Scanless::R/"lexeme_read_literal()">,
+L<C<lexeme_read_string()>|Marpa::R3::Scanless::R/"lexeme_read_string()">
+and
+L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">.
 If the condition described
 by the named event statement
 occurs during an event-triggering method,

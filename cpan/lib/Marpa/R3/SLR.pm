@@ -678,10 +678,10 @@ END_OF_LUA
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_literal {
-    my ( $slr, $symbol_name, $block_id, $start, $length ) = @_;
+    my ( $slr, $symbol_name, $block_id, $offset, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
-            "$slr->lexeme_read() called from inside a handler\n",
+            "$slr->lexeme_read_literal() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
             $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
@@ -689,7 +689,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_literal {
         );
     }
     return if not $slr->lexeme_alternative_literal( $symbol_name );
-    return $slr->lexeme_complete( $block_id, $start, $length );
+    return $slr->lexeme_complete( $block_id, $offset, $length );
 }
 
 # Returns 0 on unthrown failure, current location on success,
@@ -698,7 +698,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_block {
     my ( $slr, $symbol_name, $value, $block_id, $offset, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
-            "$slr->lexeme_read() called from inside a handler\n",
+            "$slr->lexeme_read_block() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
             $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
@@ -715,7 +715,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
     my ( $recce, $symbol_name, $value ) = @_;
     if ( $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
-            "$recce->lexeme_read() called from inside a handler\n",
+            "$recce->lexeme_read_string() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
             $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],

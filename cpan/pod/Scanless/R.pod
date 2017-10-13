@@ -364,8 +364,9 @@ If we want to read a lexeme
 which has no real relationship
 to the natural input,
 we can read it externally,
-using a method call similar to
-C<< $recce->lexeme_read($symbol_name, -7, -1, $value) >>.
+using the
+L<C<lexeme_read_block()>|/"lexeme_read_block()">
+method call.
 
 =head1 G1 locations
 
@@ -1095,7 +1096,7 @@ it should be commented out in the SLIF DSL.
 =head2 lexeme_alternative()
 
 =for Marpa::R3::Display
-name: lexeme_alternative() synopsis
+name: recognizer lexeme_alternative() synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1108,7 +1109,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: lexeme_alternative() undef synopsis
+name: recognizer lexeme_alternative() undef synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1139,7 +1140,7 @@ at the current location.
 The second argument,
 which is optional,
 is the value of the symbol.
-The value argument is interpreted as described for C<lexeme_read()>.
+The value argument is interpreted as described for C<lexeme_read_block()>.
 
 Any number of tokens may be read using C<lexeme_alternative()>
 without advancing the current location.
@@ -1246,17 +1247,24 @@ Failure is thrown.
 =head2 lexeme_read_block()
 
 =for Marpa::R3::Display
-name: lexeme_read_block synopsis
+name: recognizer lexeme_read_block() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    TODO Document lexeme_read_block
-
-    $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
+    if ( not defined $recce->lexeme_read_block($symbol_name, $value,
+        $main_block, $start_of_lexeme, $lexeme_length) ) {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
 
 =for Marpa::R3::Display::End
 
-The C<lexeme_read()> method reads a single, unambiguous, lexeme.
+TODO This method description is wrong
+-- it describes R2's lexeme_read().
+It needs to be totally rewritten.
+
+The C<lexeme_read_block()> method reads a single, unambiguous, lexeme.
 It takes four arguments, only the first of which is required.
 The first argument is the lexeme's symbol name.
 The second and third arguments specify the span in
@@ -1302,23 +1310,26 @@ the lexeme value will be a Perl C<undef>.
 =for Marpa::R3::Display
 ignore: 1
 
-    $recce->lexeme_read($symbol, $start, $length, $value)
+    $recce->lexeme_read_block($symbol, $start, $length, $value)
 
 =for Marpa::R3::Display::End
 
 is roughly equivalent to
 
 =for Marpa::R3::Display
-name: lexeme_read() equivalent
+name: recognizer lexeme_read_block() equivalent
 normalize-whitespace: 1
 
-    $recce->lexeme_alternative($symbol, $value)
-    $recce->lexeme_complete(undef, $start, $length)
+    sub read_block_equivalent {
+	my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
+        return if not $recce->lexeme_alternative( $symbol_name, $value );
+        return $recce->lexeme_complete( $block_id, $offset, $length );
+    }
 
 =for Marpa::R3::Display::End
 
 Non-lexeme
-SLIF parse events may trigger during the C<lexeme_read()> method.
+SLIF parse events may trigger during the C<lexeme_read_block()> method.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
@@ -1329,33 +1340,37 @@ If a pre-lexeme event triggers,
 current location will be set to the event location.
 
 When successful,
-C<lexeme_read()> advances
+C<lexeme_read_block()> advances
 the current G1 location by one.
-The token read by C<lexeme_read()>
+The token read by C<lexeme_read_block()>
 will start at the previous G1 location
 and end at the new current G1 location.
 The new current location in the input stream will
 be at the end location of the new lexeme.
 
-On success, C<lexeme_read()> returns the new current physical
+On success, C<lexeme_read_block()> returns the new current physical
 input stream location.
 This will never be location zero, because lexemes cannot be zero length.
 If the token was rejected,
-C<lexeme_read()> returns a Perl C<undef>.
+C<lexeme_read_block()> returns a Perl C<undef>.
 Failure is thrown as an exception.
 
 =head2 lexeme_read_literal()
 
 =for Marpa::R3::Display
-name: lexeme_read_literal() synopsis
+name: recognizer lexeme_read_literal() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    TODO Document lexeme_read_literal
-
-    $recce->lexeme_read( 'lstring', $start, $length, $value ) // die;
+    if ( not defined $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
+    }
 
 =for Marpa::R3::Display::End
+
+TODO Document lexeme_read_literal
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1367,10 +1382,15 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
-name: lexeme_read_literal() equivalent
+name: recognizer lexeme_read_literal() equivalent
 normalize-whitespace: 1
 
-     TODO lexeme_read_literal() equivalent
+    sub read_literal_equivalent {
+	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+        return if not $recce->lexeme_alternative_literal( $symbol_name );
+        return $recce->lexeme_complete( $block_id, $offset, $length );
+    }
+
 
 =for Marpa::R3::Display::End
 
@@ -1417,7 +1437,7 @@ normalize-whitespace: 1
         my ($recce, $symbol_name, $string) = @_;
         my ($save_block) = $recce->block_progress();
         my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
-        return if not $recce->lexeme_alternative( $symbol_name, $value );
+        return if not $recce->lexeme_alternative( $symbol_name, $string );
         my $return_value = $recce->lexeme_complete( $lexeme_block );
         $recce->block_set($save_block);
         return $return_value;

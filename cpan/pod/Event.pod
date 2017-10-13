@@ -237,8 +237,11 @@ L<the recognizer's C<new()>
 constructor|Marpa::R3::Scanless::R/Constructor>,
 L<C<read()>|Marpa::R3::Scanless::R/"read()">,
 L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
-L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
-L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
+L<C<lexeme_read_block()>|Marpa::R3::Scanless::R/"lexeme_read_block()">,
+L<C<lexeme_read_literal()>|Marpa::R3::Scanless::R/"lexeme_read_literal()">,
+L<C<lexeme_read_string()>|Marpa::R3::Scanless::R/"lexeme_read_string()">
+and the
+L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()"> method.
 
 The location at which a parse event triggers is the B<trigger location>.
 An event may trigger at any parse location, including location 0.
@@ -386,7 +389,10 @@ trigger parse events.
 The restricted methods are
 L<C<read()>|Marpa::R3::Scanless::R/"read()">,
 L<C<resume()>|Marpa::R3::Scanless::R/"resume()">,
-L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
+L<C<lexeme_read_block()>|Marpa::R3::Scanless::R/"lexeme_read_block()">,
+L<C<lexeme_read_literal()>|Marpa::R3::Scanless::R/"lexeme_read_literal()">,
+L<C<lexeme_read_string()>|Marpa::R3::Scanless::R/"lexeme_read_string()">
+and
 L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">.
 
 This restriction applies only to methods of the recognizer
@@ -859,11 +865,14 @@ A parse exhaustion event is called B<synchronous> if it is not
 asynchronous.
 
 Parse exhaustion in the
-L<C<lexeme_read()>|Marpa::R3::Scanless::R/"lexeme_read()"> and
+L<C<lexeme_read_block()>|Marpa::R3::Scanless::R/"lexeme_read_block()">,
+L<C<lexeme_read_literal()>|Marpa::R3::Scanless::R/"lexeme_read_literal()">,
+L<C<lexeme_read_string()>|Marpa::R3::Scanless::R/"lexeme_read_string()">
+and the
 L<C<lexeme_complete()>|Marpa::R3::Scanless::R/"lexeme_complete()">
-methods is always synchronous,
-because they
-always
+methods
+is always synchronous,
+because they always
 return control to the app after every attempt to
 read input -- they never try to continue reading input.
 Parse exhaustion in
