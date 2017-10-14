@@ -1100,11 +1100,12 @@ name: recognizer lexeme_alternative() synopsis
 partial: 1
 normalize-whitespace: 1
 
-            if ( not defined $recce->lexeme_alternative($symbol_name) ) {
-                die
-                    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-            }
+    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
+    if (not $ok) {
+        my $literal = $recce->literal( $block_id, $offset, $length );
+        die qq{Parser rejected symbol named "$symbol_name" },
+            qq{at position $offset, before lexeme "$literal"};
+    }
 
 =for Marpa::R3::Display::End
 
@@ -1160,14 +1161,14 @@ name: recognizer lexeme_complete() synopsis
 partial: 1
 normalize-whitespace: 1
 
-            next TOKEN
-                if $recce->lexeme_complete( $main_block, $start_of_lexeme,
-                        ( length $lexeme ) );
+    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
 
 =for Marpa::R3::Display::End
 
-The C<lexeme_complete()> method allows an external scanner to read
-ambiguous tokens.
+The C<lexeme_complete()> is one of the low-level methods of the external scanner.
+The low-level methods allow, among other things,
+the reading of ambiguous tokens.
+C<lexeme_complete()>
 It completes the reading of a set of tokens specified by
 one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
 method
@@ -1185,8 +1186,9 @@ Every lexeme must have a span in the physical input,
 and
 C<$block_id>, C<$offset> and C<$length>
 represent that block span.
-The span is necessary, for example, to allow sensible
-error reporting.
+The span is used, among other things,
+to allow errors to be reported by location
+in a sensible way.
 The span is interpreted,
 and G1 location and current input stream location
 are adjusted,
@@ -1203,7 +1205,7 @@ On success, C<lexeme_complete()>
 returns the new current location.
 This will never be location zero, because a succesful
 call of C<lexeme_complete()> always advances the location.
-Failure is thrown as an exception.
+Failure is always thrown.
 
 =head2 lexeme_priority_set()
 
@@ -1792,11 +1794,16 @@ a PS (paragraph separator, U+2029).
 =head2 literal()
 
 =for Marpa::R3::Display
-name: recognizer literal() synopsis
+name: recognizer lexeme_alternative() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $literal_string = $recce->literal( $block_id, $start, $span_length );
+    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
+    if (not $ok) {
+        my $literal = $recce->literal( $block_id, $offset, $length );
+        die qq{Parser rejected symbol named "$symbol_name" },
+            qq{at position $offset, before lexeme "$literal"};
+    }
 
 =for Marpa::R3::Display::End
 

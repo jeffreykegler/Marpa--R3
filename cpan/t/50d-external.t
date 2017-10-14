@@ -40,18 +40,17 @@ sub lo_reader {
 
     my $ok = $recce->lexeme_alternative( $symbol_name, $value );
     if (not $ok) {
-        die
-qq{Parser rejected symbol named "$symbol_name" at position $offset, before lexeme "},
-          $recce->literal( $block_id, $offset, $length ), q{"};
+        my $literal = $recce->literal( $block_id, $offset, $length );
+        die qq{Parser rejected symbol named "$symbol_name" },
+            qq{at position $offset, before lexeme "$literal"};
     }
+
+# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: recognizer lexeme_complete() synopsis
+
     my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
-    if (not $new_offset) {
-        die
-          qq{Parser rejected symbol named "$symbol_name" },
-          qq{at position $offset, before lexeme "},
-          $recce->literal( $block_id, $offset, $length ),
-          q{"};
-    }
 
 # Marpa::R3::Display::End
 
