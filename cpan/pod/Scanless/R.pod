@@ -63,6 +63,8 @@ normalize-whitespace: 1
 This page is the reference document for the recognizer objects
 of Marpa's SLIF (Scanless interface).
 
+=head1 External and internal scanning
+
 The Scanless interface is so-called because
 it does not require the application to supply a scanner (lexer).
 The SLIF contains its own lexer,
@@ -84,77 +86,129 @@ external scanning to supplement internal
 scanning,
 or to replace the SLIF's internal scanner entirely.
 
-=head1 The input stream
+=head1 Position in Marpa
 
-The recognizer reads a virtual input stream.
-By default, this
-is identical to a physical input stream.
-The physical input stream is
-a Perl string passed as the first argument
-to the L<C<< $recce->read() >> method|/read()> method.
-Once set by the C<read()> method, the physical input
-stream cannot be changed.
+By default. position in Marpa
+is the obvious -- there is one input string.
+This input string is read one character at a time, from
+beginning, which is character 1,
+to the end, whose character number (aka B<offset>)
+is the same as the length of the string.
+More than half of all applications
+follow this model.
 
-Physical input stream location is simply
-the Perl C<pos()> location
-in the physical input string.
-Physical input stream location may be zero,
-but is never negative.
+But, with surprising frequency,
+Current practical applications
+do not fit into this model.
+Many practical languages have an "include file" facility,
+which require a reader to be able,
+at any point, to switch to a completely different input
+string.
+Many also use pre-processing which requires the reader
+to skip forward over its input strings.
+Languages which allow
+here-docs require applications to move backward and
+forward in the input.
 
-In this document,
-the phrase "input stream" and
-the word "stream",
-unless otherwise specified,
-refer to the physical input stream.
-The phrase "input stream location" and
-the word "location",
-unless otherwise specified,
-refer
-to physical input stream location.
+Marpa's underlying input model is very flexible,
+and allows all of these things and more.
+Marpa allows multiple input strings (aka C<blocks>),
+and it allows the app to switch between them
+and to change position in them.
 
-Virtual input streams complicate the idea of parse
-location,
-but they are essential for some applications.
-Implementing the C language's pre-processor directives requires
-either two passes, or
-a virtual approach to the input.
-And Perl here-documents cannot be parsed correctly
-by an application which insists on moving forward
-serially in the input.
-The
-SLIF allows applications to skip
-backward and forward in the physical input stream,
-and to read sections of the stream repeatedly.
+=head1 Block position
 
-Input streams are ordered sets of characters,
-and the locations in them are
-represented as the integers from 0 to I<N>,
-where I<N+1> is the size of the set.
-In this document, we will refer to ordered subsets of
-contiguous locations as either B<ranges> or B<spans>.
+In its full generality,
+Marpa has two idea of position.
+The first and more frequently used is B<block position>.
+The other idea of position is B<G1 position>,
+which will be discussed below.
+In these documents,
+the bare terms "location" and "position" will mean 
+block position,
+unless stated otherwise.
+
+Block position is a duple of B<block id> and
+B<block offset>.
+When the context makes the meaning clear,
+"block offset" is often simply called "offset".
+Block ids and block offsets are both 1-based.
+
+=head1 G1 position
+
+Above I described block position.
+This is what the user is usually thinking of when
+he says "position".
+Marpa also tracks position in terms of lexemes.
+A Marpa B<lexeme>
+is similar to what is meant by "token"
+elsewhere.
+The semantics of a Marpa grammar in defined
+in terms of lexemes, so that G1 position is
+important when dealing with semantics.
+
+Technically, G1 position is position in terms
+of the G1 grammar's Earley sets.
+Each Earley set except the first represents
+the reading of a lexeme.
+Earley set 0 (which is at G1 position 0)
+is before the reading of any input.
+Earley set 1 (which is at G1 position 1)
+is after the reading of the first lexeme.
+For every I<N>, Earley set I<N> is
+at G1 position I<N>, and vice versa.
+
+=head1 Negative offsets and positions
+
+Negative offsets and positions are offsets
+relative to an "end of universe",
+where the universe varies by context.
+For blocks, the universe is whatever block
+is considered "current" in context,
+and end of universe is the end of that block.
+For G1 locations, the universe is the set of
+G1 locations, and the end of universe is
+the last valid G1 location.
+
+The offset -I<N> is the same as the
+offset I<E> - I<N> + 1,
+where I<E> is the last element in the universe.
+Therefore, suppose that block 7 has a length of 42.
+Since block offsets are 1-based,
+the last character in block 7 will be at offset 42,
+and offset 42 will be the "end of universe".
+Therefore,
+
+=over 4
+
+=item *
+Block position C<7, -1>
+is the same as block position C<7, 42>.
+
+=item *
+Block position C<7, -2>
+is the same as block position C<7, 41>.
+
+=item *
+Block position C<7, -42>
+is the same as block position C<7, 1>.
+
+=back
 
 =head1 Ranges
 
+In this document, we will refer to ordered subsets of
+contiguous locations as either B<ranges> or B<spans>.
 A range is an ordered set of contiguous locations
 specified by start location and end location:
 [I<S ... E>].
-A range is a subset of a "universe" --
-some larger ordered set of locations
-0 to I<N>.
-In this document the larger sets,
-or universes, will be
-either physical input streams
-or L<G1 location streams|"G1 locations">.
-
-The start and end locations of the range
-refer to locations
-in its universe.
-Negative locations
-refer to a locations relative
-to the end of the range's universe, so that
--1 refers to the last location of the universe,
--2 refers to the second-to-last location of the universe,
-etc.
+A range is the sting of locations
+from offset I<S> to offset I<E>.
+The range is inclusive, so that
+it includes the location I<S>
+as well as the location I<E>.
+In a range of length 1,
+I<S> will be equal to I<E>.
 
 =head1 Spans
 
