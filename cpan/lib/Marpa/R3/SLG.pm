@@ -1645,11 +1645,11 @@ sub Marpa::R3::Scanless::G::l0_rules_show {
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
     my $tag = '@' . __FILE__ . ':' . __LINE__;
-    my $code = <<'END_OF_CODE';
+    my $code = <<'END_OF_LUA';
     local slg, verbose, diag = ...
     diag = diag ~= 0 -- convert diag to a boolean
     return slg:l0_rules_show({ verbose = verbose, diag = diag })
-END_OF_CODE
+END_OF_LUA
     my ($retour) = $slg->call_by_tag($tag, $code, 'ii',
         $verbose, $diag);
     return $retour;

@@ -3323,7 +3323,13 @@ Other errors are thrown.
         slr.token_values[token_ix] = token
         return lexeme_alternative_i(slr, symbol_name, token_ix)
     end
+```
 
+Returns new block offset on success.
+Always throws errors.
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
         slr:block_set(block_id)
         slr:block_move(offset)
@@ -3341,18 +3347,7 @@ Other errors are thrown.
             slr:block_move(new_offset)
             return new_offset
         end
-        if result == -2 then
-            -- Current, we do nothing with an exhausted error code
-            -- here
-
-            -- local error_code = slr.slg.g1:error_code()
-            -- if error_code == _M.err.PARSE_EXHAUSTED then
-                -- local q = slr.event_queue
-                -- q[#q+1] = { 'no acceptable input' }
-            -- end
-            return 0
-        end
-        error('Problem in slr->g1_lexeme_complete(): '
+        error('Problem in slr->lexeme_complete(): '
             ..  slr.slg.g1:error_description())
     end
 ```

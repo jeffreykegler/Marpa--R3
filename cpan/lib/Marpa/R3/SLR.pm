@@ -659,14 +659,10 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
       local slr, block_id_arg, offset_arg, length_arg = ...
       local block_id, offset, eoread
           = slr:block_check_range(block_id_arg, offset_arg, length_arg)
-      local complete_val = slr:lexeme_complete(block_id, offset, eoread-offset)
-      if complete_val == 0 then
-          local slg = slr.slg
-          slg.g1.error()
-      end
       _M.wrap(function ()
+          local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
           slr:convert_libmarpa_events(slr)
-          return 'ok', complete_val
+          return 'ok', new_offset
       end
       )
 END_OF_LUA

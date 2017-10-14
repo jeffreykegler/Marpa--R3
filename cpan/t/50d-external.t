@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -27,6 +27,35 @@ use Marpa::R3::Test;
 ## no critic (ErrorHandling::RequireCarping);
 
 use Marpa::R3;
+
+sub lo_reader {
+    my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
+    my ($block_id) = $recce->block_progress();
+    my $value = $lexeme;
+    my $length = length $value;
+    my $offset = $start_of_lexeme;
+
+# Marpa::R3::Display
+# name: recognizer lexeme_alternative() synopsis
+
+    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
+    if (not $ok) {
+        die
+qq{Parser rejected symbol named "$symbol_name" at position $offset, before lexeme "},
+          $recce->literal( $block_id, $offset, $length ), q{"};
+    }
+    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
+    if (not $new_offset) {
+        die
+          qq{Parser rejected symbol named "$symbol_name" },
+          qq{at position $offset, before lexeme "},
+          $recce->literal( $block_id, $offset, $length ),
+          q{"};
+    }
+
+# Marpa::R3::Display::End
+
+}
 
 sub hi_block_reader {
     my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
@@ -276,7 +305,9 @@ sub my_parser {
 }
 }
 
-my $value = my_parser( \&hi_block_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
+my $value = my_parser( \&lo_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
+Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
+$value = my_parser( \&hi_block_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
 Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
 $value = my_parser( \&eq_block_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
 Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );

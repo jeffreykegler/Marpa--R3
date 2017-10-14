@@ -1108,22 +1108,6 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative() undef synopsis
-partial: 1
-normalize-whitespace: 1
-
-            TODO synopsis of lexeme_alternative with undefined value
-            Also -- implement it!
-
-            if ( not defined $recce->lexeme_alternative($symbol_name) ) {
-                die
-                    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-            }
-
-=for Marpa::R3::Display::End
-
 The C<lexeme_alternative()> method
 allows an external scanner to read
 ambiguous tokens.
