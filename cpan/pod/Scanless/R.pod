@@ -321,9 +321,50 @@ and the span C<[-3, 1]>.
 
 =head1 Block spans
 
-TODO:
-Arguments are often "block spans".
-Describe these, especially the defaults.
+When a block span is part of a set of arguments,
+one or more elements of it may be undefined.
+In this case, block ID defaults to the current block,
+offset defaults to the current offset of the specified block
+and length is set according to the eoread of the
+specified block.
+More formally:
+
+A B<block span arg> is a triple
+C<< <block-id-arg>, <offset-arg>, <length-arg> >>,
+where C<block-id-arg> is undefined or a block ID,
+C<offset> is undefined or a block offset,
+and C<length> is undefined or a length in characters (codepoints).
+A block span arg specifies a triple C<< <block-id>, <offset>, <length> >>,
+in which all of the elements are defined.
+If a block span arg specifies an invalid block span,
+it is a fatal error.
+
+=over 4
+
+=item *
+When all elements of the triple are defined,
+the block ID, offset and length are as explicitly
+specified,
+and they are treated as a block span as
+described above.
+
+=item *
+If the C<block-id> is undefined,
+it specifies the current block.
+It is a fatal error if there is no current block.
+
+=item *
+If C<offset> is undefined,
+it specified the current offset of the specified block.
+It is a fatal error if there is no specified block.
+
+=item *
+If C<length> is undefined,
+the length specified is C<eoread> - C<offset> + 1,
+where C<eoread> is the eoread of the specified block.
+It is a fatal error if there is no specified block.
+
+=back
 
 =head1 Internal scanning
 
