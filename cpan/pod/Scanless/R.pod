@@ -67,15 +67,15 @@ of Marpa's SLIF (Scanless interface).
 
 The Scanless interface is so-called because
 it does not require the application to supply a scanner (lexer).
-The SLIF contains its own lexer,
-one whose use is integrated into
-its syntax.
+The Marpa DSL contains its own lexer,
+which is integrated into its syntax.
 In this document, use of the SLIF's
 internal scanner is called
 B<internal scanning>.
 
-The SLIF allows applications that find it useful to
-do their own scanning.
+Many applications that find it useful to
+do their own scanning,
+and Marpa::R3 allows this.
 When an application
 bypasses the SLIF's internal scanner
 and does its own scanning,
@@ -86,93 +86,139 @@ external scanning to supplement internal
 scanning,
 or to replace the SLIF's internal scanner entirely.
 
-=head1 Position in Marpa
-
-By default. position in Marpa
-is the obvious -- there is one input string.
-This input string is read one character at a time, from
-beginning, which is character 1,
-to the end, whose character number (aka B<offset>)
-is the same as the length of the string.
-More than half of all applications
-follow this model.
-
-But, with surprising frequency,
-Current practical applications
-do not fit into this model.
-Many practical languages have an "include file" facility,
-which require a reader to be able,
-at any point, to switch to a completely different input
-string.
-Many also use pre-processing which requires the reader
-to skip forward over its input strings.
-Languages which allow
-here-docs require applications to move backward and
-forward in the input.
-
-Marpa's underlying input model is very flexible,
-and allows all of these things and more.
-Marpa allows multiple input strings (aka C<blocks>),
-and it allows the app to switch between them
-and to change position in them.
-
 =head1 Block position
 
-In its full generality,
-Marpa has two idea of position.
-The first and more frequently used is B<block position>.
-The other idea of position is B<G1 position>,
-which will be discussed below.
-In these documents,
-the bare terms "location" and "position" will mean 
-block position,
-unless stated otherwise.
+Naively, you would expect position in the input
+to too simple to be worth mentioning in a document.
+Input is a string.  Scanning starts at the first
+position and continues to the end of the string.
+And Marpa::R3 can be used in this way.
 
-Block position is a duple of B<block id> and
-B<block offset>.
-When the context makes the meaning clear,
-"block offset" is often simply called "offset".
-Block ids and block offsets are both 1-based.
+But, with surprising frequency,
+current practical applications
+do not fit into this model.
+Many practical languages want one or more of the following
+
+=over 4
+
+=item *
+"include file" logic
+
+=item *
+"here-docs", which in one form,
+is essentially the extension of "include file"
+logic to in-line "files"
+
+=item *
+"if/else" logic, which requires the app to skip
+over sections of the input
+
+=item *
+externally scanned symbols, which do not refer
+to any text in the main input string.
+
+=back
+
+The above features require the app to switch
+among multiple input strings,
+some concocted on the fly,
+as well as the ability to jump forward
+and backward within those input strings.
+Marpa's underlying input model is very flexible,
+and allows all of these things and more.
+
+Marpa::R3 allows multiple input strings.
+In these documents, these input strings are
+called C<blocks>.
+All blocks are Unicode,
+and numbering in characters (which are the same
+as Unicode codepoints) is 1-based.
+
+Location in the input is a duple: 
+C<< <block_id, block_offset> >>,
+where C<block_id> is a B<block ID>,
+and C<block_offset> is a B<block offset>.
+Each such duple uniquely identifies a
+B<block location>.
+
+Block ID is also an integer,
+but should be treated as opaque.
+The block offset is a 1-based integer.
+The highest valid block offset is the
+length of the block in characters.
+When context makes it clear,
+the block offset is offered called
+simply the C<offset>.
+
+Once a recognizer starts reading,
+one of its blocks is always
+the B<current block>.
+All blocks, whether current or not,
+maintain a B<current offset>
+and a B<current end of read>.
+The B<current end of read> is often
+referred to as the block's B<end of read>
+or B<eoread>.
+When a block is initialized, 
+its current offset is 1 and its eoread
+is the end of block.
+
+Reading of a block past its eoread is not allowed.
+In effect,
+eoread allows an app to tell the recognizer to use
+only a portion of a block.
+
+In these documents,
+unless stated otherwise,
+the bare terms "location" and "position" will mean 
+block position as described in this section.
 
 =head1 G1 position
 
-Above I described block position.
-This is what the user is usually thinking of when
-he says "position".
-Marpa also tracks position in terms of lexemes.
-A Marpa B<lexeme>
-is similar to what is meant by "token"
-elsewhere.
-The semantics of a Marpa grammar in defined
-in terms of lexemes, so that G1 position is
-important when dealing with semantics.
+In addition to input position,
+Marpa::R3 apps sometimes have to deal with position
+in terms of lexemes.
+(Marpa::R3's lexemes are similar to what in other parsers
+are called "tokens".)
+Position in terms of lexemes
+is called B<G1 earley set position> or,
+more often,
+B<G1 position>,
+because lexemes match G1 earley set positions "one-to-one" --
+for every lexeme there is a unique G1 earley set
+and therefore a unique G1 position.
+The first lexeme is at G1 position 1,
+and the I<N>'th lexeme is at G1 position I<N>.
 
-Technically, G1 position is position in terms
-of the G1 grammar's Earley sets.
-Each Earley set except the first represents
-the reading of a lexeme.
-Earley set 0 (which is at G1 position 0)
-is before the reading of any input.
-Earley set 1 (which is at G1 position 1)
-is after the reading of the first lexeme.
-For every I<N>, Earley set I<N> is
-at G1 position I<N>, and vice versa.
+While there is a one-to-one function from lexemes
+to G1 positions, the opposite is not quite the case.
+G1 position 0 is a G1 position before the reading
+of the first lexeme.
+This means that G1 position is 0-based.
+
+G1 position is useful when dealing with the semantics.
+The semantics is defined in terms of lexemes,
+instead of block positions.
 
 =head1 Negative offsets and positions
 
-Negative offsets and positions are offsets
+In Marpa::R3, we often use
+negative offsets and positions.
+These are offsets
 relative to an "end of universe",
 where the universe varies by context.
-For blocks, the universe is whatever block
+For blocks, the universe is the ordered set of
+characters in whatever block
 is considered "current" in context,
-and end of universe is the end of that block.
-For G1 locations, the universe is the set of
+and end of universe is the last character of the ordered set.
+For G1 locations, the universe is the ordered set of
 G1 locations, and the end of universe is
-the last valid G1 location.
+the last G1 location of that ordered set.
 
 The offset -I<N> is the same as the
 offset I<E> - I<N> + 1,
-where I<E> is the last element in the universe.
+where I<E> is the positive
+offset of the "end of universe" element.
 Therefore, suppose that block 7 has a length of 42.
 Since block offsets are 1-based,
 the last character in block 7 will be at offset 42,
