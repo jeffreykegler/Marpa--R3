@@ -214,9 +214,29 @@ to make sure they're consistent and consistently up to date.
 `( <a> <b> <c>)`
 to `(- <a> <b> <c>-)`.
 
+* Remove `{}` syntax for grouping statements.
+
 * Rename grammar, recognizer methods, classes.
 
 * Change lexeme priorities from per-location to absolute.
+
+* Clean up DSL syntax.  Eliminate, or reduce use of,
+or make more orthogonal use of,
+pseudo-rules and pseudo-symbols.
+I have in mind the following constructs:
+
+    - Start pseudo-rule: `:start ::= Script`
+
+    - Discard pseudo-rule: `:discard ~ whitespace event => ws`
+      and `:discard ~ [,] event => comma=off`
+
+    - Lexeme pseudo-rule: `:lexeme ~ <say keyword> priority => 1`
+
+    - Default pseudo-rule: `:default ::= action => [symbol, name, values]`
+    
+    - Discard default statement: `discard default = event => :symbol=on`
+
+    - Lexeme default statement: `lexeme default = action => [ name, value ]`
 
 ### To Do
 
