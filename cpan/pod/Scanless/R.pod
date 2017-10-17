@@ -176,7 +176,7 @@ block position as described in this section.
 
 =head1 G1 position
 
-In addition to input position,
+In addition to block position,
 Marpa::R3 apps sometimes have to deal with position
 in terms of lexemes.
 (Marpa::R3's lexemes are similar to what in other parsers
@@ -191,15 +191,19 @@ and therefore a unique G1 position.
 The first lexeme is at G1 position 1,
 and the I<N>'th lexeme is at G1 position I<N>.
 
-While there is a one-to-one function from lexemes
-to G1 positions, the opposite is not quite the case.
+While there is a
+G1 positions for every lexeme,
+the opposite is not the case.
+G1 position is 0-based.
 G1 position 0 is a G1 position before the reading
-of the first lexeme.
-This means that G1 position is 0-based.
+of the first lexeme,
+and therefore 
+G1 position 0 does not correspond to any lexeme.
 
 G1 location can be ignored most of the time,
 but it
-is useful for tracing the G1 grammar.
+is useful for tracing the G1 grammar
+and for advanced techniques.
 
 =head1 Negative offsets and positions
 
@@ -208,17 +212,24 @@ negative offsets and positions.
 These are offsets
 relative to an "end of universe",
 where the universe varies by context.
+
 For blocks, the universe is the ordered set of
-characters in whatever block
-is considered "current" in context,
-and end of universe is the last character of the ordered set.
+characters in the input text block
+under discussion,
+and end of universe is the last character of this ordered set --
+its B<physical end of block>.
+Eoread does not affect end-of-universe.
+A block's eoread may be different from its physical end-of-block,
+but a block's end-of-universe is always its 
+physical end-of-block.
+
 For G1 locations, the universe is the ordered set of
 G1 locations, and the end of universe is
 the last G1 location of that ordered set.
 
-The offset -I<N> is the same as the
-offset I<E> - I<N> + 1,
-where I<E> is the positive
+The negative offset -I<N> is the same as the
+offset I<EOU> - I<N> + 1,
+where I<EOU> is the positive
 offset of the "end of universe" element.
 Therefore, suppose that block 7 has a length of 42.
 Since block offsets are 1-based,
@@ -249,9 +260,10 @@ contiguous locations as either B<ranges> or B<spans>.
 A range is an ordered set of contiguous locations
 specified by start location and end location:
 [I<S ... E>].
-A range is the sting of locations
+Alternatively, a range can be seen
+as the string of locations
 from offset I<S> to offset I<E>.
-The range is inclusive, so that
+A range is inclusive, so that
 it includes the location I<S>
 as well as the location I<E>.
 In a range of length 1,
@@ -280,25 +292,26 @@ But when fencepost issues are important,
 spans require a lot of mental arithmetic,
 and a discussion that uses ranges is easier to follow.
 
-As examples,
+For the sake of some examples,
+consider again an input text block of length 100.
 
 =over
 
 =item *
 
-The entire input stream is the range C<[0 ... -1]>
-and the span C<[0, -1]>.
+The entire block is the range C<[1 ... -1]>
+and the span C<[1, -1]>.
 
 =item *
 
-The first 42 characters of the input stream are the range C<[0 ... 41]>
-and the span C<[0, 42]>.
+The first 42 characters of the input stream are the range C<[1 ... 42]>
+and the span C<[1, 42]>.
 
 =item *
 
-The entire input stream, except for the last character,
-is the range C<[0 ... -2]>
-and the span C<[0, -2]>.
+The entire block, except for the last character,
+is the range C<[1 ... -2]>
+and the span C<[1, -2]>.
 
 =item *
 
@@ -322,53 +335,18 @@ and the span C<[-3, 1]>.
 
 =head1 Block spans
 
-When a block span is part of a set of arguments,
-one or more elements of it may be undefined.
-In this case, block ID defaults to the current block,
-offset defaults to the current offset of the specified block
-and length is set according to the eoread of the
+A B<block span> is a span in terms of block location,
+specified as a triple
+C<< <block_id>, <offset>, <length> >>.
+Sometimes one or more elements of a block span are undefined.
+(For example, this can happen when a block span is part of a set of arguments.)
+
+In this case, C<block_id> ID defaults to the current block,
+C<offset> defaults to the current offset of the specified block
+and C<length> is set so that the span is to the eoread of the
 specified block.
-More formally:
-
-A B<block span arg> is a triple
-C<< <block-id-arg>, <offset-arg>, <length-arg> >>,
-where C<block-id-arg> is undefined or a block ID,
-C<offset> is undefined or a block offset,
-and C<length> is undefined or a length in characters (codepoints).
-A block span arg specifies a triple C<< <block-id>, <offset>, <length> >>,
-as follows:
-in which all of the elements are defined.
-If a block span arg specifies an invalid block span,
-it is a fatal error.
-
-=over 4
-
-=item *
-C<block_id> is C<block-id-arg> if 
-C<block-id_arg> is defined.
-Otherwise C<block-id> is the current block.
-
-=item *
-C<offset> is C<offset-arg> if 
-C<offset-arg> is defined.
-Otherwise C<offset> is the current offset
-of C<block_id>.
-
-=item *
-C<length> is C<length-arg> if 
-C<length-arg> is defined.
-Otherwise C<length> is
-C<eoread> - C<offset> + 1,
-where C<eoread> is the eoread of block C<block-id>,
-
-=item *
-It is a fatal error if C<block-id> remains undefined;
-if C<block-id> is defined and C<offset> is outside of it;
-if C<block-id> is defined and C<offset> + C<length> - 1 is outside of it;
-or
-if C<block-id> is defined and C<offset> + C<length> - 1 is before C<offset>.
-
-=back
+Block span is defined more formally
+L<below|/"Block span details">.
 
 =head1 Internal scanning
 
@@ -383,37 +361,51 @@ the C<read()> method.
 C<read()> can also be reinvoked to start reading a new input block.
 See L<the description of C<read()>|/"read()"> for details.
 
-The C<read()> method may terminate early if you have defined an "event",
-and it is triggered.
-In this case,
+=head1 External scanning
+
+External scanning allows the app to take direct control of the scanning of lexemes.
+External scanning is usually, and most simply,
+performed by reading lexemes using one of the
+C<$recce->lexeme_read_*()> series of methods.
+
+The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
+allows the reading of a string, where the string is treated as both
+the literal equivalent of the input, and its value for semantics.
+The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
+is similar, but the string is specified as a block span.
+The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
+is the most general of the top-level external scanning methods --
+it allows the app to specify both a block span and an explicit value
+for the semantics.
+
+For more advanced applications,
+including the reading of ambiguous lexemes,
+there are the low-level external scanning methods:
+L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
+L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()">.
+
+External scanning can be mixed with internal scanning --
+this allows you to get the best of both.
+An application can
+terminate the internal scanning of
+the C<read()> method early, if it has defined an "event",
+and that event triggers.
+Afterwards,
 internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
 For details,
 see L<the description of C<resume()> below|/"resume()">,
 as well as
 L<the separate document for events|Marpa::R3::Event>.
 
-=head1 External scanning
+=head1 Direct block manipulation
 
-External scanning is usually performed by reading lexemes using the
-L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
-and
-L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
-which
-allows the reading of unambiguous lexemes.
-If ambiguous lexemes are needed, then
-the L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
-L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()"> methods can be used.
-
-=head2 Literals and G1 spans
-
-It is sometimes
-useful to find the literal substring
-of the physical input stream which corresponds to a span
-of G1 locations.
-If an application reads the physical stream in sequence within the G1 span,
-Marpa "does what you mean".
-For more complicated cases, the exact rules are described
-L<below|/"G1 literal details">.
+As mentioned, Marpa::R3 does scanning by treating its input as a series of
+input text blocks.
+Advanced applications may want to manipulate these directly.
+Direct block manipulations
+can be useful for both internal and external scanning.
+The block methods are
+L<described below|/"Block methods">.
 
 =head1 Recognizer settings
 
@@ -467,6 +459,7 @@ overrides the activation setting in the grammar.
 The setting will be in effect
 before events at earleme 0 are triggered,
 and before any of the input stream is read.
+
 The L<C<activate()> method|/"activate()">
 can also be used to change an event's activation
 setting for events that trigger after earleme 0.
@@ -476,7 +469,6 @@ trigger during
 the L<recognizer's C<new() method>|/"Constructor"> --
 they can not be affected
 by calls of the C<activate()> method.
-
 If an event is initialized to inactive
 in the grammar,
 the C<event_is_active> recognizer setting
@@ -518,18 +510,18 @@ The C<event_handlers> recognizer setting
 sets the callbacks which handle events.
 Its value should be a reference to a hash,
 in which the key of every entry is an event name,
-call it C<ev>.
-The values of the hash must be anonymous functions.
-For event C<ev>,
-call C<fn> the anonymous function that is
-the value of the C<event_handlers> hash.
-Then event C<ev> will be handled by calling function
+and 
+each value of the hash must be an anonymous function.
+For an individual entry of this hash,
+call the key C<ev>
+and call its value C<func>.
+Event C<ev> will be handled by calling function
 C<fn>.
 
 If any event occurs which does not have a handler,
 it is a fatal error.
 The C<event_handler> named argument is only allowed
-by the L<C<recognizer's new() method>|/"Constructor">.
+with the L<C<recognizer's new() method>|/"Constructor">.
 Full details of the use of event handlers,
 with many examples,
 are in
@@ -542,7 +534,7 @@ a SLIF grammar object.
 The C<new()> method is required to have
 a C<grammar> setting.
 The C<grammar> setting is only allowed
-by the L<C<new() method>|/"Constructor">.
+with the L<C<new() method>|/"Constructor">.
 Once the recognizer is created, the grammar cannot be
 changed.
 
@@ -1483,7 +1475,7 @@ returns a substring of the input
 stream.
 A G1 length of zero will produce the zero-length string.
 
-=head2 g1_pos
+=head2 g1_pos()
 
 =for Marpa::R3::Display
 name: Scanless g1_pos() synopsis
@@ -1801,6 +1793,48 @@ Often they are formal or mathematical.
 While some people find these helpful, others find them distracting,
 which is why
 they are segregated here.
+
+=head2 Block span details
+
+A B<block span arg> is a triple
+C<< <block-id-arg>, <offset-arg>, <length-arg> >>,
+where C<block-id-arg> is undefined or a block ID,
+C<offset> is undefined or a block offset,
+and C<length> is undefined or a length in characters (codepoints).
+A block span arg specifies a triple C<< <block-id>, <offset>, <length> >>,
+as follows:
+in which all of the elements are defined.
+If a block span arg specifies an invalid block span,
+it is a fatal error.
+
+=over 4
+
+=item *
+C<block_id> is C<block-id-arg> if 
+C<block-id_arg> is defined.
+Otherwise C<block-id> is the current block.
+
+=item *
+C<offset> is C<offset-arg> if 
+C<offset-arg> is defined.
+Otherwise C<offset> is the current offset
+of C<block_id>.
+
+=item *
+C<length> is C<length-arg> if 
+C<length-arg> is defined.
+Otherwise C<length> is
+C<eoread> - C<offset> + 1,
+where C<eoread> is the eoread of block C<block-id>,
+
+=item *
+It is a fatal error if C<block-id> remains undefined;
+if C<block-id> is defined and C<offset> is outside of it;
+if C<block-id> is defined and C<offset> + C<length> - 1 is outside of it;
+or
+if C<block-id> is defined and C<offset> + C<length> - 1 is before C<offset>.
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
