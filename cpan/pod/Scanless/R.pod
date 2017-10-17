@@ -403,63 +403,6 @@ If ambiguous lexemes are needed, then
 the L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
 L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()"> methods can be used.
 
-Scanning must always begin with a call
-to the L<C<read()>|/"read()"> method,
-so that, in a pedantic sense, scanning always begins with internal scanning.
-But the first input string may be zero length:
-
-=for Marpa::R3::Display
-name: recognizer read() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    $recce->read( \$string, 0, 0 );
-
-=for Marpa::R3::Display::End
-
-and there is no requirement that internal scanning ever be resumed.
-
-=head2 External lexemes and the input stream
-
-For error message and other purposes,
-even externally scanned lexemes
-are required to correspond to a span of the input stream.
-An external scanner
-must set up a relationship to the input stream,
-even if that relationship is completely artificial.
-
-TODO: rewrite this.
-
-Here is
-one very general way to deal with external lexemes
-which have no natural mapping into
-the physical input stream.
-We will call what would ordinarily be the input string, the "natural input".
-To form the physical input stream, we append these 7 characters:
-"C<NO TEXT>".
-For example, if the natural input is "C<Hi! I am the real input>",
-then the physical input stream will be
-
-=for Marpa::R3::Display
-ignore: 1
-
-    "Hi! I am the real inputNO TEXT"
-
-=for Marpa::R3::Display::End
-
-To read the natural input,
-we will use
-an initial call to the L<C<read()>|/"read()"> method
-of the form
-C<< $recce->read($input_string, -8) >>.
-If we want to read a lexeme
-which has no real relationship
-to the natural input,
-we can read it externally,
-using the
-L<C<lexeme_read_block()>|/"lexeme_read_block()">
-method call.
-
 =head2 Literals and G1 spans
 
 It is sometimes
@@ -468,111 +411,8 @@ of the physical input stream which corresponds to a span
 of G1 locations.
 If an application reads the physical stream in sequence within the G1 span,
 Marpa "does what you mean".
-For more complicated cases, the exact rules are described in
-this section.
-
-Except for G1 location zero,
-every G1 location I<X> corresponds
-to one or more characters
-in the physical input stream.
-Let [I<s(X) ... e(X)>] be
-the physical input stream range that corresponds to
-G1 location I<X>.
-Only two things are guaranteed about I<s(X)> and I<e(X)> as
-a function of I<X>:
-
-=over 4
-
-=item *
-
-I<s(X)> and I<e(X)> are not defined when I<X> is zero.
-
-=item *
-It will always be the case that
-I<< s(X) <= e(X) >>.
-
-=back
-
-In mapping ranges of G1 locations to ranges of physical
-input stream locations, there are several complications:
-
-=over 4
-
-=item *
-
-There is a fencepost versus interval issue:
-physical input stream locations correspond to characters,
-but G1 locations are locations before and after characters.
-
-=item *
-
-Both kinds of locations are zero-based,
-but G1 location 0 does not corresponds to a range in
-the physical input stream.
-
-=item *
-
-Scanning is allowed to skip backward and forward,
-so the mapping of G1 location to physical stream locations
-is not necessarily monotonic.
-For example, if I<X> and I<Y> are G1 locations
-such that I<< X < Y >>,
-it is possible that
-I<< s(X) > e(Y) >>.
-
-=item *
-
-Repeated scanning of the same physical input stream locations
-is allowed, as well as overlaps.
-For example, if I<X> and I<Y> are G1 locations,
-it is possible that
-I<< s(X) < s(Y) < e(X) < e(Y) >>.
-
-=item *
-
-Even when there is a monotonic function from G1 location to physical
-input stream span,
-there will usually be gaps.
-For example, applications typically discard whitespace.
-This means that if I<W> is the physical input stream location of
-a whitespace character,
-there will be no G1 location I<X> such that
-I<< s(X) <= W <= e(X) >>.
-
-=back
-
-To cope with these situations,
-the following rules are used when
-translating G1 locations into literal substrings
-of the physical input stream.
-
-=over 4
-
-=item *
-
-If [I<X ... Y>] is a G1 range,
-and
-I<< s(X) < e(Y) >>,
-the literal will be
-substring made of the characters in the
-physical input stream range [I<s(X) ... e(Y)>].
-
-=item *
-
-If I<< s(X) >= e(Y) >>,
-the literal will be the empty string.
-
-=back
-
-For applications which read the physical input stream in lexical order,
-without skipping forward,
-the above rules will work as expected.
-For other applications,
-the above may be "close enough".
-But some applications
-may want to use custom logic to reassemble the input
-from the physical input stream.
-The L</"literal()"> method can assist in this process.
+For more complicated cases, the exact rules are described
+L<below|/"G1 literal details">.
 
 =head1 Recognizer settings
 
@@ -1641,13 +1481,6 @@ the C<g1_literal()> method
 returns a substring of the input
 stream.
 A G1 length of zero will produce the zero-length string.
-
-The substring of the input stream is determined on the assumption
-that the application reads the input in lexical order and
-without gaps
-except for whitespace and other normal discards.
-When this is not the case, the substring is determined as
-L<described above|/"Literals and G1 spans">.
 
 =head2 g1_pos
 
