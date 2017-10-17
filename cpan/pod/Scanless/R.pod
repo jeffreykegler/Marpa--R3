@@ -60,20 +60,14 @@ normalize-whitespace: 1
 
 =head1 About this document
 
-This page is the reference document for the recognizer objects
-of Marpa's SLIF (Scanless interface).
-
-=head1 External and internal scanning
-
-The Scanless interface is so-called because
-it does not require the application to supply a scanner (lexer).
-The Marpa DSL contains its own lexer,
-which is integrated into its syntax.
+This page is the reference document for Marpa::R3's recognizer objects.
+The Marpa::R3 DSL contains its own B<internal scanner>,
+integrated into its syntax.
 In this document, use of the SLIF's
 internal scanner is called
 B<internal scanning>.
 
-Many applications that find it useful to
+Many applications find it useful or necessary to
 do their own scanning,
 and Marpa::R3 allows this.
 When an application
@@ -81,23 +75,21 @@ bypasses the SLIF's internal scanner
 and does its own scanning,
 this document calls it
 B<external scanning>.
-An application can use
-external scanning to supplement internal
-scanning,
-or to replace the SLIF's internal scanner entirely.
+External scanning can be used instead of internal scanning,
+but Marpa::R3 also allows application to switch back and
+forth between internal and external scanning.
 
 =head1 Block position
 
-Naively, you would expect position in the input
-to too simple to be worth mentioning in a document.
-Input is a string.  Scanning starts at the first
-position and continues to the end of the string.
-And Marpa::R3 can be used in this way.
+By default, input in Marpa::R3
+is extremely simple.
+The input is provided as a pointer to a string.
+Scanning starts at the first
+position and continues to the last character of the string.
+Many applications fit this model.
 
-But, with surprising frequency,
-current practical applications
-do not fit into this model.
-Many practical languages want one or more of the following
+But many practical applications
+want one or more of the following
 
 =over 4
 
@@ -105,8 +97,9 @@ Many practical languages want one or more of the following
 "include file" logic
 
 =item *
-"here-docs", which in one form,
-is essentially the extension of "include file"
+"here-docs",
+which in one form,
+are essentially the extension of "include file"
 logic to in-line "files"
 
 =item *
@@ -124,15 +117,18 @@ among multiple input strings,
 some concocted on the fly,
 as well as the ability to jump forward
 and backward within those input strings.
-Marpa's underlying input model is very flexible,
-and allows all of these things and more.
+Marpa::R3's input model
+allows all of these things and more.
 
 Marpa::R3 allows multiple input strings.
 In these documents, these input strings are
-called C<blocks>.
-All blocks are Unicode,
-and numbering in characters (which are the same
-as Unicode codepoints) is 1-based.
+called C<input text blocks> or,
+more often,
+C<blocks>.
+All blocks are Unicode.
+Characters in Marpa::R3 are
+Unicode codepoints.
+Numbering of characters is 1-based.
 
 Location in the input is a duple: 
 C<< <block_id, block_offset> >>,
@@ -141,8 +137,10 @@ and C<block_offset> is a B<block offset>.
 Each such duple uniquely identifies a
 B<block location>.
 
-Block ID is also an integer,
-but should be treated as opaque.
+A block ID uniquely identifies a block.
+Block ID happens to be an integer,
+but it should be treated as opaque.
+
 The block offset is a 1-based integer.
 The highest valid block offset is the
 length of the block in characters.
@@ -152,7 +150,10 @@ simply the C<offset>.
 
 Once a recognizer starts reading,
 one of its blocks is always
-the B<current block>.
+the B<current input text block>,
+or
+B<current block>.
+
 All blocks, whether current or not,
 maintain a B<current offset>
 and a B<current end of read>.
@@ -161,7 +162,7 @@ referred to as the block's B<end of read>
 or B<eoread>.
 When a block is initialized, 
 its current offset is 1 and its eoread
-is the end of block.
+is the last character of the block.
 
 Reading of a block past its eoread is not allowed.
 In effect,
