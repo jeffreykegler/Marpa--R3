@@ -335,6 +335,7 @@ where C<block-id-arg> is undefined or a block ID,
 C<offset> is undefined or a block offset,
 and C<length> is undefined or a length in characters (codepoints).
 A block span arg specifies a triple C<< <block-id>, <offset>, <length> >>,
+as follows:
 in which all of the elements are defined.
 If a block span arg specifies an invalid block span,
 it is a fatal error.
@@ -342,103 +343,53 @@ it is a fatal error.
 =over 4
 
 =item *
-When all elements of the triple are defined,
-the block ID, offset and length are as explicitly
-specified,
-and they are treated as a block span as
-described above.
+C<block_id> is C<block-id-arg> if 
+C<block-id_arg> is defined.
+Otherwise C<block-id> is the current block.
 
 =item *
-If the C<block-id> is undefined,
-it specifies the current block.
-It is a fatal error if there is no current block.
+C<offset> is C<offset-arg> if 
+C<offset-arg> is defined.
+Otherwise C<offset> is the current offset
+of C<block_id>.
 
 =item *
-If C<offset> is undefined,
-it specified the current offset of the specified block.
-It is a fatal error if there is no specified block.
+C<length> is C<length-arg> if 
+C<length-arg> is defined.
+Otherwise C<length> is
+C<eoread> - C<offset> + 1,
+where C<eoread> is the eoread of block C<block-id>,
 
 =item *
-If C<length> is undefined,
-the length specified is C<eoread> - C<offset> + 1,
-where C<eoread> is the eoread of the specified block.
-It is a fatal error if there is no specified block.
+It is a fatal error if C<block-id> remains undefined;
+if C<block-id> is defined and C<offset> is outside of it;
+if C<block-id> is defined and C<offset> + C<length> - 1 is outside of it;
+or
+if C<block-id> is defined and C<offset> + C<length> - 1 is before C<offset>.
 
 =back
 
 =head1 Internal scanning
 
-The virtual input stream is a series of input strings.
-An input string is a substring
-of the physical input stream.
-By default the virtual input stream consists of
-exactly one input string,
-one which begins at location 0 in the physical input stream
-and whose length is the length of the physical input stream.
+The easiest way to scan is to define a lexer in the Marpa::R2 DSL
+and use Marpa::R2's internal scanner,
+by invoking the L<C<read()>|/"read()"> method.
+The C<read()> method takes a pointer to a string as one of its
+arguments, and this is used as the block.
+By default, the input block is read from its first character to its last character.
+This behavior can be changed with arguments to
+the C<read()> method.
+C<read()> can also be reinvoked to start reading a new input block.
+See L<the description of C<read()>|/"read()"> for details.
 
-The SLIF always starts scanning using the L<C<read()>|/"read()">
-method, and
-the first input string is specified, implicitly or explicitly,
-by the L<C<read()>|/"read()"> method.
-When not specified, the
-input string
-for C<read()> defaults to the range [I<0 ... -1>].
-
-L<C<read()>|/"read()"> will return success when it reaches the end of its
-input string, or when a SLIF parse event triggers.
-(Parse events are described in
-L<a separate
-document|Marpa::R3::Event>.)
-In many cases there are no parse events declared,
-or none trigger.
-If no parse event triggers
-and the parse does not fail,
-then C<read()> will read to the end of string.
-
-The SLIF tracks a C<current location> in the physical input stream.
-On return from
-the C<read()> method,
-current location will depend on the reason for the return.
-If a
-L<SLIF parse event|Marpa::R3::Event>
-triggered, the current location will be
-the event location;
-otherwise the current location will be at the end of the
-input string.
-
-The C<read()> method may only be called once for a recognizer,
-but internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
-The C<resume()> method, as the name suggests,
-resumes the internal scanning with a new input string.
-This input string must always be a substring
-of the physical input stream
-that was specified to the C<read()> method.
-By default, the new input string runs from the current location
-to the end of the physical input stream.
-
-On successful return from the
-L<C<resume()>|/"resume()"> method,
-the current location is set in the same way as it for the
-L<C<read()>|/"read()"> method:
-the event location, if an event triggered;
-otherwise, the end of string.
-The L<C<resume()>|/"resume()"> method may be called repeatedly,
-until the application considers the virtual input stream
-complete.
-More details are in the reference descriptions
-of the
-L<C<read()>|/"read()"> and
-L<C<resume()>|/"resume()"> methods, below.
-
-When the application considers input complete,
-and is ready to produce a parse value,
-the L<C<< $recce->value() >> method|/"value()"> method
-is used.
-In most cases, this is all that is needed.
-But Marpa also allows repeated passes over the same input
-with different settings.
-More details on the semantics are provided in
-L<a separate document|Marpa::R3::Semantics>.
+The C<read()> method may terminate early if you have defined an "event",
+and it is triggered.
+In this case,
+internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
+For details,
+see L<the description of C<resume()> below|/"resume()">,
+as well as
+L<the separate document for events|Marpa::R3::Event>.
 
 =head1 External scanning
 
@@ -2007,6 +1958,15 @@ mnemonic name,
 the application must provide that name explicitly,
 by specifying the character class
 or quoted string in an L0 rule.
+
+=head1 Details
+
+This section contains additional explanations, not essential to understanding
+the rest of this document.
+Often they are formal or mathematical.
+While some people find these helpful, others find them distracting,
+which is why
+they are segregated here.
 
 =head1 COPYRIGHT AND LICENSE
 
