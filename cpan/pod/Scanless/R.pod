@@ -196,9 +196,9 @@ G1 position 0 is a G1 position before the reading
 of the first lexeme.
 This means that G1 position is 0-based.
 
-G1 position is useful when dealing with the semantics.
-The semantics is defined in terms of lexemes,
-instead of block positions.
+G1 location can be ignored most of the time,
+but it
+is useful for tracing the G1 grammar.
 
 =head1 Negative offsets and positions
 
@@ -508,61 +508,6 @@ we can read it externally,
 using the
 L<C<lexeme_read_block()>|/"lexeme_read_block()">
 method call.
-
-=head1 G1 locations
-
-In addition to input stream location,
-the SLIF also tracks G1 location.
-G1 locations run from 0 to I<N>,
-where I<N+1> is the length of the input stream.
-The conventions
-and notation
-for numbering G1 locations
-and for describing G1 spans and ranges
-are the same as for input stream locations.
-
-G1 location can be ignored most of the time,
-but it does become relevant
-when tracing the G1 grammar,
-and when dealing with ambiguous terminals.
-(For those familiar with Marpa's internals,
-the G1 location is the G1 Earley set index.)
-
-Because lexemes may be ambiguous,
-more than one lexeme may be read
-at a single G1 location.
-We can think of the lexemes read at a single
-G1 location as a set -- call it the B<G1 lexeme set>,
-or, for brevity, the B<G1 set>.
-If a lexeme is unambiguous,
-its G1 set will contain exactly one lexeme.
-
-G1 location can be thought of
-as location in terms of
-boundaries of G1 sets,
-so that the
-the first G1 set starts at G1 location 0
-and ends at G1 location 1.
-When we speak of a G1 set B<at> G1 location I<L>,
-we refer to the G1 set ending at G1 location I<L>.
-That means that there is no G1 set at
-G1 location 0.
-
-As each G1 set is read,
-G1 location
-increases by one.
-B<G1 length>
-is length calculated in terms of G1 locations.
-For example, if a span of G1 locations which begin at G1 location
-42 and has length 2,
-it will contain a pair of G1 locations: G1 location 42 and G1 location 43.
-
-Sometimes it is convenient to think of
-a G1 location as corresponding to a single input stream location.
-When this is the case,
-what is meant is the location
-at the end of physical input stream span:
-C<$span_start+$span_length>.
 
 =head2 Literals and G1 spans
 
