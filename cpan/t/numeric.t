@@ -69,22 +69,32 @@ for my $maximal ( 0, 1 ) {
     my $input        = 'a' x $input_length;
     $recce->read( \$input );
 
+    # Silence message when trace_terminals is turned on
+
 # Marpa::R3::Display
 # name: SLIF recognizer set() synopsis
 
-    $recce->set( { max_parses => 42 } );
+    my $trace_fh;
+    $recce->set( { trace_file_handle => $trace_fh } );
 
 # Marpa::R3::Display::End
+
+    $recce->set( { trace_file_handle => \*STDERR } );
 
     for my $i ( 0 .. $input_length ) {
         my $expected = $maximal ? \@maximal : \@minimal;
         my $name     = $maximal ? 'maximal' : 'minimal';
 
-        my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce, end => $i } );
+        my $valuer = Marpa::R3::Scanless::V->new(
+            {
+                recognizer => $recce,
+                end        => $i,
+                max_parses => 42
+            }
+        );
         my $result = $valuer->value();
         die "No parse" if not defined $result;
-        Test::More::is( ${$result}, $expected->[$i],
-            "$name parse, length=$i" );
+        Test::More::is( ${$result}, $expected->[$i], "$name parse, length=$i" );
     } ## end for my $i ( 0 .. $input_length )
 
 }

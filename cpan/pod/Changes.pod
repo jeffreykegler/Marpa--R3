@@ -98,17 +98,27 @@ advanced techniques,
 there is a L<new
 value object|Marpa::R3::Scanless::V>.
 
-=head2 Options moved from recognizer to grammar
+=head2 Recognizer named arguments
 
 The C<exhaustion>,
 C<ranking_method>,
 C<rejection>,
 C<semantics_package>,
 and C<trace_actions>
-named arguments
-are grammar options in Marpa::R3.
-They were
-recognizer name arguments in Marpa::R2,
+recognizer named arguments
+of Marpa::R2
+have been removed.
+In Marpa::R3,
+they have become
+are named arguments of grammar objects.
+
+The C<max_parses>
+recognizer named argument
+of Marpa::R2
+has been removed.
+In Marpa::R3,
+it has become a named argument of
+the new valuator objects.
 
 =head2 Actions that are Perl names must resolve to subroutines
 

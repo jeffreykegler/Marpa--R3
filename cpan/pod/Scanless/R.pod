@@ -538,27 +538,6 @@ with the L<C<new() method>|/"Constructor">.
 Once the recognizer is created, the grammar cannot be
 changed.
 
-=head2 max_parses
-
-If non-zero, causes a fatal error when that number
-of parse results is exceeded.
-C<max_parses> is useful to
-limit CPU usage and output length when testing
-and debugging.
-Stable and production applications may
-prefer to count the number of parses,
-and take a less Draconian response when the
-count is exceeded.
-
-The value must be an integer.
-If it is zero, there will be no
-limit on the number of parse results returned.
-The default is for
-there to be no limit.
-The C<max_parses> setting is valid for both
-the recognizer's L<C<new()>|/"Constructor">
-and its L<C<set()>|/"set()"> method.
-
 =head2 too_many_earley_items
 
 The C<too_many_earley_items> setting is optional,
@@ -764,7 +743,8 @@ normalize-whitespace: 1
 name: SLIF recognizer set() synopsis
 normalize-whitespace: 1
 
-    $recce->set( { max_parses => 42 } );
+    my $trace_fh;
+    $recce->set( { trace_file_handle => $trace_fh } ); 
 
 =for Marpa::R3::Display::End
 

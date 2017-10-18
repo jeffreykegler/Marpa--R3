@@ -233,7 +233,7 @@ I have in mind the following constructs:
     - Lexeme pseudo-rule: `:lexeme ~ <say keyword> priority => 1`
 
     - Default pseudo-rule: `:default ::= action => [symbol, name, values]`
-    
+
     - Discard default statement: `discard default = event => :symbol=on`
 
     - Lexeme default statement: `lexeme default = action => [ name, value ]`
@@ -2271,7 +2271,6 @@ This is a registry object.
     class_slr_fields.l0_irls = true
     class_slr_fields.irls = true
     class_slr_fields.lexeme_queue = true
-    class_slr_fields.max_parses = true
     class_slr_fields.per_es = true
     class_slr_fields.regix = true
     class_slr_fields.slg = true
@@ -2355,7 +2354,6 @@ together.
         slr.codepoint = nil
         slr.inputs = {}
 
-        slr.max_parses = nil
         slr.per_es = {}
         slr.current_block = nil
 
@@ -2516,7 +2514,6 @@ the recognizer's Lua-level settings.
     function _M.class_slr.common_set(slr, flat_args, extra_args)
         local ok_args = {
             trace_terminals = true,
-            max_parses = true,
             too_many_earley_items = true,
             trace_values = true
         }
@@ -2557,18 +2554,6 @@ the recognizer's Lua-level settings.
                 coroutine.yield('trace', 'Setting trace_terminals option')
             end
             slr.trace_terminals = value
-        end
-
-        -- max_parses named argument --
-        raw_value = flat_args.max_parses
-        if raw_value then
-            local value = math.tointeger(raw_value)
-            if not value then
-               error(string.format(
-                   'Bad value for "max_parses" named argument: %s',
-                   inspect(raw_value)))
-            end
-            slr.max_parses = value
         end
 
         -- trace_values named argument --
@@ -4379,6 +4364,7 @@ This is a registry object.
 ```
     -- miranda: section+ class_slv field declarations
     class_slv_fields.slr = true
+    class_slv_fields.max_parses = true
     class_slv_fields.regix = true
     class_slv_fields.this_step = true
     class_slv_fields.lmw_b = true
@@ -4441,6 +4427,7 @@ which is not kept in the registry.
         local g1r = slr.g1
 
         slv.trace_values = slr.trace_values or 0
+        slv.max_parses = nil
         slv:common_set(flat_args, {'end'})
 
         local end_of_parse = slv.end_of_parse
@@ -4485,6 +4472,7 @@ the valuator's Lua-level settings.
     function _M.class_slv.common_set(slv, flat_args, extra_args)
         local ok_args = {
             ['end'] = true,
+            max_parses = true,
             trace_values = true
         }
         if extra_args then
@@ -4532,6 +4520,18 @@ the valuator's Lua-level settings.
             slv.end_of_parse = value
         end
 
+        -- 'max_parses' named argument --
+        raw_value = flat_args.max_parses
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "max_parses" named argument: %s',
+                   inspect(raw_value)))
+            end
+            slv.max_parses = value
+        end
+
     end
 ```
 
@@ -4562,7 +4562,7 @@ the valuator's Lua-level settings.
             local lmw_t = slv.lmw_t
             local lmw_o = slv.lmw_o
 
-            local max_parses = slr.max_parses
+            local max_parses = slv.max_parses
             local parse_count = lmw_t:parse_count()
             if max_parses and parse_count > max_parses then
                 error(string.format("Maximum parse count (%d) exceeded", max_parses));

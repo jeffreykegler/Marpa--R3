@@ -107,22 +107,20 @@ for my $n ( 1 .. 12 ) {
 
     # Set max_parses just in case there's an infinite loop.
     # This is for debugging, after all
-    my $recce = Marpa::R3::Scanless::R->new(
-        {   grammar           => $g,
-            max_parses        => 300
-        }
-    );
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $g, } );
     $recce->read( \'6-', 0, 1 );
     $recce->resume( 1, 1 ) for 1 .. $n;
     $recce->resume( 0, 1 );
     my $parse_count = 0;
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    my $valuer      = Marpa::R3::Scanless::V->new(
+        {
+            recognizer => $recce,
+            max_parses => 300
+        }
+    );
     while ( $valuer->value() ) { $parse_count++; }
-    Marpa::R3::Test::is( $expected[$n], $parse_count,
-        "Wall Series Number $n" );
+    Marpa::R3::Test::is( $expected[$n], $parse_count, "Wall Series Number $n" );
 
-} ## end for my $n ( 1 .. 12 )
-
-1;    # In case used as "do" file
+}
 
 # vim: expandtab shiftwidth=4:

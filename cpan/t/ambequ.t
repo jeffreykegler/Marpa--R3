@@ -339,13 +339,11 @@ my %expected_value = (
     '(2-((0*3)+1))==1' => 1,
 );
 
-# Set max at 10 just in case there's an infinite loop.
-# This is for debugging, after all
-
-$recce->set( { max_parses => 10, } );
-
 my $i = 0;
-my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+# max_parses is set to 10 just in case there's an infinite loop.
+# This is for debugging, after all
+my $valuer =
+  Marpa::R3::Scanless::V->new( { recognizer => $recce, max_parses => 10 } );
 while ( defined( my $value = $valuer->value() ) ) {
     my $value = ${$value};
     if ( defined $expected_value{$value} ) {

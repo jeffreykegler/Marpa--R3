@@ -135,13 +135,14 @@ use constant SPACE => 0x60;
 
 for my $input_length ( 1 .. 4 ) {
 
+    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $input = substr( 'abcd', 0, $input_length );
+    $recce->read( \$input );
+
     # Set max at 10 just in case there's an infinite loop.
     # This is for debugging, after all
-    my $recce = Marpa::R3::Scanless::R->new(
-        { grammar => $grammar, max_parses => 10 } );
-    my $input = substr('abcd', 0, $input_length);
-    $recce->read( \$input );
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce });
+    my $valuer =
+      Marpa::R3::Scanless::V->new( { recognizer => $recce, max_parses => 10 } );
     while ( my $value_ref = $valuer->value() ) {
         my $value = $value_ref ? ${$value_ref} : 'No parse';
         my $expected = $expected[$input_length];

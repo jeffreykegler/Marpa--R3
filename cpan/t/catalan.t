@@ -48,13 +48,13 @@ sub do_pairings {
 
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-    # An arbitrary maximum is put on the number of parses -- this is for
-    # debugging, and infinite loops happen.
-    $recce->set( { max_parses => 999, } );
 
     $recce->read( \( 'a' x $n ) );
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    # An arbitrary maximum is put on the number of parses -- this is for
+    # debugging, and infinite loops happen.
+    my $valuer = Marpa::R3::Scanless::V->new(
+        { recognizer => $recce, max_parses => 999 } );
     while ( my $value_ref = $valuer->value() ) {
         $parse_count++;
     }

@@ -137,6 +137,29 @@ so that the parse returned is of the entire virtual input stream.
 The L<C<end>|/"end"> setting is only allowed in
 L<a valuer's constructor|/"Constructor">.
 
+=head2 max_parses
+
+If non-zero, causes a fatal error when that number
+of parse results is exceeded.
+C<max_parses> is useful to
+limit CPU usage and output length when testing
+and debugging.
+Stable and production applications may
+prefer to count the number of parses,
+and take a less Draconian response when the
+count is exceeded.
+
+The value must be an integer.
+If it is zero, there will be no
+limit on the number of parse results returned.
+The default is for
+there to be no limit.
+The C<max_parses> setting is allowed
+by both
+the L<valuer's constructor|/"Constructor">
+and its
+L<C<set()>|/"set()"> method.
+
 =head2 recognizer
 
 The value of the C<recognizer> setting must be

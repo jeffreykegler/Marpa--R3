@@ -219,8 +219,6 @@ my @expected = map {
     [qw( (a;a;a;) (a;a;;a) (a;;a;a) (;a;a;a) )],
     ['(a;a;a;a)'];
 
-$recce->set( { max_parses => 20 } );
-
 my @ambiguity_expected;
 $ambiguity_expected[0] = 'No ambiguity';
 

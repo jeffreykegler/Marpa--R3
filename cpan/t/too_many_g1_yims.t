@@ -45,10 +45,6 @@ my $parse_count = 0;
 my $recce = Marpa::R3::Scanless::R->new(
     { grammar => $grammar, too_many_earley_items => 10 } );
 
-# An arbitrary maximum is put on the number of parses -- this is for
-# debugging, and infinite loops happen.
-$recce->set( { max_parses => 999, } );
-
 my $trace_output;
 open my $trace_fh, q{>}, \$trace_output;
 $recce->set( { trace_file_handle => $trace_fh } );
