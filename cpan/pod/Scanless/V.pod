@@ -278,6 +278,8 @@ the tree.
 Symbol tables are one example of the kind of data which parses often
 require, but which it is not convenient to accumulate bottom-up.
 
+TODO: Rough equivalent
+
 =head1 Accessors
 
 =head2 ambiguity_level()
