@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -220,6 +220,35 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexem
     }
 }
 
+# Marpa::R3::Display
+# name: recognizer value() equivalent
+# normalize-whitespace: 1
+
+    sub recce_value_equivalent {
+        my ($recce, $per_parse_arg) = @_;
+        my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+        my $ambiguity_level = $valuer->ambiguity_level();
+        return if $ambiguity_level == 0;
+        if ( $ambiguity_level != 1 ) {
+            my $ambiguous_status = $valuer->ambiguous();
+            die "Parse of the input is ambiguous\n", $ambiguous_status;
+        }
+        my $value_ref = $valuer->value($per_parse_arg);
+        die '$valuer->value(): No parse', "\n" if not $value_ref;
+        return $value_ref;
+    }
+
+# Marpa::R3::Display::End
+
+sub eq_valuer {
+    my ( $recce ) = @_;
+    my $value_ref = recce_value_equivalent( $recce );
+    if ( not defined $value_ref ) {
+        die "No parse was found, after reading the entire input\n";
+    }
+    return ${$value_ref};
+}
+
 sub hi_valuer {
     my ($recce) = @_;
     my $value_ref = $recce->value();
@@ -282,16 +311,16 @@ END_OF_SOURCE
     sub do_test {
         my ($hash) = @_;
         my $reader = $hash->{reader};
-        my $valuer = \&hi_valuer;
+        my $valuer = $hash->{valuer} || \&hi_valuer;
         my $string = '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)';
         my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
-        # Marpa::R3::Display
-        # name: recognizer read() synopsis
+# Marpa::R3::Display
+# name: recognizer read() synopsis
 
         $recce->read( \$string, 0, 0 );
 
-        # Marpa::R3::Display::End
+# Marpa::R3::Display::End
 
         my ($main_block) = $recce->block_progress();
 
@@ -329,6 +358,7 @@ do_test( { reader => \&hi_literal_reader } );
 do_test( { reader => \&eq_literal_reader } );
 do_test( { reader => \&hi_string_reader } );
 do_test( { reader => \&eq_string_reader } );
+do_test( { reader => \&hi_block_reader, valuer => \&eq_valuer } );
 
 sub Calc_Nodes::script::doit {
     my ($self) = @_;

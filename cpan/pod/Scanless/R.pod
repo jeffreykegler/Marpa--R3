@@ -802,6 +802,29 @@ the tree.
 Symbol tables are one example of the kind of data which parses often
 require, but which it is not convenient to accumulate bottom-up.
 
+The C<value()> method is
+the approximate equivalent of
+
+=for Marpa::R3::Display
+name: recognizer value() equivalent
+normalize-whitespace: 1
+
+    sub recce_value_equivalent {
+        my ($recce, $per_parse_arg) = @_;
+        my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+        my $ambiguity_level = $valuer->ambiguity_level();
+        return if $ambiguity_level == 0;
+        if ( $ambiguity_level != 1 ) {
+            my $ambiguous_status = $valuer->ambiguous();
+            die "Parse of the input is ambiguous\n", $ambiguous_status;
+        }
+        my $value_ref = $valuer->value($per_parse_arg);
+        die '$valuer->value(): No parse', "\n" if not $value_ref;
+        return $value_ref;
+    }
+
+=for Marpa::R3::Display::End
+
 =head1 Block methods
 
 There are methods for external scanning which allow control
