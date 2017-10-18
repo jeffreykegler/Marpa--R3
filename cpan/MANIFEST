@@ -228,6 +228,7 @@ t/00-load.t
 t/01-lua.t
 t/25_ah2.t
 t/50d-block.t
+t/50d-debug.t
 t/50d-external.t
 t/50d-gie.t
 t/50d-lexevent.t
@@ -249,7 +250,6 @@ t/chaf.t
 t/code_diag.t
 t/completed.t
 t/context.t
-t/debug.t
 t/debug2.t
 t/debug_leo.t
 t/diag.t

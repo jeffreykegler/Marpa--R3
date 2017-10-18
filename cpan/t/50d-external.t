@@ -220,11 +220,21 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexem
     }
 }
 
+sub hi_valuer {
+    my ($recce) = @_;
+    my $value_ref = $recce->value();
+    if ( not defined $value_ref ) {
+        die "No parse was found, after reading the entire input\n";
+    }
+    return ${$value_ref};
+}
+
 {
 
-my $grammar = Marpa::R3::Scanless::G->new(
-    {   bless_package => 'Calc_Nodes',
-        source          => \(<<'END_OF_SOURCE'),
+    my $grammar = Marpa::R3::Scanless::G->new(
+        {
+            bless_package => 'Calc_Nodes',
+            source        => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 :start ::= Script
 Script ::= Expression+ separator => <op comma> bless => script
@@ -252,74 +262,73 @@ Number ~ unicorn
 <op subtract> ~ unicorn
 unicorn ~ [^\s\S]
 END_OF_SOURCE
-    }
-);
-
-my @terminals = (
-    [ Number   => qr/\d+/xms,    "Number" ],
-    [ 'op pow' => qr/[\^]/xms,   'Exponentiation operator' ],
-    [ 'op pow' => qr/[*][*]/xms, 'Exponentiation' ],          # order matters!
-    [ 'op times' => qr/[*]/xms, 'Multiplication operator' ],  # order matters!
-    [ 'op divide'   => qr/[\/]/xms, 'Division operator' ],
-    [ 'op add'      => qr/[+]/xms,  'Addition operator' ],
-    [ 'op subtract' => qr/[-]/xms,  'Subtraction operator' ],
-    [ 'op lparen'   => qr/[(]/xms,  'Left parenthesis' ],
-    [ 'op rparen'   => qr/[)]/xms,  'Right parenthesis' ],
-    [ 'op comma'    => qr/[,]/xms,  'Comma operator' ],
-);
-
-sub my_parser {
-    my ( $reader, $string ) = @_;
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
-
-# Marpa::R3::Display
-# name: recognizer read() synopsis
-
-    $recce->read( \$string, 0, 0 );
-
-# Marpa::R3::Display::End
-
-    my ($main_block) = $recce->block_progress();
-
-    my $length = length $string;
-    pos $string = 0;
-    TOKEN: while (1) {
-        my $start_of_lexeme = pos $string;
-        last TOKEN if $start_of_lexeme >= $length;
-        next TOKEN if $string =~ m/\G\s+/gcxms;    # skip whitespace
-        TOKEN_TYPE: for my $t (@terminals) {
-            my ( $symbol_name, $regex, $long_name ) = @{$t};
-            my $start_of_lexeme = pos $string;
-            next TOKEN_TYPE if not $string =~ m/\G($regex)/gcxms;
-            my $lexeme = $1;
-            $reader-> ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name );
-            $recce->block_move($start_of_lexeme + length $lexeme);
         }
-    } ## end TOKEN: while (1)
-    my $value_ref = $recce->value();
-    if ( not defined $value_ref ) {
-        die "No parse was found, after reading the entire input\n";
+    );
+
+    my @terminals = (
+        [ Number   => qr/\d+/xms,  "Number" ],
+        [ 'op pow' => qr/[\^]/xms, 'Exponentiation operator' ],
+        [ 'op pow' => qr/[*][*]/xms, 'Exponentiation' ],    # order matters!
+        [ 'op times' => qr/[*]/xms, 'Multiplication operator' ]
+        ,                                                   # order matters!
+        [ 'op divide'   => qr/[\/]/xms, 'Division operator' ],
+        [ 'op add'      => qr/[+]/xms,  'Addition operator' ],
+        [ 'op subtract' => qr/[-]/xms,  'Subtraction operator' ],
+        [ 'op lparen'   => qr/[(]/xms,  'Left parenthesis' ],
+        [ 'op rparen'   => qr/[)]/xms,  'Right parenthesis' ],
+        [ 'op comma'    => qr/[,]/xms,  'Comma operator' ],
+    );
+
+    sub do_test {
+        my ($hash) = @_;
+        my $reader = $hash->{reader};
+        my $valuer = \&hi_valuer;
+        my $string = '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)';
+        my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+
+        # Marpa::R3::Display
+        # name: recognizer read() synopsis
+
+        $recce->read( \$string, 0, 0 );
+
+        # Marpa::R3::Display::End
+
+        my ($main_block) = $recce->block_progress();
+
+        my $length = length $string;
+        pos $string = 0;
+      TOKEN: while (1) {
+            my $start_of_lexeme = pos $string;
+            last TOKEN if $start_of_lexeme >= $length;
+            next TOKEN if $string =~ m/\G\s+/gcxms;      # skip whitespace
+          TOKEN_TYPE: for my $t (@terminals) {
+                my ( $symbol_name, $regex, $long_name ) = @{$t};
+                my $start_of_lexeme = pos $string;
+                next TOKEN_TYPE if not $string =~ m/\G($regex)/gcxms;
+                my $lexeme = $1;
+                $reader->(
+                    $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name
+                );
+                $recce->block_move( $start_of_lexeme + length $lexeme );
+            }
+        } ## end TOKEN: while (1)
+        my $value = $valuer->($recce)->doit();
+        Test::More::like(
+            $value,
+            qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms,
+            'Value of parse'
+        );
     }
-    return ${$value_ref}->doit();
-}
 }
 
-my $value = my_parser( \&lo_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&hi_block_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&eq_block_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&lo_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&hi_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&eq_literal_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&hi_string_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
-$value = my_parser( \&eq_string_reader, '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)' );
-Test::More::like( $value, qr/\A 86[.]3\d+ \s+ 126 \s+ 125 \s+ 16\z/xms, 'Value of parse' );
+do_test( { reader => \&lo_reader } );
+do_test( { reader => \&hi_block_reader } );
+do_test( { reader => \&eq_block_reader } );
+do_test( { reader => \&lo_literal_reader } );
+do_test( { reader => \&hi_literal_reader } );
+do_test( { reader => \&eq_literal_reader } );
+do_test( { reader => \&hi_string_reader } );
+do_test( { reader => \&eq_string_reader } );
 
 sub Calc_Nodes::script::doit {
     my ($self) = @_;
