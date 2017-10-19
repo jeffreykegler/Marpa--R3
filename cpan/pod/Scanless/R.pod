@@ -141,7 +141,7 @@ In these documents, these input strings are
 called C<input text blocks> or,
 more often,
 C<blocks>.
-All blocks are Unicode.
+Marpa::R3 will convert all blocks into Unicode.
 Characters in Marpa::R3 are
 Unicode codepoints.
 Numbering of characters is 0-based.
@@ -181,7 +181,7 @@ When context makes it clear,
 the block offset is called
 simply the C<offset>.
 All blocks, whether current or not,
-maintain a B<current offset>
+maintain a B<current offset>.
 
 An offset of I<L>,
 where I<L> is the length of the block under
@@ -207,14 +207,11 @@ is at eoblock,
 either the app must switch blocks,
 or the app must moves the block offset of the current block.
 
-As mentioned, every block, whether current or not,
-maintains a current offset.
-Every block also maintains
+Every block maintains
 a B<current end of read>.
 The B<current end of read> is also
 referred to as the block's B<end of read>
 or B<eoread>.
-
 Reading of a block ends when the next character read
 would be the one at eoread.
 In effect, eoread is a temporary eoblock.
@@ -273,12 +270,13 @@ where the universe varies by context.
 For blocks, the universe is the ordered set of
 characters in the input text block
 under discussion,
-and end of universe is the last character of this ordered set --
-its B<physical end of block>.
-Eoread does not affect end-of-universe.
-A block's eoread may be different from its physical end-of-block,
-but a block's end-of-universe is always its 
-physical end-of-block.
+and end of universe is the last physical
+character of the block.
+This will be the character
+at offset C<eoblock - 1>,
+that is,
+the character immediately before eoblock.
+Eoread has no effect on end-of-universe.
 
 For G1 locations, the universe is the ordered set of
 G1 locations, and the end of universe is
@@ -289,24 +287,24 @@ offset I<EOU> - I<N> + 1,
 where I<EOU> is the positive
 offset of the "end of universe" element.
 Therefore, suppose that block 7 has a length of 42.
-Since block offsets are 1-based,
-the last character in block 7 will be at offset 42,
-and offset 42 will be the "end of universe".
+Since block offsets are 0-based,
+the last character in block 7 will be at offset 41,
+so that offset 41 is the "end of universe".
 Therefore,
 
 =over 4
 
 =item *
 Block position C<7, -1>
-is the same as block position C<7, 42>.
-
-=item *
-Block position C<7, -2>
 is the same as block position C<7, 41>.
 
 =item *
+Block position C<7, -2>
+is the same as block position C<7, 40>.
+
+=item *
 Block position C<7, -42>
-is the same as block position C<7, 1>.
+is the same as block position C<7, 0>.
 
 =back
 
