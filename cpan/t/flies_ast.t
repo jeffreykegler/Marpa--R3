@@ -55,7 +55,7 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 # Marpa::R3::Display
-# name: "time flies" DSL synopsis
+# name: time-flies DSL synopsis
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),

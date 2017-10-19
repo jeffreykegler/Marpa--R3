@@ -16,7 +16,7 @@ Marpa::R3::Scanless::DSL - The DSL for the Scanless interface
 =head1 Synopsis
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -63,15 +63,15 @@ normalize-whitespace: 1
 
 This is the reference document for
 the domain-specific language (DSL)
-of Marpa's Scanless interface (SLIF).
-The SLIF's DSL is
+of Marpa::R3.
+The Marpa::R3 DSL is
 an extension of BNF.
-The SLIF DSL is used to specify other
+The Marpa::R3 DSL is used to specify other
 DSL's, and is therefore a "meta-DSL".
 
 =head1 Lexical conventions
 
-The SLIF source string consists of a series of rules,
+The Marpa::R3 DSL source string consists of a series of rules,
 pseudo-rules and statements.
 Whitespace separates tokens, but is otherwise ignored.
 
@@ -149,14 +149,14 @@ displayed between angle brackets,
 regardless of whether the symbol was originally
 specified in bracketed form.
 
-When a SLIF symbol needs to be
+When a Marpa::R3 DSL symbol needs to be
 referred to by name in Perl code,
 it is the symbol's explicit name that is used.
 
 =head2 Single-quoted strings
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -218,7 +218,7 @@ match case-insensitive.
 =head2 Character classes
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -315,7 +315,7 @@ event though both classes
 specify exactly the same set of characters.
 
 Special characters are allowed in event names.
-For example, SLIF authors sometimes write
+For example, Marpa::R3 DSL authors sometimes write
 lexeme events using quote (C<'"a"'>),
 predictions starting with a caret (C<'^a'>),
 completions ending with a dollar sigh (C<'a$'>)
@@ -325,14 +325,14 @@ or starting with a bang
 (C<'!a'>).
 These are conventions,
 and 
-entirely up to the SLIF author.
-The SLIF allows any event to have any legal
+entirely up to the Marpa::R3 DSL author.
+The Marpa::R3 DSL allows any event to have any legal
 event name.
 
 =head1 Event initializer
 
 =for Marpa::R3::Display
-name: SLIF completed event statement synopsis
+name: completed event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -343,7 +343,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF discard event statement synopsis 2
+name: discard event statement synopsis 2
 partial: 1
 normalize-whitespace: 1
 
@@ -354,7 +354,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF nulled event statement synopsis
+name: nulled event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -408,7 +408,7 @@ as described below.
 
 =head1 Statements
 
-The SLIF DSL consists of a series of statements.
+The Marpa::R3 DSL consists of a series of statements.
 The statements are of three kinds, as indicated by their declarator:
 
 =over 4
@@ -555,7 +555,7 @@ method|Marpa::R3::Scanless::G/"productions_show()">.
 =head2 Start rule
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -587,7 +587,7 @@ A empty rule makes its LHS symbol a nullable symbol.
 =head2 Quantified rule
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -615,7 +615,7 @@ L<C<separator>|/"separator">.
 =head2 Prioritized rule
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -671,7 +671,7 @@ and that duplication will be reported as a fatal error.
 =head2 Discard pseudo-rule
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -680,7 +680,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF discard event synopsis
+name: discard event synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -726,13 +726,13 @@ described
 L<above|/"Event initializer">.
 If present, it defines a discard event,
 as described in
-L<the document on SLIF parse
+L<the document on parse
 events|Marpa::R3::Event/"Discard events">.
 
 =head2 Default pseudo-rule
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -741,7 +741,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF symbol, name array descriptor example
+name: symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
 
@@ -770,7 +770,7 @@ the value which it had prior to any explicit settings.
 =head2 Lexeme pseudo-rule
 
 =for Marpa::R3::Display
-name: SLIF lexeme rule synopsis
+name: lexeme rule synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -805,7 +805,7 @@ and for documenting grammars.
 =head2 Discard default statement
 
 =for Marpa::R3::Display
-name: SLIF default discard event statement synopsis 1
+name: default discard event statement synopsis 1
 partial: 1
 normalize-whitespace: 1
 
@@ -814,7 +814,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF default discard event statement synopsis 2
+name: default discard event statement synopsis 2
 partial: 1
 normalize-whitespace: 1
 
@@ -840,7 +840,7 @@ names|/"Event name">.
 =head2 Lexeme default statement
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -850,7 +850,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF "time flies" DSL synopsis
+name: time-flies DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -872,7 +872,7 @@ Only one lexeme default statement is allowed in a grammar.
 =head2 Named event statement
 
 =for Marpa::R3::Display
-name: SLIF completed event statement synopsis
+name: completed event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -884,7 +884,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF nulled event statement synopsis
+name: nulled event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -896,7 +896,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF predicted event statement synopsis
+name: predicted event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -908,7 +908,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 The named event statement sets up a
-SLIF parse event.
+parse event.
 A named event statement consists of, in order
 
 =over 4
@@ -939,7 +939,7 @@ A symbol name.
 
 =back
 
-The SLIF's event-triggering methods are
+The event-triggering methods are
 L<the Scanless recognizer's read()|Marpa::R3::Scanless::R/"read()">,
 L<resume()|Marpa::R3::Scanless::R/"resume()">,
 L<C<lexeme_read_block()>|Marpa::R3::Scanless::R/"lexeme_read_block()">,
@@ -957,7 +957,7 @@ named events may be queried using
 L<the Scanless recognizer's events()
 method|Marpa::R3::Scanless::R/"events()">.
 For details, see
-L<the document on SLIF parse
+L<the document on parse
 events|Marpa::R3::Event>.
 
 =head2 Inaccessible symbol statement
@@ -1010,7 +1010,7 @@ warning messages.
 
 =head1 Ambiguity
 
-Marpa parses ambiguous grammars and the design of the SLIF exploits this.
+Marpa parses ambiguous grammars and the design of the Marpa::R3 DSL exploits this.
 A flexible, but potentially ambiguous, syntax is used.
 Actual ambiguities are obvious to the human eye,
 and users will create them,
@@ -1020,7 +1020,7 @@ will rarely be needed.
 
 If and when an actual ambiguity does occur, an error message reports
 the ambiguity and its exact location.
-It will always be possible to disambiguate a SLIF DSL,
+It will always be possible to disambiguate a Marpa::R3 DSL script,
 and there will always
 be more than one way to do this.
 
@@ -1063,7 +1063,7 @@ statements.
 
 =head2 Other ways to disambiguate
 
-There are many other ways to disambiguate SLIF statements.
+There are many other ways to disambiguate Marpa::R3 DSL statements.
 If the ambiguity is between keywords and symbol names,
 enclosing a symbol name in angle brackets will force it to be
 treated only as a symbol name.
@@ -1204,7 +1204,7 @@ Again, intuitively,
 =head2 event
 
 =for Marpa::R3::Display
-name: SLIF named lexeme event synopsis
+name: named lexeme event synopsis
 normalize-whitespace: 1
 
     :lexeme ~ <a> pause => before event => 'before a'
@@ -1230,13 +1230,13 @@ The value of the C<event> adverb is an event
 initializer.
 Event initializers are as described
 L<above|/"Event initializer">.
-SLIF parse events are described in detail in
+Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
 =head2 name
 
 =for Marpa::R3::Display
-name: SLIF symbol, name array descriptor example
+name: symbol, name array descriptor example
 partial: 1
 normalize-whitespace: 1
 
@@ -1264,7 +1264,7 @@ normalize-whitespace: 1
 
 The C<null-ranking> adverb applies only to G1 rules
 (L0 rules do not have a semantics) and is ignored unless
-the SLIF grammar's C<ranking_method> named argument
+the grammar's C<ranking_method> named argument
 is set to something other than its default.
 Some rule alternatives can match the same input in several ways,
 depending on which symbols are nulled.
@@ -1285,7 +1285,7 @@ see L<the document on parse order|Marpa::R3::Semantics::Order>.
 =head2 pause
 
 =for Marpa::R3::Display
-name: SLIF named lexeme event synopsis
+name: named lexeme event synopsis
 normalize-whitespace: 1
 
     :lexeme ~ <a> pause => before event => 'before a'
@@ -1298,8 +1298,8 @@ normalize-whitespace: 1
 The C<pause> adverb applies only to lexemes and
 is only allowed in
 L<a C<:lexeme> pseudo-rule|/"Lexeme pseudo-rule">.
-The C<pause> adverb declares a SLIF parse event.
-The L<event adverb|/"event"> names the SLIF parse event
+The C<pause> adverb declares a parse event.
+The L<event adverb|/"event"> names the parse event
 declared by
 the C<pause> adverb.
 It is a fatal error to specify the
@@ -1441,7 +1441,7 @@ For example, in the synopsis, the LHS symbol is
 C<Expression>.  The alternative
 
 =for Marpa::R3::Display
-name: SLIF DSL Synopsis
+name: DSL Synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1456,7 +1456,7 @@ to be operators.
 In the RHS alternative
 
 =for Marpa::R3::Display
-name: SLIF DSL Synopsis
+name: DSL Synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1474,7 +1474,7 @@ For example,
 in the RHS alternative
 
 =for Marpa::R3::Display
-name: SLIF DSL Synopsis
+name: DSL Synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1561,7 +1561,7 @@ Marpa does catch the case where an alternative consists
 only of a single operand -- a "unit rule".
 This causes a fatal error.
 Unit rules are easy to define by accident in
-the SLIF.
+the Marpa::R3 DSL.
 The author knows of no practical use for them,
 and their presence in a grammar is usually
 unintentional.
