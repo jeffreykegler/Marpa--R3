@@ -4225,7 +4225,7 @@ It is designed to be convenient for use as a tail call.
       pos = pos or offset
       local codepoint = slr:codepoint_from_pos(block_ix, pos)
       return _M.userX(
-             "Error in SLIF parse: %s\n\z
+             "Error in parse: %s\n\z
               * String before error: %s\n\z
               * The error was at %s, and at character %s, ...\n\z
               * here: %s\n",

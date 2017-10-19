@@ -125,7 +125,7 @@ my @tests_data = (
     [ 'Bare', '', 'No parse', 'Input read to end but no parse', '[none]' ],
     [ 'Bare', '1', '1', 'Parse OK', 'entire input', 1 ],
     [   'Bare', '1 2', 'No parse',
-        'Error in SLIF parse: Parse exhausted, but lexemes remain, at B1L1c3',
+        'Error in parse: Parse exhausted, but lexemes remain, at B1L1c3',
         '1', 1
     ],
     [ 'Plus', '', 'No parse', 'Input read to end but no parse', '[none]' ],

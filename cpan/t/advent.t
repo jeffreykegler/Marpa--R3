@@ -84,7 +84,7 @@ push @tests, [
     '2♥ 7♥ 2♦ 3♣ 3♦ 1♦',
     'Parse failed before end',
     <<'END_OF_MESSAGE'
-Error in SLIF parse: No lexeme found at B1L1c16
+Error in parse: No lexeme found at B1L1c16
 * String before error: \x{2665} 7\x{2665} 2\x{2666} 3\x{2663} 3\x{2666}\s
 * The error was at B1L1c16, and at character U+0031 "1", ...
 * here: 1\x{2666}
