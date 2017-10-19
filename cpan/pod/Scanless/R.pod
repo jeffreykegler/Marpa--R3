@@ -666,56 +666,65 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Given a pointer to a string and,
-optionally,
-a L<span|/"Spans">
-within it,
-C<read()> parses the input string according to the grammar.
-More formally,
-the C<read()> takes three arguments, the last
-two of which are optional.
-The first, required, argument must be a pointer
-to a string.
-This string will become the B<current input text block>.
-The second and third arguments, if provided, specify
-the B<reading span> -- the span
-within the input text block that will be read.
+C<read()> is the basic method for internal scanning.
+It takes three arguments, the first of which is required.
+Call them, in order, C<$p_string>, C<$start>, C<$length>.
 
-By default, the reading span is the input text block.
-More formally,
-the default start location is zero and
-the default length is -1.
-Negative locations and lengths are
-interpreted as L<described above|/"Spans">.
+C<$p_string> is required
+and must be a pointer to a string.
+A new input text block is created from C<$p_string>.
+The current block is set to this new block.
+C<read()> then parses this new current block according to the grammar.
+
+The C<$start> argument is optional.
+Parsing starts in the new block at offset C<$start>.
+If C<$start> is undefined, it defaults to 1 -- the first
+character of the new block.
+In other words, the default is to read from the beginning
+of the
+new physical block.
+If start is negative,
+it is interpretated as
+L<as defined above|/"Negative offsets and positions">.
+
+The C<$length> argument is optional.
+If defined, eoread is set to C<$start> + C<$length> - 1.
+If not defined, eoread is set to the last physical character
+of the new, current block.
+In other words, the default is to read to the end of the
+new physical block.
+C<$length> may not be negative.
+If C<$start> and $<length> produce an eoread which is outside
+the new current block, it is a fatal error.
+
+If C<$length> is zero, C<read()> set a new current block,
+and then stops immediately.
+This can be useful when an application wants to take control
+before any internal scanning is done.
+An application may, for example, use C<read()>
+to set up a buffer but then immediate switch to external
+scanning.
 
 C<read()> may be called multiple times during a parse.
 Each C<read()> creates a new
 B<input text block>,
 and that new input text block
 becomes the current text block.
-Every input text block has a B<block index>.
-The input text block read by the first
-C<read()> call is block 1.
-The input block read
-by the I<n>'th C<read()> call
-of a parse is block I<n>.
 
-C<read()> returns success if it parses to the end
-of the input string,
+C<read()> returns success if it parses to eoread,
 or if it triggers a SLIF parse event.
 If a SLIF parse event occurs during the C<read()> method,
-the current location is set to the event location.
+the current location of the current block
+is set to the event location.
 SLIF parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 If no SLIF parse event triggers,
-and the parse reaches the end of the reading span without a
+and the parse reaches eoread without a
 failure,
-the current location is set to the end of the reading span.
+the current location is set one past eoread.
 
 On success, C<read()> returns the current
-physical input stream location.
-A successful call of C<read()>
-may return zero.
+offset of the new, current block.
 On failure, C<read()> throws an exception.
 
 The C<read()> method is
