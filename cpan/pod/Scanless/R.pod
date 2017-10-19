@@ -81,44 +81,60 @@ forth between internal and external scanning.
 
 =head1 Block position
 
-By default, input in Marpa::R3
-is extremely simple.
+If an app uses the basic internal scanning method,
+L<C<read()>|/"read()">,
+and accepts its defaults,
+the Marpa::R3 input
+is very simple.
 The input is provided as a pointer to a string.
 Scanning starts at the first
 position and continues to the last character of the string.
 Many applications fit this model.
-
-But many practical applications
-want one or more of the following
+But many common practical applications
+want to do one or more of the following
 
 =over 4
 
 =item *
-"include file" logic
+Stop reading the current file,
+read from another one,
+then resume reading the current file.
+Preprocessors, including the one for the
+C language, commonly need to do this.
 
 =item *
-"here-docs",
-which in one form,
-are essentially the extension of "include file"
-logic to in-line "files"
+"Include" files, as just described,
+but also nest them.
+The C preprocessor does this.
+
 
 =item *
-"if/else" logic, which requires the app to skip
-over sections of the input
+Allow "here-docs".
+Here-docs are similar to "include" files, except
+they are not separate files,
+but distant portions of the current file.
+Perl does this.
 
 =item *
-externally scanned symbols, which do not refer
+Implement "if/else" preprocessor logic, skipping sections
+of the current input.
+The C preprocessor does this.
+
+=item *
+Allow externally scanned symbols, which do not refer
 to any text in the main input string.
+For reasonable error messages to be generated,
+some sort of literal equivalent of the symbol needs
+to be available.
 
 =back
 
-The above features require the app to switch
+To implement the above features,
+an app must be able to switch
 among multiple input strings,
-some concocted on the fly,
-as well as the ability to jump forward
+and be able to jump forward
 and backward within those input strings.
-Marpa::R3's input model
-allows all of these things and more.
+Marpa::R3's input model has these abilities.
 
 Marpa::R3 allows multiple input strings.
 In these documents, these input strings are
@@ -129,6 +145,22 @@ All blocks are Unicode.
 Characters in Marpa::R3 are
 Unicode codepoints.
 Numbering of characters is 0-based.
+
+Reading is always done from the
+the B<current input text block>,
+or
+B<current block>.
+When the recognizer is created, there is
+no 
+current input text block.
+An input text block is set to be the
+current input text block
+when one of the reading methods is called.
+The L<C<read()>|/"read()">
+method sets the current block implicitly.
+Other methods allow the app
+to create blocks
+and to set the current block explicitly.
 
 Location in the input is a duple: 
 C<< <block_id, block_offset> >>,
@@ -142,44 +174,57 @@ Block ID happens to be an integer,
 but it should be treated as opaque.
 
 The block offset is a 0-based integer.
-By default, the next character read will be
+By default, the next character read is
 the character at the current block offset
 of the current block.
-
-The highest valid block offset is the
-physical length of the block in characters.
-When the block offset is equal to the physical
-length of the block,
-it indicates that the block has been read all
-the way to the end,
-and that there are no more characters to be read.
-(But an app can continue reading characters,
-if it switches blocks,
-or if it moves the block offset of the current block.)
 When context makes it clear,
-the block offset is offered called
+the block offset is called
 simply the C<offset>.
-
-Once a recognizer starts reading,
-one of its blocks is always
-the B<current input text block>,
-or
-B<current block>.
-
 All blocks, whether current or not,
 maintain a B<current offset>
-and a B<current end of read>.
-The B<current end of read> is often
+
+An offset of I<L>,
+where I<L> is the length of the block under
+discussion,
+is called
+the B<end of the physical block>,
+B<end of block>,
+or B<eoblock>.
+Eoblock represents the offset immediately after
+the last character of the physical block.
+
+In any block,
+its eoblock is
+the highest valid block offset.
+When the current offset of a block is equal to its eoblock,
+that block has been read all
+the way to the end,
+and there are no more characters to be read.
+For
+an app to read more characters when the current offset
+of the current block
+is at eoblock,
+either the app must switch blocks,
+or the app must moves the block offset of the current block.
+
+As mentioned, every block, whether current or not,
+maintains a current offset.
+Every block also maintains
+a B<current end of read>.
+The B<current end of read> is also
 referred to as the block's B<end of read>
 or B<eoread>.
-When a block is initialized, 
-its current offset is 1 and its eoread
-is the last character of the block.
 
-Reading of a block past its eoread is not allowed.
-In effect,
-eoread allows an app to tell the recognizer to use
+Reading of a block ends when the next character read
+would be the one at eoread.
+In effect, eoread is a temporary eoblock.
+It is often useful for
+an app to tell the recognizer to use
 only a portion of a block.
+
+When a block is initialized, 
+its current offset is 0 and
+its eoread is equal to its eoblock.
 
 In these documents,
 unless stated otherwise,
