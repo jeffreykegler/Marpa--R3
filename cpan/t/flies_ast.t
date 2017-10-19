@@ -17,7 +17,7 @@
 # http://www.cis.upenn.edu/~treebank/
 
 # This example originally came from Ralf Muschall.  Ruslan Shvedov
-# reworked my implementation, converting it to the SLIF and
+# reworked my implementation, converting it to Marpa's DSL and
 # Penn Treebank.  Ruslan and Ralf clearly know English grammar better than
 # most of us native speakers.
 
@@ -55,7 +55,7 @@ use Marpa::R3::Test;
 use Marpa::R3;
 
 # Marpa::R3::Display
-# name: SLIF "time flies" DSL synopsis
+# name: "time flies" DSL synopsis
 
 my $grammar = Marpa::R3::Scanless::G->new(
     {   source => \(<<'END_OF_SOURCE'),

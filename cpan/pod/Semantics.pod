@@ -11,12 +11,12 @@
 
 =head1 NAME
 
-Marpa::R3::Semantics - How the SLIF evaluates parses
+Marpa::R3::Semantics - How Marpa::R3 evaluates parses
 
 =head1 Synopsis
 
 =for Marpa::R3::Display
-name: SLIF full synopsis
+name: full synopsis
 normalize-whitespace: 1
 
     use Marpa::R3;
@@ -109,7 +109,7 @@ normalize-whitespace: 1
 =head1 About this document
 
 This document describes the semantics for
-Marpa's primary interface, the SLIF.
+Marpa::R3.
 
 =head1 What is semantics?
 
@@ -204,7 +204,7 @@ of the parse tree.
 
 The calls of the
 L<C<value()> method|Marpa::R3::Scanless::R/"value()">
-by a SLIF recognizer produce a series of zero
+by a recognizer produce a series of zero
 or more parses trees,
 called a B<parse series>.
 A recognizer will have only one parse series,
@@ -238,7 +238,7 @@ L<a separate document|Marpa::R3::Semantics::Null>.
 
 =head1 Actions and how Marpa finds them
 
-The way in which the SLIF finds the value of a node is called that node's B<action>.
+The way in which Marpa::R3 finds the value of a node is called that node's B<action>.
 Actions can be explicit or implicit.
 An explicit action is one that is explicitly specified by the application,
 in one of the ways
@@ -313,7 +313,7 @@ are "the same",
 the blessing is taken into account.
 Two productions are considered to have different semantics if
 they are blessed differently.
-The SLIF's null semantics are described in more detail
+Marpa::R3's null semantics are described in more detail
 L<in a separate document|Marpa::R3::Semantics::Null>.
 
 =head1 Blessings
@@ -417,7 +417,7 @@ the lexeme default statement.
 
 =back
 
-If any production or lexeme of a SLIF grammar has
+If any production or lexeme of a grammar has
 a blessing other than C<::undef>,
 a C<bless_package> is required,
 and failure to specify one results in
@@ -448,7 +448,7 @@ The other actions are B<Perl closure actions>.
 =head1 Array descriptor actions
 
 =for Marpa::R3::Display
-name: SLIF DSL synopsis
+name: DSL synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -674,7 +674,7 @@ L<as described below|/"Resolving Perl names to Perl variables">.
 To resolve Perl identifiers to Perl names,
 a semantics package must be defined.
 The semantics package can be defined using the
-L<SLIF grammar's C<semantics_package> named
+L<grammar's C<semantics_package> named
 argument|Marpa::R3::Scanless::G/"semantics_package">.
 
 If the user wants the Perl variables implementing the semantics
@@ -753,7 +753,7 @@ a variable number of child nodes.
 =head1 Action context
 
 =for Marpa::R3::Display
-name: SLIF action context synopsis
+name: action context synopsis
 normalize-whitespace: 1
 
     sub do_S {
@@ -780,20 +780,20 @@ to B<context variables>.
 =over
 
 =item * C<$Marpa::R3::Context::grammar> is set to
-L<the SLIF grammar|Marpa::R3::Scanless::G> being parsed.
+L<the grammar|Marpa::R3::Scanless::G> being parsed.
 
 =item * C<$Marpa::R3::Context::recognizer> is set to
-L<the SLIF recognizer|Marpa::R3::Scanless::R> that did this parse.
+L<the recognizer|Marpa::R3::Scanless::R> that did this parse.
 
 =item * C<$Marpa::R3::Context::valuer> is set to
-L<the SLIF valuer|Marpa::R3::Scanless::V> that is doing
+L<the valuer|Marpa::R3::Scanless::V> that is doing
 this evaluation.
 
 =item * C<$Marpa::R3::Context::production_id> is the ID of the
 current production.
 Given the production ID, an application can find
 its LHS and RHS symbols using
-L<the SLIF grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
+L<the grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
 
 =item * C<Marpa::R3::Context::g1_range()> returns the start
 and end G1 locations of the current production instance.
@@ -808,7 +808,7 @@ and the length is in G1 locations.
 =head1 Bailing out of parse evaluation
 
 =for Marpa::R3::Display
-name: SLIF bail synopsis
+name: bail synopsis
 normalize-whitespace: 1
 
     my $bail_message = "This is a bail out message!";
@@ -862,7 +862,7 @@ This is initialized
 
 =over 4
 
-=item * To the argument to the SLIF recognizer's C<value()> method, if that
+=item * To the argument to the recognizer's C<value()> method, if that
 argument is defined.
 
 =item * Otherwise, to an empty hashref.
@@ -894,7 +894,7 @@ on parse order|Marpa::R3::Semantics::Order>.
 Grammars with infinite loops (cycles)
 are generally regarded as useless in practical applications.
 Due to lack of interest,
-the SLIF does not currently support them,
+Marpa::R3 does not currently support them,
 although Libmarpa itself, Marpa's thin interface and the NAIF all do.
 Those interested in knowing more can look at L<the
 document on the NAIF's support of infinitely ambiguous

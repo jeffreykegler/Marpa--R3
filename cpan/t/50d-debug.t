@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Displays for SLIF Progress.pod
+# Displays for Progress.pod
 
 use 5.010001;
 
@@ -33,7 +33,7 @@ use Marpa::R3;
 my $progress_report = q{};
 
 # Marpa::R3::Display
-# name: SLIF debug example, part 1
+# name: debug example, part 1
 
 my $slif_debug_source = <<'END_OF_SOURCE';
 :default ::= action => ::array bless => ::lhs
@@ -78,14 +78,14 @@ open my $trace_fh, q{>}, \( my $trace_output = q{} );
 ## use critic
 
 # Marpa::R3::Display
-# name: SLIF grammar set() synopsis
+# name: grammar set() synopsis
 
 $grammar->set( { trace_file_handle => $trace_fh } );
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example, part 2
+# name: debug example, part 2
 
 my $recce = Marpa::R3::Scanless::R->new(
     { grammar => $grammar,
@@ -101,13 +101,13 @@ $progress_report = $recce->progress_show( 0, -1 );
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example error message
+# name: debug example error message
 # start-after-line: END_OF_TEXT
 # end-before-line: '^END_OF_TEXT$'
 
 $eval_error =~ s/^(Marpa::R3 \s+ exception \s+ at) .*/$1\n/xms;
 Marpa::R3::Test::is($eval_error, <<'END_OF_TEXT', 'Error message before fix');
-Error in SLIF parse: No lexeme found at B1L1c18
+Error in parse: No lexeme found at B1L1c18
 * String before error: a = 8675309 + 42\s
 * The error was at B1L1c18, and at character U+002a "*", ...
 * here: * 711
@@ -118,7 +118,7 @@ END_OF_TEXT
 
 
 # Marpa::R3::Display
-# name: SLIF debug example dump of value
+# name: debug example dump of value
 
 my $value_ref = $recce->value();
 my $expected_output = \bless( [
@@ -144,7 +144,7 @@ my $expected_output = \bless( [
 Test::More::is_deeply( $value_ref, $expected_output, 'Value before fix' );
 
 # Marpa::R3::Display
-# name: SLIF debug example progress report
+# name: debug example progress report
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
@@ -210,14 +210,14 @@ $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse  = 1;
 
 # Marpa::R3::Display
-# name: SLIF progress(0) example
+# name: progress(0) example
 
 my $report0 = $recce->progress(0);
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF progress() output at location 0
+# name: progress() output at location 0
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
@@ -237,7 +237,7 @@ Test::More::is_deeply( Data::Dumper::Dumper($report0),
 my $report1 = $recce->progress(1);
 
 # Marpa::R3::Display
-# name: SLIF progress() output at location 1
+# name: progress() output at location 1
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
@@ -257,7 +257,7 @@ Test::More::is_deeply( Data::Dumper::Dumper($report1),
 my $report2 = $recce->progress(2);
 
 # Marpa::R3::Display
-# name: SLIF progress() output at location 2
+# name: progress() output at location 2
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
@@ -275,14 +275,14 @@ Test::More::is_deeply( Data::Dumper::Dumper($report2),
     $expected_report2, 'progress report at location -4' );
 
 # Marpa::R3::Display
-# name: SLIF progress() example
+# name: progress() example
 
 my $latest_report = $recce->progress();
 
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF progress() output at default location
+# name: progress() output at default location
 # start-after-line: END_PROGRESS_REPORT
 # end-before-line: '^END_PROGRESS_REPORT$'
 
@@ -309,7 +309,7 @@ Test::More::is_deeply( Data::Dumper::Dumper($latest_report),
     $expected_report3, 'progress report at location -3' );
 
 # Marpa::R3::Display
-# name: SLIF debug example trace output
+# name: debug example trace output
 # start-after-line: END_TRACE_OUTPUT
 # end-before-line: '^END_TRACE_OUTPUT$'
 
@@ -499,7 +499,7 @@ $productions_show_output = $grammar->productions_show();
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $productions_show_output,
-    <<'END_OF_OUTPUT', 'SLIF productions_show()' );
+    <<'END_OF_OUTPUT', 'productions_show()' );
 R1 [:start:] ::= statements
 R2 statement ::= <numeric assignment>
 R3 assignment ::= 'set' variable 'to' expression
@@ -556,12 +556,12 @@ $productions_show_output = $grammar->productions_show( { verbose => 3 } );
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example productions_show() output
+# name: debug example productions_show() output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
 
 Marpa::R3::Test::is( $productions_show_output,
-    <<'END_OF_OUTPUT', 'SLIF productions_show()' );
+    <<'END_OF_OUTPUT', 'productions_show()' );
 R1 [:start:] ::= statements
   Symbol IDs: <3> ::=
   Canonical names: [:start:] ::=
@@ -707,7 +707,7 @@ END_OF_OUTPUT
 my $rules_show_output = $grammar->g1_rules_show( { verbose => 3 } );
 
 Marpa::R3::Test::is( $rules_show_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show()' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'g1_rules_show()' );
 R0 statements ::= statement *
   Symbol IDs: <21> ::= <20>
   Canonical symbols: statements ::= statement
@@ -773,7 +773,7 @@ END_OF_SHOW_RULES_OUTPUT
 $rules_show_output = $grammar->l0_rules_show( { verbose => 3 });
 
 Marpa::R3::Test::is( $rules_show_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show()' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'l0_rules_show()' );
 R0 'set' ~ [s] [e] [t]
   Symbol IDs: <2> ::= <26> <20> <27>
   Canonical symbols: [Lex-0] ::= [[s]] [[e]] [[t]]
@@ -857,7 +857,7 @@ END_OF_SHOW_RULES_OUTPUT
 my $productions_diag_output = $grammar->productions_show( { diag => 1 } );
 
 Marpa::R3::Test::is( $productions_diag_output,
-    <<'END_OF_OUTPUT', 'SLIF productions_show() diag form' );
+    <<'END_OF_OUTPUT', 'productions_show() diag form' );
 R1 [:start:] ::= statements
 R2 statement ::= <numeric assignment>
 R3 assignment ::= [Lex-0] variable [Lex-1] expression
@@ -911,7 +911,7 @@ my $rules_diag_output;
 $rules_diag_output = $grammar->g1_rules_show( { verbose => 3, diag => 1 } );
 
 Marpa::R3::Test::is( $rules_diag_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF g1_rules_show() diag form' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'g1_rules_show() diag form' );
 R0 statements ::= statement *
   Symbol IDs: <21> ::= <20>
   Canonical symbols: statements ::= statement
@@ -977,7 +977,7 @@ END_OF_SHOW_RULES_OUTPUT
 $rules_diag_output = $grammar->l0_rules_show( { verbose => 3, diag => 1 } );
 
 Marpa::R3::Test::is( $rules_diag_output,
-    <<'END_OF_SHOW_RULES_OUTPUT', 'SLIF l0_rules_show() diag form' );
+    <<'END_OF_SHOW_RULES_OUTPUT', 'l0_rules_show() diag form' );
 R0 [Lex-0] ~ [[s]] [[e]] [[t]]
   Symbol IDs: <2> ::= <26> <20> <27>
   Canonical symbols: [Lex-0] ::= [[s]] [[e]] [[t]]
@@ -1068,7 +1068,7 @@ $symbols_show_output = $grammar->symbols_show();
 # Marpa::R3::Display::End
 
 Marpa::R3::Test::is( $symbols_show_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show()' );
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'symbols_show()' );
 S1 [:discard:]
 S2 [:lex_start:]
 S3 [:start:]
@@ -1119,12 +1119,12 @@ $symbols_show_output = $grammar->symbols_show( { verbose => 3 } );
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF debug example symbols_show() output
+# name: debug example symbols_show() output
 # start-after-line: END_OF_SHOW_SYMBOLS_OUTPUT
 # end-before-line: '^END_OF_SHOW_SYMBOLS_OUTPUT$'
 
 Marpa::R3::Test::is( $symbols_show_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF symbols_show() verbose' );
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'symbols_show() verbose' );
 S1 [:discard:]
   Canonical name: [:discard:]
   DSL name: [:discard:]
@@ -1253,7 +1253,7 @@ $symbols_show_output = "G1 Symbols:\n";
 $symbols_show_output .= $grammar->g1_symbols_show(3);
 
 Marpa::R3::Test::is( $symbols_show_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF g1_symbols_show()' );
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'g1_symbols_show()' );
 G1 Symbols:
 g1 S0 [:start:]
   Canonical name: [:start:]
@@ -1344,7 +1344,7 @@ $symbols_show_output = "L0 Symbols:\n";
 $symbols_show_output .= $grammar->l0_symbols_show(3);
 
 Marpa::R3::Test::is( $symbols_show_output,
-    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'SLIF l0_symbols_show()' );
+    <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'l0_symbols_show()' );
 L0 Symbols:
 l0 S0 [:discard:]
   Canonical name: [:discard:]

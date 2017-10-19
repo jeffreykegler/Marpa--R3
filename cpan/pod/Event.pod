@@ -11,12 +11,12 @@
 
 =head1 NAME
 
-Marpa::R3::Event - SLIF parse events
+Marpa::R3::Event - Parse events
 
 =head1 Synopsis
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 normalize-whitespace: 1
 partial: 1
 
@@ -71,14 +71,14 @@ L<below|/"A messy example">.
 
 =head1 About this document
 
-This document is an overview of B<SLIF parse events>.
+This document is an overview of B<parse events>.
 One example of a circumstance for
 which an event can be created is the prediction of a symbol
 in the parse.
 Another example is the recognition of a symbol in the parse.
 A third example is parse exhaustion.
 
-SLIF parse events are often used to allow an application to
+Parse events are often used to allow an application to
 switch over to its own custom procedural logic.
 Among other things,
 an application can do its own "external" scanning of lexemes.
@@ -89,10 +89,8 @@ any point.
 
 =over 4
 
-=item * SLIF parse events are called B<parse events>
-or,
-in contexts where the meaning is clear,
-simply B<events>.
+=item * In contexts where the meaning is clear,
+Parse events are called B<events>.
 
 =item * In this document, an B<instance> of a symbol
 in a parse
@@ -182,7 +180,7 @@ which may be actual or potential.
 Prediction events,
 for example,
 report potential symbol instances.
-Instance events are declared in the SLIF DSL.
+Instance events are declared in the Marpa::R3 DSL.
 
 =item * B<Location events> report the general status
 of the parse at particular location,
@@ -223,16 +221,16 @@ or a non-lexeme event.
 
 =over 4
 
-=item * An SLIF parse event must be B<declared>.
+=item * An parse event must be B<declared>.
 
 =item * A declared event may B<trigger>.
 
 =back
 
 Once declared, a parse event
-may trigger during any event-triggering SLIF
+may trigger during any event-triggering
 recognizer method.
-The event-triggering SLIF recognizer methods are
+The event-triggering recognizer methods are
 L<the recognizer's C<new()>
 constructor|Marpa::R3::Scanless::R/Constructor>,
 L<C<read()>|Marpa::R3::Scanless::R/"read()">,
@@ -404,12 +402,12 @@ not restricted.
 
 =head2 Completion events
 
-Completion events are declared in the SLIF DSL
+Completion events are declared in the Marpa::R3 DSL
 using the
 L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">:
 
 =for Marpa::R3::Display
-name: SLIF completed event statement synopsis
+name: completed event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -424,7 +422,7 @@ A completion event triggers
 when a non-nulled instance of its symbol
 is recognized at the current location.
 Completion events are non-lexeme events.
-A completion SLIF parse event can be specified for any
+A completion parse event can be specified for any
 symbol that is not a lexeme.
 
 When a completion event triggers,
@@ -445,7 +443,7 @@ and the event name.
 =head2 Discard events
 
 =for Marpa::R3::Display
-name: SLIF discard event statement synopsis 2
+name: discard event statement synopsis 2
 partial: 1
 normalize-whitespace: 1
 
@@ -530,12 +528,12 @@ the G1 location is reported as zero.
 
 =head2 Nulling events
 
-A nulling event is declared in the SLIF DSL
+A nulling event is declared in the Marpa::R3 DSL
 using the
 L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">:
 
 =for Marpa::R3::Display
-name: SLIF nulled event statement synopsis
+name: nulled event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -586,12 +584,12 @@ and the event name.
 
 =head2 Prediction events
 
-A prediction event is declared in the SLIF DSL
+A prediction event is declared in the Marpa::R3 DSL
 using the
 L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">:
 
 =for Marpa::R3::Display
-name: SLIF predicted event statement synopsis
+name: predicted event statement synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -610,7 +608,7 @@ at the event location unless a prediction,
 if properly declared and activated,
 would trigger at that location.
 
-Prediction SLIF parse events may be defined for any symbol,
+Prediction parse events may be defined for any symbol,
 whether it is a lexeme or not.
 But prediction events are non-lexeme events,
 even when their symbol is a lexeme.
@@ -623,7 +621,7 @@ and the event name.
 =head2 Pre-lexeme events
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -638,7 +636,7 @@ its event location
 is set to the location where the lexeme starts,
 which will be before the trigger location.
 
-The SLIF recognizer will B<not> have
+The recognizer will B<not> have
 read the lexeme
 when its pre-lexeme event triggers.
 In effect,
@@ -734,7 +732,7 @@ The length, in codepoints, of the lexeme.
 =head2 Post-lexeme events
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -744,7 +742,7 @@ normalize-whitespace: 1
 
 A post-lexeme event is a lexeme event.
 It triggers if the lexeme is scanned at the current location.
-The SLIF recognizer will have
+The recognizer will have
 already read the lexeme
 when its post-lexeme event triggers.
 
@@ -790,7 +788,7 @@ The length, in codepoints, of the lexeme.
 =head2 Exhaustion events
 
 =for Marpa::R3::Display
-name: SLIF exhaustion grammar setting synopsis part 1
+name: exhaustion grammar setting synopsis part 1
 
     my $g = Marpa::R3::Scanless::G->new(
         {
@@ -803,7 +801,7 @@ name: SLIF exhaustion grammar setting synopsis part 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF exhaustion grammar setting synopsis part 2
+name: exhaustion grammar setting synopsis part 2
 partial: 1
 normalize-whitespace: 1
 
@@ -911,7 +909,7 @@ L<a separate document|Marpa::R3::Exhaustion>.
 =head2 Rejection events
 
 =for Marpa::R3::Display
-name: SLIF rejection grammar setting synopsis part 1
+name: rejection grammar setting synopsis part 1
 normalize-whitespace: 1
 
     my $g = Marpa::R3::Scanless::G->new(
@@ -924,7 +922,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF rejection grammar setting synopsis part 2
+name: rejection grammar setting synopsis part 2
 partial: 1
 normalize-whitespace: 1
 
@@ -995,7 +993,7 @@ The event is activated.
 An event is activated by default when it
 is declared.
 Deactivation and reactivation of events is
-done with the SLIF recognizer's
+done with the recognizer's
 L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 
 =item *
@@ -1057,7 +1055,7 @@ The event is activated.
 An event is activated by default when it
 is declared.
 Deactivation and reactivation of events is
-done with the SLIF recognizer's
+done with the recognizer's
 L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 
 =back
@@ -1103,7 +1101,7 @@ The event is activated.
 An event is activated by default when it
 is declared.
 Deactivation and reactivation of events is
-done with the SLIF recognizer's
+done with the recognizer's
 L<activate() method|Marpa::R3::Scanless::R/"activate()">.
 
 =back
@@ -1126,7 +1124,7 @@ The symbol C<< <insert d> >> has a pre-lexeme event
 declared:
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -1175,7 +1173,7 @@ rule.
 =head1 Implications
 
 This section describes
-some implications of the SLIF parse events mechanism
+some implications of the parse events mechanism
 that may be unexpected at first.
 These implications are Marpa working as designed and,
 I hope the reader will agree,
@@ -1237,7 +1235,7 @@ input stream in the example does not contain a
 C<< <z> >> symbol.
 
 Exhaustion events are not tentative.
-All other SLIF parse events are tentative.
+All other parse events are tentative.
 
 In the example, the predictions
 for
@@ -1311,7 +1309,7 @@ nulled; and
 
 =item *
 
-a nulling SLIF parse event
+a nulling parse event
 is declared for I<Y> and activated; and
 
 =item *
@@ -1321,7 +1319,7 @@ in the parse at location I<L>; then
 
 =item *
 
-a nulling SLIF parse event for I<Y>
+a nulling parse event for I<Y>
 will trigger at location I<L>.
 
 =back
@@ -1353,7 +1351,7 @@ a prediction event
 and a completion event:
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 normalize-whitespace: 1
 partial: 1
 
@@ -1387,7 +1385,7 @@ The prediction of the second instance is, in fact,
 fulfilled, as reported at location 25:
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 normalize-whitespace: 1
 partial: 1
 
@@ -1400,7 +1398,7 @@ The second instance is length 1 and predicted at location
 This is because whitespace delayed its start by one position.
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 normalize-whitespace: 1
 partial: 1
 
@@ -1798,7 +1796,7 @@ normalize-whitespace: 1
 
 =head2 A messy example
 
-The SLIF DSL in this example
+The Marpa::R3 DSL script in this example
 is designed to
 include the unusual
 cases described in this document.
@@ -1813,7 +1811,7 @@ will not resemble any grammar that you
 encounter in practice.
 
 =for Marpa::R3::Display
-name: SLIF Event synopsis
+name: Event synopsis
 normalize-whitespace: 1
 
     sub forty_two { return 42; };

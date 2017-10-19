@@ -72,7 +72,7 @@ for my $maximal ( 0, 1 ) {
     # Silence message when trace_terminals is turned on
 
 # Marpa::R3::Display
-# name: SLIF recognizer set() synopsis
+# name: recognizer set() synopsis
 
     my $trace_fh;
     $recce->set( { trace_file_handle => $trace_fh } );

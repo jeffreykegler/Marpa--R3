@@ -16,7 +16,7 @@ Marpa::R3::Progress - Progress reports on your parse
 =head1 About this document
 
 This document describes
-the progress reports for Marpa's SLIF interface.
+the progress reports for Marpa::R3.
 These allow an application to know
 exactly where it is in the parse at any
 point.
@@ -167,7 +167,7 @@ and deliberately introduced a problem.
 I've commented out one of the correct rules:
 
 =for Marpa::R3::Display
-name: SLIF debug example, part 1
+name: debug example, part 1
 partial: 1
 normalize-whitespace: 1
 
@@ -178,7 +178,7 @@ normalize-whitespace: 1
 and replaced it with a altered one:
 
 =for Marpa::R3::Display
-name: SLIF debug example, part 1
+name: debug example, part 1
 partial: 1
 normalize-whitespace: 1
 
@@ -213,7 +213,7 @@ if it is thought of as a very
 early stage in the incremental development of something useful.
 
 =for Marpa::R3::Display
-name: SLIF debug example, part 1
+name: debug example, part 1
 partial: 1
 normalize-whitespace: 1
 
@@ -265,7 +265,7 @@ For the sake of our example we will pretend that it did.
 If we try the following input,
 
 =for Marpa::R3::Display:
-name: SLIF debug example, part 2
+name: debug example, part 2
 partial: 1
 normalize-whitespace: 1
 
@@ -276,11 +276,11 @@ normalize-whitespace: 1
 we will get this error message,
 
 =for Marpa::R3::Display
-name: SLIF debug example error message
+name: debug example error message
 partial: 1
 normalize-whitespace: 1
 
-    Error in SLIF parse: No lexeme found at B1L1c18
+    Error in parse: No lexeme found at B1L1c18
     * String before error: a = 8675309 + 42\s
     * The error was at B1L1c18, and at character U+002a "*", ...
     * here: * 711
@@ -303,7 +303,7 @@ It's a nice to way to see
 what Marpa thinks the parse was so far.
 
 =for Marpa::R3::Display
-name: SLIF debug example dump of value
+name: debug example dump of value
 partial: 1
 normalize-whitespace: 1
 
@@ -361,7 +361,7 @@ A lexeme is rejected if it is not acceptable.
 The last few lines of the C<trace_terminals> output are:
 
 =for Marpa::R3::Display
-name: SLIF debug example trace output
+name: debug example trace output
 partial: 1
 normalize-whitespace: 1
 
@@ -409,7 +409,7 @@ Earley set 5
 from our example.
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -433,7 +433,7 @@ normalize-whitespace: 1
 =head2 Progress report lines
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -484,7 +484,7 @@ of the parse at location 5 for debugging purposes.)
 Let's look at another progress report line:
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -509,7 +509,7 @@ and "C<prec=0>" indicates that its precedence is 0.
 Predicted rules also appear in progress reports:
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -542,7 +542,7 @@ That production is part of a precedenced rule in the DSL.
 Here it is:
 
 =for Marpa::R3::Display
-name: SLIF debug example, part 1
+name: debug example, part 1
 partial: 1
 normalize-whitespace: 1
 
@@ -556,7 +556,7 @@ normalize-whitespace: 1
 And here is that production as shown in the C<productions_show()> listing:
 
 =for Marpa::R3::Display
-name: SLIF debug example productions_show() output
+name: debug example productions_show() output
 partial: 1
 normalize-whitespace: 1
 
@@ -577,7 +577,7 @@ there should be a prediction of R17 at location 0.
 So we look at the predictions at location 0.
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -614,7 +614,7 @@ C<E<lt>numeric expressionE<gt>> occurs in only two dotted production instances.
 Here they are:
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -623,7 +623,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 partial: 1
 normalize-whitespace: 1
 
@@ -646,7 +646,7 @@ One is in the precedenced rule which defines
 C<E<lt>numeric expressionE<gt>>.
 
 =for Marpa::R3::Display
-name: SLIF debug example, part 1
+name: debug example, part 1
 partial: 1
 normalize-whitespace: 1
 
@@ -669,7 +669,7 @@ This rule does not need fixing.
 That leaves one rule to look at.
 
 =for Marpa::R3::Display
-name: SLIF debug example, part 1
+name: debug example, part 1
 partial: 1
 normalize-whitespace: 1
 
@@ -785,7 +785,7 @@ In fact, this happens frequently.
 When it does happen, the lines in the progress report will look like these
 
 =for Marpa::R3::Display
-name: SLIF Leo progress_show() example
+name: Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
@@ -794,7 +794,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF Leo progress_show() example
+name: Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
@@ -803,7 +803,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF Leo progress_show() example
+name: Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
@@ -812,7 +812,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display
-name: SLIF Leo progress_show() example
+name: Leo progress_show() example
 partial: 1
 normalize-whitespace: 1
 
@@ -865,7 +865,7 @@ Marpa's "situational awareness" in innovative ways.
 =head2 progress()
 
 =for Marpa::R3::Display
-name: SLIF progress(0) example
+name: progress(0) example
 normalize-whitespace: 1
 
     my $report0 = $recce->progress(0);
@@ -875,7 +875,7 @@ normalize-whitespace: 1
 Z<>
 
 =for Marpa::R3::Display
-name: SLIF progress() example
+name: progress() example
 normalize-whitespace: 1
 
     my $latest_report = $recce->progress();
@@ -907,10 +907,10 @@ to identify productions
 in tracing and debugging output.
 Given a production ID, an application can expand it into
 its LHS and RHS symbols using
-L<the SLIF grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
+L<the grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
 Given a symbol ID,
 its name and other information can be found using
-L<other SLIF grammar
+L<other grammar
 methods|Marpa::R3::Scanless::G/"Accessors">.
 
 Dot position is I<N>,
@@ -977,7 +977,7 @@ document.
 =head2 Code
 
 =for Marpa::R3::Display:
-name: SLIF debug example, part 1
+name: debug example, part 1
 normalize-whitespace: 1
 
     my $slif_debug_source = <<'END_OF_SOURCE';
@@ -1019,7 +1019,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 =for Marpa::R3::Display:
-name: SLIF debug example, part 2
+name: debug example, part 2
 perltidy: '-dcsc -sil=0'
 
     my $recce = Marpa::R3::Scanless::R->new(
@@ -1038,12 +1038,12 @@ perltidy: '-dcsc -sil=0'
 =head2 Error message
 
 =for Marpa::R3::Display
-name: SLIF debug example error message
+name: debug example error message
 partial: 1
 remove-display-indent: 1
 remove-blank-last-line: 1
 
-    Error in SLIF parse: No lexeme found at B1L1c18
+    Error in parse: No lexeme found at B1L1c18
     * String before error: a = 8675309 + 42\s
     * The error was at B1L1c18, and at character U+002a "*", ...
     * here: * 711
@@ -1059,7 +1059,7 @@ to produce a value, and in those cases examining the value can be
 helpful in determining what the parser thinks it has seen so far.
 
 =for Marpa::R3::Display
-name: SLIF debug example dump of value
+name: debug example dump of value
 partial: 1
 normalize-whitespace: 1
 
@@ -1087,7 +1087,7 @@ normalize-whitespace: 1
 =head2 Trace output
 
 =for Marpa::R3::Display
-name: SLIF debug example trace output
+name: debug example trace output
 remove-display-indent: 1
 remove-blank-last-line: 1
 
@@ -1210,7 +1210,7 @@ remove-blank-last-line: 1
 =head2 progress_show() output
 
 =for Marpa::R3::Display
-name: SLIF debug example progress report
+name: debug example progress report
 remove-display-indent: 1
 remove-blank-last-line: 1
 
@@ -1277,7 +1277,7 @@ particularly at first.
 But the more verbose output is included here for illustration.
 
 =for Marpa::R3::Display
-name: SLIF debug example productions_show() output
+name: debug example productions_show() output
 remove-display-indent: 1
 remove-blank-last-line: 1
 partial: 1
@@ -1426,7 +1426,7 @@ partial: 1
 =head2 symbols_show() output
 
 =for Marpa::R3::Display
-name: SLIF debug example symbols_show() output
+name: debug example symbols_show() output
 remove-display-indent: 1
 remove-blank-last-line: 1
 partial: 1
@@ -1566,7 +1566,7 @@ and C<Data::Dumper::Terse> set to 1.
 The C<Data::Dumper> output from L<C<progress()>|/"progress()"> at G1 location 0:
 
 =for Marpa::R3::Display
-name: SLIF progress() output at location 0
+name: progress() output at location 0
 remove-display-indent: 1
 remove-blank-last-line: 1
 
@@ -1577,7 +1577,7 @@ remove-blank-last-line: 1
 The C<Data::Dumper> output from L<C<progress()>|/"progress()"> at G1 location 1:
 
 =for Marpa::R3::Display
-name: SLIF progress() output at location 1
+name: progress() output at location 1
 remove-display-indent: 1
 remove-blank-last-line: 1
 
@@ -1588,7 +1588,7 @@ remove-blank-last-line: 1
 The C<Data::Dumper> output from L<C<progress()>|/"progress()"> at location 2:
 
 =for Marpa::R3::Display
-name: SLIF progress() output at location 2
+name: progress() output at location 2
 remove-display-indent: 1
 remove-blank-last-line: 1
 
@@ -1600,7 +1600,7 @@ The default L<C<progress()>|/"progress()"> output is for the latest Earley set.
 Here is the L<C<progress()>|/"progress()"> output for the latest Earley set.
 
 =for Marpa::R3::Display
-name: SLIF progress() output at default location
+name: progress() output at default location
 remove-display-indent: 1
 remove-blank-last-line: 1
 

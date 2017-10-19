@@ -200,7 +200,7 @@ variable ~ [[:alpha:]] <optional word characters>
 <optional word characters> ~ [[:alnum:]]*
 
 # Marpa::R3::Display
-# name: SLIF lexeme rule synopsis
+# name: lexeme rule synopsis
 
 :lexeme ~ <say keyword> priority => 1
 

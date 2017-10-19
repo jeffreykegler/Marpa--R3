@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# SLIF semantics examples
+# semantics examples
 
 use 5.010001;
 
@@ -32,7 +32,7 @@ use Marpa::R3;
 my $trace_rules = q{};
 
 # Marpa::R3::Display
-# name: SLIF action context synopsis
+# name: action context synopsis
 
 sub do_S {
     my ($per_parse_object) = @_;
@@ -51,7 +51,7 @@ sub do_S {
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF bail synopsis
+# name: bail synopsis
 
 my $bail_message = "This is a bail out message!";
 

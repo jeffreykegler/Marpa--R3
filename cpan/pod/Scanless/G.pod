@@ -80,8 +80,8 @@ for blessing node values into a Perl class,
 in conjunction with the
 L<C<bless> adverb|Marpa::R3::Scanless::DSL/"bless">.
 C<bless_package> should not be confused with the
-L<SLIF's
-C<semantics_package> grammar setting|Marpa::R3::Scanless::G/"semantics_package">.
+L<C<semantics_package>
+grammar setting|Marpa::R3::Scanless::G/"semantics_package">.
 The two are not closely related.
 
 =head2 exhaustion
@@ -153,14 +153,14 @@ Sets the semantic package for the grammar.
 The C<semantics_package> grammar setting
 is used when resolving action names to
 fully qualified Perl names.
-For more details on the SLIF semantics,
-see the L<document on SLIF
+For more details on Marpa's semantics,
+see the L<document on
 semantics|Marpa::R3::Semantics>.
 
 The C<semantics_package> grammar setting
 should not be confused with the
-L<SLIF's
-C<bless_package> grammar setting|Marpa::R3::Scanless::G/"bless_package">.
+L<C<bless_package>
+grammar setting|Marpa::R3::Scanless::G/"bless_package">.
 The two are not closely related.
 
 =head2 source
@@ -231,14 +231,14 @@ C<parse()> throws an exception.
 =head2 set()
 
 =for Marpa::R3::Display
-name: SLIF grammar set() synopsis
+name: grammar set() synopsis
 normalize-whitespace: 1
 
     $grammar->set( { trace_file_handle => $trace_fh } );
 
 =for Marpa::R3::Display::End
 
-This method allows the named arguments to be changed after an SLIF
+This method allows the named arguments to be changed after a
 grammar is created.
 Currently, the only argument that may be changed in L<C<trace_file_handle>|/"trace_file_handle">.
 
@@ -451,7 +451,7 @@ Verbosity level must be an integer.
 The default verbosity is 1, which is adequate for
 most purposes.
 A verbosity of 2 prints additional information useful
-for those new to SLIF tracing and debugging.
+for those new to Marpa:R3's tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
 
@@ -506,7 +506,7 @@ name: SLG symbol_dsl_form() synopsis
 Takes one, required, argument: a symbol ID.
 The return value is the "DSL form" of the symbol.
 This is the symbol exactly as it was
-specified by the user in the SLIF DSL.
+specified by the user in the Marpa::R3 DSL.
 The return value is a Perl C<undef> if the symbol does not exist,
 or if it has no DSL form.
 
@@ -604,7 +604,7 @@ Verbosity level must be an integer.
 The default verbosity is 1, which is adequate for
 most purposes.
 A verbosity of 2 prints additional information useful
-for those new to SLIF tracing and debugging.
+for those new to Marpa::R3's tracing and debugging.
 A verbosity of 3 prints additional information for
 experts.
 

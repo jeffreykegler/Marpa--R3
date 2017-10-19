@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# A "full" Synopsis for the intro doc to the SLIF
+# A "full" Synopsis for the intro doc
 
 use 5.010001;
 
@@ -29,7 +29,7 @@ use Marpa::R3::Test;
 ## no critic (ErrorHandling::RequireCarping);
 
 # Marpa::R3::Display
-# name: SLIF full synopsis
+# name: full synopsis
 
 use Marpa::R3;
 

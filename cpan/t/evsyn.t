@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Example for synopsis in POD for overview of SLIF parse events
+# Example for synopsis in POD for overview of parse events
 
 use 5.010001;
 
@@ -28,7 +28,7 @@ use Marpa::R3::Test;
 ## no critic (ErrorHandling::RequireCarping);
 
 # Marpa::R3::Display
-# name: SLIF Event synopsis
+# name: Event synopsis
 
 sub forty_two { return 42; };
 
@@ -172,9 +172,9 @@ my $value_ref = $slr->value();
 my $value = $value_ref ? ${$value_ref} : 'No Parse';
 
 my $actual_events = join "\n", @event_history, '';
-Marpa::R3::Test::is( $actual_events, $expected_events, 'SLIF parse event synopsis' );
+Marpa::R3::Test::is( $actual_events, $expected_events, 'parse event synopsis' );
 
-Test::More::is( $value, 42, 'SLIF parse event synopsis value' );
+Test::More::is( $value, 42, 'parse event synopsis value' );
 
 1;    # In case used as "do" file
 

@@ -119,7 +119,7 @@ END_OF_HISTORY
 my $progress_show_output = $test_slr->progress_show();
 
 # Marpa::R3::Display
-# name: SLIF Leo progress_show() example
+# name: Leo progress_show() example
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
 
@@ -150,7 +150,7 @@ END_OF_OUTPUT
 Marpa::R3::Test::is(
     $progress_show_output,
     $expected_progress_show_output,
-    "SLIF Leo progress_show() example"
+    "Leo progress_show() example"
 );
 
 # Never reaches closure
@@ -196,7 +196,7 @@ sub do_test {
     my $value_ref = $slr->value();
     my $value = $value_ref ? ${$value_ref} : 'No parse';
     ( my $expected = $input ) =~ s/\s//gxms;
-    Marpa::R3::Test::is( $value, $expected, "Leo SLIF parse of $expected" );
+    Marpa::R3::Test::is( $value, $expected, "Leo parse of $expected" );
     my $event_history = join "\n", @event_history, q{};
     Marpa::R3::Test::is( $event_history, $expected_history, "Event history of $expected" );
     return $slr;

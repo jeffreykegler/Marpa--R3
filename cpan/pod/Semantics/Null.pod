@@ -11,7 +11,7 @@
 
 =head1 NAME
 
-Marpa::R3::Semantics::Null - How the SLIF evaluates null rules and symbols
+Marpa::R3::Semantics::Null - How Marpa::R3 evaluates null rules and symbols
 
 =head1 Overview
 
@@ -94,7 +94,7 @@ null symbol.
 Here is an example:
 
 =for Marpa::R3::Display
-name: SLIF null value example
+name: null value example
 normalize-whitespace: 1
 
     sub do_L {
@@ -191,7 +191,7 @@ All the other nulled nodes were discarded.
 Here is the output:
 
 =for Marpa::R3::Display
-name: SLIF null value example output
+name: null value example output
 normalize-whitespace: 1
 
     S(L(null A;null B;X(x));null R)

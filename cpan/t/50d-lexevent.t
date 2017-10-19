@@ -39,7 +39,7 @@ c ~ 'c'
 d ~ 'd'
 
 # Marpa::R3::Display
-# name: SLIF named lexeme event synopsis
+# name: named lexeme event synopsis
 
 :lexeme ~ <a> pause => before event => 'before a'
 :lexeme ~ <b> pause => after event => 'after b'=on

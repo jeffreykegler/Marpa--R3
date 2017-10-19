@@ -26,7 +26,7 @@ use Marpa::R3;
 my $verbose;
 die if not Getopt::Long::GetOptions( verbose => \$verbose );
 
-# This example tests the Ruby Slippers using the SLIF
+# This example tests the Ruby Slippers
 
 my $grammar = << '=== GRAMMAR ===';
 lexeme default = action => [ name, value ] # to add token names to ast
@@ -45,7 +45,7 @@ semi ~ ';'
 === GRAMMAR ===
 
 # Marpa::R3::Display
-# name: SLIF rejection grammar setting synopsis part 1
+# name: rejection grammar setting synopsis part 1
 
 my $g = Marpa::R3::Scanless::G->new(
     {
@@ -83,7 +83,7 @@ sub test {
     state $recce_debug_args = {};
 
 # Marpa::R3::Display
-# name: SLIF rejection grammar setting synopsis part 2
+# name: rejection grammar setting synopsis part 2
 
     my $rejection = 0;
     my $pos;

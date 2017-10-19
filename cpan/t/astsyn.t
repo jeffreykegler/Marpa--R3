@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Synopsis for DSL pod of SLIF
+# Synopsis for DSL pod
 
 use 5.010001;
 
@@ -29,7 +29,7 @@ use Marpa::R3::Test;
 ## no critic (ErrorHandling::RequireCarping);
 
 # Marpa::R3::Display
-# name: SLIF DSL synopsis
+# name: DSL synopsis
 
 use Marpa::R3;
 

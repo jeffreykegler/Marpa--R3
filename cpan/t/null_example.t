@@ -10,8 +10,6 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Note: SLIF TEST
-
 use 5.010001;
 
 use strict;
@@ -48,7 +46,7 @@ sub restore_stdout {
 }
 
 # Marpa::R3::Display
-# name: SLIF null value example
+# name: null value example
 
 sub do_L {
     my (undef, $values) = @_;
@@ -103,7 +101,7 @@ $slr->read( \'x' );
 ## use critic
 
 # Marpa::R3::Display
-# name: SLIF null value example output
+# name: null value example output
 # start-after-line: END_OF_OUTPUT
 # end-before-line: '^END_OF_OUTPUT$'
 

@@ -12,7 +12,7 @@
 
 # Synopsis tests
 
-# Test SLIF -- predicted, nulled and completed events with 
+# Test predicted, nulled and completed events for
 # deactivation and reactivation, initialization at DSL time,
 # initialization override at recce creation time
 
@@ -45,7 +45,7 @@ D ::= 'd'
 D ::= # empty
 
 # Marpa::R3::Display
-# name: SLIF predicted event statement synopsis
+# name: predicted event statement synopsis
 
 event '^a' = predicted A
 event '^b'=off = predicted B
@@ -55,7 +55,7 @@ event '^d' = predicted D
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF completed event statement synopsis
+# name: completed event statement synopsis
 
 event 'a' = completed A
 event 'b'=off = completed B
@@ -65,7 +65,7 @@ event 'd' = completed D
 # Marpa::R3::Display::End
 
 # Marpa::R3::Display
-# name: SLIF nulled event statement synopsis
+# name: nulled event statement synopsis
 
 event '!a' = nulled A
 event '!b'=off = nulled B
@@ -167,7 +167,7 @@ sub do_test {
     if (defined $reactivate_events) {
 
 # Marpa::R3::Display
-# name: SLIF activate() method synopsis
+# name: activate() method synopsis
 
         $recce->activate($_, 0) for @events;
 

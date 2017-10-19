@@ -383,7 +383,7 @@ END_OF_SOURCE
 if (1) {
 
 # Marpa::R3::Display
-# name: SLIF symbol, name array descriptor example
+# name: symbol, name array descriptor example
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 

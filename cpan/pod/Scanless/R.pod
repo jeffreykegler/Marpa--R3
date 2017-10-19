@@ -63,7 +63,7 @@ normalize-whitespace: 1
 This page is the reference document for Marpa::R3's recognizer objects.
 The Marpa::R3 DSL contains its own B<internal scanner>,
 integrated into its syntax.
-In this document, use of the SLIF's
+In this document, use of the
 internal scanner is called
 B<internal scanning>.
 
@@ -71,7 +71,7 @@ Many applications find it useful or necessary to
 do their own scanning,
 and Marpa::R3 allows this.
 When an application
-bypasses the SLIF's internal scanner
+bypasses the internal scanner
 and does its own scanning,
 this document calls it
 B<external scanning>.
@@ -530,7 +530,7 @@ L<a separate document|Marpa::R3::Event>.
 =head2 grammar
 
 The value of the C<grammar> setting must be
-a SLIF grammar object.
+a grammar object.
 The C<new()> method is required to have
 a C<grammar> setting.
 The C<grammar> setting is only allowed
@@ -634,7 +634,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<new()> method is the constructor for SLIF recognizers.
+The C<new()> method is the constructor for recognizers.
 The arguments
 to the C<new()> constructor must be one or more hashes of named arguments,
 where each hash key is a recognizer setting.
@@ -712,13 +712,13 @@ and that new input text block
 becomes the current text block.
 
 C<read()> returns success if it parses to eoread,
-or if it triggers a SLIF parse event.
-If a SLIF parse event occurs during the C<read()> method,
+or if it triggers a parse event.
+If a parse event occurs during the C<read()> method,
 the current location of the current block
 is set to the event location.
-SLIF parse events are described in detail in
+Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
-If no SLIF parse event triggers,
+If no parse event triggers,
 and the parse reaches eoread without a
 failure,
 the current location is set one past eoread.
@@ -749,7 +749,7 @@ normalize-whitespace: 1
 =head2 set()
 
 =for Marpa::R3::Display
-name: SLIF recognizer set() synopsis
+name: recognizer set() synopsis
 normalize-whitespace: 1
 
     my $trace_fh;
@@ -757,7 +757,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-This method allows recognizer settings to be changed after a SLIF
+This method allows recognizer settings to be changed after a
 grammar is created.
 The arguments to
 C<set()> must be one or more hashes whose key-value pairs
@@ -789,7 +789,7 @@ Some applications will not want to treat parse ambiguity
 as an error, and may wish to deal with one or more of the
 parse values.
 They can do this using L<a
-SLIF valuer object|Marpa::R3::Scanless::V>.
+valuer object|Marpa::R3::Scanless::V>.
 
 The C<value()> method allows one optional argument.
 If provided, the argument
@@ -934,7 +934,7 @@ normalize-whitespace: 1
 =head2 activate()
 
 =for Marpa::R3::Display
-name: SLIF activate() method synopsis
+name: recognizer activate() method synopsis
 partial: 1
 normalize-whitespace: 1
 
@@ -943,8 +943,8 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 The C<activate()> method allows the recognizer to deactivate and reactivate
-SLIF parse events.
-SLIF parse events are described in
+parse events.
+Parse events are described in
 L<a separate document|Marpa::R3::Event>.
 
 The C<activate()> method takes two arguments.
@@ -953,14 +953,14 @@ The first is the name of an event, and the second (optional) argument is
 If the argument is 0, the event is deactivated.
 If the argument is 1, the event is activated.
 An argument of 1 is the default.
-Since an SLIF recognizer always starts with all defined events
+Since an recognizer always starts with all defined events
 activated,
 0 will probably be more common as the second argument to
 C<activate()>
 
 Though they are not reported until the call of the
 C<read()> method,
-location 0 events are triggered in the SLIF recognizer's
+location 0 events are triggered in the recognizer's
 constructor,
 before the C<activate()> method can be called.
 Currently there is no way to deactivate
@@ -973,7 +973,7 @@ the C<activate()> method purely for efficiency
 purposes will be counter-productive.
 Also, deactivated events still impose
 some overhead, so if an event is never used,
-it should be commented out in the SLIF DSL.
+it should be commented out in the DSL.
 
 =head2 lexeme_alternative()
 
@@ -1077,7 +1077,7 @@ are adjusted,
 as described for
 L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
 
-SLIF parse events may occur during
+Parse events may occur during
 the L<C<lexeme_complete()>|/"lexeme_complete()"> method,
 as described for
 L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
@@ -1092,7 +1092,7 @@ Failure is always thrown.
 =head2 lexeme_priority_set()
 
 =for Marpa::R3::Display
-name: SLIF recognizer lexeme_priority_set() synopsis
+name: recognizer lexeme_priority_set() synopsis
 normalize-whitespace: 1
 
         $recce->lexeme_priority_set( 'prefix lexeme', -1 );
@@ -1162,8 +1162,8 @@ may be artificial, but a span is defined for every token,
 even if only by default.
 
 The fourth argument specifies the lexeme value.
-The lexeme value plays an important role in the SLIF's semantics.
-More details on the SLIF's semantics are in
+The lexeme value plays an important role in the Marpa::R3's semantics.
+More details on the Marpa::R3's semantics are in
 L<a document dedicated to them|Marpa::R3::Semantics>.
 If the fourth argument
 is omitted,
@@ -1197,8 +1197,8 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Non-lexeme
-SLIF parse events may trigger during the C<lexeme_read_block()> method.
-SLIF parse events are described in detail in
+Parse events may trigger during the C<lexeme_read_block()> method.
+Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
 Current input stream location will be set
@@ -1353,7 +1353,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 The C<resume()> method resumes
-the SLIF's internal scanning,
+internal scanning,
 L<as described
 above|/"Internal scanning">.
 A physical input stream must already have
@@ -1370,18 +1370,18 @@ The default length is -1.
 Negative arguments are interpreted
 as L<described above|/"Spans">.
 
-If a SLIF parse event occurs during the C<read()> method,
+If a parse event occurs during the C<read()> method,
 the current location is set to the event location.
-SLIF parse events are described in detail in
+Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
-If no SLIF parse event triggers,
+If no parse event triggers,
 and the parse reaches the end of the input string without a
 failure,
 the current location is set to the end of the input string.
 
 C<resume()> is considered successful
 if it reads input to the end of input string,
-or if a SLIF parse event triggers.
+or if a parse event triggers.
 On success, C<resume()> returns
 the new current location.
 On unthrown failure,
@@ -1507,7 +1507,7 @@ name: recognizer exhausted() synopsis
 
 =for Marpa::R3::Display::End
 
-The exhausted method returns a Perl true if parsing in a SLIF
+The exhausted method returns a Perl true if parsing in a
 recognizer is
 exhausted, and a Perl false otherwise. Parsing is exhausted when the
 recognizer will not accept any further input.
@@ -1582,7 +1582,7 @@ and a Perl false in scalar context.
 =head2 line_column()
 
 =for Marpa::R3::Display
-name: SLIF trace example
+name: trace example
 partial: 1
 normalize-whitespace: 1
 
@@ -1714,7 +1714,7 @@ the C<progress()> method
 identify rules by their G1 rule ID.
 G1 rule IDs can be converted to a list of the rule's
 symbols using the L<C<rule()> method
-of the SLIF grammar|Marpa::R3::Scanless::G/"rule()">.
+of the grammar|Marpa::R3::Scanless::G/"rule()">.
 Details on progress reports can be found in
 L<their own document|Marpa::R3::Progress>.
 
@@ -1755,7 +1755,7 @@ The arguments are Earley set IDs instead of physical input stream locations,
 because Earley set IDs represent a unique point in the parse.
 By contrast,
 a single physical input stream location might be visited many times
-by a SLIF recognizer.
+by a recognizer.
 
 The output is intended only for reading by humans.
 The exact format is subject to change

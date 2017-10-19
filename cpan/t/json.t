@@ -348,7 +348,7 @@ sub trace_json {
     my $trace_desc = q{};
 
 # Marpa::R3::Display
-# name: SLIF trace example
+# name: trace example
 
         my @pause_location;
         my $recce = Marpa::R3::Scanless::R->new(

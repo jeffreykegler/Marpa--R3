@@ -85,7 +85,7 @@ rsquare ~ <deep rsquare>
 === GRAMMAR ===
 
 # Marpa::R3::Display
-# name: SLIF exhaustion grammar setting synopsis part 1
+# name: exhaustion grammar setting synopsis part 1
 
     my $g = Marpa::R3::Scanless::G->new(
         {
@@ -135,7 +135,7 @@ sub test {
         # No prefix should go beyond the first location of the shortest span.
 
 # Marpa::R3::Display
-# name: SLIF exhaustion grammar setting synopsis part 2
+# name: exhaustion grammar setting synopsis part 2
 
         my @shortest_span = ();
 
@@ -196,7 +196,7 @@ sub test {
         $recce->read( \$string, $target_start, $prefix_end - $target_start );
 
 # Marpa::R3::Display
-# name: SLIF recognizer lexeme_priority_set() synopsis
+# name: recognizer lexeme_priority_set() synopsis
 
         $recce->lexeme_priority_set( 'prefix lexeme', -1 );
 

@@ -29,7 +29,7 @@ use Marpa::R3::Test;
 ## no critic (ErrorHandling::RequireCarping);
 
 # Marpa::R3::Display
-# name: SLIF discard event synopsis
+# name: discard event synopsis
 
 use Marpa::R3;
 

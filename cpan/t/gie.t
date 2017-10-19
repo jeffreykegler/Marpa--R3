@@ -105,7 +105,7 @@ END_OF_DSL
     # Example for synopsis of discard events
 
 # Marpa::R3::Display
-# name: SLIF discard event statement synopsis 2
+# name: discard event statement synopsis 2
 
     my $dsl = <<'END_OF_DSL';
 :start ::= Script
@@ -149,7 +149,7 @@ for my $default (qw(on off))
     # Test of ':symbol' reserved event value
 
 # Marpa::R3::Display
-# name: SLIF default discard event statement synopsis 1
+# name: default discard event statement synopsis 1
 
     my $dsl = <<'END_OF_DSL';
 discard default = event => :symbol=on
@@ -273,7 +273,7 @@ END_OF_EVENTS
     # in discard default statement
 
 # Marpa::R3::Display
-# name: SLIF default discard event statement synopsis 2
+# name: default discard event statement synopsis 2
 
     my $dsl = <<'END_OF_DSL';
 discard default = event => :symbol
