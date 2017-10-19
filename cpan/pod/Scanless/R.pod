@@ -153,9 +153,6 @@ B<current block>.
 When the recognizer is created, there is
 no 
 current input text block.
-An input text block is set to be the
-current input text block
-when one of the reading methods is called.
 The L<C<read()>|/"read()">
 method sets the current block implicitly.
 Other methods allow the app
@@ -205,7 +202,7 @@ an app to read more characters when the current offset
 of the current block
 is at eoblock,
 either the app must switch blocks,
-or the app must moves the block offset of the current block.
+or the app must move the block offset of the current block.
 
 Every block maintains
 a B<current end of read>.
@@ -215,8 +212,8 @@ or B<eoread>.
 Reading of a block ends when the next character read
 would be the one at eoread.
 In effect, eoread is a temporary eoblock.
-It is often useful for
-an app to tell the recognizer to use
+It is often used for
+to tell the recognizer to read
 only a portion of a block.
 
 When a block is initialized, 
@@ -246,7 +243,7 @@ The first lexeme is at G1 position 1,
 and the I<N>'th lexeme is at G1 position I<N>.
 
 While there is a
-G1 positions for every lexeme,
+G1 position for every lexeme,
 the opposite is not the case.
 G1 position is 0-based.
 G1 position 0 is a G1 position before the reading
@@ -259,18 +256,18 @@ but it
 is useful for tracing the G1 grammar
 and for advanced techniques.
 
-=head1 Negative offsets and positions
+=head1 Universes
 
-In Marpa::R3, we often use
-negative offsets and positions.
-These are offsets
-relative to an "end of universe",
-where the universe varies by context.
+In order to have a common language
+for locations, spans, ranges and offsets,
+the concept of a B<universe> of locations
+is useful.
+Each type of location has its own "universe".
 
 For blocks, the universe is the ordered set of
 characters in the input text block
 under discussion,
-and end of universe is the last physical
+and B<end of universe> is the last physical
 character of the block.
 This will be the character
 at offset C<eoblock - 1>,
@@ -279,8 +276,10 @@ the character immediately before eoblock.
 Eoread has no effect on end-of-universe.
 
 For G1 locations, the universe is the ordered set of
-G1 locations, and the end of universe is
+G1 locations, and the B<end of universe> is
 the last G1 location of that ordered set.
+
+=head1 Negative offsets and positions
 
 The negative offset -I<N> is the same as the
 offset I<EOU> - I<N> + 1,
@@ -348,25 +347,25 @@ spans require a lot of mental arithmetic,
 and a discussion that uses ranges is easier to follow.
 
 For the sake of some examples,
-consider again an input text block of length 100.
+consider again a 0-based input text block of length 100.
 
 =over
 
 =item *
 
-The entire block is the range C<[1 ... -1]>
-and the span C<[1, -1]>.
+The entire block is the range C<[0 ... -1]>
+and the span C<[0, -1]>.
 
 =item *
 
-The first 42 characters of the input stream are the range C<[1 ... 42]>
-and the span C<[1, 42]>.
+The first 42 characters of the input stream are the range C<[0 ... 41]>
+and the span C<[0, 42]>.
 
 =item *
 
 The entire block, except for the last character,
-is the range C<[1 ... -2]>
-and the span C<[1, -2]>.
+is the range C<[0 ... -2]>
+and the span C<[0, -2]>.
 
 =item *
 
@@ -396,7 +395,7 @@ C<< <block_id>, <offset>, <length> >>.
 Sometimes one or more elements of a block span are undefined.
 (For example, this can happen when a block span is part of a set of arguments.)
 
-In this case, C<block_id> ID defaults to the current block,
+In this case, C<block_id> defaults to the current block,
 C<offset> defaults to the current offset of the specified block
 and C<length> is set so that the span is to the eoread of the
 specified block.
@@ -430,8 +429,9 @@ The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
 is similar, but the string is specified as a block span.
 The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
 is the most general of the top-level external scanning methods --
-it allows the app to specify both a block span and an explicit value
-for the semantics.
+it allows the app to specify the literal and the value separately --
+the literal as a block span
+and the value explicitly.
 
 For more advanced applications,
 including the reading of ambiguous lexemes,
