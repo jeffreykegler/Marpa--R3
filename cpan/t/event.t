@@ -146,7 +146,7 @@ sub do_test {
     if (defined $reactivate_events) {
 
 # Marpa::R3::Display
-# name: activate() method synopsis
+# name: recognizer activate() method synopsis
 
         $recce->activate($_, 0) for @events;
 

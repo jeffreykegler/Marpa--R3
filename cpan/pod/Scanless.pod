@@ -16,7 +16,7 @@ Marpa::R3::Scanless - Scanless interface
 =head1 Synopsis
 
 =for Marpa::R3::Display
-name: SLIF full synopsis
+name: full synopsis
 normalize-whitespace: 1
 
     use Marpa::R3;
@@ -110,15 +110,15 @@ normalize-whitespace: 1
 
 This document
 is an introduction and overview
-to Marpa's Scanless interface (SLIF).
-Marpa::R3's top-level page has
-L<an SLIF tutorial in Marpa's top-level page|Marpa::R3>.
-If you are new to Marpa or its SLIF,
+to Marpa::R3's interface.
+Marpa::R3's top-level page also has
+L<an tutorial|Marpa::R3>.
+If you are new to Marpa::R3,
 you probably want to start with that.
 
 This document follows up on the tutorial,
 looking more deeply and carefully at the concepts
-behind the SLIF.
+behind Marpa::R3.
 Separate documents provide
 the reference documentation for
 L<Scanless grammar objects|Marpa::R3::Scanless::G>,

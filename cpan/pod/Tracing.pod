@@ -17,7 +17,7 @@ Marpa::R3::Tracing - Tracing your grammar
 
 This document is an overview of
 the techniques for tracing and
-debugging parses and grammars using Marpa's SLIF interface.
+debugging parses and grammars.
 
 =head1 Basic techniques
 
@@ -35,7 +35,7 @@ in a rush to use more advanced techniques.
 =head2 Dump the parse value
 
 Sometimes, even when there is a parse error, you can still evaluate the parse
-using the L<SLIF recognizer's C<value()>
+using the L<recognizer's C<value()>
 method|Marpa::R3::Scanless::R/"value()">.
 If you are fortunate enough to have a parse value at the point of failure,
 it can be an excellent way
@@ -49,7 +49,7 @@ If you are trying to run diagnostics on a failed parse,
 it is useful to catch the exception using C<eval>:
 
 =for Marpa::R3::Display:
-name: SLIF debug example, part 2
+name: debug example, part 2
 partial: 1
 normalize-whitespace: 1
 
@@ -98,7 +98,7 @@ verbosity level higher than 1.
 
 =head2 Other traces
 
-Setting the L<SLIF recognizer's C<trace_values> named argument|Marpa::R3::Scanless::R/"trace_values">
+Setting the L<recognizer's C<trace_values> named argument|Marpa::R3::Scanless::R/"trace_values">
 to a trace level of 1
 traces the values of the parse tree nodes as they are pushed on, and
 popped off, the evaluation stack.
@@ -115,21 +115,21 @@ includes the following:
 =item * If the failed parse returns a value, a dump of that value.
 
 =item * Set the
-L<SLIF recognizer's C<trace_terminals> named
+L<recognizer's C<trace_terminals> named
 argument|Marpa::R3::Scanless::R/"trace_terminals">
 to level 1.
 
 =item * Run
 L<C<productions_show>|Marpa::R3::Scanless::G/"productions_show()">
-on the SLIF grammar.
+on the grammar.
 
 =item * Run
 L<C<symbols_show>|Marpa::R3::Scanless::G/"symbols_show()">
-on the SLIF grammar.
+on the grammar.
 
 =item * Run
 L<C<progress_show()>|Marpa::R3::Progress>
-on the SLIF recognizer.
+on the recognizer.
 
 =back
 
