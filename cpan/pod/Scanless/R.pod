@@ -128,7 +128,7 @@ C<blocks>.
 All blocks are Unicode.
 Characters in Marpa::R3 are
 Unicode codepoints.
-Numbering of characters is 1-based.
+Numbering of characters is 0-based.
 
 Location in the input is a duple: 
 C<< <block_id, block_offset> >>,
@@ -141,9 +141,21 @@ A block ID uniquely identifies a block.
 Block ID happens to be an integer,
 but it should be treated as opaque.
 
-The block offset is a 1-based integer.
+The block offset is a 0-based integer.
+By default, the next character read will be
+the character at the current block offset
+of the current block.
+
 The highest valid block offset is the
-length of the block in characters.
+physical length of the block in characters.
+When the block offset is equal to the physical
+length of the block,
+it indicates that the block has been read all
+the way to the end,
+and that there are no more characters to be read.
+(But an app can continue reading characters,
+if it switches blocks,
+or if it moves the block offset of the current block.)
 When context makes it clear,
 the block offset is offered called
 simply the C<offset>.
