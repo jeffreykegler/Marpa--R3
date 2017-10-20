@@ -2092,7 +2092,8 @@ the `codepoint` command.
                 break
             end
         end
-        return 'ok', events
+        local _, offset = slr:block_progress()
+        return offset
     end
 ```
 

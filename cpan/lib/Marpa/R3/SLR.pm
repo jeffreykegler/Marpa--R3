@@ -341,9 +341,7 @@ sub Marpa::R3::Scanless::R::read {
     my $block_id = $slr->block_new($p_string);
     $slr->block_set($block_id);
     $slr->block_move($start_pos, $length);
-    $slr->block_read();
-    my (undef, $offset) = $slr->block_progress();
-    return $offset;
+    return $slr->block_read();
 }
 
 sub Marpa::R3::Scanless::R::resume {
@@ -361,9 +359,7 @@ sub Marpa::R3::Scanless::R::resume {
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
     $length //= -1;
     $slr->block_move( $start_pos, $length );
-    $slr->block_read();
-    my (undef, $offset) = $slr->block_progress();
-    return $offset;
+    return $slr->block_read();
 }
 
 sub character_describe {
@@ -950,7 +946,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::block_read {
     my ($slr ) = @_;
-    $slr->coro_by_tag(
+    my ($offset) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => '',
@@ -969,11 +965,12 @@ sub Marpa::R3::Scanless::R::block_read {
         <<'END_OF_LUA');
         local slr = ...
         _M.wrap(function ()
-                return slr:block_read()
+                local offset = slr:block_read()
+                return 'ok', offset
             end
         )
 END_OF_LUA
-    return;
+    return $offset;
 }
 
 sub Marpa::R3::Scanless::R::input_length {

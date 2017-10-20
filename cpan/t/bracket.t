@@ -196,8 +196,7 @@ sub test {
         $rejection_is_fatal = undef;
         $recce->block_set($main_block);
         $recce->block_move( $pos, -1 );
-        $recce->block_read();
-        (undef, $pos) = $recce->block_progress();
+        $pos = $recce->block_read();
         return 1;
     };
 

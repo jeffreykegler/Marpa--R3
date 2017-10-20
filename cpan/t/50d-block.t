@@ -53,9 +53,7 @@ sub block_level_read {
     my $block_id = $recce->block_new($p_string);
     $recce->block_set($block_id);
     $recce->block_move($offset, $length);
-    $recce->block_read();
-    my (undef, $new_offset) = $recce->block_progress();
-    return $new_offset;
+    return $recce->block_read();
 }
 
 # Marpa::R3::Display::End
@@ -66,9 +64,7 @@ sub block_level_read {
 sub block_level_resume {
     my ($recce, $offset, $length) = @_;
     $recce->block_move( $offset, $length );
-    $recce->block_read();
-    my (undef, $new_offset) = $recce->block_progress();
-    return $new_offset;
+    return $recce->block_read();
 }
 
 # Marpa::R3::Display::End
