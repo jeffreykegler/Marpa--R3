@@ -606,10 +606,16 @@ and
 a warning is printed to the trace file handle.
 
 Marpa parses from any BNF,
-and can handle grammars and inputs which produce very large
-Earley sets.
-But parsing that involves very large Earley sets can be slow.
+even when the BNF describes a highly ambiguous grammar.
+But highly ambiguous grammars can produce Earley sets large
+enough to exceed the memory capacity of even the largest machines.
+And parsing for less ambiguous grammars
+can be impractically slow.
 
+Ideally C<too_many_earley_items> is set at the
+"point of no return" -- an Earley set size which,
+when reached, indicates that
+the Earley sets will grow out of control.
 By default, Marpa calculates
 an Earley item warning threshold
 for the G1 recognizer
@@ -617,8 +623,8 @@ based on the size of the
 G1 grammar,
 and for each L0 recognizer based on the size
 of the L0 grammar.
-The default thresholds will never be less than 100.
-The default is the result of considerable experience
+These default thresholds will never be less than 100.
+Marpa::R3's default is the result of considerable experience
 and almost all users will be happy with it.
 
 If the
@@ -629,9 +635,11 @@ If the Earley item warning threshold is set to 0,
 no recognizer event is generated,
 and
 warnings about large Earley sets are turned off.
-An Earley item threshold warning almost always
-indicates a serious issue,
-and turning these warnings off will
+In fact,
+Marpa::R3's default values are highly successful
+in identifying the true "point of no return",
+beyond which it is pointless to continue,
+so that turning these warnings off will
 rarely be something
 that an application wants to do.
 
@@ -733,26 +741,29 @@ C<read()> then parses this new current block according to the grammar.
 
 The C<$start> argument is optional.
 Parsing starts in the new block at offset C<$start>.
-If C<$start> is undefined, it defaults to 1 -- the first
+If C<$start> is undefined, it defaults to 0 -- the first
 character of the new block.
 In other words, the default is to read from the beginning
 of the
 new physical block.
 If start is negative,
-it is interpretated as
+it is interpreted as
 L<as defined above|/"Negative offsets and positions">.
 
 The C<$length> argument is optional.
-If defined, eoread is set to C<$start> + C<$length> - 1.
-If not defined, eoread is set to the last physical character
+If C<$length> is defined and non-negative,
+eoread is set to C<$start> + C<$length>.
+If C<$length> is defined and negative,
+eoread is set to C<eoblock> + C<$length> + 1.
+If C<$length> is not defined, eoread is set to the eoblock
 of the new, current block.
-In other words, the default is to read to the end of the
-new physical block.
-C<$length> may not be negative.
-If C<$start> and $<length> produce an eoread which is outside
+(In other words, the default is to read to the end of the
+new physical block.)
+If C<$start> and <$length> produce an eoread which is outside
 the new current block, it is a fatal error.
 
-If C<$length> is zero, C<read()> set a new current block,
+Notice that when C<$length> is zero,
+C<read()> sets a new current block,
 and then stops immediately.
 This can be useful when an application wants to take control
 before any internal scanning is done.
@@ -769,14 +780,14 @@ becomes the current text block.
 C<read()> returns success if it parses to eoread,
 or if it triggers a parse event.
 If a parse event occurs during the C<read()> method,
-the current location of the current block
+the current offset of the current block
 is set to the event location.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 If no parse event triggers,
 and the parse reaches eoread without a
 failure,
-the current location is set one past eoread.
+the current offset is set at eoread.
 
 On success, C<read()> returns the current
 offset of the new, current block.
@@ -861,7 +872,7 @@ Perl semantics closures.
 When data does not conveniently fit into the bottom-up
 flow of parse tree evaluation,
 the per-parse argument
-is useful for sharing it within
+is useful for sharing data within
 the tree.
 Symbol tables are one example of the kind of data which parses often
 require, but which it is not convenient to accumulate bottom-up.
