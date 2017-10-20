@@ -1292,52 +1292,77 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-TODO This method description is wrong
--- it describes R2's lexeme_read().
-It needs to be totally rewritten.
+C<lexeme_read_block()> is the most basic method for external scanning.
+It takes five arguments, only the first of which is required.
+Call them, in order,
+C<$symbol_name>,
+C<$value>,
+C<$block_id>,
+C<$offset>,
+and
+C<$length>.
 
-The C<lexeme_read_block()> method reads a single, unambiguous, lexeme.
-It takes four arguments, only the first of which is required.
-The first argument is the lexeme's symbol name.
-The second and third arguments specify the span in
-the physical input stream.
-The last argument specifies the value of the lexeme.
+The C<$symbol_name> argument is the name of the symbol
+to scan.
+In addition
+Every token must have two things associated with it:
 
-In the span specified by
-the second and third arguments,
-the start location defaults to the current location.
-If the
-L<pause span|Marpa::R3::Event/"Pause span">
-is defined,
-and the start of the pause span is
-the same as the current location,
-length defaults to the length of the pause span.
-Otherwise length defaults to -1.
-Negative values are allowed and are interpreted
-as L<described above|/"Spans">.
+=over 4
 
-The span will be interpreted as the section
-of the physical input stream
-that corresponds to the current G1 set.
-(As a reminder, the G1 set consists
-of the tokens read at single G1 location.)
-This correspondence between the span and the token
-may be artificial, but a span is defined for every token,
-even if only by default.
+=item *
+A symbol name, which is required,
+and which must be the name of a lexeme in
+both the L0 and G1 grammars.
+The symbol name
+tells the parser what symbol the Marpa semantics should see
+this token as.
 
-The fourth argument specifies the lexeme value.
-The lexeme value plays an important role in the Marpa::R3's semantics.
-More details on the Marpa::R3's semantics are in
-L<a document dedicated to them|Marpa::R3::Semantics>.
-If the fourth argument
-is omitted,
-the lexeme value will be a string
-containing the corresponding substring
-of the input stream.
-Omitting the value argument does not have the same
-effect as passing an explicit Perl C<undef>.
-If the value argument is an explicit Perl C<undef>,
-the lexeme value will be a Perl C<undef>.
+=item *
+A value (although this may be undefined).
+The symbol name and the
+value of a lexeme are what is seen by the semantics.
+
+=item *
+A B<literal equivalent>, which must be a span in
+the input.
+The literal equivalent of a lexeme is needed for
+the messages produced by
+tracing, debugging, error reporting, etc.
+
+=back
+
+The C<$value> arguments will be the value of the token.
+The C<$block_id>, C<$offset>, and C<$length> arguments
+are the literal equivalent of the token, as a 
+L<block span|/"Block spans">.
+
+Parse events may trigger during the C<lexeme_read_block()> method.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+
+After C<$lexeme_read_block>
+the current block will be set to C<$block_id>,
+and its current offset will be set to C<$start+$length>,
+unless a pre-lexeme event triggers.
+If a pre-lexeme event triggers,
+the current offset of the current block
+will be set to the event location.
+
+When successful,
+C<lexeme_read_block()> advances
+the current G1 location by one.
+The token read by C<lexeme_read_block()>
+will start at the previous G1 location
+and end at the new current G1 location.
+The G1 location of the token will be considered to be
+the new current G1 location.
+
+On success, C<lexeme_read_block()> returns the new current physical
+input stream location.
+This will never be location zero, because lexemes cannot be zero length.
+If the token was rejected,
+C<lexeme_read_block()> returns a Perl C<undef>.
+Failure is thrown as an exception.
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1359,33 +1384,6 @@ normalize-whitespace: 1
     }
 
 =for Marpa::R3::Display::End
-
-Non-lexeme
-Parse events may trigger during the C<lexeme_read_block()> method.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-
-Current input stream location will be set
-to C<$start+$length>,
-unless a pre-lexeme event triggers.
-If a pre-lexeme event triggers,
-current location will be set to the event location.
-
-When successful,
-C<lexeme_read_block()> advances
-the current G1 location by one.
-The token read by C<lexeme_read_block()>
-will start at the previous G1 location
-and end at the new current G1 location.
-The new current location in the input stream will
-be at the end location of the new lexeme.
-
-On success, C<lexeme_read_block()> returns the new current physical
-input stream location.
-This will never be location zero, because lexemes cannot be zero length.
-If the token was rejected,
-C<lexeme_read_block()> returns a Perl C<undef>.
-Failure is thrown as an exception.
 
 =head2 lexeme_read_literal()
 
