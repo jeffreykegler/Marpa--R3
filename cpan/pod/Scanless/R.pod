@@ -730,25 +730,26 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 C<read()> is the basic method for internal scanning.
-It takes three arguments, the first of which is required.
+It creates a new block and scans it according to its
+arguments.
+
+C<read()> takes three arguments, only the first of which is required.
 Call them, in order, C<$p_string>, C<$start>, C<$length>.
 
 C<$p_string> is required
 and must be a pointer to a string.
 A new input text block is created from C<$p_string>.
 The current block is set to this new block.
-C<read()> then parses this new current block according to the grammar.
 
 The C<$start> argument is optional.
-Parsing starts in the new block at offset C<$start>.
-If C<$start> is undefined, it defaults to 0 -- the first
-character of the new block.
-In other words, the default is to read from the beginning
-of the
-new physical block.
-If start is negative,
-it is interpreted as
-L<as defined above|/"Negative offsets and positions">.
+If C<$start> is defined and non-negative,
+the current offset of the newly created block is set to
+C<$start>.
+If C<$start> is negative,
+the current offset of the newly created block
+is set to C<eoblock> + C<$start> - 1.
+If C<$start> is not defined,
+the current offset of the newly created block is set to 0.
 
 The C<$length> argument is optional.
 If C<$length> is defined and non-negative,
@@ -757,41 +758,71 @@ If C<$length> is defined and negative,
 eoread is set to C<eoblock> + C<$length> + 1.
 If C<$length> is not defined, eoread is set to the eoblock
 of the new, current block.
-(In other words, the default is to read to the end of the
-new physical block.)
-If C<$start> and <$length> produce an eoread which is outside
-the new current block, it is a fatal error.
 
-Notice that when C<$length> is zero,
+If C<$start> and <$length> would produce an eoread which is after
+eoblock;
+or would produce an eoread which is before the new current offset,
+it is a fatal error.
+
+C<read()>
+creates a new block whose text is set from C<$p_string>
+and whose current offset and eoread is set as stated above.
+It sets the current block to the newly created block.
+C<read()> then
+It starts internal scanning of the newly created block,
+which is now the current block.
+
+During internal scanning,
+C<read()> moves the current offset of the current block
+forward.
+Internal scanning continues until
+one of the following occurs:
+
+=over 4
+
+=item *
+Current offset is equal to eoread.
+
+=item *
+A parse event is triggered.
+
+=item *
+A failure occurs.
+
+=back
+
+If C<read()> terminates because
+the current offset is equal to eoread,
+C<read> succeeds
+and returns eoread.
+If C<read()> terminates because
+of a parse event,
+it returns the new current offset,
+which is the event location of the parse event.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+All failures are thrown.
+
+The new block can be created with eoread at 0.
+This happens, for example, if the C<$length> argument
+is 0.
+In this case,
+as the above implies,
 C<read()> sets a new current block,
 and then stops immediately.
-This can be useful when an application wants to take control
+This technique can be useful when an application wants to take control
 before any internal scanning is done.
-An application may, for example, use C<read()>
-to set up a buffer but then immediate switch to external
+An application may, for example, use a C<read()> call with
+a length of 0
+to set up a buffer, and then immediately switch to external
 scanning.
 
 C<read()> may be called multiple times during a parse.
 Each C<read()> creates a new
-B<input text block>,
-and that new input text block
+B<input text block>.
+On each call to C<read()>,
+the new input text block
 becomes the current text block.
-
-C<read()> returns success if it parses to eoread,
-or if it triggers a parse event.
-If a parse event occurs during the C<read()> method,
-the current offset of the current block
-is set to the event location.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-If no parse event triggers,
-and the parse reaches eoread without a
-failure,
-the current offset is set at eoread.
-
-On success, C<read()> returns the current
-offset of the new, current block.
-On failure, C<read()> throws an exception.
 
 The C<read()> method is
 the approximate equivalent of
@@ -805,9 +836,7 @@ normalize-whitespace: 1
         my $block_id = $recce->block_new($p_string);
         $recce->block_set($block_id);
         $recce->block_move($offset, $length);
-        $recce->block_read();
-        my (undef, $new_offset) = $recce->block_progress();
-        return $new_offset;
+        return $recce->block_read();
     }
 
 =for Marpa::R3::Display::End
@@ -902,8 +931,10 @@ normalize-whitespace: 1
 
 =head1 Block methods
 
-There are methods for external scanning which allow control
+These methods allow control
 of the input on the block level.
+They are useful for both internal and external
+scanning.
 
 =head2 block_move ()
 
@@ -916,7 +947,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 C<block_move()> takes 2 optional arguments:
-call them C<$offset> and C<$length>.
+call them, in order, C<$offset> and C<$length>.
 If C<$offset> is defined,
 C<block_move()>
 sets the current offset of the current block
@@ -925,15 +956,13 @@ If C<$offset> is omitted,
 the current offset of the current block
 is not changed.
 
-If length is non-negative,
+If length is defined and non-negative,
 C<block_move()>
-sets eoread (end of read) in the current block
+sets eoread in the current block
 to C<$offset> + C<$length>.
-If C<$length> is negative, eoread is
-set to C<$eob> + C<$length> + 1,
-where C<$eob> is the physical end of
-the current block.
-If C<$length> is omitted,
+If C<$length> is defined and negative, eoread is
+set to C<eoblock> + C<$length> + 1.
+If C<$length> is not defined,
 the eoread of the current block
 is not changed.
 
@@ -947,15 +976,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Creates a new block and returns its block id.
-The first, required, argument is C<$input_string>,
-which becomes the input string for the block.
+Takes one, required, argument, call it C<$p_string>.
+Creates a new block and returns its block id,
+call it C<$new_block>.
+C<$input_string> becomes the input string for
+$<new_block>.
 
 It is important to note that C<block_new()>
-does B<not> set the current block to the block it creates.
-Many applications create input blocks
-in sets, for later use,
-and this behavior is convenient for them.
+does B<not> set the current block to block C<$new_block>.
+This is convenient for those applications which need to
+create, for later use, a series of input blocks
+based on the contents of the current block.
 
 =head2 block_read ()
 
@@ -967,6 +998,44 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+C<block_read()> is the low-level method for
+internal scanning.
+C<block_read()> does not accept any arguments.
+
+C<block_read()>
+starts internal scanning of the current block
+at the current offset.
+C<block_read()>
+continues internal scanning,
+moving the current offset of the current block
+forward,
+until one of the following occurs:
+
+=over 4
+
+=item *
+Current offset is equal to eoread.
+
+=item *
+A parse event is triggered.
+
+=item *
+A failure occurs.
+
+=back
+
+If C<block_read()> terminates because
+the current offset is equal to eoread,
+C<block_read> succeeds
+and returns eoread.
+If C<block_read()> terminates because
+of a parse event,
+it returns the new current offset,
+which is the event location of the parse event.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+All failures are thrown.
+
 =head2 block_set ()
 
 =for Marpa::R3::Display
@@ -976,6 +1045,14 @@ normalize-whitespace: 1
     $recce->block_set($main_block_id);
 
 =for Marpa::R3::Display::End
+
+C<block_set()> takes one, required, argument.
+call it C<$block_id>.
+C<block_set()> set the current block to C<$block_id>.
+C<block_set()> does not change the current offset or eoread
+of any block.
+C<block_set()> does not return a value.
+Failures are thrown.
 
 =head2 block_progress ()
 
@@ -994,6 +1071,13 @@ normalize-whitespace: 1
     ($block_id, $offset, $eoread) = $recce->block_progress( $main_block_id );
 
 =for Marpa::R3::Display::End
+
+C<block_progress()> does not take any arguments.
+It returns, in order,
+the ID of the current block;
+the current offset of the current block;
+and the current eoread of the current block.
+Failures are thrown.
 
 =head1 Mutators for external scanning
 
@@ -1024,7 +1108,7 @@ activated,
 0 will probably be more common as the second argument to
 C<activate()>
 
-Though they are not reported until the call of the
+Although they are not reported until the call of the
 C<read()> method,
 location 0 events are triggered in the recognizer's
 constructor,
@@ -1037,8 +1121,8 @@ can be reduced by using the C<activate()> method.
 But making many calls to
 the C<activate()> method purely for efficiency
 purposes will be counter-productive.
-Also, deactivated events still impose
-some overhead, so if an event is never used,
+Also, deactivated events continue to impose
+a small overhead, so if an event is never used,
 it should be commented out in the DSL.
 
 =head2 lexeme_alternative()
@@ -1102,6 +1186,14 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+C<lexeme_alternative_literal()> takes only one, required, argument.
+C<lexeme_alternative_literal()> differs from
+C<lexeme_alternative()> only in how it sets the value of the token.
+For a token read by C<lexeme_alternative_literal()>,
+the value of the token will be the same as its literal equivalent,
+as set in the next call to 
+C<lexeme_complete()>.
+
 =head2 lexeme_complete()
 
 =for Marpa::R3::Display
@@ -1130,13 +1222,19 @@ The C<lexeme_complete()> method
 requires three arguments.
 Call them, in order,
 C<$block_id>, C<$offset> and C<$length>.
-Every lexeme must have a span in the physical input,
-and
-C<$block_id>, C<$offset> and C<$length>
+These are treated as a block span,
+L<as described above|/"Block spans">
+The block span is used to set the literal equivalent of the
+set of alternative tokens completed by the
+C<lexeme_complete()> call.
+
+Every token must have literal equivalent,
+which must be a span in the physical input.
 represent that block span.
-The span is used, among other things,
+The literal equivalent is used, among other things,
 to allow errors to be reported by location
 in a sensible way.
+
 The span is interpreted,
 and G1 location and current input stream location
 are adjusted,
@@ -1188,7 +1286,7 @@ normalize-whitespace: 1
     if ( not defined $recce->lexeme_read_block($symbol_name, $value,
         $main_block, $start_of_lexeme, $lexeme_length) ) {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
           $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
     }
 
@@ -1298,7 +1396,7 @@ normalize-whitespace: 1
 
     if ( not defined $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
           $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
     }
 
@@ -1337,7 +1435,7 @@ normalize-whitespace: 1
 
     if ( not defined $recce->lexeme_read_string( $symbol_name, $lexeme ) ) {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
           $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
     }
 
@@ -1464,9 +1562,7 @@ normalize-whitespace: 1
     sub block_level_resume {
         my ($recce, $offset, $length) = @_;
         $recce->block_move( $offset, $length );
-        $recce->block_read();
-        my (undef, $new_offset) = $recce->block_progress();
-        return $new_offset;
+        return $recce->block_read();
     }
 
 =for Marpa::R3::Display::End
