@@ -591,7 +591,7 @@ and then the pages describing
 L<its DSL|Marpa::R3::DSL>,
 L<its grammar methods|Marpa::R3::Grammar>,
 and
-L<its recognizer methods|Marpa::R3::Scanless::R>.
+L<its recognizer methods|Marpa::R3::Recognizer>.
 Marpa's standard semantics are fully described in the
 L<Marpa::R3::Semantics> document.
 

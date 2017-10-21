@@ -940,13 +940,13 @@ A symbol name.
 =back
 
 The event-triggering methods are
-L<the Scanless recognizer's read()|Marpa::R3::Scanless::R/"read()">,
-L<resume()|Marpa::R3::Scanless::R/"resume()">,
-L<C<lexeme_read_block()>|Marpa::R3::Scanless::R/"lexeme_read_block()">,
-L<C<lexeme_read_literal()>|Marpa::R3::Scanless::R/"lexeme_read_literal()">,
-L<C<lexeme_read_string()>|Marpa::R3::Scanless::R/"lexeme_read_string()">
+L<the Scanless recognizer's read()|Marpa::R3::Recognizer/"read()">,
+L<resume()|Marpa::R3::Recognizer/"resume()">,
+L<C<lexeme_read_block()>|Marpa::R3::Recognizer/"lexeme_read_block()">,
+L<C<lexeme_read_literal()>|Marpa::R3::Recognizer/"lexeme_read_literal()">,
+L<C<lexeme_read_string()>|Marpa::R3::Recognizer/"lexeme_read_string()">
 and
-L<lexeme_complete()|Marpa::R3::Scanless::R/"lexeme_complete()">.
+L<lexeme_complete()|Marpa::R3::Recognizer/"lexeme_complete()">.
 If the condition described
 by the named event statement
 occurs during an event-triggering method,
@@ -955,7 +955,7 @@ with the current location at the event location.
 Once triggered,
 named events may be queried using
 L<the Scanless recognizer's events()
-method|Marpa::R3::Scanless::R/"events()">.
+method|Marpa::R3::Recognizer/"events()">.
 For details, see
 L<the document on parse
 events|Marpa::R3::Event>.

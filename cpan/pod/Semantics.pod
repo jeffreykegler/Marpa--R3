@@ -203,13 +203,13 @@ of the parse tree.
 =head1  Parse trees
 
 The calls of the
-L<C<value()> method|Marpa::R3::Scanless::R/"value()">
+L<C<value()> method|Marpa::R3::Recognizer/"value()">
 by a recognizer produce a series of zero
 or more parses trees,
 called a B<parse series>.
 A recognizer will have only one parse series,
 unless it calls
-the L<C<series_restart()> method|Marpa::R3::Scanless::R/"series_restart()">.
+the L<C<series_restart()> method|Marpa::R3::Recognizer/"series_restart()">.
 
 There may be zero parses in a parse series,
 because there may be no valid parse of a virtual input.
@@ -489,7 +489,7 @@ the G1 start location of the production or lexeme instance.
 Together
 the C<g1length> and C<g1start> array item descriptors
 describe a G1 location
-L<span|Marpa::R3::Scanless::R/"Spans">.
+L<span|Marpa::R3::Recognizer/"Spans">.
 
 Typical applications will prefer to use
 the C<start> and C<length> array item descriptors,
@@ -501,7 +501,7 @@ for example with application which do not scan
 monotonically forward in the physical input,
 but instead jump backwards in it.
 G1 locations are described in detail
-L<in another document|Marpa::R3::Scanless::R/"G1 locations">.
+L<in another document|Marpa::R3::Recognizer/"G1 locations">.
 
 =item C<length>
 
@@ -783,10 +783,10 @@ to B<context variables>.
 L<the grammar|Marpa::R3::Grammar> being parsed.
 
 =item * C<$Marpa::R3::Context::recognizer> is set to
-L<the recognizer|Marpa::R3::Scanless::R> that did this parse.
+L<the recognizer|Marpa::R3::Recognizer> that did this parse.
 
 =item * C<$Marpa::R3::Context::valuer> is set to
-L<the valuer|Marpa::R3::Scanless::V> that is doing
+L<the valuer|Marpa::R3::Valuer> that is doing
 this evaluation.
 
 =item * C<$Marpa::R3::Context::production_id> is the ID of the
@@ -848,7 +848,7 @@ L<C<new()>|Marpa::R3::Grammar/"Constructor"> method.
 The action functions are called during the Evaluation
 Phase, by the
 by the recognizer's
-L<C<value()>|Marpa::R3::Scanless::R/"value()"> method.
+L<C<value()>|Marpa::R3::Recognizer/"value()"> method.
 More details about timing of action resolution and 
 call
 are given in

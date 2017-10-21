@@ -24,7 +24,7 @@ each of which will have its own parse result.
 
 This document describes ways of controlling
 the order in which
-the L<SLIF recognizer's C<value()> method|Marpa::R3::Scanless::R/"value()">
+the L<SLIF recognizer's C<value()> method|Marpa::R3::Recognizer/"value()">
 evaluates the parse
 trees of an ambiguous parse.
 It also describes ways to exclude selected parse trees
@@ -64,7 +64,7 @@ are semantic equivalents.
 
 By calling
 the recognizer's
-L<C<value()>|Marpa::R3::Scanless::R/"value()">
+L<C<value()>|Marpa::R3::Recognizer/"value()">
 method
 repeatedly,
 Marpa can produce all the parse results

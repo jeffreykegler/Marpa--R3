@@ -41,7 +41,7 @@ removed.
 
 There is a new valuer object,
 with its own L<new
-POD document|Marpa::R3::Scanless::V.pod>.
+POD document|Marpa::R3::Valuer.pod>.
 
 =head2 Marpa strings must be UTF-8
 
@@ -90,13 +90,13 @@ now throws a fatal error if
 the parse is ambiguous -- this is
 what most applications want.
 Details are in L<its
-documentation|Marpa::R3::Scanless::R/"value()">.
+documentation|Marpa::R3::Recognizer/"value()">.
 
 For dealing
 with ambiguous parses, and other
 advanced techniques,
 there is a L<new
-value object|Marpa::R3::Scanless::V>.
+value object|Marpa::R3::Valuer>.
 
 =head2 Recognizer named arguments
 

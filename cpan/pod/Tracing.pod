@@ -36,7 +36,7 @@ in a rush to use more advanced techniques.
 
 Sometimes, even when there is a parse error, you can still evaluate the parse
 using the L<recognizer's C<value()>
-method|Marpa::R3::Scanless::R/"value()">.
+method|Marpa::R3::Recognizer/"value()">.
 If you are fortunate enough to have a parse value at the point of failure,
 it can be an excellent way
 to determine what the parser thinks it has seen so far.
@@ -61,7 +61,7 @@ normalize-whitespace: 1
 =head2 Trace terminals
 
 Set the L<C<trace_terminals> recognizer named
-argument|Marpa::R3::Scanless::R/"trace_terminals">
+argument|Marpa::R3::Recognizer/"trace_terminals">
 to 1.
 This tells you which tokens the recognizer is looking for and which ones it thinks it found.
 If the problem is in lexing, C<trace_terminals> tells you the whole story.
@@ -98,7 +98,7 @@ verbosity level higher than 1.
 
 =head2 Other traces
 
-Setting the L<recognizer's C<trace_values> named argument|Marpa::R3::Scanless::R/"trace_values">
+Setting the L<recognizer's C<trace_values> named argument|Marpa::R3::Recognizer/"trace_values">
 to a trace level of 1
 traces the values of the parse tree nodes as they are pushed on, and
 popped off, the evaluation stack.
@@ -116,7 +116,7 @@ includes the following:
 
 =item * Set the
 L<recognizer's C<trace_terminals> named
-argument|Marpa::R3::Scanless::R/"trace_terminals">
+argument|Marpa::R3::Recognizer/"trace_terminals">
 to level 1.
 
 =item * Run

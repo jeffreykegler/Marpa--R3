@@ -39,7 +39,7 @@ reading this document.
 =head1 Introduction to Earley items
 
 To read the
-L<C<progress_show>|Marpa::R3::Scanless::R/"progress_show()">
+L<C<progress_show>|Marpa::R3::Recognizer/"progress_show()">
 output, it is important to have a
 basic idea of what
 Earley items are,
@@ -341,7 +341,7 @@ We can't always get a parse value, so we don't want to rely on it.
 =head1 Output from trace_terminals()
 
 You can rely on getting the output from
-L<C<trace_terminals>|Marpa::R3::Scanless::R/trace_terminals>,
+L<C<trace_terminals>|Marpa::R3::Recognizer/trace_terminals>,
 and it is a good next place to check.
 Typically, you will be interested in the last tokens
 to be accepted.
@@ -349,7 +349,7 @@ Sometimes that information alone is enough to make it clear
 where the problem is.
 
 The full
-L<C<trace_terminals>|Marpa::R3::Scanless::R/trace_terminals>
+L<C<trace_terminals>|Marpa::R3::Recognizer/trace_terminals>
 output for this example is in the Appendix.
 We see that the recognizer accepts the input as far
 as the multiplication sign ("C<*>"),
@@ -400,7 +400,7 @@ In our example the current location is
 B1L1c17 (L0 location block 1 line 1 column 17),
 which is also G1 location 5.
 By default,
-L<C<progress_show>|Marpa::R3::Scanless::R/"progress_show()">
+L<C<progress_show>|Marpa::R3::Recognizer/"progress_show()">
 prints out only the progress reports for the current location.
 
 Here are the progress reports for
@@ -704,7 +704,7 @@ and which might be unexpected.
 =head2 Empty rules
 
 When a symbol is nulled in your parse,
-L<C<progress_show>|Marpa::R3::Scanless::R/"progress_show()">
+L<C<progress_show>|Marpa::R3::Recognizer/"progress_show()">
 show only the nulled symbol.
 It does not show the symbols expansion into rules,
 or any of its nulled child symbols.

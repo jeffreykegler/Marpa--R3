@@ -469,7 +469,7 @@ such as whitespace.
 Most applications are monotonic,
 and yours is, unless you've taken special pains to make it otherwise.
 Computation of literal substrings for non-monotonic applications
-is addressed in L<Marpa::R3::Scanless::R/"Literals and G1 spans">.
+is addressed in L<Marpa::R3::Recognizer/"Literals and G1 spans">.
 
 =head2 glade_g1_span()
 
@@ -634,7 +634,7 @@ Ambiguity reports are as L<described below|"Ambiguity reports">.
 
 While the C<ambiguities()> method can be called to determine whether
 or not ambiguities exist, it is the more expensive way to do it.
-The L<$valuer-E<gt>ambiguity_level() method|Marpa::R3::Scanless::V/"ambiguity_level()">
+The L<$valuer-E<gt>ambiguity_level() method|Marpa::R3::Valuer/"ambiguity_level()">
 tests an already-existing boolean and is therefore extremely fast.
 If you are simply testing for ambiguity,
 use the C<ambiguity_level()> method instead.
