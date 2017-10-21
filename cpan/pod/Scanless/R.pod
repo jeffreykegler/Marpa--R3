@@ -402,6 +402,39 @@ specified block.
 Block span is defined more formally
 L<below|/"Block span details">.
 
+=head1 Reading Tokens
+
+Both internal and external scanning read tokens.
+In internal scanning tokenization is done as described by
+the L0 grammar.
+In external scanning, the app controls tokenization directly.
+
+Every token must have three things associated with it:
+
+=over 4
+
+=item 1.
+A symbol name, which is required,
+and which must be the name of a lexeme in
+both the L0 and G1 grammars.
+The symbol name
+tells the parser what symbol the Marpa semantics should see
+this token as.
+
+=item 2.
+A value (although this may be undefined).
+The symbol name and the
+value of a lexeme are what is seen by the semantics.
+
+=item 3.
+A B<literal equivalent>, which must be a span in
+the input.
+The literal equivalent of a lexeme is needed for
+the messages produced by
+tracing, debugging, error reporting, etc.
+
+=back
+
 =head1 Internal scanning
 
 The easiest way to scan is to define a lexer in the Marpa::R2 DSL
@@ -461,6 +494,18 @@ Direct block manipulations
 can be useful for both internal and external scanning.
 The block methods are
 L<described below|/"Block methods">.
+
+=head1 Evaluation
+
+After scanning, an app almost always wants to evaluate the parse.
+This can be done using
+L<the recognizer's C<value()>
+method|/"value()">.
+For advanced techniques, such as retrieving multiple values
+from an ambigious parse,
+Marpa::R3's
+L<valuer objects|Marpa::R3::Scanless::V>
+can be used.
 
 =head1 Recognizer settings
 
@@ -1187,8 +1232,9 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 C<lexeme_alternative_literal()> takes only one, required, argument.
-C<lexeme_alternative_literal()> differs from
-C<lexeme_alternative()> only in how it sets the value of the token.
+C<lexeme_alternative_literal()> differs from each other
+C<lexeme_alternative()> only in their arguments,
+and in how they set the value of the token.
 For a token read by C<lexeme_alternative_literal()>,
 the value of the token will be the same as its literal equivalent,
 as set in the next call to 
@@ -1215,7 +1261,8 @@ method
 at a G1 location.
 Most applications
 will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">
+L<C<lexeme_read_string()>|/"lexeme_read_string()">,
+L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
 The C<lexeme_complete()> method
@@ -1304,33 +1351,6 @@ C<$length>.
 
 The C<$symbol_name> argument is the name of the symbol
 to scan.
-In addition
-Every token must have two things associated with it:
-
-=over 4
-
-=item *
-A symbol name, which is required,
-and which must be the name of a lexeme in
-both the L0 and G1 grammars.
-The symbol name
-tells the parser what symbol the Marpa semantics should see
-this token as.
-
-=item *
-A value (although this may be undefined).
-The symbol name and the
-value of a lexeme are what is seen by the semantics.
-
-=item *
-A B<literal equivalent>, which must be a span in
-the input.
-The literal equivalent of a lexeme is needed for
-the messages produced by
-tracing, debugging, error reporting, etc.
-
-=back
-
 The C<$value> arguments will be the value of the token.
 The C<$block_id>, C<$offset>, and C<$length> arguments
 are the literal equivalent of the token, as a 
@@ -1341,8 +1361,9 @@ Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
 After C<$lexeme_read_block>
-the current block will be set to C<$block_id>,
-and its current offset will be set to C<$start+$length>,
+the current block will be set to C<$block_id>.
+The current offset of the current block
+will be set to C<$start+$length>,
 unless a pre-lexeme event triggers.
 If a pre-lexeme event triggers,
 the current offset of the current block
@@ -1400,7 +1421,26 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-TODO Document lexeme_read_literal
+C<lexeme_read_literal()> is an method for external scanning.
+C<lexeme_read_literal()> differs from
+C<lexeme_read_block()> only in its arguments,
+and in how it sets the value of the token.
+
+It takes four arguments, only the first of which is required.
+Call them, in order,
+C<$symbol_name>,
+C<$block_id>,
+C<$offset>,
+and
+C<$length>.
+
+The C<$symbol_name> argument is the name of the symbol
+to scan.
+The C<$block_id>, C<$offset>, and C<$length> arguments
+are the literal equivalent of the token, as a 
+L<block span|/"Block spans">.
+The value of the token will be the same
+as its literal equivalent.
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1412,6 +1452,21 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
+name: recognizer lexeme_read_literal() equivalent 2
+normalize-whitespace: 1
+
+    sub read_literal_equivalent2 {
+	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+	my $value = $recce->literal( $block_id, $offset, $length );
+        return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
+    }
+
+=for Marpa::R3::Display::End
+
+In terms of low-level external scanning methods,
+the above is roughly equivalent to
+
+=for Marpa::R3::Display
 name: recognizer lexeme_read_literal() equivalent
 normalize-whitespace: 1
 
@@ -1421,6 +1476,19 @@ normalize-whitespace: 1
         return $recce->lexeme_complete( $block_id, $offset, $length );
     }
 
+=for Marpa::R3::Display::End
+
+and it is also roughly equivalent to 
+
+=for Marpa::R3::Display
+name: recognizer lexeme_read_literal() equivalent 2
+normalize-whitespace: 1
+
+    sub read_literal_equivalent2 {
+	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+	my $value = $recce->literal( $block_id, $offset, $length );
+        return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
+    }
 
 =for Marpa::R3::Display::End
 

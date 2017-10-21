@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -168,6 +168,34 @@ sub eq_literal_reader {
     my $length = length $lexeme;
     if (
         not defined read_literal_equivalent(
+            $recce, $symbol_name, $main_block, $start_of_lexeme, $length
+        )
+      )
+    {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+          $recce->literal( $main_block, $start_of_lexeme, $length ), q{"};
+    }
+}
+
+# Marpa::R3::Display
+# name: recognizer lexeme_read_literal() equivalent 2
+# normalize-whitespace: 1
+
+    sub read_literal_equivalent2 {
+	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+	my $value = $recce->literal( $block_id, $offset, $length );
+        return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
+    }
+
+# Marpa::R3::Display::End
+
+sub eq2_literal_reader {
+    my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
+    my ($main_block) = $recce->block_progress();
+    my $length = length $lexeme;
+    if (
+        not defined read_literal_equivalent2(
             $recce, $symbol_name, $main_block, $start_of_lexeme, $length
         )
       )
@@ -356,6 +384,7 @@ do_test( { reader => \&eq_block_reader } );
 do_test( { reader => \&lo_literal_reader } );
 do_test( { reader => \&hi_literal_reader } );
 do_test( { reader => \&eq_literal_reader } );
+do_test( { reader => \&eq2_literal_reader } );
 do_test( { reader => \&hi_string_reader } );
 do_test( { reader => \&eq_string_reader } );
 do_test( { reader => \&hi_block_reader, valuer => \&eq_valuer } );
