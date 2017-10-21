@@ -704,7 +704,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_block {
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_string {
-    my ( $recce, $symbol_name, $value ) = @_;
+    my ( $recce, $symbol_name, $string ) = @_;
     if ( $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$recce->lexeme_read_string() called from inside a handler\n",
@@ -715,8 +715,8 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
         );
     }
     my ($save_block) = $recce->block_progress();
-    my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
-    return if not $recce->lexeme_alternative( $symbol_name, $value );
+    my $lexeme_block = $recce->block_new( \$string );
+    return if not $recce->lexeme_alternative( $symbol_name, $string );
     my $return_value = $recce->lexeme_complete( $lexeme_block );
     $recce->block_set($save_block);
     return $return_value;
@@ -933,7 +933,7 @@ sub Marpa::R3::Scanless::R::block_move {
             = slr:block_check_range(nil, offset_arg, length_arg)
         if not ok then
            -- new_block_offset is error message
-           error(block_offset)
+           error(offset)
         end
         -- we don't set offset if the arg was nil
         local new_offset = offset_arg and offset or nil

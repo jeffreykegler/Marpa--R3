@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
@@ -230,7 +230,7 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
     sub read_string_equivalent {
         my ($recce, $symbol_name, $string) = @_;
         my ($save_block) = $recce->block_progress();
-        my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
+        my $lexeme_block = $recce->block_new( \$string );
         return if not $recce->lexeme_alternative( $symbol_name, $string );
         my $return_value = $recce->lexeme_complete( $lexeme_block );
         $recce->block_set($save_block);
@@ -245,6 +245,33 @@ sub eq_string_reader {
         die
 qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
           $lexeme;
+    }
+}
+
+# Marpa::R3::Display
+# name: recognizer lexeme_read_string() equivalent 2
+# normalize-whitespace: 1
+
+    sub read_string_equivalent2 {
+	my ( $recce, $symbol_name, $string ) = @_;
+        my ($save_block) = $recce->block_progress();
+        my $new_block = $recce->block_new( \$string );
+        my $return_value = $recce->lexeme_read_block( $symbol_name, $string, $new_block );
+        $recce->block_set($save_block);
+        return $return_value;
+    }
+
+# Marpa::R3::Display::End
+
+sub eq2_string_reader {
+    my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
+    my ($main_block) = $recce->block_progress();
+    my $length = length $lexeme;
+    if ( not defined read_string_equivalent2( $recce, $symbol_name, $lexeme ) )
+    {
+        die
+qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+          $recce->literal( $main_block, $start_of_lexeme, $length ), q{"};
     }
 }
 
@@ -387,6 +414,7 @@ do_test( { reader => \&eq_literal_reader } );
 do_test( { reader => \&eq2_literal_reader } );
 do_test( { reader => \&hi_string_reader } );
 do_test( { reader => \&eq_string_reader } );
+do_test( { reader => \&eq2_string_reader } );
 do_test( { reader => \&hi_block_reader, valuer => \&eq_valuer } );
 
 sub Calc_Nodes::script::doit {

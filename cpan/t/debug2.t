@@ -116,7 +116,7 @@ F4 B2L1c1 Factor ::= Number .
 P4 B4L1c1 Factor ::= . Number
 P6 B4L1c1 Factor ::= . Factor Multiply Factor
 R6:2 B2L1c1 Factor ::= Factor Multiply . Factor
-=== Earley set 3 at B4L1c9 ===
+=== Earley set 3 at B4L1c2 ===
 R6:1 x2 B2L1c1-B4L1c1 Factor ::= Factor . Multiply Factor
 F1 B2L1c1 [:start:] ::= Expression .
 F2 B2L1c1 Expression ::= Factor .

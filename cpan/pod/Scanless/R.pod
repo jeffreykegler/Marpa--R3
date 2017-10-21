@@ -414,6 +414,7 @@ Every token must have three things associated with it:
 =over 4
 
 =item 1.
+
 A symbol name, which is required,
 and which must be the name of a lexeme in
 both the L0 and G1 grammars.
@@ -422,11 +423,13 @@ tells the parser what symbol the Marpa semantics should see
 this token as.
 
 =item 2.
+
 A value (although this may be undefined).
 The symbol name and the
 value of a lexeme are what is seen by the semantics.
 
 =item 3.
+
 A B<literal equivalent>, which must be a span in
 the input.
 The literal equivalent of a lexeme is needed for
@@ -1399,7 +1402,7 @@ name: recognizer lexeme_read_block() equivalent
 normalize-whitespace: 1
 
     sub read_block_equivalent {
-	my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
+        my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
         return if not $recce->lexeme_alternative( $symbol_name, $value );
         return $recce->lexeme_complete( $block_id, $offset, $length );
     }
@@ -1456,8 +1459,8 @@ name: recognizer lexeme_read_literal() equivalent 2
 normalize-whitespace: 1
 
     sub read_literal_equivalent2 {
-	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-	my $value = $recce->literal( $block_id, $offset, $length );
+        my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+        my $value = $recce->literal( $block_id, $offset, $length );
         return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
     }
 
@@ -1471,23 +1474,9 @@ name: recognizer lexeme_read_literal() equivalent
 normalize-whitespace: 1
 
     sub read_literal_equivalent {
-	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+        my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
         return if not $recce->lexeme_alternative_literal( $symbol_name );
         return $recce->lexeme_complete( $block_id, $offset, $length );
-    }
-
-=for Marpa::R3::Display::End
-
-and it is also roughly equivalent to 
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_literal() equivalent 2
-normalize-whitespace: 1
-
-    sub read_literal_equivalent2 {
-	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-	my $value = $recce->literal( $block_id, $offset, $length );
-        return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
     }
 
 =for Marpa::R3::Display::End
@@ -1516,7 +1505,15 @@ C<$string>
 is a string which is both the value of the token
 and its literal representation.
 
-TODO: Complete this.
+The C<lexeme_read_string()> differs from C<lexeme_read_block()>
+in its arguments,
+and in the way it sets its literal equivalent.
+Internally, C<lexeme_read_string()> creates a new block using
+C<$string>,
+and this block, in its entirety,
+becomes the literal equivalent of the token.
+
+After
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1528,13 +1525,41 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
+name: recognizer lexeme_read_string() equivalent 2
+normalize-whitespace: 1
+
+    sub read_string_equivalent2 {
+        my ( $recce, $symbol_name, $string ) = @_;
+        my ($save_block) = $recce->block_progress();
+        my $new_block = $recce->block_new( \$string );
+        my $return_value = $recce->lexeme_read_block( $symbol_name, $string, $new_block );
+        $recce->block_set($save_block);
+        return $return_value;
+    }
+
+=for Marpa::R3::Display::End
+
+C<lexeme_read_string()> is not designed for
+very long values of C<$string>.
+For efficiency with long strings,
+use the equivalent in terms of C<lexeme_read_literal()>, as just shown.
+C<lexeme_read_literal()> sets the value of the token to a span
+of an input text block,
+while C<lexeme_read_string()> sets the value of the token to a string.
+Marpa::R3 optimizes token values when they are literals in its
+input text blocks.
+
+In terms of low-level external scanning methods,
+C<lexeme_read_string()> is roughly equivalent to
+
+=for Marpa::R3::Display
 name: lexeme_read_string() equivalent
 normalize-whitespace: 1
 
     sub read_string_equivalent {
         my ($recce, $symbol_name, $string) = @_;
         my ($save_block) = $recce->block_progress();
-        my $lexeme_block = $recce->block_new( \( '<' . $symbol_name . '>' ) );
+        my $lexeme_block = $recce->block_new( \$string );
         return if not $recce->lexeme_alternative( $symbol_name, $string );
         my $return_value = $recce->lexeme_complete( $lexeme_block );
         $recce->block_set($save_block);
@@ -1542,6 +1567,10 @@ normalize-whitespace: 1
     }
 
 =for Marpa::R3::Display::End
+
+The example just above shows the value of the token being set to a string
+in the C<lexeme_alternative()> call.
+As mentioned, this is not efficient for very long strings.
 
 =head2 resume()
 
