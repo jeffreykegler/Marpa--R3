@@ -1504,16 +1504,45 @@ to be read.
 C<$string>
 is a string which is both the value of the token
 and its literal representation.
-
-The C<lexeme_read_string()> differs from C<lexeme_read_block()>
-in its arguments,
-and in the way it sets its literal equivalent.
+The C<lexeme_read_string()> is very similar to
+C<lexeme_read_block()>,
+but differs in its arguments,
+and in the way it sets its literal equivalent,
+and in its handling of input text blocks.
 Internally, C<lexeme_read_string()> creates a new block using
 C<$string>,
 and this block, in its entirety,
 becomes the literal equivalent of the token.
 
-After
+Unless a pre-lexeme event triggers,
+C<lexeme_read_string()> does not move the current offset.
+If no pre-lexeme event triggers,
+the current block and its current offset and current eoread
+are all unchanged by
+a call to
+the C<lexeme_read_string()> method --
+they remain as they were before the call.
+
+Parse events may trigger during the C<lexeme_read_string()> method.
+If a pre-lexeme event triggers,
+the current block will be the newly created block,
+and its current offset will be offset 0.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+
+When successful,
+C<lexeme_read_string()> advances
+the current G1 location by one.
+The token read by C<lexeme_read_string()>
+will start at the previous G1 location
+and end at the new current G1 location.
+The G1 location of the token will be considered to be
+the new current G1 location.
+
+On success, C<lexeme_read_string()> returns the current offset.
+If the token was rejected,
+C<lexeme_read_string()> returns a Perl C<undef>.
+Failure is thrown as an exception.
 
 =for Marpa::R3::Display
 ignore: 1
