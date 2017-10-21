@@ -550,7 +550,7 @@ and L<the progress
 mechanism|Marpa::R3::Progress> track parses by production.
 You can determine what the productions are for a grammar
 using the L<productions_show() grammar
-method|Marpa::R3::Scanless::G/"productions_show()">.
+method|Marpa::R3::Grammar/"productions_show()">.
 
 =head2 Start rule
 

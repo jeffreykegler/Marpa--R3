@@ -11,7 +11,7 @@
 
 =head1 Name
 
-Marpa::R3::Scanless::R - Scanless interface recognizers
+Marpa::R3::Recognizer - Recognizer objects
 
 =head1 Synopsis
 
@@ -507,7 +507,7 @@ method|/"value()">.
 For advanced techniques, such as retrieving multiple values
 from an ambigious parse,
 Marpa::R3's
-L<valuer objects|Marpa::R3::Scanless::V>
+L<valuer objects|Marpa::R3::Valuer>
 can be used.
 
 =head1 Recognizer settings
@@ -932,7 +932,7 @@ Some applications will not want to treat parse ambiguity
 as an error, and may wish to deal with one or more of the
 parse values.
 They can do this using L<a
-valuer object|Marpa::R3::Scanless::V>.
+valuer object|Marpa::R3::Valuer>.
 
 The C<value()> method allows one optional argument.
 If provided, the argument
@@ -1997,7 +1997,7 @@ the C<progress()> method
 identify rules by their G1 rule ID.
 G1 rule IDs can be converted to a list of the rule's
 symbols using the L<C<rule()> method
-of the grammar|Marpa::R3::Scanless::G/"rule()">.
+of the grammar|Marpa::R3::Grammar/"rule()">.
 Details on progress reports can be found in
 L<their own document|Marpa::R3::Progress>.
 

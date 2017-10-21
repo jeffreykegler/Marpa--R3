@@ -363,7 +363,7 @@ If the blessing is a Perl word
 (a string of alphanumerics or underscores),
 the name of the class will be formed by prepending
 the value of L<the C<bless_package>
-named argument|Marpa::R3::Scanless::G/"bless_package">, followed
+named argument|Marpa::R3::Grammar/"bless_package">, followed
 by a double colon ("C<::>").
 
 If the blessing begins with a double colon ("C<::>"), it is a
@@ -675,7 +675,7 @@ To resolve Perl identifiers to Perl names,
 a semantics package must be defined.
 The semantics package can be defined using the
 L<grammar's C<semantics_package> named
-argument|Marpa::R3::Scanless::G/"semantics_package">.
+argument|Marpa::R3::Grammar/"semantics_package">.
 
 If the user wants the Perl variables implementing the semantics
 in the C<main> namespace,
@@ -780,7 +780,7 @@ to B<context variables>.
 =over
 
 =item * C<$Marpa::R3::Context::grammar> is set to
-L<the grammar|Marpa::R3::Scanless::G> being parsed.
+L<the grammar|Marpa::R3::Grammar> being parsed.
 
 =item * C<$Marpa::R3::Context::recognizer> is set to
 L<the recognizer|Marpa::R3::Scanless::R> that did this parse.
@@ -793,7 +793,7 @@ this evaluation.
 current production.
 Given the production ID, an application can find
 its LHS and RHS symbols using
-L<the grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
+L<the grammar's C<production_expand()> method|Marpa::R3::Grammar/"production_expand()">.
 
 =item * C<Marpa::R3::Context::g1_range()> returns the start
 and end G1 locations of the current production instance.
@@ -844,7 +844,7 @@ C<Marpa::R3::Context::bail()> method was called.
 Resolution from a Perl name to a Perl function takes place
 when the grammar is created
 by the grammar's
-L<C<new()>|Marpa::R3::Scanless::G/"Constructor"> method.
+L<C<new()>|Marpa::R3::Grammar/"Constructor"> method.
 The action functions are called during the Evaluation
 Phase, by the
 by the recognizer's

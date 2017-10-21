@@ -72,7 +72,7 @@ in the current parse series.
 The default is for the parse results to be returned
 in an B<arbitrary parse order>.
 This corresponds to the "C<none>" value of
-L<the grammar's C<ranking_method>|Marpa::R3::Scanless::G/"ranking_method">
+L<the grammar's C<ranking_method>|Marpa::R3::Grammar/"ranking_method">
 named argument.
 
 Traversal of the parse trees in
@@ -90,7 +90,7 @@ the parse series is traversed.
 =head2 Ranking methods
 
 SLIF grammar objects have a L<C<ranking_method> named
-argument|Marpa::R3::Scanless::G/"ranking_method">,
+argument|Marpa::R3::Grammar/"ranking_method">,
 whose value can be the name of a ranking method,
 or "C<none>", indicating that the default ranking method is to
 be used.

@@ -11,7 +11,7 @@
 
 =head1 Name
 
-Marpa::R3::Scanless::V - Scanless interface valuers
+Marpa::R3::Valuer - Valuer objects
 
 =head1 Synopsis
 
@@ -86,7 +86,7 @@ Many applications,
 probably the majority,
 will not need the SLIF valuer class or its methods.
 Instead, they will find
-the L<C<< $recognizer->value() >> method|Marpa::R3::Scanless::R/value()> method
+the L<C<< $recognizer->value() >> method|Marpa::R3::Recognizer/value()> method
 sufficient for their needs.
 
 The methods in this document

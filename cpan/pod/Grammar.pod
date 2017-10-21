@@ -11,7 +11,7 @@
 
 =head1 Name
 
-Marpa::R3::Scanless::G - Scanless interface grammars
+Marpa::R3::Grammar - Grammar objects
 
 =head1 Synopsis
 
@@ -81,7 +81,7 @@ in conjunction with the
 L<C<bless> adverb|Marpa::R3::Scanless::DSL/"bless">.
 C<bless_package> should not be confused with the
 L<C<semantics_package>
-grammar setting|Marpa::R3::Scanless::G/"semantics_package">.
+grammar setting|Marpa::R3::Grammar/"semantics_package">.
 The two are not closely related.
 
 =head2 exhaustion
@@ -160,7 +160,7 @@ semantics|Marpa::R3::Semantics>.
 The C<semantics_package> grammar setting
 should not be confused with the
 L<C<bless_package>
-grammar setting|Marpa::R3::Scanless::G/"bless_package">.
+grammar setting|Marpa::R3::Grammar/"bless_package">.
 The two are not closely related.
 
 =head2 source

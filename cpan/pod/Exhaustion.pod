@@ -140,7 +140,7 @@ a location at which parse exhaustion occurs.
 How parse exhaustion is handled depends on the setting
 of the
 L<SLIF's C<exhaustion> grammar
-setting|Marpa::R3::Scanless::G/"exhaustion">.
+setting|Marpa::R3::Grammar/"exhaustion">.
 The value of this may be "C<fatal>" or
 "C<event>".
 ("C<fatal>" is the default.)
@@ -306,7 +306,7 @@ Completion parse events may be a cleaner way to deal with this.
 Applications which do want to use parse exhaustion as part of
 a strategy for finding the EOP
 can set the
-L<SLIF's C<exhaustion> grammar setting|Marpa::R3::Scanless::G/"exhaustion">
+L<SLIF's C<exhaustion> grammar setting|Marpa::R3::Grammar/"exhaustion">
 to "C<event>", so that a parse event occurs at parse exhaustion.
 When the event-triggering method returns, the application
 can then

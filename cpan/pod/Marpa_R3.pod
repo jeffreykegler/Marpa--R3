@@ -137,13 +137,13 @@ normalize-whitespace: 1
 
 The code first creates a new SLIF grammar.
 SLIF grammars are
-L<C<Marpa::R3::Scanless:G>|Marpa::R3::Scanless::G> objects.
+L<C<Marpa::R3::Scanless:G>|Marpa::R3::Grammar> objects.
 They are created
 with the
-L<Marpa::R3::Scanless:G::new|Marpa::R3::Scanless::G/"Constructor">
+L<Marpa::R3::Scanless:G::new|Marpa::R3::Grammar/"Constructor">
 constructor.
 The arguments to
-L<Marpa::R3::Scanless::G::new|Marpa::R3::Scanless::G/"Constructor">
+L<Marpa::R3::Scanless::G::new|Marpa::R3::Grammar/"Constructor">
 are references to
 hashes of named arguments.
 In the key/value pairs of these hashes,
@@ -589,7 +589,7 @@ you probably want to go next to
 L<the overview of the SLIF interface|Marpa::R3::Scanless>,
 and then the pages describing
 L<its DSL|Marpa::R3::DSL>,
-L<its grammar methods|Marpa::R3::Scanless::G>,
+L<its grammar methods|Marpa::R3::Grammar>,
 and
 L<its recognizer methods|Marpa::R3::Scanless::R>.
 Marpa's standard semantics are fully described in the

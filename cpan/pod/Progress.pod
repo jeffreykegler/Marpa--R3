@@ -907,11 +907,11 @@ to identify productions
 in tracing and debugging output.
 Given a production ID, an application can expand it into
 its LHS and RHS symbols using
-L<the grammar's C<production_expand()> method|Marpa::R3::Scanless::G/"production_expand()">.
+L<the grammar's C<production_expand()> method|Marpa::R3::Grammar/"production_expand()">.
 Given a symbol ID,
 its name and other information can be found using
 L<other grammar
-methods|Marpa::R3::Scanless::G/"Accessors">.
+methods|Marpa::R3::Grammar/"Accessors">.
 
 Dot position is I<N>,
 where I<N> is the number of RHS symbols

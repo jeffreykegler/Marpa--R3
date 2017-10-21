@@ -172,7 +172,7 @@ any summary of the changes
 to the SLG accessors
 would be essentially be a repetition of
 L<their
-documentation|Marpa::R3::Scanless::G/"Accessors">.
+documentation|Marpa::R3::Grammar/"Accessors">.
 
 =head2 Marpa::R2::Scanless::R methods changed in Marpa::R3
 

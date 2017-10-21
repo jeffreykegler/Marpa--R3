@@ -121,7 +121,7 @@ looking more deeply and carefully at the concepts
 behind Marpa::R3.
 Separate documents provide
 the reference documentation for
-L<Scanless grammar objects|Marpa::R3::Scanless::G>,
+L<Scanless grammar objects|Marpa::R3::Grammar>,
 L<Scanless recognizer objects|Marpa::R3::Scanless::R>
 and
 L<the Scanless DSL|Marpa::R3::DSL>.

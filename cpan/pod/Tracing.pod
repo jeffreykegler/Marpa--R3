@@ -88,9 +88,9 @@ to debug an error in a grammar.
 =head2 Double check rules and symbols
 
 It sometimes helps to look carefully at the output of
-L<C<symbols_show>|Marpa::R3::Scanless::G/"symbols_show()">
+L<C<symbols_show>|Marpa::R3::Grammar/"symbols_show()">
 and
-L<C<productions_show>|Marpa::R3::Scanless::G/"productions_show()">.
+L<C<productions_show>|Marpa::R3::Grammar/"productions_show()">.
 Check if anything there is
 not what you expected.
 For thorough checking, it can be helpful to use a
@@ -120,11 +120,11 @@ argument|Marpa::R3::Scanless::R/"trace_terminals">
 to level 1.
 
 =item * Run
-L<C<productions_show>|Marpa::R3::Scanless::G/"productions_show()">
+L<C<productions_show>|Marpa::R3::Grammar/"productions_show()">
 on the grammar.
 
 =item * Run
-L<C<symbols_show>|Marpa::R3::Scanless::G/"symbols_show()">
+L<C<symbols_show>|Marpa::R3::Grammar/"symbols_show()">
 on the grammar.
 
 =item * Run
