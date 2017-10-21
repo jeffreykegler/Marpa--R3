@@ -87,7 +87,6 @@ and connects the token to the grammar.
 =item 2.
 
 A B<symbol value> or B<value>, which may be undefined.
-Together,
 The
 value of the token is also seen by the semantics.
 
@@ -102,16 +101,16 @@ if desired.
 The literal equivalent is needed for
 the messages produced by
 tracing, debugging, error reporting, etc.
-If more than one token is accepted at a G1 location,
-which can happen if tokens are ambiguous,
+If more than one token is accepted at a G1 location --
+which can happen if tokens are ambiguous --
 all of the tokens must have the same literal equivalent.
 
 =back
 
-=head1 Top-level methods
+=head1 High-level methods
 
 Most applications doing external scanning
-will want to use the top-level methods.
+will want to use the high-level methods.
 The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
 allows the reading of a string, where the string is both
 the literal equivalent of the input, and its value for semantics.
@@ -119,7 +118,7 @@ The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
 is similar, but the string is specified as a block span.
 
 The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
-is the most general of the top-level external scanning methods.
+is the most general of the high-level external scanning methods.
 C<lexeme_read_block()> allows the app to specify the literal and the value separately.
 The literal equivalent is passed to C<lexeme_read_block> as a block span
 and the symbol value is passed to C<lexeme_read_block> explicitly.
@@ -189,7 +188,7 @@ Any number of tokens may be read using C<lexeme_alternative()>
 without advancing the current location.
 This allows an application to use ambiguous tokens.
 To complete reading at a G1 location,
-and advance the current G1 location to the next G1 location,
+advancing the current G1 location to the next G1 location,
 use the L<C<lexeme_complete()>|/"lexeme_complete()"> method.
 
 B<Return values>:
@@ -225,8 +224,9 @@ C<lexeme_alternative()> differ from each other
 only in their arguments,
 and in how they set the value of the token.
 For a token read by C<lexeme_alternative_literal()>,
-the value of the token will be the same as its literal equivalent,
-as set in the next call to 
+the value of the token will be the same as its literal equivalent.
+This literal equivalent
+will be set by the next call to 
 C<lexeme_complete()>.
 
 =head2 lexeme_complete()
@@ -265,9 +265,8 @@ The block span is used to set the literal equivalent for the
 set of alternative tokens completed by the
 C<lexeme_complete()> call.
 
-The span is interpreted,
-and G1 location and current input stream location
-are adjusted,
+Current block, block offset
+and G1 location are adjusted,
 as described for
 L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
 
@@ -336,8 +335,7 @@ The G1 location of the token will be considered to be
 the new current G1 location.
 
 B<Return values>:
-On success, C<lexeme_read_block()> returns the new current physical
-input stream location.
+On success, C<lexeme_read_block()> returns the new current offset.
 If the token was rejected,
 C<lexeme_read_block()> returns a Perl C<undef>.
 Failure is thrown as an exception.
@@ -454,16 +452,16 @@ C<$symbol_name>
 is the symbol name of a token
 to be read.
 C<$string>
-is a string which is both the value of the token
+is a string which becomes both the value of the token
 and its literal equivalent.
-The C<lexeme_read_string()> is very similar to
+The C<lexeme_read_string()> method is very similar to
 C<lexeme_read_block()>,
 but differs in its arguments,
-and in the way it sets its literal equivalent,
+in the way it sets its literal equivalent,
 and in its handling of input text blocks.
 Internally, C<lexeme_read_string()> creates a new block using
-C<$string>,
-and this block, in its entirety,
+C<$string> as its text.
+This new block, in its entirety,
 becomes the literal equivalent of the token.
 
 Unless a pre-lexeme event triggers,
@@ -495,7 +493,7 @@ B<Return values>:
 On success, C<lexeme_read_string()> returns the current offset.
 If the token was rejected,
 C<lexeme_read_string()> returns a Perl C<undef>.
-Failure is thrown as an exception.
+Other failure is thrown as an exception.
 
 =for Marpa::R3::Display
 ignore: 1
