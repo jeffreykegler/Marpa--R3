@@ -78,6 +78,8 @@ B<external scanning>.
 External scanning can be used instead of internal scanning,
 but Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
+External scanning is describe in
+L<it own document|Marpa::R3::Ext_Scan>.
 
 =head1 Block position
 
@@ -106,7 +108,6 @@ C language, commonly need to do this.
 "Include" files, as just described,
 but also nest them.
 The C preprocessor does this.
-
 
 =item *
 Allow "here-docs".
@@ -402,43 +403,7 @@ specified block.
 Block span is defined more formally
 L<below|/"Block span details">.
 
-=head1 Reading Tokens
-
-Both internal and external scanning read tokens.
-In internal scanning tokenization is done as described by
-the L0 grammar.
-In external scanning, the app controls tokenization directly.
-
-Every token must have three things associated with it:
-
-=over 4
-
-=item 1.
-
-A symbol name, which is required,
-and which must be the name of a lexeme in
-both the L0 and G1 grammars.
-The symbol name
-tells the parser what symbol the Marpa semantics should see
-this token as.
-
-=item 2.
-
-A value (although this may be undefined).
-The symbol name and the
-value of a lexeme are what is seen by the semantics.
-
-=item 3.
-
-A B<literal equivalent>, which must be a span in
-the input.
-The literal equivalent of a lexeme is needed for
-the messages produced by
-tracing, debugging, error reporting, etc.
-
-=back
-
-=head1 Internal scanning
+=head1 Scanning
 
 The easiest way to scan is to define a lexer in the Marpa::R2 DSL
 and use Marpa::R2's internal scanner,
@@ -451,50 +416,9 @@ the C<read()> method.
 C<read()> can also be reinvoked to start reading a new input block.
 See L<the description of C<read()>|/"read()"> for details.
 
-=head1 External scanning
-
-External scanning allows the app to take direct control of the scanning of lexemes.
-External scanning is usually, and most simply,
-performed by reading lexemes using one of the
-C<$recce->lexeme_read_*()> series of methods.
-
-The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
-allows the reading of a string, where the string is treated as both
-the literal equivalent of the input, and its value for semantics.
-The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
-is similar, but the string is specified as a block span.
-The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
-is the most general of the top-level external scanning methods --
-it allows the app to specify the literal and the value separately --
-the literal as a block span
-and the value explicitly.
-
-For more advanced applications,
-including the reading of ambiguous lexemes,
-there are the low-level external scanning methods:
-L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
-L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()">.
-
-External scanning can be mixed with internal scanning --
-this allows you to get the best of both.
-An application can
-terminate the internal scanning of
-the C<read()> method early, if it has defined an "event",
-and that event triggers.
-Afterwards,
-internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
-For details,
-see L<the description of C<resume()> below|/"resume()">,
-as well as
-L<the separate document for events|Marpa::R3::Event>.
-
-=head1 Direct block manipulation
-
 As mentioned, Marpa::R3 does scanning by treating its input as a series of
 input text blocks.
 Advanced applications may want to manipulate these directly.
-Direct block manipulations
-can be useful for both internal and external scanning.
 The block methods are
 L<described below|/"Block methods">.
 
@@ -755,7 +679,74 @@ For more on recognizer settings,
 see
 L<the section describing them|/"Recognizer settings">.
 
-=head1 Basic mutators
+=head1 Mutators
+
+=head2 activate()
+
+=for Marpa::R3::Display
+name: recognizer activate() method synopsis
+partial: 1
+normalize-whitespace: 1
+
+        $recce->activate($_, 0) for @events;
+
+=for Marpa::R3::Display::End
+
+The C<activate()> method allows the recognizer to deactivate and reactivate
+parse events.
+Parse events are described in
+L<a separate document|Marpa::R3::Event>.
+
+The C<activate()> method takes two arguments.
+The first is the name of an event, and the second (optional) argument is
+0 or 1.
+If the argument is 0, the event is deactivated.
+If the argument is 1, the event is activated.
+An argument of 1 is the default.
+Since an recognizer always starts with all defined events
+activated,
+0 will probably be more common as the second argument to
+C<activate()>
+
+Although they are not reported until the call of the
+C<read()> method,
+location 0 events are triggered in the recognizer's
+constructor,
+before the C<activate()> method can be called.
+Currently there is no way to deactivate
+location zero events.
+
+The overhead imposed by events
+can be reduced by using the C<activate()> method.
+But making many calls to
+the C<activate()> method purely for efficiency
+purposes will be counter-productive.
+Also, deactivated events continue to impose
+a small overhead, so if an event is never used,
+it should be commented out in the DSL.
+
+=head2 lexeme_priority_set()
+
+=for Marpa::R3::Display
+name: recognizer lexeme_priority_set() synopsis
+normalize-whitespace: 1
+
+        $recce->lexeme_priority_set( 'prefix lexeme', -1 );
+
+=for Marpa::R3::Display::End
+
+Takes as its first argument the name of a lexeme
+and changes the priority of that lexeme to the value
+of its second argument.
+Both arguments are required.
+
+Changing the lexeme priority is a very flexible
+technique.
+It can, in effect, allow an application
+to switch lexers.
+
+On success, returns the old priority value.
+Failure is thrown.
 
 =head2 read()
 
@@ -889,6 +880,96 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+=head2 resume()
+
+=for Marpa::R3::Display
+name: recognizer read/resume synopsis
+partial: 1
+normalize-whitespace: 1
+
+    my @pause_location;
+    my $recce = Marpa::R3::Scanless::R->new(
+        {
+            grammar        => $parser->{grammar},
+            event_handlers => {
+                'before lstring' => sub () {
+                    ( undef, undef, undef, @pause_location ) = @_;
+                    'pause';
+                },
+
+            }
+        }
+    );
+    my $length = length $string;
+    for (
+        my $pos = $recce->read( \$string );
+        $pos < $length;
+        $pos = $recce->resume()
+        )
+    {
+        my $start = $pause_location[1];
+        my $length = $pause_location[2];
+        my $value = substr $string, $start + 1, $length - 2;
+        $value = decode_string($value) if -1 != index $value, '\\';
+        $recce->lexeme_read_block( 'lstring', $value, undef, $start, $length ) // die;
+    } ## end for ( my $pos = $recce->read( \$string ); $pos < $length...)
+    my $per_parse_arg = bless {}, 'MarpaX::JSON::Actions';
+    my $value_ref = $recce->value($per_parse_arg);
+    return ${$value_ref};
+
+=for Marpa::R3::Display::End
+
+The C<resume()> method resumes
+internal scanning,
+L<as described
+above|/"Internal scanning">.
+A physical input stream must already have
+been specified using the
+L<C<< $recce->read() >> method|/"read()">.
+The C<resume()> method should only be called during the
+Reading Phase.
+
+The C<resume()> method takes two optional arguments,
+which represent the start and length parameters of
+a span in the physical input stream.
+The default start location is the current location.
+The default length is -1.
+Negative arguments are interpreted
+as L<described above|/"Spans">.
+
+If a parse event occurs during the C<read()> method,
+the current location is set to the event location.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+If no parse event triggers,
+and the parse reaches the end of the input string without a
+failure,
+the current location is set to the end of the input string.
+
+C<resume()> is considered successful
+if it reads input to the end of input string,
+or if a parse event triggers.
+On success, C<resume()> returns
+the new current location.
+On unthrown failure,
+C<resume()> returns a Perl C<undef>.
+Currently, all failures are thrown.
+
+The C<resume()> method is
+the approximate equivalent of
+
+=for Marpa::R3::Display
+name: Block level resume() equivalent
+normalize-whitespace: 1
+
+    sub block_level_resume {
+        my ($recce, $offset, $length) = @_;
+        $recce->block_move( $offset, $length );
+        return $recce->block_read();
+    }
+
+=for Marpa::R3::Display::End
+
 =head2 set()
 
 =for Marpa::R3::Display
@@ -981,8 +1062,6 @@ normalize-whitespace: 1
 
 These methods allow control
 of the input on the block level.
-They are useful for both internal and external
-scanning.
 
 =head2 block_move ()
 
@@ -1126,567 +1205,6 @@ the ID of the current block;
 the current offset of the current block;
 and the current eoread of the current block.
 Failures are thrown.
-
-=head1 Mutators for external scanning
-
-=head2 activate()
-
-=for Marpa::R3::Display
-name: recognizer activate() method synopsis
-partial: 1
-normalize-whitespace: 1
-
-        $recce->activate($_, 0) for @events;
-
-=for Marpa::R3::Display::End
-
-The C<activate()> method allows the recognizer to deactivate and reactivate
-parse events.
-Parse events are described in
-L<a separate document|Marpa::R3::Event>.
-
-The C<activate()> method takes two arguments.
-The first is the name of an event, and the second (optional) argument is
-0 or 1.
-If the argument is 0, the event is deactivated.
-If the argument is 1, the event is activated.
-An argument of 1 is the default.
-Since an recognizer always starts with all defined events
-activated,
-0 will probably be more common as the second argument to
-C<activate()>
-
-Although they are not reported until the call of the
-C<read()> method,
-location 0 events are triggered in the recognizer's
-constructor,
-before the C<activate()> method can be called.
-Currently there is no way to deactivate
-location zero events.
-
-The overhead imposed by events
-can be reduced by using the C<activate()> method.
-But making many calls to
-the C<activate()> method purely for efficiency
-purposes will be counter-productive.
-Also, deactivated events continue to impose
-a small overhead, so if an event is never used,
-it should be commented out in the DSL.
-
-=head2 lexeme_alternative()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
-    if (not $ok) {
-        my $literal = $recce->literal( $block_id, $offset, $length );
-        die qq{Parser rejected symbol named "$symbol_name" },
-            qq{at position $offset, before lexeme "$literal"};
-    }
-
-=for Marpa::R3::Display::End
-
-The C<lexeme_alternative()> method
-allows an external scanner to read
-ambiguous tokens.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
-C<lexeme_alternative()> takes one or two arguments.
-The first argument,
-which is required,
-is the name of a symbol to be read
-at the current location.
-The second argument,
-which is optional,
-is the value of the symbol.
-The value argument is interpreted as described for C<lexeme_read_block()>.
-
-Any number of tokens may be read using C<lexeme_alternative()>
-without advancing the current location.
-This allows an application to use ambiguous tokens.
-To complete reading at a G1 location,
-and advance the current G1 location to the next G1 location,
-use the L<C<lexeme_complete()>|/"lexeme_complete()"> method.
-
-On success, returns a non-negative number,
-which may be zero.
-Returns C<undef> if the token was rejected.
-Failures are thrown as exceptions.
-
-=head2 lexeme_alternative_literal()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative_literal() synopsis
-partial: 1
-normalize-whitespace: 1
-
-            if ( not defined $recce->lexeme_alternative_literal($symbol_name) ) {
-                die
-                    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-            }
-
-=for Marpa::R3::Display::End
-
-C<lexeme_alternative_literal()> takes only one, required, argument.
-C<lexeme_alternative_literal()> differs from each other
-C<lexeme_alternative()> only in their arguments,
-and in how they set the value of the token.
-For a token read by C<lexeme_alternative_literal()>,
-the value of the token will be the same as its literal equivalent,
-as set in the next call to 
-C<lexeme_complete()>.
-
-=head2 lexeme_complete()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_complete() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
-
-=for Marpa::R3::Display::End
-
-The C<lexeme_complete()> is one of the low-level methods of the external scanner.
-The low-level methods allow, among other things,
-the reading of ambiguous tokens.
-C<lexeme_complete()>
-It completes the reading of a set of tokens specified by
-one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
-method
-at a G1 location.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
-The C<lexeme_complete()> method
-requires three arguments.
-Call them, in order,
-C<$block_id>, C<$offset> and C<$length>.
-These are treated as a block span,
-L<as described above|/"Block spans">
-The block span is used to set the literal equivalent of the
-set of alternative tokens completed by the
-C<lexeme_complete()> call.
-
-Every token must have literal equivalent,
-which must be a span in the physical input.
-represent that block span.
-The literal equivalent is used, among other things,
-to allow errors to be reported by location
-in a sensible way.
-
-The span is interpreted,
-and G1 location and current input stream location
-are adjusted,
-as described for
-L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
-
-Parse events may occur during
-the L<C<lexeme_complete()>|/"lexeme_complete()"> method,
-as described for
-L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
-
-B<Return value:>
-On success, C<lexeme_complete()>
-returns the new current location.
-Failure is always thrown.
-
-=head2 lexeme_priority_set()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_priority_set() synopsis
-normalize-whitespace: 1
-
-        $recce->lexeme_priority_set( 'prefix lexeme', -1 );
-
-=for Marpa::R3::Display::End
-
-Takes as its first argument the name of a lexeme
-and changes the priority of that lexeme to the value
-of its second argument.
-Both arguments are required.
-
-Changing the lexeme priority is a very flexible
-technique.
-It can, in effect, allow an application
-to switch lexers.
-
-On success, returns the old priority value.
-Failure is thrown.
-
-=head2 lexeme_read_block()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_block() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    if ( not defined $recce->lexeme_read_block($symbol_name, $value,
-        $main_block, $start_of_lexeme, $lexeme_length) ) {
-        die
-    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
-
-=for Marpa::R3::Display::End
-
-C<lexeme_read_block()> is the basic method for external scanning.
-It takes five arguments, only the first of which is required.
-Call them, in order,
-C<$symbol_name>,
-C<$value>,
-C<$block_id>,
-C<$offset>,
-and
-C<$length>.
-
-The C<$symbol_name> argument is the name of the symbol
-to scan.
-The C<$value> arguments will be the value of the token.
-The C<$block_id>, C<$offset>, and C<$length> arguments
-are the literal equivalent of the token, as a 
-L<block span|/"Block spans">.
-
-Parse events may trigger during the C<lexeme_read_block()> method.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-
-After C<$lexeme_read_block>
-the current block will be set to C<$block_id>.
-The current offset of the current block
-will be set to C<$start+$length>,
-unless a pre-lexeme event triggers.
-If a pre-lexeme event triggers,
-the current offset of the current block
-will be set to the event location.
-
-When successful,
-C<lexeme_read_block()> advances
-the current G1 location by one.
-The token read by C<lexeme_read_block()>
-will start at the previous G1 location
-and end at the new current G1 location.
-The G1 location of the token will be considered to be
-the new current G1 location.
-
-On success, C<lexeme_read_block()> returns the new current physical
-input stream location.
-If the token was rejected,
-C<lexeme_read_block()> returns a Perl C<undef>.
-Failure is thrown as an exception.
-
-=for Marpa::R3::Display
-ignore: 1
-
-    $recce->lexeme_read_block($symbol, $start, $length, $value)
-
-=for Marpa::R3::Display::End
-
-is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_block() equivalent
-normalize-whitespace: 1
-
-    sub read_block_equivalent {
-        my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
-        return if not $recce->lexeme_alternative( $symbol_name, $value );
-        return $recce->lexeme_complete( $block_id, $offset, $length );
-    }
-
-=for Marpa::R3::Display::End
-
-=head2 lexeme_read_literal()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_literal() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    if ( not defined $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
-        die
-    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
-
-=for Marpa::R3::Display::End
-
-C<lexeme_read_literal()> is an method for external scanning.
-C<lexeme_read_literal()> differs from
-C<lexeme_read_block()> only in its arguments,
-and in how it sets the value of the token.
-
-It takes four arguments, only the first of which is required.
-Call them, in order,
-C<$symbol_name>,
-C<$block_id>,
-C<$offset>,
-and
-C<$length>.
-
-The C<$symbol_name> argument is the name of the symbol
-to scan.
-The C<$block_id>, C<$offset>, and C<$length> arguments
-are the literal equivalent of the token, as a 
-L<block span|/"Block spans">.
-The value of the token will be the same
-as its literal equivalent.
-
-=for Marpa::R3::Display
-ignore: 1
-
-    $recce->lexeme_read_literal($symbol, $start, $length, $value)
-
-=for Marpa::R3::Display::End
-
-is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_literal() equivalent 2
-normalize-whitespace: 1
-
-    sub read_literal_equivalent2 {
-        my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-        my $value = $recce->literal( $block_id, $offset, $length );
-        return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
-    }
-
-=for Marpa::R3::Display::End
-
-In terms of low-level external scanning methods,
-the above is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_literal() equivalent
-normalize-whitespace: 1
-
-    sub read_literal_equivalent {
-        my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-        return if not $recce->lexeme_alternative_literal( $symbol_name );
-        return $recce->lexeme_complete( $block_id, $offset, $length );
-    }
-
-=for Marpa::R3::Display::End
-
-=head2 lexeme_read_string()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_string() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    if ( not defined $recce->lexeme_read_string( $symbol_name, $lexeme ) ) {
-        die
-    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
-
-=for Marpa::R3::Display::End
-
-The C<lexeme_read_string()> method takes 2 arguments, both required.
-Call them, in order, C<$symbol_name> and C<$string>.
-C<$symbol_name>
-is the symbol name of a token
-to be read.
-C<$string>
-is a string which is both the value of the token
-and its literal representation.
-The C<lexeme_read_string()> is very similar to
-C<lexeme_read_block()>,
-but differs in its arguments,
-and in the way it sets its literal equivalent,
-and in its handling of input text blocks.
-Internally, C<lexeme_read_string()> creates a new block using
-C<$string>,
-and this block, in its entirety,
-becomes the literal equivalent of the token.
-
-Unless a pre-lexeme event triggers,
-C<lexeme_read_string()> does not move the current offset.
-If no pre-lexeme event triggers,
-the current block and its current offset and current eoread
-are all unchanged by
-a call to
-the C<lexeme_read_string()> method --
-they remain as they were before the call.
-
-Parse events may trigger during the C<lexeme_read_string()> method.
-If a pre-lexeme event triggers,
-the current block will be the newly created block,
-and its current offset will be offset 0.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-
-When successful,
-C<lexeme_read_string()> advances
-the current G1 location by one.
-The token read by C<lexeme_read_string()>
-will start at the previous G1 location
-and end at the new current G1 location.
-The G1 location of the token will be considered to be
-the new current G1 location.
-
-On success, C<lexeme_read_string()> returns the current offset.
-If the token was rejected,
-C<lexeme_read_string()> returns a Perl C<undef>.
-Failure is thrown as an exception.
-
-=for Marpa::R3::Display
-ignore: 1
-
-    $recce->lexeme_read_string($symbol, $string)
-
-=for Marpa::R3::Display::End
-
-is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_string() equivalent 2
-normalize-whitespace: 1
-
-    sub read_string_equivalent2 {
-        my ( $recce, $symbol_name, $string ) = @_;
-        my ($save_block) = $recce->block_progress();
-        my $new_block = $recce->block_new( \$string );
-        my $return_value = $recce->lexeme_read_block( $symbol_name, $string, $new_block );
-        $recce->block_set($save_block);
-        return $return_value;
-    }
-
-=for Marpa::R3::Display::End
-
-C<lexeme_read_string()> is not designed for
-very long values of C<$string>.
-For efficiency with long strings,
-use the equivalent in terms of C<lexeme_read_literal()>, as just shown.
-C<lexeme_read_literal()> sets the value of the token to a span
-of an input text block,
-while C<lexeme_read_string()> sets the value of the token to a string.
-Marpa::R3 optimizes token values when they are literals in its
-input text blocks.
-
-In terms of low-level external scanning methods,
-C<lexeme_read_string()> is roughly equivalent to
-
-=for Marpa::R3::Display
-name: lexeme_read_string() equivalent
-normalize-whitespace: 1
-
-    sub read_string_equivalent {
-        my ($recce, $symbol_name, $string) = @_;
-        my ($save_block) = $recce->block_progress();
-        my $lexeme_block = $recce->block_new( \$string );
-        return if not $recce->lexeme_alternative( $symbol_name, $string );
-        my $return_value = $recce->lexeme_complete( $lexeme_block );
-        $recce->block_set($save_block);
-        return $return_value;
-    }
-
-=for Marpa::R3::Display::End
-
-The example just above shows the value of the token being set to a string
-in the C<lexeme_alternative()> call.
-As mentioned, this is not efficient for very long strings.
-
-=head2 resume()
-
-=for Marpa::R3::Display
-name: recognizer read/resume synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my @pause_location;
-    my $recce = Marpa::R3::Scanless::R->new(
-        {
-            grammar        => $parser->{grammar},
-            event_handlers => {
-                'before lstring' => sub () {
-                    ( undef, undef, undef, @pause_location ) = @_;
-                    'pause';
-                },
-
-            }
-        }
-    );
-    my $length = length $string;
-    for (
-        my $pos = $recce->read( \$string );
-        $pos < $length;
-        $pos = $recce->resume()
-        )
-    {
-        my $start = $pause_location[1];
-        my $length = $pause_location[2];
-        my $value = substr $string, $start + 1, $length - 2;
-        $value = decode_string($value) if -1 != index $value, '\\';
-        $recce->lexeme_read_block( 'lstring', $value, undef, $start, $length ) // die;
-    } ## end for ( my $pos = $recce->read( \$string ); $pos < $length...)
-    my $per_parse_arg = bless {}, 'MarpaX::JSON::Actions';
-    my $value_ref = $recce->value($per_parse_arg);
-    return ${$value_ref};
-
-=for Marpa::R3::Display::End
-
-The C<resume()> method resumes
-internal scanning,
-L<as described
-above|/"Internal scanning">.
-A physical input stream must already have
-been specified using the
-L<C<< $recce->read() >> method|/"read()">.
-The C<resume()> method should only be called during the
-Reading Phase.
-
-The C<resume()> method takes two optional arguments,
-which represent the start and length parameters of
-a span in the physical input stream.
-The default start location is the current location.
-The default length is -1.
-Negative arguments are interpreted
-as L<described above|/"Spans">.
-
-If a parse event occurs during the C<read()> method,
-the current location is set to the event location.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-If no parse event triggers,
-and the parse reaches the end of the input string without a
-failure,
-the current location is set to the end of the input string.
-
-C<resume()> is considered successful
-if it reads input to the end of input string,
-or if a parse event triggers.
-On success, C<resume()> returns
-the new current location.
-On unthrown failure,
-C<resume()> returns a Perl C<undef>.
-Currently, all failures are thrown.
-
-The C<resume()> method is
-the approximate equivalent of
-
-=for Marpa::R3::Display
-name: Block level resume() equivalent
-normalize-whitespace: 1
-
-    sub block_level_resume {
-        my ($recce, $offset, $length) = @_;
-        $recce->block_move( $offset, $length );
-        return $recce->block_read();
-    }
-
-=for Marpa::R3::Display::End
 
 =head1 Accessors
 
