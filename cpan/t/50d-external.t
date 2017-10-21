@@ -246,7 +246,7 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexem
 	my ( $recce, $symbol_name, $string ) = @_;
         my ($save_block) = $recce->block_progress();
         my $new_block = $recce->block_new( \$string );
-        my $return_value = $recce->lexeme_read_block( $symbol_name, $string, $new_block );
+        my $return_value = $recce->lexeme_read_literal( $symbol_name, $new_block );
         $recce->block_set($save_block);
         return $return_value;
     }

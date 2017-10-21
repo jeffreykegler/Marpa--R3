@@ -61,44 +61,6 @@ External scanning can be used instead of internal scanning.
 Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
 
-=head1 Top-level methods
-
-Most applications doing external scanning
-will want to use the top-level methods.
-The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
-allows the reading of a string, where the string is treated as both
-the literal equivalent of the input, and its value for semantics.
-The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
-is similar, but the string is specified as a block span.
-The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
-is the most general of the top-level external scanning methods --
-it allows the app to specify the literal and the value separately --
-the literal as a block span
-and the value explicitly.
-
-=head1 Low level methods
-
-Advanced applications,
-including those which want to read ambiguous lexemes,
-can use the low-level external scanning methods:
-L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
-L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()">.
-
-=head1 Mixing internal and external scanning
-
-External scanning can be mixed with internal scanning
-to get the best of both.
-An application can
-terminate the internal scanning of
-the C<read()> method early, if it has defined an "event",
-and that event triggers.
-Afterwards,
-internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
-For details,
-see L<the description of C<resume()> below|/"resume()">,
-as well as
-L<the separate document for events|Marpa::R3::Event>.
-
 =head1 Tokens
 
 In external scanning, the app controls tokenization directly.
@@ -129,8 +91,49 @@ the input.
 The literal equivalent of a lexeme is needed for
 the messages produced by
 tracing, debugging, error reporting, etc.
+If more than one token is accepted at a G1 location,
+which can happen if tokens are ambiguous,
+all of them must have the same literal equivalent.
 
 =back
+
+=head1 Top-level methods
+
+Most applications doing external scanning
+will want to use the top-level methods.
+The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
+allows the reading of a string, where the string is treated as both
+the literal equivalent of the input, and its value for semantics.
+The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
+is similar, but the string is specified as a block span.
+The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
+is the most general of the top-level external scanning methods --
+it allows the app to specify the literal and the value separately --
+the literal as a block span
+and the value explicitly.
+
+=head1 Low level methods
+
+Advanced applications,
+including those which want to read ambiguous lexemes,
+can use the low-level external scanning methods:
+L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
+L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()">.
+
+=head1 Mixing internal and external scanning
+
+External scanning can be mixed with internal scanning
+to get the best of both.
+An application can
+terminate the internal scanning of
+the C<read()> method early, if it has defined an parse event,
+and that parse event triggers.
+Afterwards,
+internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
+For details,
+see L<the description of C<resume()> below|/"resume()">,
+as well as
+L<the separate document for events|Marpa::R3::Event>.
 
 =head1 Mutators
 
@@ -196,8 +199,9 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 C<lexeme_alternative_literal()> takes only one, required, argument.
-C<lexeme_alternative_literal()> differs from each other
-C<lexeme_alternative()> only in their arguments,
+C<lexeme_alternative_literal()> and
+C<lexeme_alternative()> differ from each other
+only in their arguments,
 and in how they set the value of the token.
 For a token read by C<lexeme_alternative_literal()>,
 the value of the token will be the same as its literal equivalent,
@@ -215,36 +219,30 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<lexeme_complete()> is one of the low-level methods of the external scanner.
-The low-level methods allow, among other things,
-the reading of ambiguous tokens.
-C<lexeme_complete()>
-It completes the reading of a set of tokens specified by
-one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
-method
-at a G1 location.
+C<lexeme_complete()> is one of the low-level methods of the external scanner.
 Most applications
 will prefer the simpler
 L<C<lexeme_read_string()>|/"lexeme_read_string()">,
 L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
+Use of the low-level methods allows, among other things,
+the reading of ambiguous tokens.
+C<lexeme_complete()>
+completes the reading of a set of tokens specified by
+one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
+method
+at a G1 location.
+
 The C<lexeme_complete()> method
-requires three arguments.
+accepts three optional arguments.
 Call them, in order,
 C<$block_id>, C<$offset> and C<$length>.
-These are treated as a block span,
-L<as described above|/"Block spans">
-The block span is used to set the literal equivalent of the
+These are treated as a
+L<block span|Marpa::R3::Recognizer/"Block spans">.
+The block span is used to set the literal equivalent for the
 set of alternative tokens completed by the
 C<lexeme_complete()> call.
-
-Every token must have literal equivalent,
-which must be a span in the physical input.
-represent that block span.
-The literal equivalent is used, among other things,
-to allow errors to be reported by location
-in a sensible way.
 
 The span is interpreted,
 and G1 location and current input stream location
@@ -254,8 +252,8 @@ L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
 
 Parse events may occur during
 the L<C<lexeme_complete()>|/"lexeme_complete()"> method,
-as described for
-L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
 
 B<Return value:>
 On success, C<lexeme_complete()>
@@ -362,14 +360,14 @@ C<lexeme_read_literal()> differs from
 C<lexeme_read_block()> only in its arguments,
 and in how it sets the value of the token.
 
-It takes four arguments, only the first of which is required.
+C<lexeme_read_literal()>
+takes four arguments, only the first of which is required.
 Call them, in order,
 C<$symbol_name>,
 C<$block_id>,
 C<$offset>,
 and
 C<$length>.
-
 The C<$symbol_name> argument is the name of the symbol
 to scan.
 The C<$block_id>, C<$offset>, and C<$length> arguments
@@ -435,7 +433,7 @@ is the symbol name of a token
 to be read.
 C<$string>
 is a string which is both the value of the token
-and its literal representation.
+and its literal equivalent.
 The C<lexeme_read_string()> is very similar to
 C<lexeme_read_block()>,
 but differs in its arguments,
@@ -493,7 +491,7 @@ normalize-whitespace: 1
         my ( $recce, $symbol_name, $string ) = @_;
         my ($save_block) = $recce->block_progress();
         my $new_block = $recce->block_new( \$string );
-        my $return_value = $recce->lexeme_read_block( $symbol_name, $string, $new_block );
+        my $return_value = $recce->lexeme_read_literal( $symbol_name, $new_block );
         $recce->block_set($save_block);
         return $return_value;
     }
