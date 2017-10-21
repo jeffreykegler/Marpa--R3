@@ -251,7 +251,7 @@ explicit action.
 The implicit action for a lexeme is to return
 its literal value in the input stream, as a string.
 An explicit default action name for lexemes may be set using the
-L<the lexeme default statement|Marpa::R3::Scanless::DSL/"Lexeme default statement">.
+L<the lexeme default statement|Marpa::R3::DSL/"Lexeme default statement">.
 A lexeme action cannot be a Perl closure action --
 it must be one of the built-in actions that are
 appropriate for lexemes.
@@ -272,10 +272,10 @@ The remaining I<n> elements are the values of the production's
 RHS children, in lexical order.
 
 An explicit action for a RHS alternative can be specified using
-L<the C<action> adverb|Marpa::R3::Scanless::DSL/"action">
+L<the C<action> adverb|Marpa::R3::DSL/"action">
 for the its RHS alternative.
 A default explicit action for RHS alternatives can be specified with a
-L<default pseudo-rule|Marpa::R3::Scanless::DSL/"Default pseudo-rule">.
+L<default pseudo-rule|Marpa::R3::DSL/"Default pseudo-rule">.
 
 =head2 Nulled symbol actions
 
@@ -735,7 +735,7 @@ If the production is nulled, the array will contain zero elements.
 Everything just said about production nodes
 applies to nodes for
 L<quantified
-productions|Marpa::R3::Scanless::DSL/"Quantified production">.
+productions|Marpa::R3::DSL/"Quantified production">.
 But there is a difference between quantified productions
 and others, and it a big one if you are writing a production
 evaluation closure.

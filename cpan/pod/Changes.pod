@@ -50,7 +50,7 @@ Marpa expects all strings passed to it to be valid UTF-8.
 
 =head2 "Eager" lexemes added
 
-See L<Marpa::R3::Scanless::DSL/"eager">.
+See L<Marpa::R3::DSL/"eager">.
 
 =head2 Problems with kernel Earley items in progress reports fixed
 

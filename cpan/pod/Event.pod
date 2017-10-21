@@ -205,9 +205,9 @@ An instance event is either
 a B<lexeme event> or
 a B<non-lexeme event>.
 A lexeme event is declared using a
-L<C<:lexeme> pseudo-rule|Marpa::R3::Scanless::DSL/"Lexeme pseudo-rule">.
+L<C<:lexeme> pseudo-rule|Marpa::R3::DSL/"Lexeme pseudo-rule">.
 A non-lexeme event is declared using a
-L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">.
+L<named event statement|Marpa::R3::DSL/"Named event statement">.
 
 The various types of parse events are described in detail
 L<below|/"Types of parse event">.
@@ -404,7 +404,7 @@ not restricted.
 
 Completion events are declared in the Marpa::R3 DSL
 using the
-L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">:
+L<named event statement|Marpa::R3::DSL/"Named event statement">:
 
 =for Marpa::R3::Display
 name: completed event statement synopsis
@@ -456,7 +456,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Discard events are specified in
-L<discard pseudo-rules|Marpa::R3::Scanless::DSL/"Discard pseudo-rule">.
+L<discard pseudo-rules|Marpa::R3::DSL/"Discard pseudo-rule">.
 They are non-lexeme events.
 This may seem counter-intuitive,
 but a lexeme must be a symbol visible to the G1
@@ -530,7 +530,7 @@ the G1 location is reported as zero.
 
 A nulling event is declared in the Marpa::R3 DSL
 using the
-L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">:
+L<named event statement|Marpa::R3::DSL/"Named event statement">:
 
 =for Marpa::R3::Display
 name: nulled event statement synopsis
@@ -586,7 +586,7 @@ and the event name.
 
 A prediction event is declared in the Marpa::R3 DSL
 using the
-L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">:
+L<named event statement|Marpa::R3::DSL/"Named event statement">:
 
 =for Marpa::R3::Display
 name: predicted event statement synopsis
@@ -977,7 +977,7 @@ applied in order, are true:
 =item *
 
 It is declared in a
-L<C<:lexeme> pseudo-rule|Marpa::R3::Scanless::DSL/"Lexeme pseudo-rule">.
+L<C<:lexeme> pseudo-rule|Marpa::R3::DSL/"Lexeme pseudo-rule">.
 
 =item *
 
@@ -1030,7 +1030,7 @@ if all of the following are true:
 =item *
 
 It is declared in a
-L<named event statement|Marpa::R3::Scanless::DSL/"Named event statement">.
+L<named event statement|Marpa::R3::DSL/"Named event statement">.
 
 =item *
 

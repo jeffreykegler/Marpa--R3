@@ -173,7 +173,7 @@ arbitrary.
 
 Rule alternatives may be part of a single rule in the DSL --
 for example, a
-L<prioritized rule|Marpa::R3::Scanless::DSL/"Prioritized rule">.
+L<prioritized rule|Marpa::R3::DSL/"Prioritized rule">.
 Placement with a DSL rule
 makes no difference when ranking rule alternatives.
 For example, it makes no difference if two rule alternatives
@@ -206,7 +206,7 @@ with null symbols higher.
 
 The
 L<C<null-ranking> adverb
-for RHS alternatives|Marpa::R3::Scanless::DSL/"null-ranking">
+for RHS alternatives|Marpa::R3::DSL/"null-ranking">
 specifies which nulling variants are ranked high or low.
 If the C<null-ranking> is "C<low>",
 then the closer a nulling variant

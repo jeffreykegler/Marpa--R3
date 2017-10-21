@@ -1299,8 +1299,6 @@ L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
 B<Return value:>
 On success, C<lexeme_complete()>
 returns the new current location.
-This will never be location zero, because a succesful
-call of C<lexeme_complete()> always advances the location.
 Failure is always thrown.
 
 =head2 lexeme_priority_set()
@@ -1342,7 +1340,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-C<lexeme_read_block()> is the most basic method for external scanning.
+C<lexeme_read_block()> is the basic method for external scanning.
 It takes five arguments, only the first of which is required.
 Call them, in order,
 C<$symbol_name>,
@@ -1383,7 +1381,6 @@ the new current G1 location.
 
 On success, C<lexeme_read_block()> returns the new current physical
 input stream location.
-This will never be location zero, because lexemes cannot be zero length.
 If the token was rejected,
 C<lexeme_read_block()> returns a Perl C<undef>.
 Failure is thrown as an exception.

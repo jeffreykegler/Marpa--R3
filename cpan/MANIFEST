@@ -214,7 +214,7 @@ pod/Glade.pod
 pod/Marpa_R3.pod
 pod/Progress.pod
 pod/Scanless.pod
-pod/Scanless/DSL.pod
+pod/DSL.pod
 pod/Scanless/G.pod
 pod/Scanless/R.pod
 pod/Scanless/V.pod

@@ -11,7 +11,7 @@
 
 =head1 Name
 
-Marpa::R3::Scanless::DSL - The DSL for the Scanless interface
+Marpa::R3::DSL - The Marpa::R3 domain specific language
 
 =head1 Synopsis
 
