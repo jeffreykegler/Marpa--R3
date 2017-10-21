@@ -39,7 +39,7 @@ sub lo_reader {
 # name: recognizer lexeme_alternative() synopsis
 
     my $ok = $recce->lexeme_alternative( $symbol_name, $value );
-    if (not $ok) {
+    if (not defined $ok) {
         my $literal = $recce->literal( $block_id, $offset, $length );
         die qq{Parser rejected symbol named "$symbol_name" },
             qq{at position $offset, before lexeme "$literal"};
@@ -76,12 +76,12 @@ sub hi_block_reader {
 }
 
 # Marpa::R3::Display
-# name: recognizer lexeme_read_block() equivalent
+# name: recognizer lexeme_read_block() low-level equivalent
 # normalize-whitespace: 1
 
     sub read_block_equivalent {
 	my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
-        return if not $recce->lexeme_alternative( $symbol_name, $value );
+        return if not defined $recce->lexeme_alternative( $symbol_name, $value );
         return $recce->lexeme_complete( $block_id, $offset, $length );
     }
 
@@ -116,9 +116,6 @@ sub lo_literal_reader {
         $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
             if not defined $ok;
     $ok = $recce->lexeme_complete( $main_block, $start_of_lexeme, $lexeme_length);
-    die qq{No token found at position $start_of_lexeme, before "},
-      $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
-           if not $ok;
 
 # Marpa::R3::Display::End
 
@@ -135,19 +132,19 @@ sub hi_literal_reader {
     my $ok = $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length);
     die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
-           if not $ok;
+           if not defined $ok;
 
 # Marpa::R3::Display::End
 
 }
 
 # Marpa::R3::Display
-# name: recognizer lexeme_read_literal() equivalent
+# name: recognizer lexeme_read_literal() low-level equivalent
 # normalize-whitespace: 1
 
-    sub read_literal_equivalent {
+    sub read_literal_equivalent_lo {
 	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-        return if not $recce->lexeme_alternative_literal( $symbol_name );
+        return if not defined $recce->lexeme_alternative_literal( $symbol_name );
         return $recce->lexeme_complete( $block_id, $offset, $length );
     }
 
@@ -158,7 +155,7 @@ sub eq_literal_reader {
     my ($main_block) = $recce->block_progress();
     my $length = length $lexeme;
     if (
-        not defined read_literal_equivalent(
+        not defined read_literal_equivalent_lo(
             $recce, $symbol_name, $main_block, $start_of_lexeme, $length
         )
       )
@@ -170,10 +167,10 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexem
 }
 
 # Marpa::R3::Display
-# name: recognizer lexeme_read_literal() equivalent 2
+# name: recognizer lexeme_read_literal() high-level equivalent
 # normalize-whitespace: 1
 
-    sub read_literal_equivalent2 {
+    sub read_literal_equivalent_hi {
 	my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
 	my $value = $recce->literal( $block_id, $offset, $length );
         return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
@@ -186,7 +183,7 @@ sub eq2_literal_reader {
     my ($main_block) = $recce->block_progress();
     my $length = length $lexeme;
     if (
-        not defined read_literal_equivalent2(
+        not defined read_literal_equivalent_hi(
             $recce, $symbol_name, $main_block, $start_of_lexeme, $length
         )
       )
@@ -214,14 +211,14 @@ sub hi_string_reader {
 }
 
 # Marpa::R3::Display
-# name: lexeme_read_string() equivalent
+# name: recognizer lexeme_read_string() low-level equivalent
 # normalize-whitespace: 1
 
-    sub read_string_equivalent {
+    sub read_string_equivalent_lo {
         my ($recce, $symbol_name, $string) = @_;
         my ($save_block) = $recce->block_progress();
         my $lexeme_block = $recce->block_new( \$string );
-        return if not $recce->lexeme_alternative( $symbol_name, $string );
+        return if not defined $recce->lexeme_alternative( $symbol_name, $string );
         my $return_value = $recce->lexeme_complete( $lexeme_block );
         $recce->block_set($save_block);
         return $return_value;
@@ -231,7 +228,7 @@ sub hi_string_reader {
 
 sub eq_string_reader {
     my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
-    if ( not defined read_string_equivalent( $recce, $symbol_name, $lexeme ) ) {
+    if ( not defined read_string_equivalent_lo( $recce, $symbol_name, $lexeme ) ) {
         die
 qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
           $lexeme;
@@ -239,10 +236,10 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexem
 }
 
 # Marpa::R3::Display
-# name: recognizer lexeme_read_string() equivalent 2
+# name: recognizer lexeme_read_string() high-level equivalent
 # normalize-whitespace: 1
 
-    sub read_string_equivalent2 {
+    sub read_string_equivalent_hi {
 	my ( $recce, $symbol_name, $string ) = @_;
         my ($save_block) = $recce->block_progress();
         my $new_block = $recce->block_new( \$string );
@@ -257,7 +254,7 @@ sub eq2_string_reader {
     my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
     my ($main_block) = $recce->block_progress();
     my $length = length $lexeme;
-    if ( not defined read_string_equivalent2( $recce, $symbol_name, $lexeme ) )
+    if ( not defined read_string_equivalent_hi( $recce, $symbol_name, $lexeme ) )
     {
         die
 qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},

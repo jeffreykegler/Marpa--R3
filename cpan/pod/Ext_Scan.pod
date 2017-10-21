@@ -55,8 +55,14 @@ normalize-whitespace: 1
 =head1 About this document
 
 This page describes B<external scanning>.
-Many applications find it useful or necessary to
-do their own scanning.
+By default, Marpa::R3 scans based on the L0 grammar in
+its DSL.
+This DSL-driven scanning is called B<internal scanning>.
+
+But
+many applications find it useful or necessary to
+do their own scanning in procedural code.
+In Marpa::R3 this is called B<external scanning>.
 External scanning can be used instead of internal scanning.
 Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
@@ -74,26 +80,31 @@ A B<symbol name>, which is required.
 The symbol name must be the name of a lexeme in
 both the L0 and G1 grammars.
 The symbol name
-tells the parser what symbol the Marpa semantics should see
-this token as.
+tells the parser what symbol the Marpa semantics will see
+this token as,
+and connects the token to the grammar.
 
 =item 2.
 
-A value, which may be undefined.
+A B<symbol value> or B<value>, which may be undefined.
 Together,
-the symbol name and the
-value of a lexeme are what is seen by the semantics.
+The
+value of the token is also seen by the semantics.
 
 =item 3.
 
 A B<literal equivalent>, which must be a span in
 the input.
-The literal equivalent of a lexeme is needed for
+The literal equivalent of a token is not directly visible
+to the semantics,
+although in Marpa::R3 it can always be accessed,
+if desired.
+The literal equivalent is needed for
 the messages produced by
 tracing, debugging, error reporting, etc.
 If more than one token is accepted at a G1 location,
 which can happen if tokens are ambiguous,
-all of them must have the same literal equivalent.
+all of the tokens must have the same literal equivalent.
 
 =back
 
@@ -102,15 +113,16 @@ all of them must have the same literal equivalent.
 Most applications doing external scanning
 will want to use the top-level methods.
 The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
-allows the reading of a string, where the string is treated as both
+allows the reading of a string, where the string is both
 the literal equivalent of the input, and its value for semantics.
 The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
 is similar, but the string is specified as a block span.
+
 The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
-is the most general of the top-level external scanning methods --
-it allows the app to specify the literal and the value separately --
-the literal as a block span
-and the value explicitly.
+is the most general of the top-level external scanning methods.
+C<lexeme_read_block()> allows the app to specify the literal and the value separately.
+The literal equivalent is passed to C<lexeme_read_block> as a block span
+and the symbol value is passed to C<lexeme_read_block> explicitly.
 
 =head1 Low level methods
 
@@ -131,7 +143,7 @@ and that parse event triggers.
 Afterwards,
 internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
 For details,
-see L<the description of C<resume()> below|/"resume()">,
+see L<the description of C<resume() |Marpa::R3::Recognizer/"resume()">,
 as well as
 L<the separate document for events|Marpa::R3::Event>.
 
@@ -145,7 +157,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $ok = $recce->lexeme_alternative( $symbol_name, $value );
-    if (not $ok) {
+    if (not defined $ok) {
         my $literal = $recce->literal( $block_id, $offset, $length );
         die qq{Parser rejected symbol named "$symbol_name" },
             qq{at position $offset, before lexeme "$literal"};
@@ -153,9 +165,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<lexeme_alternative()> method
-allows an external scanner to read
-ambiguous tokens.
+C<lexeme_alternative()> is one of the low-level methods of the external scanner.
 Most applications
 will prefer the simpler
 L<C<lexeme_read_string()>|/"lexeme_read_string()">,
@@ -172,6 +182,9 @@ which is optional,
 is the value of the symbol.
 The value argument is interpreted as described for C<lexeme_read_block()>.
 
+The C<lexeme_alternative()> method
+allows an external scanner to read
+ambiguous tokens.
 Any number of tokens may be read using C<lexeme_alternative()>
 without advancing the current location.
 This allows an application to use ambiguous tokens.
@@ -179,6 +192,7 @@ To complete reading at a G1 location,
 and advance the current G1 location to the next G1 location,
 use the L<C<lexeme_complete()>|/"lexeme_complete()"> method.
 
+B<Return values>:
 On success, returns a non-negative number,
 which may be zero.
 Returns C<undef> if the token was rejected.
@@ -197,6 +211,13 @@ normalize-whitespace: 1
             if not defined $ok;
 
 =for Marpa::R3::Display::End
+
+C<lexeme_alternative_literal()> is one of the low-level methods of the external scanner.
+Most applications
+will prefer the simpler
+L<C<lexeme_read_string()>|/"lexeme_read_string()">,
+L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
+and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
 C<lexeme_alternative_literal()> takes only one, required, argument.
 C<lexeme_alternative_literal()> and
@@ -226,7 +247,7 @@ L<C<lexeme_read_string()>|/"lexeme_read_string()">,
 L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
-Use of the low-level methods allows, among other things,
+Use of the low-level methods allows
 the reading of ambiguous tokens.
 C<lexeme_complete()>
 completes the reading of a set of tokens specified by
@@ -255,7 +276,7 @@ the L<C<lexeme_complete()>|/"lexeme_complete()"> method,
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
-B<Return value:>
+B<Return values:>
 On success, C<lexeme_complete()>
 returns the new current location.
 Failure is always thrown.
@@ -314,6 +335,7 @@ and end at the new current G1 location.
 The G1 location of the token will be considered to be
 the new current G1 location.
 
+B<Return values>:
 On success, C<lexeme_read_block()> returns the new current physical
 input stream location.
 If the token was rejected,
@@ -330,12 +352,12 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
-name: recognizer lexeme_read_block() equivalent
+name: recognizer lexeme_read_block() low-level equivalent
 normalize-whitespace: 1
 
     sub read_block_equivalent {
         my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
-        return if not $recce->lexeme_alternative( $symbol_name, $value );
+        return if not defined $recce->lexeme_alternative( $symbol_name, $value );
         return $recce->lexeme_complete( $block_id, $offset, $length );
     }
 
@@ -351,7 +373,7 @@ normalize-whitespace: 1
     my $ok = $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length);
     die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
-           if not $ok;
+           if not defined $ok;
 
 =for Marpa::R3::Display::End
 
@@ -386,10 +408,10 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
-name: recognizer lexeme_read_literal() equivalent 2
+name: recognizer lexeme_read_literal() high-level equivalent
 normalize-whitespace: 1
 
-    sub read_literal_equivalent2 {
+    sub read_literal_equivalent_hi {
         my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
         my $value = $recce->literal( $block_id, $offset, $length );
         return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
@@ -401,12 +423,12 @@ In terms of low-level external scanning methods,
 the above is roughly equivalent to
 
 =for Marpa::R3::Display
-name: recognizer lexeme_read_literal() equivalent
+name: recognizer lexeme_read_literal() low-level equivalent
 normalize-whitespace: 1
 
-    sub read_literal_equivalent {
+    sub read_literal_equivalent_lo {
         my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-        return if not $recce->lexeme_alternative_literal( $symbol_name );
+        return if not defined $recce->lexeme_alternative_literal( $symbol_name );
         return $recce->lexeme_complete( $block_id, $offset, $length );
     }
 
@@ -469,6 +491,7 @@ and end at the new current G1 location.
 The G1 location of the token will be considered to be
 the new current G1 location.
 
+B<Return values>:
 On success, C<lexeme_read_string()> returns the current offset.
 If the token was rejected,
 C<lexeme_read_string()> returns a Perl C<undef>.
@@ -484,10 +507,10 @@ ignore: 1
 is roughly equivalent to
 
 =for Marpa::R3::Display
-name: recognizer lexeme_read_string() equivalent 2
+name: recognizer lexeme_read_string() high-level equivalent
 normalize-whitespace: 1
 
-    sub read_string_equivalent2 {
+    sub read_string_equivalent_hi {
         my ( $recce, $symbol_name, $string ) = @_;
         my ($save_block) = $recce->block_progress();
         my $new_block = $recce->block_new( \$string );
@@ -512,14 +535,14 @@ In terms of low-level external scanning methods,
 C<lexeme_read_string()> is roughly equivalent to
 
 =for Marpa::R3::Display
-name: lexeme_read_string() equivalent
+name: recognizer lexeme_read_string() low-level equivalent
 normalize-whitespace: 1
 
-    sub read_string_equivalent {
+    sub read_string_equivalent_lo {
         my ($recce, $symbol_name, $string) = @_;
         my ($save_block) = $recce->block_progress();
         my $lexeme_block = $recce->block_new( \$string );
-        return if not $recce->lexeme_alternative( $symbol_name, $string );
+        return if not defined $recce->lexeme_alternative( $symbol_name, $string );
         my $return_value = $recce->lexeme_complete( $lexeme_block );
         $recce->block_set($save_block);
         return $return_value;

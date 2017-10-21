@@ -1450,12 +1450,7 @@ name: recognizer lexeme_alternative() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
-    if (not $ok) {
-        my $literal = $recce->literal( $block_id, $offset, $length );
-        die qq{Parser rejected symbol named "$symbol_name" },
-            qq{at position $offset, before lexeme "$literal"};
-    }
+    my $literal = $recce->literal( $block_id, $offset, $length );
 
 =for Marpa::R3::Display::End
 
