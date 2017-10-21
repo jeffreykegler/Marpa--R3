@@ -78,7 +78,7 @@ B<external scanning>.
 External scanning can be used instead of internal scanning,
 but Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
-External scanning is describe in
+External scanning is described in
 L<it own document|Marpa::R3::Ext_Scan>.
 
 =head1 Block position
@@ -105,7 +105,7 @@ Preprocessors, including the one for the
 C language, commonly need to do this.
 
 =item *
-"Include" files, as just described,
+Use "Include" files as just described,
 but also nest them.
 The C preprocessor does this.
 
@@ -234,11 +234,11 @@ in terms of lexemes.
 (Marpa::R3's lexemes are similar to what in other parsers
 are called "tokens".)
 Position in terms of lexemes
-is called B<G1 earley set position> or,
+is called B<G1 Earley set position> or,
 more often,
 B<G1 position>,
-because lexemes match G1 earley set positions "one-to-one" --
-for every lexeme there is a unique G1 earley set
+because lexemes match G1 Earley set positions "one-to-one" --
+for every lexeme there is a unique G1 Earley set
 and therefore a unique G1 position.
 The first lexeme is at G1 position 1,
 and the I<N>'th lexeme is at G1 position I<N>.
@@ -348,7 +348,7 @@ spans require a lot of mental arithmetic,
 and a discussion that uses ranges is easier to follow.
 
 For the sake of some examples,
-consider again a 0-based input text block of length 100.
+consider a 0-based input text block of length 100.
 
 =over
 
@@ -395,7 +395,6 @@ specified as a triple
 C<< <block_id>, <offset>, <length> >>.
 Sometimes one or more elements of a block span are undefined.
 (For example, this can happen when a block span is part of a set of arguments.)
-
 In this case, C<block_id> defaults to the current block,
 C<offset> defaults to the current offset of the specified block
 and C<length> is set so that the span is to the eoread of the
@@ -725,6 +724,9 @@ Also, deactivated events continue to impose
 a small overhead, so if an event is never used,
 it should be commented out in the DSL.
 
+B<Return values>: No documented return value.
+Failures are thrown.
+
 =head2 lexeme_priority_set()
 
 =for Marpa::R3::Display
@@ -745,6 +747,7 @@ technique.
 It can, in effect, allow an application
 to switch lexers.
 
+B<Return values>:
 On success, returns the old priority value.
 Failure is thrown.
 
@@ -771,13 +774,13 @@ normalize-whitespace: 1
 C<read()> is the basic method for internal scanning.
 It creates a new block and scans it according to its
 arguments.
-
 C<read()> takes three arguments, only the first of which is required.
 Call them, in order, C<$p_string>, C<$start>, C<$length>.
 
 C<$p_string> is required
 and must be a pointer to a string.
-A new input text block is created from C<$p_string>.
+A new input text block is created with the string
+pointed to by C<$p_string> as its text.
 The current block is set to this new block.
 
 The C<$start> argument is optional.
@@ -796,21 +799,17 @@ eoread is set to C<$start> + C<$length>.
 If C<$length> is defined and negative,
 eoread is set to C<eoblock> + C<$length> + 1.
 If C<$length> is not defined, eoread is set to the eoblock
-of the new, current block.
+of the newly created, current block.
 
 If C<$start> and <$length> would produce an eoread which is after
 eoblock;
 or would produce an eoread which is before the new current offset,
 it is a fatal error.
 
+Once it has created the a new block,
+and has set it to the current block,
 C<read()>
-creates a new block whose text is set from C<$p_string>
-and whose current offset and eoread is set as stated above.
-It sets the current block to the newly created block.
-C<read()> then
-It starts internal scanning of the newly created block,
-which is now the current block.
-
+starts internal scanning of that block.
 During internal scanning,
 C<read()> moves the current offset of the current block
 forward.
@@ -829,18 +828,6 @@ A parse event is triggered.
 A failure occurs.
 
 =back
-
-If C<read()> terminates because
-the current offset is equal to eoread,
-C<read> succeeds
-and returns eoread.
-If C<read()> terminates because
-of a parse event,
-it returns the new current offset,
-which is the event location of the parse event.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-All failures are thrown.
 
 The new block can be created with eoread at 0.
 This happens, for example, if the C<$length> argument
@@ -862,6 +849,19 @@ B<input text block>.
 On each call to C<read()>,
 the new input text block
 becomes the current text block.
+
+B<Return values>:
+If C<read()> terminates because
+the current offset is equal to eoread,
+C<read> succeeds
+and returns eoread.
+If C<read()> terminates because
+of a parse event,
+it returns the new current offset,
+which is the event location of the parse event.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+All failures are thrown.
 
 The C<read()> method is
 the approximate equivalent of
@@ -904,7 +904,7 @@ Reading Phase.
 The C<resume()> method takes two optional arguments,
 which represent the start and length parameters of
 a span in the physical input stream.
-The default start location is the current location.
+The default start offset is the current offset.
 The default length is -1.
 Negative arguments are interpreted
 as L<described above|/"Spans">.
