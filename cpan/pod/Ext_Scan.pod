@@ -57,21 +57,14 @@ normalize-whitespace: 1
 This page describes B<external scanning>.
 Many applications find it useful or necessary to
 do their own scanning.
-In Marpa::R3,
-when an application
-bypasses the internal scanner
-and does its own scanning,
-External scanning can be used instead of internal scanning,
-but Marpa::R3 also allows application to switch back and
+External scanning can be used instead of internal scanning.
+Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
 
-=head1 External scanning
+=head1 Top-level methods
 
-External scanning allows the app to take direct control of the scanning of lexemes.
-External scanning is usually, and most simply,
-performed by reading lexemes using one of the
-C<$recce->lexeme_read_*()> series of methods.
-
+Most applications doing external scanning
+will want to use the top-level methods.
 The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
 allows the reading of a string, where the string is treated as both
 the literal equivalent of the input, and its value for semantics.
@@ -83,14 +76,18 @@ it allows the app to specify the literal and the value separately --
 the literal as a block span
 and the value explicitly.
 
-For more advanced applications,
-including the reading of ambiguous lexemes,
-there are the low-level external scanning methods:
+=head1 Low level methods
+
+Advanced applications,
+including those which want to read ambiguous lexemes,
+can use the low-level external scanning methods:
 L<C<< $recce->lexeme_alternative() >>|/"lexeme_alternative()"> and
 L<C<< $recce->lexeme_complete() >>|/"lexeme_complete()">.
 
-External scanning can be mixed with internal scanning --
-this allows you to get the best of both.
+=head1 Mixing internal and external scanning
+
+External scanning can be mixed with internal scanning
+to get the best of both.
 An application can
 terminate the internal scanning of
 the C<read()> method early, if it has defined an "event",
@@ -111,8 +108,8 @@ Every token must have three things associated with it:
 
 =item 1.
 
-A symbol name, which is required,
-and which must be the name of a lexeme in
+A B<symbol name>, which is required.
+The symbol name must be the name of a lexeme in
 both the L0 and G1 grammars.
 The symbol name
 tells the parser what symbol the Marpa semantics should see
@@ -120,8 +117,9 @@ this token as.
 
 =item 2.
 
-A value (although this may be undefined).
-The symbol name and the
+A value, which may be undefined.
+Together,
+the symbol name and the
 value of a lexeme are what is seen by the semantics.
 
 =item 3.
@@ -157,7 +155,8 @@ allows an external scanner to read
 ambiguous tokens.
 Most applications
 will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">
+L<C<lexeme_read_string()>|/"lexeme_read_string()">,
+L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
 C<lexeme_alternative()> takes one or two arguments.
@@ -189,11 +188,10 @@ name: recognizer lexeme_alternative_literal() synopsis
 partial: 1
 normalize-whitespace: 1
 
-            if ( not defined $recce->lexeme_alternative_literal($symbol_name) ) {
-                die
-                    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-                    $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-            }
+    my $ok = $recce->lexeme_alternative_literal($symbol_name);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+            if not defined $ok;
 
 =for Marpa::R3::Display::End
 
@@ -271,12 +269,11 @@ name: recognizer lexeme_read_block() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    if ( not defined $recce->lexeme_read_block($symbol_name, $value,
-        $main_block, $start_of_lexeme, $lexeme_length) ) {
-        die
-    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_read_block($symbol_name, $value,
+        $main_block, $start_of_lexeme, $lexeme_length);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+      $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+          if not defined $ok;
 
 =for Marpa::R3::Display::End
 
@@ -353,11 +350,10 @@ name: recognizer lexeme_read_literal() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    if ( not defined $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
-        die
-    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+       $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+           if not $ok;
 
 =for Marpa::R3::Display::End
 
@@ -425,11 +421,10 @@ name: recognizer lexeme_read_string() synopsis
 partial: 1
 normalize-whitespace: 1
 
-    if ( not defined $recce->lexeme_read_string( $symbol_name, $lexeme ) ) {
-        die
-    qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_read_string( $symbol_name, $lexeme );
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+      $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+         if not defined $ok;
 
 =for Marpa::R3::Display::End
 

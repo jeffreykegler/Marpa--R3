@@ -65,12 +65,11 @@ sub hi_block_reader {
 # Marpa::R3::Display
 # name: recognizer lexeme_read_block() synopsis
 
-    if ( not defined $recce->lexeme_read_block($symbol_name, $value,
-        $main_block, $start_of_lexeme, $lexeme_length) ) {
-        die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_read_block($symbol_name, $value,
+        $main_block, $start_of_lexeme, $lexeme_length);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+      $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+          if not defined $ok;
 
 # Marpa::R3::Display::End
 
@@ -112,23 +111,16 @@ sub lo_literal_reader {
 # Marpa::R3::Display
 # name: recognizer lexeme_alternative_literal() synopsis
 
-    if ( not defined $recce->lexeme_alternative_literal($symbol_name) ) {
-        die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
-    if (
-        not $recce->lexeme_complete(
-            $main_block, $start_of_lexeme, $lexeme_length
-        )
-      )
-    {
-        die qq{No token found at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_alternative_literal($symbol_name);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+            if not defined $ok;
+    $ok = $recce->lexeme_complete( $main_block, $start_of_lexeme, $lexeme_length);
+    die qq{No token found at position $start_of_lexeme, before "},
+      $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+           if not $ok;
 
 # Marpa::R3::Display::End
-
 
 }
 
@@ -140,11 +132,10 @@ sub hi_literal_reader {
 # Marpa::R3::Display
 # name: recognizer lexeme_read_literal() synopsis
 
-    if ( not defined $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length) ) {
-        die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+       $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+           if not $ok;
 
 # Marpa::R3::Display::End
 
@@ -213,11 +204,10 @@ sub hi_string_reader {
 # Marpa::R3::Display
 # name: recognizer lexeme_read_string() synopsis
 
-    if ( not defined $recce->lexeme_read_string( $symbol_name, $lexeme ) ) {
-        die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-          $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"};
-    }
+    my $ok = $recce->lexeme_read_string( $symbol_name, $lexeme );
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+      $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+         if not defined $ok;
 
 # Marpa::R3::Display::End
 
