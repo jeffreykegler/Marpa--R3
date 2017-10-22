@@ -322,7 +322,7 @@ sub Marpa::R3::Scanless::R::set {
             end
         )
 END_OF_LUA
-    return $slr;
+    return;
 } ## end sub Marpa::R3::Scanless::R::set
 
 sub Marpa::R3::Scanless::R::read {
@@ -1002,8 +1002,7 @@ sub Marpa::R3::Scanless::R::activate {
         -- print('$slr->activate():', event_name, activate)
         return slr:activate_by_event_name(event_name, activate)
 END_OF_LUA
-
-    return 1;
+    return;
 }
 
 # On success, returns the old priority value.

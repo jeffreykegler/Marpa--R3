@@ -145,7 +145,7 @@ sub Marpa::R3::Scanless::G::set {
             q{Bad named argument(s) to $slg->set() method} . join q{ },
             @bad_arguments );
     }
-    return $slg;
+    return;
 }
 
 sub Marpa::R3::Internal::Scanless::G::set {

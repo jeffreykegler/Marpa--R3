@@ -316,7 +316,7 @@ sub Marpa::R3::Scanless::V::set {
             end
         )
 END_OF_LUA
-    return $slv;
+    return;
 }
 
 # Returns false if no parse
