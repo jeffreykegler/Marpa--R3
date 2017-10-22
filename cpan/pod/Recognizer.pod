@@ -820,7 +820,7 @@ the current offset of the newly created block is set to
 C<$start>.
 If C<$start> is negative,
 the current offset of the newly created block
-is set to C<eoblock> + C<$start> - 1.
+is set to C<eoblock> + C<$start>.
 If C<$start> is not defined,
 the current offset of the newly created block is set to 0.
 
@@ -896,13 +896,14 @@ C<resume()> does not change
 the current block setting of the recognizer.
 
 The C<resume()> method takes two optional arguments,
-call them C<$start> and C<$length>.
+call them, in order,
+C<$start> and C<$length>.
 If C<$start> is defined and non-negative,
 the current offset of the current block is set to
 C<$start>.
 If C<$start> is negative,
 the current offset of the current block
-is set to C<eoblock> + C<$start> - 1.
+is set to C<eoblock> + C<$start>.
 If C<$start> is not defined,
 the current offset of the current block
 is left unchanged.
@@ -917,10 +918,10 @@ the eoread of the current block is left unchanged.
 
 Once the current offset and eoread are set,
 internal scanning takes place.
-Internal scanning is describe in detail
+Internal scanning is described in detail
 L<above|/"Internal scanning">.
 
-Parse events may occur during the C<resume():
+Parse events may occur during the C<resume()>
 method.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
@@ -972,6 +973,10 @@ are recognizer settings and their values.
 The allowed recognizer settings are
 L<described above|/"Recognizer settings">.
 
+B<Return values>:
+Returns the recognizer object.
+Failures are thrown.
+
 =head2 value()
 
 =for Marpa::R3::Display
@@ -1016,12 +1021,15 @@ The parse is evaluated with end-of-parse
 at the current G1 location.
 Setting end-of-parse is one of the advanced techniques
 allowed when an app uses a
-L<C<valuer objects>|Marpa::R3::Valuer>
+L<C<valuer object>|Marpa::R3::Valuer>
 instead of the recognizer's C<value()> call.
 
 B<Return values>:
 If C<value()> successful produced a parse value,
-iti returns a reference to that value.
+C<value()> returns a reference to that value.
+Successful parses can have a Perl C<undef> as a parse value,
+in which case
+C<value()> returns a reference to Perl C<undef>.
 If there was no valid parse according to the grammar,
 the C<value> method returns C<undef>.
 If the parse was ambiguous, an error is thrown.
@@ -1052,7 +1060,7 @@ normalize-whitespace: 1
 
 =head1 Block methods
 
-These methods allow control
+The block methods allow control
 of the input on the block level.
 
 =head2 block_move ()
@@ -1066,11 +1074,16 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 C<block_move()> takes 2 optional arguments:
-call them, in order, C<$offset> and C<$length>.
-If C<$offset> is defined,
+Call them, in order, C<$offset> and C<$length>.
+
+If C<$offset> is defined and non-negative,
 C<block_move()>
 sets the current offset of the current block
 C<$offset>.
+If C<$offset> is defined and negative,
+C<block_move()>
+sets the current offset of the current block
+to C<eoblock> + C<$offset>.
 If C<$offset> is omitted,
 the current offset of the current block
 is not changed.
@@ -1085,6 +1098,10 @@ If C<$length> is not defined,
 the eoread of the current block
 is not changed.
 
+B<Return values>:
+Returns a Perl C<undef>.
+Failures are thrown.
+
 =head2 block_new ()
 
 =for Marpa::R3::Display
@@ -1096,16 +1113,22 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Takes one, required, argument, call it C<$p_string>.
-Creates a new block and returns its block id,
-call it C<$new_block>.
-C<$input_string> becomes the input string for
-$<new_block>.
+Creates a new block.
+The text of the newly created block
+is the string pointed to by
+C<$p_string>.
+Call the ID of the newly created block,
+C<$new_block>.
 
 It is important to note that C<block_new()>
 does B<not> set the current block to block C<$new_block>.
 This is convenient for those applications which need to
 create, for later use, a series of input blocks
 based on the contents of the current block.
+
+B<Return values>:
+Returns the block ID of the newly created block.
+Failures are thrown.
 
 =head2 block_read ()
 
@@ -1266,6 +1289,7 @@ the C<g1_literal()> method
 returns a substring of the input
 stream.
 A G1 length of zero will produce the zero-length string.
+Failure is always thrown.
 
 =head2 g1_pos()
 
@@ -1277,6 +1301,7 @@ name: Scanless g1_pos() synopsis
 =for Marpa::R3::Display::End
 
 Returns the current G1 location.
+Failure is always thrown.
 
 =head2 exhausted()
 
@@ -1289,9 +1314,11 @@ name: recognizer exhausted() synopsis
 
 The exhausted method returns a Perl true if parsing in a
 recognizer is
-exhausted, and a Perl false otherwise. Parsing is exhausted when the
-recognizer will not accept any further input.
+exhausted, and a Perl false otherwise.
+Failure is always thrown.
 
+Parsing is said to be "exhausted" when the
+recognizer will not accept any further input.
 Marpa usually "does what you mean" in case of parse exhaustion,
 but this method
 allows the recognizer's exhaustion status to be discovered directly.
@@ -1318,9 +1345,12 @@ normalize-whitespace: 1
 
 The C<input_length()> method accepts one, optional argument.
 Its argument is the index of an input block, call it C<block_ix>.
-C<input_length()> returns the length of that input block.
 If C<block_ix> is omitted, the input block defaults to the
 current input block.
+
+B<Return values>:
+C<input_length()> returns the length of that input block.
+Failure is always thrown.
 
 =head2 last_completed()
 
@@ -1356,8 +1386,8 @@ L<span|/"Spans"> of the most recent match.
 If there was more than one most recent match, it returns
 the longest.
 If there was no match,
-C<last_completed()> returns the empty array in array context
-and a Perl false in scalar context.
+C<last_completed()> returns the empty array.
+Failure is always thrown.
 
 =head2 line_column()
 
@@ -1383,11 +1413,6 @@ is C<$id>.
 If C<$offset> is not defined, the selected offset
 is the current offset of the selected block;
 otherwise the selected offset is C<$offset>.
-C<line_column()> returns the line and column position
-of the selected offset in the selected block,
-as a 2-element array.
-The first element of the array is the line position,
-and the second element is the column position.
 
 Numbering of lines and columns is 1-based,
 following UNIX editor tradition.
@@ -1445,6 +1470,19 @@ a PS (paragraph separator, U+2029).
 
 =back
 
+C<line_column()> never changes the current block setting
+of the recognizer,
+the current offset of the current block
+or
+eoread of the current block.
+
+B<Return values>:
+C<line_column()> returns the line and column position
+of the selected offset in the selected block,
+as a 2-element array.
+The first element of the array is the line position,
+and the second element is the column position.
+Failure is always thrown.
 
 =head2 literal()
 

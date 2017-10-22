@@ -2178,7 +2178,7 @@ and block-related methods.
             return nil, string.format('Bad current position argument %s', block_offset_arg)
         end
         if new_block_offset < 0 then
-            new_block_offset = block_length + new_block_offset
+            new_block_offset = block_length + new_block_offset + 1
         end
         if new_block_offset < 0 then
             return nil, string.format('Current position is before start of block: %s', block_offset_arg)
