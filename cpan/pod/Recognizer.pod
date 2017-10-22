@@ -893,7 +893,7 @@ The C<resume()> method resumes
 internal scanning.
 The recognizer must already have a current block set.
 C<resume()> does not change
-The current block setting of the recognizer.
+the current block setting of the recognizer.
 
 The C<resume()> method takes two optional arguments,
 call them C<$start> and C<$length>.
@@ -915,14 +915,15 @@ eoread of the current block is set to C<eoblock> + C<$length> + 1.
 If C<$length> is not defined,
 the eoread of the current block is left unchanged.
 
-If a parse event occurs during the C<resume()> method,
-the current location is set to the event location.
+Once the current offset and eoread are set,
+internal scanning takes place.
+Internal scanning is describe in detail
+L<above|/"Internal scanning">.
+
+Parse events may occur during the C<resume():
+method.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
-If no parse event triggers,
-and the parse reaches the end of the input string without a
-failure,
-the current offset is set to eoread.
 
 The C<resume()> method is often used,
 in conjunction with external scanning,
@@ -982,19 +983,13 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<value> method call evaluates the value of
-the parse at the current location,
-and returns a reference to that value.
-If there was no valid parse according to the grammar,
-the C<value> method returns C<undef>.
-
-If the parse was ambiguous, an error is thrown.
-The error message will describe the ambiguity in detail.
-
-Some applications will not want to treat parse ambiguity
-as an error, and may wish to deal with one or more of the
-parse values.
-They can do this using L<a
+The C<value()> method call is the basic method
+for evaluating a parse.
+It assumes the user wants a single parse value,
+and wants to treat parse ambiguity as an error.
+Apps which want to parse ambiguous grammars,
+or which want to ignore ambiguity,
+can do this by using L<a
 valuer object|Marpa::R3::Valuer>.
 
 The C<value()> method allows one optional argument.
@@ -1016,6 +1011,21 @@ is useful for sharing data within
 the tree.
 Symbol tables are one example of the kind of data which parses often
 require, but which it is not convenient to accumulate bottom-up.
+
+The parse is evaluated with end-of-parse
+at the current G1 location.
+Setting end-of-parse is one of the advanced techniques
+allowed when an app uses a
+L<C<valuer objects>|Marpa::R3::Valuer>
+instead of the recognizer's C<value()> call.
+
+B<Return values>:
+If C<value()> successful produced a parse value,
+iti returns a reference to that value.
+If there was no valid parse according to the grammar,
+the C<value> method returns C<undef>.
+If the parse was ambiguous, an error is thrown.
+The error message will describe the ambiguity in detail.
 
 The C<value()> method is
 the approximate equivalent of
