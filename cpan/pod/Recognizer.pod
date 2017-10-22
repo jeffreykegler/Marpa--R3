@@ -402,24 +402,50 @@ specified block.
 Block span is defined more formally
 L<below|/"Block span details">.
 
-=head1 Scanning
+=head1 Internal scanning
 
-The easiest way to scan is to define a lexer in the Marpa::R2 DSL
-and use Marpa::R2's internal scanner,
-by invoking the L<C<read()>|/"read()"> method.
-The C<read()> method takes a pointer to a string as one of its
-arguments, and this is used as the block.
-By default, the input block is read from its first character to its last character.
-This behavior can be changed with arguments to
-the C<read()> method.
-C<read()> can also be reinvoked to start reading a new input block.
-See L<the description of C<read()>|/"read()"> for details.
+Several Marpa::R3 method calls do internal scanning.
+The most basic of these is
+the L<C<read()>|/"read()"> method.
 
-As mentioned, Marpa::R3 does scanning by treating its input as a series of
-input text blocks.
-Advanced applications may want to manipulate these directly.
-The block methods are
-L<described below|/"Block methods">.
+Internal scanning requires there to be a current block.
+The current block will have a current offset and an eoread.
+Internal scanning reads and parses the text of the current block,
+starting from the current offset,
+until one of the following occurs:
+
+=over 4
+
+=item *
+The next character read would be at eoread.
+In this case, current offset is equal to eoread.
+The character at eoread is B<not> read.
+
+=item *
+A parse event is triggered.
+In this case, the current offset is
+set to the event locaiton.
+
+=item *
+A failure occurs.
+The current offset is set to the
+location of the failure.
+
+=back
+
+A special case of internal scanning
+is when, at the start of internal scanning,
+eoread is equal to the current offset.
+This happens, for example, if the C<$length> argument
+to the
+L<read() method|/"read()">
+is set to 0.
+In this case, as the above rules imply,
+internal scanning stops immediately,
+leaving current offset unchanged.
+This can be used as a technique to set a new input
+text block without reading it,
+perhaps in preparation for external scanning.
 
 =head1 Evaluation
 
@@ -678,6 +704,11 @@ For more on recognizer settings,
 see
 L<the section describing them|/"Recognizer settings">.
 
+Parse events may occur during the recognizer's
+C<new()> constructor.
+Parse events are described in detail in
+L<a separate document|Marpa::R3::Event>.
+
 =head1 Mutators
 
 =head2 activate()
@@ -806,42 +837,9 @@ eoblock;
 or would produce an eoread which is before the new current offset,
 it is a fatal error.
 
-Once it has created the a new block,
-and has set it to the current block,
-C<read()>
-starts internal scanning of that block.
-During internal scanning,
-C<read()> moves the current offset of the current block
-forward.
-Internal scanning continues until
-one of the following occurs:
-
-=over 4
-
-=item *
-Current offset is equal to eoread.
-
-=item *
-A parse event is triggered.
-
-=item *
-A failure occurs.
-
-=back
-
-The new block can be created with eoread at 0.
-This happens, for example, if the C<$length> argument
-is 0.
-In this case,
-as the above implies,
-C<read()> sets a new current block,
-and then stops immediately.
-This technique can be useful when an application wants to take control
-before any internal scanning is done.
-An application may, for example, use a C<read()> call with
-a length of 0
-to set up a buffer, and then immediately switch to external
-scanning.
+Once C<read()> has created the a new block,
+it does internal scanning
+L<as described above|/"Internal scanning">.
 
 C<read()> may be called multiple times during a parse.
 Each C<read()> creates a new
@@ -892,43 +890,51 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 The C<resume()> method resumes
-internal scanning,
-L<as described
-above|/"Internal scanning">.
-A physical input stream must already have
-been specified using the
-L<C<< $recce->read() >> method|/"read()">.
-The C<resume()> method should only be called during the
-Reading Phase.
+internal scanning.
+The recognizer must already have a current block set.
+C<resume()> does not change
+The current block setting of the recognizer.
 
 The C<resume()> method takes two optional arguments,
-which represent the start and length parameters of
-a span in the physical input stream.
-The default start offset is the current offset.
-The default length is -1.
-Negative arguments are interpreted
-as L<described above|/"Spans">.
+call them C<$start> and C<$length>.
+If C<$start> is defined and non-negative,
+the current offset of the current block is set to
+C<$start>.
+If C<$start> is negative,
+the current offset of the current block
+is set to C<eoblock> + C<$start> - 1.
+If C<$start> is not defined,
+the current offset of the current block
+is left unchanged.
 
-If a parse event occurs during the C<read()> method,
+The C<$length> argument is optional.
+If C<$length> is defined and non-negative,
+eoread of the current block is set to C<$start> + C<$length>.
+If C<$length> is defined and negative,
+eoread of the current block is set to C<eoblock> + C<$length> + 1.
+If C<$length> is not defined,
+the eoread of the current block is left unchanged.
+
+If a parse event occurs during the C<resume()> method,
 the current location is set to the event location.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 If no parse event triggers,
 and the parse reaches the end of the input string without a
 failure,
-the current location is set to the end of the input string.
+the current offset is set to eoread.
 
-The C<resume()> method is often used in connection with
-external scanning, and is discussed more in
-L<the document for that technique|Marpa::R3::Ext_Scan>.
+The C<resume()> method is often used,
+in conjunction with external scanning,
+to resume internal scanning.
+External scanning is described
+L<in its own document|Marpa::R3::Ext_Scan>.
 
-C<resume()> is considered successful
-if it reads input to the end of input string,
-or if a parse event triggers.
+B<Return values>:
 On success, C<resume()> returns
 the new current location.
-On unthrown failure,
-C<resume()> returns a Perl C<undef>.
+A return value of Perl C<undef>
+is reserved for unthrown failures.
 Currently, all failures are thrown.
 
 The C<resume()> method is
@@ -1108,35 +1114,22 @@ C<block_read()> does not accept any arguments.
 C<block_read()>
 starts internal scanning of the current block
 at the current offset.
-C<block_read()>
-continues internal scanning,
-moving the current offset of the current block
-forward,
-until one of the following occurs:
+Internal scanning is described
+L<above|/"Internal scanning">.
 
-=over 4
-
-=item *
-Current offset is equal to eoread.
-
-=item *
-A parse event is triggered.
-
-=item *
-A failure occurs.
-
-=back
-
-If C<block_read()> terminates because
-the current offset is equal to eoread,
-C<block_read> succeeds
-and returns eoread.
-If C<block_read()> terminates because
-of a parse event,
-it returns the new current offset,
-which is the event location of the parse event.
+Parse events may occur during C<block_read()>.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
+
+B<Return values>:
+If C<block_read()> terminates because
+it reached eoread,
+it returns eoread,
+which will also be the current offset.
+If C<block_read()> terminates because
+of a parse event,
+it return the event location,
+which will also be the current offset.
 All failures are thrown.
 
 =head2 block_set ()
