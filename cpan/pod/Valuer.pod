@@ -237,6 +237,10 @@ are valuer settings and their values.
 The allowed valuer settings are
 L<described above|/"Valuer settings">.
 
+B<Return values>:
+The return value is reserved for future use.
+Failures are always thrown.
+
 =head2 value()
 
 =for Marpa::R3::Display

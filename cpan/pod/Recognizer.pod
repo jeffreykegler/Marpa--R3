@@ -755,8 +755,9 @@ Also, deactivated events continue to impose
 a small overhead, so if an event is never used,
 it should be commented out in the DSL.
 
-B<Return values>: No documented return value.
-Failures are thrown.
+B<Return values>:
+The return value is reserved for future use.
+Failures are always thrown.
 
 =head2 lexeme_priority_set()
 
@@ -974,8 +975,8 @@ The allowed recognizer settings are
 L<described above|/"Recognizer settings">.
 
 B<Return values>:
-Returns the recognizer object.
-Failures are thrown.
+The return value is reserved for future use.
+Failures are always thrown.
 
 =head2 value()
 

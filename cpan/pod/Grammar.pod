@@ -242,6 +242,9 @@ This method allows the named arguments to be changed after a
 grammar is created.
 Currently, the only argument that may be changed in L<C<trace_file_handle>|/"trace_file_handle">.
 
+B<Return values>: The return value is reserved for future use.
+Failures are always thrown.
+
 =head1 Accessors
 
 =head2 highest_production_id()
