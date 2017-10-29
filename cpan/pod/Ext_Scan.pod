@@ -181,20 +181,27 @@ which is optional,
 is the value of the symbol.
 The value argument is interpreted as described for C<lexeme_read_block()>.
 
-The C<lexeme_alternative()> method
-allows an external scanner to read
-ambiguous tokens.
-Any number of tokens may be read using C<lexeme_alternative()>
-without advancing the current location.
-This allows an application to use ambiguous tokens.
-To complete reading at a G1 location,
-advancing the current G1 location to the next G1 location,
-use the L<C<lexeme_complete()>|/"lexeme_complete()"> method.
+In low-level scanning, a list of accepted tokens is first created through one
+or more calls to C<lexeme_alternative()>.
+C<lexeme_alternative()> itself does not cause the
+a token to read by the parser,
+and it does not
+change the block and G1 location information.
+For the list accepted tokens to be read by the parser,
+the C<lexeme_complete()> method must be called.
+
+By making two or more calls
+of the C<lexeme_alternative()> method
+before the next call of C<lexeme_complete()>,
+an app can read an
+ambiguous token.
+(An ambiguous token is one which can be more than one symbol.)
 
 B<Return values>:
-On success, returns a non-negative number,
-which may be zero.
 Returns C<undef> if the token was rejected.
+On success, returns a value reserved for future use.
+The value on success will not necessarily be a Perl true,
+so that apps testing for rejection must test for a Perl C<undef> explicitly.
 Failures are thrown as exceptions.
 
 =head2 lexeme_alternative_literal()
@@ -228,6 +235,9 @@ the value of the token will be the same as its literal equivalent.
 This literal equivalent
 will be set by the next call to 
 C<lexeme_complete()>.
+Otherwise, C<lexeme_alternative_literal()> behaves in
+exactly the same way as
+C<lexeme_alternative()>.
 
 =head2 lexeme_complete()
 
@@ -269,11 +279,8 @@ Current block, block offset
 and G1 location are adjusted,
 as described for
 L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
-
-Parse events may occur during
-the L<C<lexeme_complete()>|/"lexeme_complete()"> method,
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
+L<Parse events|Marpa::R3::Event>
+may occur in the L<C<lexeme_complete()>|/"lexeme_complete()"> method.
 
 B<Return values:>
 On success, C<lexeme_complete()>

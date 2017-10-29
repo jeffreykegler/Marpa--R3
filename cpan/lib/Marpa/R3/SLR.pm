@@ -714,9 +714,9 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
             "\n",
         );
     }
+    return if not $recce->lexeme_alternative( $symbol_name, $string );
     my ($save_block) = $recce->block_progress();
     my $lexeme_block = $recce->block_new( \$string );
-    return if not $recce->lexeme_alternative( $symbol_name, $string );
     my $return_value = $recce->lexeme_complete( $lexeme_block );
     $recce->block_set($save_block);
     return $return_value;
