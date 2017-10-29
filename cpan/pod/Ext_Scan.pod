@@ -461,21 +461,44 @@ to be read.
 C<$string>
 is a string which becomes both the value of the token
 and its literal equivalent.
-The C<lexeme_read_string()> method is very similar to
-C<lexeme_read_block()>,
-but differs in its arguments,
-in the way it sets its literal equivalent,
-and in its handling of input text blocks.
+The C<lexeme_read_string()> method differs from
+C<lexeme_read_block()> in 3 respects:
+
+=over 4
+
+=item *
+
+Its arguments are different, as described above.
+
+=item *
+
+It set its literal equivalent differently, as described below.
+
+=item *
+
+It creates a new text block.
+
+=back
+
 Internally, C<lexeme_read_string()> creates a new block using
 C<$string> as its text.
 This new block, starting at offset 0 and ending at eoblock,
 becomes the literal equivalent of the token.
 
 C<lexeme_read_string()> never changes the current block data.
+This means that the input text block that
+C<lexeme_read_string()> creates will be invisible to most
+apps that use
+C<lexeme_read_string()>.
 Parse events may trigger during the C<lexeme_read_string()> method.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
+If a parse event occurs, and it invokes a handler,
+the handler event location will see an event location
+in the text block that C<lexeme_read_string()> created.
 
+C<lexeme_read_string()> is successful if the token
+is not rejected.
 When successful,
 C<lexeme_read_string()> advances
 the current G1 location by one.
