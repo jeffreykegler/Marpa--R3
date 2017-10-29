@@ -468,22 +468,11 @@ in the way it sets its literal equivalent,
 and in its handling of input text blocks.
 Internally, C<lexeme_read_string()> creates a new block using
 C<$string> as its text.
-This new block, in its entirety,
+This new block, starting at offset 0 and ending at eoblock,
 becomes the literal equivalent of the token.
 
-Unless a pre-lexeme event triggers,
-C<lexeme_read_string()> does not move the current offset.
-If no pre-lexeme event triggers,
-the current block and its current offset and current eoread
-are all unchanged by
-a call to
-the C<lexeme_read_string()> method --
-they remain as they were before the call.
-
+C<lexeme_read_string()> never changes the current block data.
 Parse events may trigger during the C<lexeme_read_string()> method.
-If a pre-lexeme event triggers,
-the current block will be the newly created block,
-and its current offset will be offset 0.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
 
