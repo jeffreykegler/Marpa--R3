@@ -223,8 +223,27 @@ its eoread is equal to its eoblock.
 
 In these documents,
 unless stated otherwise,
-the bare terms "location" and "position" will mean 
+the bare terms B<location>
+and B<position> will mean 
 block position as described in this section.
+When these documents refer to the B<current block data>,
+they will mean these 3 data items:
+
+=over 4
+
+=item *
+
+the recognizer's current block setting;
+
+=item *
+
+the current offset of that current block; and
+
+=item *
+
+the current eoread of that current block.
+
+=back
 
 =head1 G1 position
 
