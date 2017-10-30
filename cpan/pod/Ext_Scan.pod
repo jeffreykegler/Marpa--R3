@@ -112,39 +112,58 @@ all of the tokens must have the same literal equivalent.
 
 =back
 
-=head1 External scanning in detail
+=head1 Completion and non-completion methods
+
+An method is called an external scanning completion method,
+or just a B<completion method>,
+if it might complete external scanning at a G1 location.
+Any other external scanning method is called a non-completion
+method.
+
+There are only two non-completion external scanning methods:
+C<lexeme_alternative()>
+and
+C<lexeme_alternative_literal()>.
+These are low-level methods which prepare a list of tokens
+for the C<lexeme_complete()> completion method.
+
+=head1 Completion method details
 
 This section describes the usual behaviors for the
 external scanning of a single token.
-Some methods, for example C<lexeme_read_string()>,
+Some completion methods, for example C<lexeme_read_string()>
+and C<lexeme_complete()>,
 behave differently
 in a few specifics.
-Whenever a method does not follow the rules described
+Whenever an external scanning completion method
+does not follow the rules described
 in this section,
 the difference will be specificly noted in the
 description of that method.
 
-External scanning can succeed or fail.
-If external scanning fails, the failure may be hard
+External scanning completion can succeed or fail.
+If external scanning completion fails, the failure may be hard
 or soft.
-The only soft failure that can occur in external scanning
+The only soft failure that can occur in external scanning completion
 is the rejection of a token.
 
 =head2 Block location
 
-For every external scan of a token which is not
-a hard failure, there is a block span,
-which is specified as described for each method.
+Every external scanning completion must have a valid block span,
+or else that completion results in a hard failure.
+How that valid block span is specified varies by method.
 For the purposes of this section, let that
 block span be C<< <$block_id, $offset, $length> >>.
-In that case, we'll define the B<eolexeme>, or "end of lexeme",
+Also for the purposes of this section,
+we will define the B<eolexeme>,
+or "end of lexeme",
 as C<$offset> + C<$length>.
 
 =over 4
 
 =item *
 
-If external scanning succeeds and no event occurs,
+If external scanning completion succeeds and no event occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the eolexeme.
 The current eoread of the current block will
@@ -152,7 +171,7 @@ not be changed.
 
 =item *
 
-If external scanning succeeds and an event occurs,
+If external scanning completion succeeds and an event occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the event location.
 The current eoread of the current block will
@@ -163,24 +182,25 @@ unless the event was a pre-lexeme event.
 =item *
 
 This is a special case of the immediately preceding case.
-If external scanning succeeds and a pre-lexeme event occurs,
+If external scanning completion succeeds and a pre-lexeme event occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the event location,
 which will be the same as C<$offset>.
 
 =item *
 
-If the token is rejected,
-external scanning results in a soft failure.
+If an external scanning completion method rejects a token,
+then the external scanning completion results in a soft failure.
 In this case the current block data
 remains unchanged.
 
 =item *
 
-Any failure in external scanning,
+Any failure in external scanning completion,
 other than token rejection,
 is a hard failure.
-In this case no guarantee is made about the current block data.
+In the case of a hard failure,
+no guarantee is made about the current block data.
 Marpa::R3 will attempt to leave the current block data valid
 and pointing to an "error location" -- that is, a location
 as relevant as possible to the error.
@@ -189,7 +209,7 @@ as relevant as possible to the error.
 
 =head2 G1 location
 
-If external scanning succeeds,
+If external scanning completion succeeds,
 and a pre-lexeme event does not occur,
 Marpa::R3 advances
 the current G1 location by one.
@@ -198,23 +218,23 @@ and end at the new current G1 location.
 The G1 location of the token will be considered to be
 the new current G1 location.
 
-If external scanning succeeds,
+If external scanning completion succeeds,
 and a pre-lexeme event does occur,
 the current G1 location will remain where it was
 before external scanning.
 
-If external scanning has a soft failure,
+If external scanning completion has a soft failure,
 the current G1 location will remain where it was
 before external scanning.
 
-If external scanning has a hard failure,
+If external scanning completion has a hard failure,
 no guarantee is made about the current G1 location.
 Marpa::R3 will attempt to leave it valid and unchanged.
 
 =head2 Event handlers
 
 L<Parse events|Marpa::R3::Event>
-may occur during external scanning.
+may occur during external scanning completion.
 The event handlers will see
 a G1 location and an event location as described
 above.
