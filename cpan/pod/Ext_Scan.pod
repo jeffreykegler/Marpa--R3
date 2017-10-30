@@ -150,7 +150,7 @@ How that valid block span is specified varies by method.
 For the purposes of this section, let that
 block span be C<< <$block_id, $offset, $length> >>.
 Also for the purposes of this section,
-we will define the B<eolexeme>,
+we will define B<eolexeme>,
 or "end of lexeme",
 as C<$offset> + C<$length>.
 
@@ -160,7 +160,7 @@ as C<$offset> + C<$length>.
 
 If external scanning completion succeeds and no event occurs,
 the current block is set to C<$block_id>.
-The current offset is set to the eolexeme.
+The current offset is set to eolexeme.
 The current eoread of the current block will
 not be changed.
 
@@ -173,6 +173,8 @@ The current eoread of the current block will
 not be changed.
 The event location will be the same as eolexeme,
 unless the event was a pre-lexeme event.
+The current eoread of the current block will
+not be changed.
 
 =item *
 
@@ -181,6 +183,8 @@ If external scanning completion succeeds and a pre-lexeme event occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the event location,
 which will be the same as C<$offset>.
+The current eoread of the current block will
+not be changed.
 
 =item *
 
@@ -291,12 +295,14 @@ C<$length>.
 The C<$symbol_name> argument is the name of the symbol
 to scan.
 The C<$value> argument will be the value of the token.
+If C<$value> is missing or undefined,
+the value of the token will be a Perl C<undef>.
 The C<$block_id>, C<$offset>, and C<$length> arguments
 are the literal equivalent of the token, as a 
 L<block span|/"Block spans">.
-
-C<lexeme_read_block()> performs external scanning
-L<as described above|"External scanning in detail">.
+C<lexeme_read_block()> is an external scanning completion
+method and details of its behavior are
+L<as described above|"Completion method details">.
 
 B<Return values>:
 On success, C<lexeme_read_block()> returns the new current offset.
@@ -356,9 +362,9 @@ are the literal equivalent of the token, as a
 L<block span|/"Block spans">.
 The value of the token will be the same
 as its literal equivalent.
-C<lexeme_read_literal()> performs external scanning
-as described above,
-in the secton on L</"External scanning in detail">.
+C<lexeme_read_literal()> is an external scanning completion
+method and details of its behavior are
+L<as described above|"Completion method details">.
 
 =for Marpa::R3::Display
 ignore: 1
@@ -418,10 +424,10 @@ to be read.
 C<$string>
 is a string which becomes both the value of the token
 and its literal equivalent.
-With two important differences,
-the C<lexeme_read_string()> method
-behaves as described above,
-in the secton on L</"External scanning in detail">.
+C<lexeme_read_literal()> is an external scanning completion
+method and, with two important exceptions,
+the details of its behavior are
+L<as described above|"Completion method details">.
 
 The first difference is that,
 on success,
@@ -432,14 +438,13 @@ We'll call this block the "per-string block".
 The literal equivalent of the token
 will be the per-string block, starting at offset 0 and ending at eoblock.
 
-The second difference is that
+The second difference is that,
+after a successful call to C<lexeme_read_string()>,
 the per-string block does B<not> become the new current block.
 The current block data after a call to
 C<lexeme_read_string()>
 will be the same as it was before
 the call to C<lexeme_read_string()>.
-(A pedantic exception to this is the case of a hard failure:
-hard failures leave the current block data undefined.)
 
 For most purposes, then,
 the per-string block
@@ -448,7 +453,6 @@ app that called
 C<lexeme_read_string()>.
 Apps which trace or keep track of the details of the input text blocks
 may notice the additional block.
-
 Also, event handlers
 which
 trigger during the C<lexeme_read_string()> method
@@ -551,31 +555,29 @@ L<C<lexeme_read_string()>|/"lexeme_read_string()">,
 L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
-C<lexeme_alternative()> takes one or two arguments.
-The first argument,
-which is required,
-is the name of a symbol to be read
+C<lexeme_alternative()> takes up to two arguments.
+Call them, in order, C<$symbol_name> and C<$value>.
+C<$symbol_name> is required
+and must be the name of a symbol to be read
 at the current location.
-The second argument,
-which is optional,
-is the value of the symbol.
-The value argument is interpreted as described for C<lexeme_read_block()>.
+C<$value> is optional,
+and specifies the value of the symbol.
+If C<$value> is missing, the value of the symbol
+will be a Perl C<undef>.
 
-In low-level scanning, a list of accepted tokens is first created through one
-or more calls to C<lexeme_alternative()>.
-C<lexeme_alternative()> itself does not cause the
-a token to read by the parser,
-and it does not
-change the block and G1 location information.
-For the list accepted tokens to be read by the parser,
-the C<lexeme_complete()> method must be called.
-
+The C<lexeme_alternative()> method is a non-completion method -- it adds to
+the list of tokens which will be completed by a later call
+to the C<lexeme_complete()> method.
 By making two or more calls
 of the C<lexeme_alternative()> method
 before the next call of C<lexeme_complete()>,
 an app can read an
 ambiguous token.
 (An ambiguous token is one which can be more than one symbol.)
+
+C<lexeme_alternative()> has a soft failure if it rejects 
+C<$symbol_name>.
+All other failures are hard failures.
 
 B<Return values>:
 Returns C<undef> if the token was rejected.
