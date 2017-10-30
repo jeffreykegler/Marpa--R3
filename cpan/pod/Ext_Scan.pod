@@ -70,6 +70,10 @@ forth between internal and external scanning.
 =head1 Tokens
 
 In external scanning, the app controls tokenization directly.
+External scanning might also be called one-by-one scanning because,
+unlike internal scanning in which Marpa::R3 tokenizes a string for the app,
+in external scanning the app feeds tokens to Marpa::R3 one-by-one.
+
 Every token must have three things associated with it:
 
 =over 4
@@ -80,9 +84,10 @@ A B<symbol name>, which is required.
 The symbol name must be the name of a lexeme in
 both the L0 and G1 grammars.
 The symbol name
-tells the parser what symbol the Marpa semantics will see
-this token as,
-and connects the token to the grammar.
+tells the parser which symbol represents this token to
+the Marpa semantics.
+The symbol name, in other words,
+connects the token to the grammar.
 
 =item 2.
 
@@ -92,8 +97,8 @@ value of the token is also seen by the semantics.
 
 =item 3.
 
-A B<literal equivalent>, which must be a span in
-the input.
+A B<literal equivalent>, which is required
+and must be a span in the input.
 The literal equivalent of a token is not directly visible
 to the semantics,
 although in Marpa::R3 it can always be accessed,
@@ -120,8 +125,8 @@ is similar, but the string is specified as a block span.
 The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
 is the most general of the high-level external scanning methods.
 C<lexeme_read_block()> allows the app to specify the literal and the value separately.
-The literal equivalent is passed to C<lexeme_read_block> as a block span
-and the symbol value is passed to C<lexeme_read_block> explicitly.
+The literal equivalent is passed to C<lexeme_read_block> as a block span.
+The symbol value is passed to C<lexeme_read_block> explicitly.
 
 =head1 Low level methods
 
@@ -137,12 +142,12 @@ External scanning can be mixed with internal scanning
 to get the best of both.
 An application can
 terminate the internal scanning of
-the C<read()> method early, if it has defined an parse event,
+the C<read()> method early, if it has defined an parse event
 and that parse event triggers.
 Afterwards,
-internal scanning can be resumed with the L<C<resume()>|/"resume()"> method.
+internal scanning can be resumed with the L<resume()|/"resume()"> method.
 For details,
-see L<the description of C<resume() |Marpa::R3::Recognizer/"resume()">,
+see L<the description of C<resume()|Marpa::R3::Recognizer/"resume()">,
 as well as
 L<the separate document for events|Marpa::R3::Event>.
 
