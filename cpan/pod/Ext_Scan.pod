@@ -342,7 +342,8 @@ L<block span|/"Block spans">.
 The value of the token will be the same
 as its literal equivalent.
 C<lexeme_read_literal()> performs external scanning
-as described above L</"External scanning in detail">.
+as described above,
+in the secton on L</"External scanning in detail">.
 
 =for Marpa::R3::Display
 ignore: 1
@@ -402,58 +403,49 @@ to be read.
 C<$string>
 is a string which becomes both the value of the token
 and its literal equivalent.
-The C<lexeme_read_string()> method differs from
-C<lexeme_read_block()> in 3 respects:
+With two important differences,
+the C<lexeme_read_string()> method
+behaves as described above,
+in the secton on L</"External scanning in detail">.
 
-=over 4
+The first difference is that,
+on success,
+C<lexeme_read_string()>
+creates a new input text block,
+using C<$string> as its text.
+We'll call this block the "per-string block".
+The literal equivalent of the token
+will be the per-string block, starting at offset 0 and ending at eoblock.
 
-=item *
+The second difference is that
+the per-string block does B<not> become the new current block.
+The current block data after a call to
+C<lexeme_read_string()>
+will be the same as it was before
+the call to C<lexeme_read_string()>.
+(A pedantic exception to this is the case of a hard failure:
+hard failures leave the current block data undefined.)
 
-Its arguments are different, as described above.
-
-=item *
-
-It set its literal equivalent differently, as described below.
-
-=item *
-
-It creates a new text block.
-
-=back
-
-Internally, C<lexeme_read_string()> creates a new block using
-C<$string> as its text.
-This new block, starting at offset 0 and ending at eoblock,
-becomes the literal equivalent of the token.
-
-C<lexeme_read_string()> never changes the current block data.
-This means that the input text block that
-C<lexeme_read_string()> creates will be invisible to most
-apps that use
+For most purposes, then,
+the per-string block
+is invisible to the
+app that called
 C<lexeme_read_string()>.
-Parse events may trigger during the C<lexeme_read_string()> method.
-Parse events are described in detail in
-L<a separate document|Marpa::R3::Event>.
-If a parse event occurs, and it invokes a handler,
-the handler event location will see an event location
-in the text block that C<lexeme_read_string()> created.
+Apps which trace or keep track of the details of the input text blocks
+may notice the additional block.
 
-C<lexeme_read_string()> is successful if the token
-is not rejected.
-When successful,
-C<lexeme_read_string()> advances
-the current G1 location by one.
-The token read by C<lexeme_read_string()>
-will start at the previous G1 location
-and end at the new current G1 location.
-The G1 location of the token will be considered to be
-the new current G1 location.
+Also, event handlers
+which
+trigger during the C<lexeme_read_string()> method
+will see the per-string block.
 
 B<Return values>:
-On success, C<lexeme_read_string()> returns the current offset.
-If the token was rejected,
-C<lexeme_read_string()> returns a Perl C<undef>.
-Other failure is thrown as an exception.
+On success, C<lexeme_read_block()> returns the new current offset.
+Soft failure occurs if and only if
+the token was rejected.
+On soft failure,
+C<lexeme_read_block()> returns a Perl C<undef>.
+Other failures are thrown as exceptions.
 
 =for Marpa::R3::Display
 ignore: 1
