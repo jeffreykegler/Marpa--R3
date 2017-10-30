@@ -147,7 +147,7 @@ and that parse event triggers.
 Afterwards,
 internal scanning can be resumed with the L<resume()|/"resume()"> method.
 For details,
-see L<the description of C<resume()|Marpa::R3::Recognizer/"resume()">,
+see L<the description of C<resume()>|Marpa::R3::Recognizer/"resume()">,
 as well as
 L<the separate document for events|Marpa::R3::Event>.
 
