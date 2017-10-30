@@ -112,21 +112,111 @@ all of the tokens must have the same literal equivalent.
 
 =back
 
-=head1 High-level methods
+=head1 External scanning
 
-Most applications doing external scanning
-will want to use the high-level methods.
-The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
-allows the reading of a string, where the string is both
-the literal equivalent of the input, and its value for semantics.
-The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
-is similar, but the string is specified as a block span.
+This section describes the usual behaviors for the
+external scanning of a single token.
+Some methods, for example C<lexeme_read_block()>,
+behave differently
+in a few specifics.
+Whenever a method does not follow the rules described
+in this section,
+the difference will be specificly noted in the
+description of that method.
 
-The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
-is the most general of the high-level external scanning methods.
-C<lexeme_read_block()> allows the app to specify the literal and the value separately.
-The literal equivalent is passed to C<lexeme_read_block> as a block span.
-The symbol value is passed to C<lexeme_read_block> explicitly.
+External scanning can succeed or fail.
+If external scanning fails, the failure may be hard
+or soft.
+The only soft failure that can occur in external scanning
+is the rejection of a token.
+
+=head2 Block location
+
+For every external scan of a token which is not
+a hard failure, there is a block span,
+which is specified as described for each method.
+For the purposes of this section, let that
+block span be C<< <$block_id, $offset, $length> >>.
+In that case, we'll define B<eolexeme>, the "end of lexeme"
+as C<$offset> + C<$length>.
+
+=over 4
+
+=item *
+
+If external scanning succeeds and no event occurs,
+the current block is set to C<$block_id>.
+and the current offset is set to the eolexeme.
+The current eoread of the current block will
+not be changed.
+
+=item *
+
+If external scanning succeeds and an event occurs,
+the current block is set to C<$block_id>.
+and the current offset is set to the event location.
+The current eoread of the current block will
+not be changed.
+The event location will be the same as eolexeme,
+unless the event was a pre-lexeme event.
+
+=item *
+
+As a special case of the immediately preceding case,
+if external scanning succeeds and a pre-lexeme event occurs,
+the current block is set to C<$block_id>.
+The current offset is set to the event location,
+which will be the same as C<$offset>.
+
+=item *
+
+If the token is rejected,
+external scanning results in a soft failure.
+In this case the current block data
+remains unchanged.
+
+=item *
+
+Any failure in external scanning,
+other than token rejection,
+is a hard failure.
+In this case no guarantee is made about the current block data.
+Marpa::R3 will attempt to leave the current block data valid
+and pointing to an "error location" -- that is, a location
+as relevant as possible to the error.
+
+=back
+
+=head2 G1 location
+
+If external scanning succeeds,
+and a pre-lexeme event does not occur,
+Marpa::R3 advances
+the current G1 location by one.
+The token read will start at the previous G1 location
+and end at the new current G1 location.
+The G1 location of the token will be considered to be
+the new current G1 location.
+
+If external scanning succeeds,
+and a pre-lexeme event does occur,
+the current G1 location will remain where it was
+before external scanning.
+
+If external scanning has a soft failure,
+the current G1 location will remain where it was
+before external scanning.
+
+If external scanning has a hard failure,
+no guarantee is made about the current G1 location.
+Marpa::R3 will attempt to leave it valid and unchanged.
+
+=head2 Event handlers
+
+On success, the event handlers will see
+a G1 location and an event location as described
+above.
+Event handlers are not invoked on failure.
 
 =head1 Mixing internal and external scanning
 
@@ -144,6 +234,18 @@ as well as
 L<the separate document for events|Marpa::R3::Event>.
 
 =head1 High-level mutators
+
+Most applications doing external scanning
+will want to use the high-level methods.
+The L<C<< $recce->lexeme_read_string() >> method|/"lexeme_read_string()">
+allows the reading of a string, where the string is both
+the literal equivalent of the input, and its value for semantics.
+The L<C<< $recce->lexeme_read_literal() >> method|/"lexeme_read_literal()">
+is similar, but the string is specified as a block span.
+
+The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
+is the most general of the high-level external scanning methods.
+C<lexeme_read_block()> allows the app to specify the literal and the value separately.
 
 =head2 lexeme_read_block()
 
@@ -172,23 +274,33 @@ C<$length>.
 
 The C<$symbol_name> argument is the name of the symbol
 to scan.
-The C<$value> arguments will be the value of the token.
+The C<$value> argument will be the value of the token.
 The C<$block_id>, C<$offset>, and C<$length> arguments
 are the literal equivalent of the token, as a 
 L<block span|/"Block spans">.
 
+
+If the symbol is rejected,
+C<lexeme_read_block()> has a soft failure.
+On soft failure, no token is read,
+and the current block data
+and the G1 location are unchanged.
+
+If 
+C<lexeme_read_block()> succeeds and no event occurs,
+The current block will be set to C<$block_id>,
+and
+the current offset of the current block
+will be set to C<$start+$length>.
+
 Parse events may trigger during the C<lexeme_read_block()> method.
+If 
+C<lexeme_read_block()> succeeds and a parse event triggers,
+the current block will be set to C<$block_id>,
+and the current offset of the current block
+will be set to the event location.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
-
-After C<$lexeme_read_block>
-the current block will be set to C<$block_id>.
-The current offset of the current block
-will be set to C<$start+$length>,
-unless a pre-lexeme event triggers.
-If a pre-lexeme event triggers,
-the current offset of the current block
-will be set to the event location.
 
 When successful,
 C<lexeme_read_block()> advances
