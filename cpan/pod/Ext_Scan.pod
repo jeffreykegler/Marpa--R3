@@ -129,17 +129,12 @@ for the C<lexeme_complete()> completion method.
 
 =head1 Completion method details
 
-This section describes the usual behaviors for the
-external scanning of a single token.
-Some completion methods, for example C<lexeme_read_string()>
-and C<lexeme_complete()>,
-behave differently
-in a few specifics.
-Whenever an external scanning completion method
-does not follow the rules described
-in this section,
-the difference will be specificly noted in the
-description of that method.
+The external scanning completion methods
+have almost all of their behaviors in common.
+For convenience, therefore, the usual behaviors
+of the completion methods are described in the section,
+and exceptions to these behaviors are noted
+in the descriptions of the individual methods.
 
 External scanning completion can succeed or fail.
 If external scanning completion fails, the failure may be hard
@@ -150,7 +145,7 @@ is the rejection of a token.
 =head2 Block location
 
 Every external scanning completion must have a valid block span,
-or else that completion results in a hard failure.
+unless that completion results in a hard failure.
 How that valid block span is specified varies by method.
 For the purposes of this section, let that
 block span be C<< <$block_id, $offset, $length> >>.
