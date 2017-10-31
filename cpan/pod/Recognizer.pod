@@ -414,10 +414,14 @@ specified as a triple
 C<< <block_id>, <offset>, <length> >>.
 Sometimes one or more elements of a block span are undefined.
 (For example, this can happen when a block span is part of a set of arguments.)
-In this case, C<block_id> defaults to the current block,
-C<offset> defaults to the current offset of the specified block
-and C<length> is set so that the span is to the eoread of the
+If C<block_id> is missing or undefined, it defaults to the current block.
+If C<offset> is missing or undefined,
+it defaults to the current offset of the specified block.
+If C<length> is undefined, it is set so that the span is to the eoread of the
 specified block.
+If C<length> is defined and positive,
+but would produce a span that goes beyond eoread,
+it is truncated.
 Block span is defined more formally
 L<below|/"Block span details">.
 
@@ -1651,6 +1655,8 @@ as follows:
 in which all of the elements are defined.
 If a block span arg specifies an invalid block span,
 it is a fatal error.
+In what follows,
+C<eoread> is the eoread of block C<block-id>.
 
 =over 4
 
@@ -1658,26 +1664,31 @@ it is a fatal error.
 C<block_id> is C<block-id-arg> if 
 C<block-id_arg> is defined.
 Otherwise C<block-id> is the current block.
+It is a fatal error if C<block-id> is undefined
+and there is not current block.
 
 =item *
-C<offset> is C<offset-arg> if 
+C<offset> is C<offset-arg>,
+converted to a non-negative offset,
+if 
 C<offset-arg> is defined.
 Otherwise C<offset> is the current offset
 of C<block_id>.
+It is a fatal error is C<offset-arg> cannot
+be converted to a non-negative offset.
 
 =item *
-C<length> is C<length-arg> if 
-C<length-arg> is defined.
-Otherwise C<length> is
-C<eoread> - C<offset> + 1,
-where C<eoread> is the eoread of block C<block-id>,
-
-=item *
-It is a fatal error if C<block-id> remains undefined;
-if C<block-id> is defined and C<offset> is outside of it;
-if C<block-id> is defined and C<offset> + C<length> - 1 is outside of it;
-or
-if C<block-id> is defined and C<offset> + C<length> - 1 is before C<offset>.
+If C<length-arg> is not defined,
+then C<length> is
+C<eoread> - C<offset>.
+If C<length-arg> is defined,
+C<length> is C<length-arg>,
+converted to a non-negative length.
+If 
+C<offset> + C<length> would be greater than C<eoread>,
+C<length> is truncated to C<eoread> - C<offset>.
+It is a fatal error is C<length-arg> cannot
+be converted to a non-negative length.
 
 =back
 
