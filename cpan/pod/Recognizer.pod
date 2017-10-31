@@ -409,19 +409,20 @@ and the span C<[-3, 1]>.
 
 =head1 Block spans
 
-A B<block span> is a span in terms of block location,
-specified as a triple
-C<< <block_id>, <offset>, <length> >>.
+A B<block span> is a span in terms of block location.
+It is specified as a triple
+C<< <$block_id>, <$offset>, <$length> >>.
 Sometimes one or more elements of a block span are undefined.
 (For example, this can happen when a block span is part of a set of arguments.)
-If C<block_id> is missing or undefined, it defaults to the current block.
-If C<offset> is missing or undefined,
-it defaults to the current offset of the specified block.
-If C<length> is undefined, it is set so that the span is to the eoread of the
+If C<$block_id> is missing or undefined, the specified block is the current block.
+If C<$offset> is missing or undefined,
+the specified offset is the current offset of the specified block.
+If C<$length> is missing or undefined,
+the specified length is to the eoread of the
 specified block.
-If C<length> is defined and positive,
-but would produce a span that goes beyond eoread,
-it is truncated.
+If C<$length> is defined and positive,
+but would result in a span that goes beyond eoread,
+the specified length is truncated.
 Block span is defined more formally
 L<below|/"Block span details">.
 
@@ -1646,49 +1647,48 @@ they are segregated here.
 =head2 Block span details
 
 A B<block span arg> is a triple
-C<< <block-id-arg>, <offset-arg>, <length-arg> >>,
-where C<block-id-arg> is undefined or a block ID,
+C<< <$block_id_arg>, <$offset_arg>, <$length_arg> >>,
+where C<$block_id_arg> is undefined or a block ID,
 C<offset> is undefined or a block offset,
 and C<length> is undefined or a length in characters (codepoints).
-A block span arg specifies a triple C<< <block-id>, <offset>, <length> >>,
+The specified block span is a triple C<< <block_id>, <offset>, <length> >>,
+all of whose elements are defined.
+Let C<eoread> be the eoread of C<block_id>.
+The specified block span is determined
 as follows:
-in which all of the elements are defined.
-If a block span arg specifies an invalid block span,
-it is a fatal error.
-In what follows,
-C<eoread> is the eoread of block C<block-id>.
 
 =over 4
 
 =item *
-C<block_id> is C<block-id-arg> if 
-C<block-id_arg> is defined.
-Otherwise C<block-id> is the current block.
-It is a fatal error if C<block-id> is undefined
+C<block_id> is C<$block_id_arg> if 
+C<$block_id_arg> is defined.
+Otherwise C<block_id> is the current block.
+It is a fatal error if C<block_id> is undefined
 and there is not current block.
 
 =item *
-C<offset> is C<offset-arg>,
+If 
+C<$offset_arg> is defined,
+C<offset> is C<$offset_arg>,
 converted to a non-negative offset,
-if 
-C<offset-arg> is defined.
-Otherwise C<offset> is the current offset
-of C<block_id>.
-It is a fatal error is C<offset-arg> cannot
+It is a fatal error is C<offset_arg> cannot
 be converted to a non-negative offset.
+If C<$offset_arg> is not defined,
+then C<offset> is the current offset
+of C<block_id>.
 
 =item *
-If C<length-arg> is not defined,
+If C<$length_arg> is not defined,
 then C<length> is
 C<eoread> - C<offset>.
-If C<length-arg> is defined,
-C<length> is C<length-arg>,
+If C<length_arg> is defined,
+C<length> is C<$length_arg>,
 converted to a non-negative length.
+It is a fatal error is C<$length_arg> cannot
+be converted to a non-negative length.
 If 
 C<offset> + C<length> would be greater than C<eoread>,
 C<length> is truncated to C<eoread> - C<offset>.
-It is a fatal error is C<length-arg> cannot
-be converted to a non-negative length.
 
 =back
 
