@@ -191,7 +191,6 @@ sub gen_codepoint_event_handler {
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
     my $character_class_table =
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
-    my $coro_arg = undef;
 
     return sub {
         my ( $codepoint, $trace_terminals ) = @_;
@@ -223,7 +222,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
             } ## end if ( $character =~ $re )
         } ## end for my $entry ( @{$character_class_table} )
 
-        $coro_arg = { symbols => \@symbols };
+        my $coro_arg = { symbols => \@symbols };
         $coro_arg->{is_graphic} = 'true' if $is_graphic;
         return 'ok', $coro_arg;
     };
