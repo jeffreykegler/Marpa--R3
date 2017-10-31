@@ -1647,10 +1647,11 @@ they are segregated here.
 =head2 Block span details
 
 A B<block span arg> is a triple
-C<< <$block_id_arg>, <$offset_arg>, <$length_arg> >>,
-where C<$block_id_arg> is undefined or a block ID,
-C<offset> is undefined or a block offset,
-and C<length> is undefined or a length in characters (codepoints).
+C<< <$block_id_arg>, <$offset_arg>, <$length_arg> >>.
+C<$block_id_arg> is undefined or a block ID.
+C<offset> is undefined or a block offset.
+C<length> is undefined or a length in characters (codepoints).
+
 The specified block span is a triple C<< <block_id>, <offset>, <length> >>,
 all of whose elements are defined.
 Let C<eoread> be the eoread of C<block_id>.
@@ -1664,14 +1665,14 @@ C<block_id> is C<$block_id_arg> if
 C<$block_id_arg> is defined.
 Otherwise C<block_id> is the current block.
 It is a fatal error if C<block_id> is undefined
-and there is not current block.
+and there is no current block.
 
 =item *
 If 
 C<$offset_arg> is defined,
 C<offset> is C<$offset_arg>,
-converted to a non-negative offset,
-It is a fatal error is C<offset_arg> cannot
+converted to a non-negative offset.
+It is a fatal error if C<offset_arg> cannot
 be converted to a non-negative offset.
 If C<$offset_arg> is not defined,
 then C<offset> is the current offset
@@ -1681,10 +1682,10 @@ of C<block_id>.
 If C<$length_arg> is not defined,
 then C<length> is
 C<eoread> - C<offset>.
-If C<length_arg> is defined,
+If C<$length_arg> is defined,
 C<length> is C<$length_arg>,
 converted to a non-negative length.
-It is a fatal error is C<$length_arg> cannot
+It is a fatal error if C<$length_arg> cannot
 be converted to a non-negative length.
 If 
 C<offset> + C<length> would be greater than C<eoread>,
