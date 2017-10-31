@@ -566,7 +566,9 @@ If C<$value> is missing, the value of the symbol
 will be a Perl C<undef>.
 
 The C<lexeme_alternative()> method is a non-completion method -- it adds to
-the list of tokens which will be completed by a later call
+the list of accepted tokens.
+To be read by the parser, this list of accepted tokens
+must be completed by a later call
 to the C<lexeme_complete()> method.
 By making two or more calls
 of the C<lexeme_alternative()> method
@@ -574,6 +576,11 @@ before the next call of C<lexeme_complete()>,
 an app can read an
 ambiguous token.
 (An ambiguous token is one which can be more than one symbol.)
+
+When the recognizer starts,
+the list of accepted tokens is empty.
+The list of accepted tokens is cleared whenever C<lexeme_complete()>
+is called.
 
 C<lexeme_alternative()> has a soft failure if it rejects 
 C<$symbol_name>.
@@ -657,12 +664,26 @@ The block span is used to set the literal equivalent for the
 set of alternative tokens completed by the
 C<lexeme_complete()> call.
 
-Current block, block offset
-and G1 location are adjusted,
-as described for
-L<the C<lexeme_read_block()> method|/"lexeme_read_block()">.
-L<Parse events|Marpa::R3::Event>
-may occur in the L<C<lexeme_complete()>|/"lexeme_complete()"> method.
+C<lexeme_read_literal()> is an external scanning completion
+method and, with one important difference,
+the details of its behavior are
+L<as described above|"Completion method details">.
+The difference is that token rejection never occurs
+in C<lexeme_complete()>.
+C<lexeme_complete()> relies on the app to have built a list
+of accepted tokens using the
+C<lexeme_alternative()>
+or
+C<lexeme_alternative_literal()>
+calls.
+
+It is a hard failure if C<lexeme_complete()> is called
+but the list of tokens accepted by
+C<lexeme_alternative()>
+or
+C<lexeme_alternative_literal()>
+methods is empty.
+All failures in C<lexeme_complete()> are hard failures.
 
 B<Return values:>
 On success, C<lexeme_complete()>
