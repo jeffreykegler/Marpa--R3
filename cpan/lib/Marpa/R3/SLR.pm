@@ -96,7 +96,7 @@ sub Marpa::R3::Scanless::R::error_literal {
         <<'END_OF_LUA', 'iii', $block_id, $offset, $length );
     local slr, block_id_arg, offset_arg, length_arg = ...
     local block_id, offset, eoread
-        = slr:block_max_range(block_id_arg, offset_arg, length_arg)
+        = slr:block_check_range(block_id_arg, offset_arg, length_arg)
     if not block_id then
         -- if block == nil, offset is error message
         error(offset)
