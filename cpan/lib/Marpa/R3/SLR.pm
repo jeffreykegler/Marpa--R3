@@ -186,6 +186,49 @@ sub gen_app_event_handler {
     };
 }
 
+sub gen_codepoint_event_handler {
+    my ($slr) = @_;
+    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $character_class_table =
+      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+    my $coro_arg = undef;
+
+    return sub {
+        my ( $codepoint, $trace_terminals ) = @_;
+        my $character = pack( 'U', $codepoint );
+        my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
+
+        my @symbols;
+        for my $entry ( @{$character_class_table} ) {
+
+            my ( $symbol_id, $re ) = @{$entry};
+
+            # say STDERR "Codepoint %x vs $re\n";
+
+            if ( $character =~ $re ) {
+
+                if ( $trace_terminals >= 2 ) {
+                    my $trace_file_handle =
+                      $slr
+                      ->[ Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE ];
+                    my $char_desc = character_describe( $slr, $codepoint );
+                    say {$trace_file_handle}
+qq{Registering character $char_desc as symbol $symbol_id: },
+                      $slg->l0_symbol_display_form($symbol_id)
+                      or Marpa::R3::exception("Could not say(): $ERRNO");
+                } ## end if ( $trace_terminals >= 2 )
+
+                push @symbols, $symbol_id;
+
+            } ## end if ( $character =~ $re )
+        } ## end for my $entry ( @{$character_class_table} )
+
+        $coro_arg = { symbols => \@symbols };
+        $coro_arg->{is_graphic} = 'true' if $is_graphic;
+        return 'ok', $coro_arg;
+    };
+}
+
 sub Marpa::R3::Scanless::R::new {
     my ( $class, @args ) = @_;
 
@@ -883,50 +926,13 @@ sub Marpa::R3::Scanless::R::block_new {
     my $character_class_table =
       $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
 
-    my $coro_arg = undef;
     my ($block_id) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 's',
             args      => [ ${$p_string} ],
             handlers  => {
-                codepoint => sub {
-                    my ($codepoint, $trace_terminals) = @_;
-                    my $character = pack( 'U', $codepoint );
-                    my $is_graphic = ( $character =~ m/[[:graph:]]+/ );
-
-                    my @symbols;
-                    for my $entry ( @{$character_class_table} ) {
-
-                        my ( $symbol_id, $re ) = @{$entry};
-
-                        # say STDERR "Codepoint %x vs $re\n";
-
-                        if ( $character =~ $re ) {
-
-                            if ( $trace_terminals >= 2 ) {
-                                my $trace_file_handle =
-                                  $slr->[
-                                  Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE
-                                  ];
-                                my $char_desc =
-                                  character_describe( $slr, $codepoint );
-                                say {$trace_file_handle}
-qq{Registering character $char_desc as symbol $symbol_id: },
-                                  $slg->l0_symbol_display_form($symbol_id)
-                                  or Marpa::R3::exception(
-                                    "Could not say(): $ERRNO");
-                            } ## end if ( $trace_terminals >= 2 )
-
-                            push @symbols, $symbol_id;
-
-                        } ## end if ( $character =~ $re )
-                    } ## end for my $entry ( @{$character_class_table} )
-
-                    $coro_arg = { symbols => \@symbols };
-                    $coro_arg->{is_graphic} = 'true' if $is_graphic;
-                    return 'ok', $coro_arg;
-                },
+                codepoint => gen_codepoint_event_handler($slr),
                 event => gen_app_event_handler($slr),
             },
         },
