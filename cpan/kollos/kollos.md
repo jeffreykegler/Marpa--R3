@@ -2221,6 +2221,31 @@ and block-related methods.
         return eoread
     end
 
+    -- assumes valid block_id, block_offset
+    -- returns:
+    --     current eoread, if length_arg == nil
+    --     end-of-read, based on length_arg, if length_arg valid and non-nil
+    --     current eoread, otherwise
+    -- Note: negative block_offset is an error
+    -- Note: uses the `block_offset` in its arguments, *not* the one actually
+    --     in the block
+    function _M.class_slr.block_max_length(slr, block_id, block_offset, length_arg)
+        local block = slr.inputs[block_id]
+        local block_length = #block
+
+        if not length_arg then
+            local _, _, eoread = slr:block_progress(block_id)
+            return eoread
+        end
+        local longueur = math.tointeger(length_arg)
+        if not longueur or longueur < 0 then
+            return nil, string.format('Bad length argument %s', length_arg)
+        end
+        local eoread = block_offset + longueur
+        if eoread > block_length then return block_length end
+        return eoread
+    end
+
     function _M.class_slr.block_check_offset(slr, block_id_arg, block_offset_arg)
         local block_id, erreur
             = _M.class_slr.block_check_id(slr, block_id_arg, block_offset_arg)
@@ -2245,6 +2270,25 @@ and block-related methods.
         if not block_id then return nil, block_offset end
         local eoread, erreur
             = _M.class_slr.block_check_length(slr, block_id, block_offset, length_arg)
+        if not eoread then return nil, erreur end
+        return block_id, block_offset, eoread
+    end
+
+    -- assumes nothing about arguments
+    -- block_id defaults to current block if block_id_arg == nil
+    -- block_offset defaults to current offset in current block
+    --     if block_offset_arg == nil
+    -- eoread defaults to end-of-block if length_arg == nil
+    -- eoread is <= offset+length, if length_arg ~= nil
+    -- returns block_id, block_offset, eoread on success
+    -- returns nil, error-message otherwise
+    function _M.class_slr.block_max_range(slr, block_id_arg, block_offset_arg, length_arg)
+        local block_id, block_offset
+            = _M.class_slr.block_check_offset(slr, block_id_arg, block_offset_arg)
+        -- `block offset` is error message when block_id == nil
+        if not block_id then return nil, block_offset end
+        local eoread, erreur
+            = _M.class_slr.block_max_length(slr, block_id, block_offset, length_arg)
         if not eoread then return nil, erreur end
         return block_id, block_offset, eoread
     end

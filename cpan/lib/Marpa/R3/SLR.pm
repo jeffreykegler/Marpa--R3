@@ -78,6 +78,29 @@ sub Marpa::R3::Scanless::R::literal {
     local slr, block_id_arg, offset_arg, length_arg = ...
     local block_id, offset, eoread
         = slr:block_check_range(block_id_arg, offset_arg, length_arg)
+    if not block_id then
+        -- if block == nil, offset is error message
+        error(offset)
+    end
+    return slr:literal(block_id, offset, eoread-offset)
+END_OF_LUA
+    return $literal;
+}
+
+# Substring in terms of locations in the input stream
+# This is the one users will be most interested in.
+# The `length` must be positive and is treated as a maximum
+sub Marpa::R3::Scanless::R::error_literal {
+    my ( $slr, $block_id, $offset, $length ) = @_;
+    my ($literal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'iii', $block_id, $offset, $length );
+    local slr, block_id_arg, offset_arg, length_arg = ...
+    local block_id, offset, eoread
+        = slr:block_max_range(block_id_arg, offset_arg, length_arg)
+    if not block_id then
+        -- if block == nil, offset is error message
+        error(offset)
+    end
     return slr:literal(block_id, offset, eoread-offset)
 END_OF_LUA
     return $literal;
@@ -704,22 +727,62 @@ sub Marpa::R3::Scanless::R::lexeme_read_block {
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_string {
-    my ( $recce, $symbol_name, $string ) = @_;
-    if ( $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    my ( $slr, $symbol_name, $string ) = @_;
+    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
-            "$recce->lexeme_read_string() called from inside a handler\n",
+            '$recce->lexeme_read_string() called from inside a handler', "\n",
             "   This is not allowed\n",
             "   The event was ",
-            $recce->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
             "\n",
         );
     }
-    return if not $recce->lexeme_alternative( $symbol_name, $string );
-    my ($save_block) = $recce->block_progress();
-    my $lexeme_block = $recce->block_new( \$string );
-    my $return_value = $recce->lexeme_complete( $lexeme_block );
-    $recce->block_set($save_block);
-    return $return_value;
+    # return if not $recce->lexeme_alternative( $symbol_name, $string );
+    # my ($save_block) = $recce->block_progress();
+    # my $lexeme_block = $recce->block_new( \$string );
+    # my $return_value = $recce->lexeme_complete( $lexeme_block );
+    # $recce->block_set($save_block);
+    # return $return_value;
+
+    my ($ok, $return_value) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+           signature => 'ss',
+           args => [ $symbol_name, $string ],
+           handlers => {
+               trace => sub {
+                    my ($msg) = @_;
+                    my $trace_file_handle =
+                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+               },
+               event => gen_app_event_handler($slr),
+           }
+        },
+        <<'END_OF_LUA');
+      local slr, symbol_name, input_string = ...
+      _M.wrap(function ()
+          local ok = slr:lexeme_alternative(symbol_name, input_string )
+          if not ok then return 'ok', 0 end
+          local save_block = slr:block_progress()
+          local new_block_id = slr:block_progress(slr:block_new(input_string))
+          local new_eoread
+          local dummy
+          dummy, dummy, new_eoread = slr:block_progress(new_block_id)
+          -- print('new_eoread', new_eoread)
+          -- print('input_string', input_string)
+          local new_offset = slr:lexeme_complete(new_block_id, 0, new_eoread)
+          slr:convert_libmarpa_events()
+          slr:block_set(save_block)
+          return 'ok', 'ok', new_offset
+      end
+      )
+END_OF_LUA
+
+      return if not $ok;
+      return $return_value;
+
 }
 
 sub Marpa::R3::Scanless::R::g1_to_block_first {
