@@ -2615,7 +2615,7 @@ the recognizer's Lua-level settings.
     end
 ```
 
-### Reading
+### Internal reading
 
 The top-level read function.
 
@@ -3271,14 +3271,36 @@ Read alternatives into the G1 grammar.
     end
 ```
 
-#### External reading
+### High-level external reading
+
+Returns `nil` if `symbol_name` is rejected,
+otherwise the new offset.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lexeme_read_string(slr, symbol_name, input_string)
+        local ok = slr:lexeme_alternative(symbol_name, input_string )
+        if not ok then return end
+        local save_block = slr:block_progress()
+        local new_block_id = slr:block_progress(slr:block_new(input_string))
+        local new_eoread
+        local dummy
+        dummy, dummy, new_eoread = slr:block_progress(new_block_id)
+          -- print('new_eoread', new_eoread)
+          -- print('input_string', input_string)
+        local new_offset = slr:lexeme_complete(new_block_id, 0, new_eoread)
+        slr:convert_libmarpa_events()
+        slr:block_set(save_block)
+        return new_offset
+    end
+```
+
+### Low-level external reading
 
 These functions are for "external" reading of tokens --
 that is reading tokens by a means other than Marpa's own
 lexer.
 It assumes that the caller checked the args.
-
-##### Methods
 
 `value_type` arg is "literal", "explicit" or "undef".
 In the Perl interface, the `token` arg is always an SV.

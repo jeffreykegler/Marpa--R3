@@ -760,12 +760,6 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
             "\n",
         );
     }
-    # return if not $recce->lexeme_alternative( $symbol_name, $string );
-    # my ($save_block) = $recce->block_progress();
-    # my $lexeme_block = $recce->block_new( \$string );
-    # my $return_value = $recce->lexeme_complete( $lexeme_block );
-    # $recce->block_set($save_block);
-    # return $return_value;
 
     my ($ok, $return_value) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -787,19 +781,9 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
         <<'END_OF_LUA');
       local slr, symbol_name, input_string = ...
       _M.wrap(function ()
-          local ok = slr:lexeme_alternative(symbol_name, input_string )
-          if not ok then return 'ok', 0 end
-          local save_block = slr:block_progress()
-          local new_block_id = slr:block_progress(slr:block_new(input_string))
-          local new_eoread
-          local dummy
-          dummy, dummy, new_eoread = slr:block_progress(new_block_id)
-          -- print('new_eoread', new_eoread)
-          -- print('input_string', input_string)
-          local new_offset = slr:lexeme_complete(new_block_id, 0, new_eoread)
-          slr:convert_libmarpa_events()
-          slr:block_set(save_block)
-          return 'ok', 'ok', new_offset
+          local offset = slr:lexeme_read_string(symbol_name, input_string )
+          if not offset then return 'ok', 0 end
+          return 'ok', 1, offset
       end
       )
 END_OF_LUA
