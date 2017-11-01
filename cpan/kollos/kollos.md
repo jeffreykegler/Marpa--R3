@@ -3279,7 +3279,7 @@ otherwise the new offset.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_read_string(slr, symbol_name, input_string)
-        local ok = slr:lexeme_alternative(symbol_name, input_string )
+        local ok = lexeme_alternative_i(slr, symbol_name, input_string )
         if not ok then return end
         local save_block = slr:block_progress()
         local new_block_id = slr:block_progress(slr:block_new(input_string))
@@ -3298,13 +3298,13 @@ otherwise the new offset.
             block_id_arg, offset_arg, length_arg)
         local block_id, offset, eoread
             = slr:block_check_range(block_id_arg, offset_arg, length_arg)
+        local ok
         if token_sv then
-            local ok = slr:lexeme_alternative(symbol_name, token_sv )
-            if not ok then return end
+            ok = lexeme_alternative_i(slr, symbol_name, token_sv )
         else
-            local ok = slr:lexeme_alternative_undef(symbol_name)
-            if not ok then return end
+            ok = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
         end
+        if not ok then return end
         local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
         slr:convert_libmarpa_events()
         return new_offset
@@ -3314,7 +3314,7 @@ otherwise the new offset.
             block_id_arg, offset_arg, length_arg)
         local block_id, offset, eoread
             = slr:block_check_range(block_id_arg, offset_arg, length_arg)
-        local ok = slr:lexeme_alternative_literal(symbol_name)
+        local ok = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
         local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
         slr:convert_libmarpa_events()
         return new_offset
@@ -3335,8 +3335,10 @@ Returns 1 if read OK, `nil` on soft error.
 Other errors are thrown.
 
 ```
+    -- miranda: section+ forward declarations
+    local lexeme_alternative_i2
     -- miranda: section+ most Lua function definitions
-    local function lexeme_alternative_i(slr, symbol_name, token_ix)
+    function lexeme_alternative_i2(slr, symbol_name, token_ix)
         local slg = slr.slg
         local xsy = slg.xsys[symbol_name]
         if not xsy then
@@ -3366,16 +3368,32 @@ Other errors are thrown.
             symbol_name, error_description
         );
     end
-    function _M.class_slr.lexeme_alternative_literal(slr, symbol_name)
-        return lexeme_alternative_i(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
-    end
-    function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
-        return lexeme_alternative_i(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
-    end
-    function _M.class_slr.lexeme_alternative(slr, symbol_name, token)
+```
+
+```
+    -- miranda: section+ forward declarations
+    local lexeme_alternative_i
+    -- miranda: section+ most Lua function definitions
+    function lexeme_alternative_i(slr, symbol_name, token)
         local token_ix = #slr.token_values + 1
         slr.token_values[token_ix] = token
-        return lexeme_alternative_i(slr, symbol_name, token_ix)
+        return lexeme_alternative_i2(slr, symbol_name, token_ix)
+    end
+```
+
+These are the externally visible low-level `lexeme_alternative*()`
+methods
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lexeme_alternative_literal(slr, symbol_name)
+        return lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
+    end
+    function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
+        return lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
+    end
+    function _M.class_slr.lexeme_alternative(slr, symbol_name, token)
+        return lexeme_alternative_i(slr, symbol_name, token)
     end
 ```
 
