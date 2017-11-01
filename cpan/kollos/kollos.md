@@ -3309,6 +3309,16 @@ otherwise the new offset.
         slr:convert_libmarpa_events()
         return new_offset
     end
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lexeme_read_literal(slr, symbol_name,
+            block_id_arg, offset_arg, length_arg)
+        local block_id, offset, eoread
+            = slr:block_check_range(block_id_arg, offset_arg, length_arg)
+        local ok = slr:lexeme_alternative_literal(symbol_name)
+        local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
+        slr:convert_libmarpa_events()
+        return new_offset
+    end
 ```
 
 ### Low-level external reading
