@@ -63,7 +63,7 @@ But
 many applications find it useful or necessary to
 do their own scanning in procedural code.
 In Marpa::R3 this is called B<external scanning>.
-External scanning can be used instead of internal scanning.
+External scanning can be used as a replacement for internal scanning.
 Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
 
@@ -71,8 +71,9 @@ forth between internal and external scanning.
 
 In external scanning, the app controls tokenization directly.
 External scanning might also be called one-by-one scanning because,
-unlike internal scanning in which Marpa::R3 tokenizes a string for the app,
-in external scanning the app feeds tokens to Marpa::R3 one-by-one.
+in external scanning, the app feeds tokens to Marpa::R3 one-by-one.
+This differs from internal scanning -- in internal scanning
+Marpa::R3 tokenizes a string for the app.
 
 Every token must have three things associated with it:
 

@@ -87,25 +87,6 @@ END_OF_LUA
     return $literal;
 }
 
-# Substring in terms of locations in the input stream
-# This is the one users will be most interested in.
-# The `length` must be positive and is treated as a maximum
-sub Marpa::R3::Scanless::R::error_literal {
-    my ( $slr, $block_id, $offset, $length ) = @_;
-    my ($literal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iii', $block_id, $offset, $length );
-    local slr, block_id_arg, offset_arg, length_arg = ...
-    local block_id, offset, eoread
-        = slr:block_check_range(block_id_arg, offset_arg, length_arg)
-    if not block_id then
-        -- if block == nil, offset is error message
-        error(offset)
-    end
-    return slr:literal(block_id, offset, eoread-offset)
-END_OF_LUA
-    return $literal;
-}
-
 sub Marpa::R3::Internal::Scanless::meta_recce {
     my ($hash_args) = @_;
     state $meta_grammar = Marpa::R3::Internal::Scanless::meta_grammar();
@@ -325,7 +306,7 @@ END_OF_LUA
         <<'END_OF_LUA');
         local slr, flat_args = ...
         _M.wrap(function ()
-            slr:convert_libmarpa_events(slr)
+            slr:convert_libmarpa_events()
             return 'ok'
         end)
 END_OF_LUA
@@ -722,7 +703,7 @@ sub Marpa::R3::Scanless::R::lexeme_complete {
           = slr:block_check_range(block_id_arg, offset_arg, length_arg)
       _M.wrap(function ()
           local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
-          slr:convert_libmarpa_events(slr)
+          slr:convert_libmarpa_events()
           return 'ok', new_offset
       end
       )
@@ -799,6 +780,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
                     say {$trace_file_handle} $msg;
                     return 'ok';
                },
+               codepoint => gen_codepoint_event_handler($slr),
                event => gen_app_event_handler($slr),
            }
         },
