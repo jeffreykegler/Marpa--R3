@@ -3293,6 +3293,22 @@ otherwise the new offset.
         slr:block_set(save_block)
         return new_offset
     end
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.lexeme_read_block(slr, symbol_name, token_sv,
+            block_id_arg, offset_arg, length_arg)
+        local block_id, offset, eoread
+            = slr:block_check_range(block_id_arg, offset_arg, length_arg)
+        if token_sv then
+            local ok = slr:lexeme_alternative(symbol_name, token_sv )
+            if not ok then return end
+        else
+            local ok = slr:lexeme_alternative_undef(symbol_name)
+            if not ok then return end
+        end
+        local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
+        slr:convert_libmarpa_events()
+        return new_offset
+    end
 ```
 
 ### Low-level external reading

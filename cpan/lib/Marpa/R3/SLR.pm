@@ -743,8 +743,41 @@ sub Marpa::R3::Scanless::R::lexeme_read_block {
             "\n",
         );
     }
-    return if not $slr->lexeme_alternative( $symbol_name, $value );
-    return $slr->lexeme_complete( $block_id, $offset, $length );
+    if ( Scalar::Util::tainted( $value ) ) {
+        Marpa::R3::exception(
+            "Problem in Marpa::R3: Attempt to use a tainted token value\n",
+            "Marpa::R3 is insecure for use with tainted data\n"
+        );
+    }
+    my ($ok, $return_value) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+           signature => 'sSiii',
+           args => [ $symbol_name, $value, $block_id, $offset, $length ],
+           handlers => {
+               trace => sub {
+                    my ($msg) = @_;
+                    my $trace_file_handle =
+                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+               },
+               codepoint => gen_codepoint_event_handler($slr),
+               event => gen_app_event_handler($slr),
+           }
+        },
+        <<'END_OF_LUA');
+      local slr, symbol_name, token_sv, block_id, offset, length = ...
+      _M.wrap(function ()
+          local offset = slr:lexeme_read_block(symbol_name, token_sv, block_id, offset, length )
+          if not offset then return 'ok', 0 end
+          return 'ok', 1, offset
+      end
+      )
+END_OF_LUA
+
+      return if not $ok;
+      return $return_value;
 }
 
 # Returns 0 on unthrown failure, current location on success,
