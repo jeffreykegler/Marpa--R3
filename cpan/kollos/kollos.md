@@ -2265,7 +2265,7 @@ This is a registry object.
     class_slr_fields.event_queue = true
     class_slr_fields.g1 = true
     class_slr_fields.inputs = true
-    class_slr_fields.is_external_scanning = true
+    class_slr_fields.is_lo_level_scanning = true
     class_slr_fields.l0 = true
     class_slr_fields.l0_candidate = true
     class_slr_fields.g1_isys = true
@@ -2372,7 +2372,7 @@ together.
         slr.trace_terminals = 0
         slr.start_of_lexeme = 0
         slr.end_of_lexeme = 0
-        slr.is_external_scanning = false
+        slr.is_lo_level_scanning = false
 
         local g_l0_rules = slg.l0.irls
         local r_l0_rules = slr.l0_irls
@@ -2624,10 +2624,19 @@ if there is some way to continue it),
 `false` otherwise.
 
 ```
+    -- miranda: section+ forward declarations
+    local error_lo_hi_scanning
     -- miranda: section+ most Lua function definitions
+    function error_lo_hi_scanning(function_name)
+        return _M.userX(
+           'unpermitted mix of external and internal scanning\n\z
+           \u{20}   "%s" called while doing low level scanning\n\z
+           \u{20}   Did you want to call lexeme_complete first?\n',
+        function_name)
+    end
     function _M.class_slr.read(slr)
-        if slr.is_external_scanning then
-           _M.userX( 'unpermitted mix of external and internal scanning' )
+        if slr.is_lo_level_scanning then
+           return error_lo_hi_scanning("slr.read()")
         end
         if slr.block_mode then
            _M.userX( 'unpermitted use of slr.read() in block mode' )
@@ -3279,6 +3288,9 @@ otherwise the new offset.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_read_string(slr, symbol_name, input_string)
+        if slr.is_lo_level_scanning then
+           return error_lo_hi_scanning("slr.lexeme_read_string()")
+        end
         local ok = lexeme_alternative_i(slr, symbol_name, input_string )
         if not ok then return end
         local save_block = slr:block_progress()
@@ -3296,6 +3308,9 @@ otherwise the new offset.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_read_block(slr, symbol_name, token_sv,
             block_id_arg, offset_arg, length_arg)
+        if slr.is_lo_level_scanning then
+           return error_lo_hi_scanning("slr.lexeme_read_block()")
+        end
         local block_id, offset, eoread
             = slr:block_check_range(block_id_arg, offset_arg, length_arg)
         local ok
@@ -3312,6 +3327,9 @@ otherwise the new offset.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_read_literal(slr, symbol_name,
             block_id_arg, offset_arg, length_arg)
+        if slr.is_lo_level_scanning then
+           return error_lo_hi_scanning("slr.lexeme_read_literal()")
+        end
         local block_id, offset, eoread
             = slr:block_check_range(block_id_arg, offset_arg, length_arg)
         local ok = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
@@ -3354,7 +3372,6 @@ Other errors are thrown.
         end
         local symbol_id = lexeme.g1_isy.id
         local g1r = slr.g1
-        slr.is_external_scanning = true
         local return_value = g1r:alternative(symbol_id, token_ix, 1)
         if return_value == _M.err.NONE then return 1 end
         if return_value == _M.err.UNEXPECTED_TOKEN_ID then return end
@@ -3387,12 +3404,15 @@ methods
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_alternative_literal(slr, symbol_name)
+        slr.is_lo_level_scanning = true
         return lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
     end
     function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
+        slr.is_lo_level_scanning = true
         return lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
     end
     function _M.class_slr.lexeme_alternative(slr, symbol_name, token)
+        slr.is_lo_level_scanning = true
         return lexeme_alternative_i(slr, symbol_name, token)
     end
 ```
@@ -3407,7 +3427,7 @@ Always throws errors.
         slr:block_move(offset)
         local g1r = slr.g1
         slr.event_queue = {}
-        slr.is_external_scanning = false
+        slr.is_lo_level_scanning = false
         local result = g1r:earleme_complete()
         if result >= 0 then
             slr:g1_convert_events()
