@@ -776,8 +776,7 @@ constructor,
 before the C<activate()> method can be called.
 To deactivate
 location zero events,
-use the
-The L<C<event_is_active>|/"event_is_active"> recognizer setting
+use the L<C<event_is_active>|/"event_is_active"> recognizer setting
 in that recognizer's L<C<new()>|/"Constructor">.
 
 The overhead imposed by events
