@@ -79,7 +79,7 @@ External scanning can be used instead of internal scanning,
 but Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
 External scanning is described in
-L<it own document|Marpa::R3::Ext_Scan>.
+L<its own document|Marpa::R3::Ext_Scan>.
 
 =head1 Block position
 
@@ -91,6 +91,7 @@ is very simple.
 The input is provided as a pointer to a string.
 Scanning starts at the first
 position and continues to the last character of the string.
+
 Many applications fit this model.
 But many common practical applications
 want to do one or more of the following
@@ -122,7 +123,7 @@ of the current input.
 The C preprocessor does this.
 
 =item *
-Allow externally scanned symbols, which do not refer
+Allow externally scanned symbols that do not refer
 to any text in the main input string.
 For reasonable error messages to be generated,
 some sort of literal equivalent of the symbol needs
@@ -451,9 +452,15 @@ In this case, the current offset is
 set to the event locaiton.
 
 =item *
-A failure occurs.
+A soft failure occurs.
 The current offset is set to the
-location of the failure.
+location of the soft failure.
+
+=item *
+A hard failure occurs.
+The current block data is undefined,
+but Marpa::R3 attempts to set it to the
+location of the hard failure.
 
 =back
 
@@ -537,8 +544,8 @@ before events at earleme 0 are triggered,
 and before any of the input stream is read.
 
 The L<C<activate()> method|/"activate()">
-can also be used to change an event's activation
-setting for events that trigger after earleme 0.
+can also be used to change an event's activation,
+and that is usually preferable.
 But
 events at earleme 0
 trigger during
@@ -592,7 +599,7 @@ For an individual entry of this hash,
 call the key C<ev>
 and call its value C<func>.
 Event C<ev> will be handled by calling function
-C<fn>.
+C<func>.
 
 If any event occurs which does not have a handler,
 it is a fatal error.
@@ -636,7 +643,7 @@ can be impractically slow.
 Ideally C<too_many_earley_items> is set at the
 "point of no return" -- an Earley set size which,
 when reached, indicates that
-the Earley sets will grow out of control.
+the Earley sets are destined to grow out of control.
 By default, Marpa calculates
 an Earley item warning threshold
 for the G1 recognizer
@@ -767,8 +774,11 @@ C<read()> method,
 location 0 events are triggered in the recognizer's
 constructor,
 before the C<activate()> method can be called.
-Currently there is no way to deactivate
-location zero events.
+To deactivate
+location zero events,
+use the
+The L<C<event_is_active>|/"event_is_active"> recognizer setting
+in that recognizer's L<C<new()>|/"Constructor">.
 
 The overhead imposed by events
 can be reduced by using the C<activate()> method.
@@ -845,7 +855,7 @@ the current offset of the newly created block is set to
 C<$start>.
 If C<$start> is negative,
 the current offset of the newly created block
-is set to C<eoblock> + C<$start>.
+is set to C<eoblock> + C<$start> + 1.
 If C<$start> is not defined,
 the current offset of the newly created block is set to 0.
 
@@ -857,10 +867,12 @@ eoread is set to C<eoblock> + C<$length> + 1.
 If C<$length> is not defined, eoread is set to the eoblock
 of the newly created, current block.
 
-If C<$start> and <$length> would produce an eoread which is after
-eoblock;
-or would produce an eoread which is before the new current offset,
-it is a fatal error.
+It is a fatal error
+if C<$start> and C<$length> would produce an eoread which is after
+eoblock.
+It is also a fatal error
+if C<$start> and C<$length>
+would produce an eoread which is before the current offset.
 
 Once C<read()> has created the a new block,
 it does internal scanning
@@ -884,7 +896,10 @@ it returns the new current offset,
 which is the event location of the parse event.
 Parse events are described in detail in
 L<a separate document|Marpa::R3::Event>.
-All failures are thrown.
+A return value of Perl C<undef>
+is reserved for soft failures.
+Hard failures are thrown.
+Currently, all failures are hard failures.
 
 The C<read()> method is
 the approximate equivalent of
@@ -926,9 +941,9 @@ C<$start> and C<$length>.
 If C<$start> is defined and non-negative,
 the current offset of the current block is set to
 C<$start>.
-If C<$start> is negative,
+If C<$start> is defined and negative,
 the current offset of the current block
-is set to C<eoblock> + C<$start>.
+is set to C<eoblock> + C<$start> + 1.
 If C<$start> is not defined,
 the current offset of the current block
 is left unchanged.
@@ -961,8 +976,9 @@ B<Return values>:
 On success, C<resume()> returns
 the new current location.
 A return value of Perl C<undef>
-is reserved for unthrown failures.
-Currently, all failures are thrown.
+is reserved for soft failures.
+Hard failures are thrown.
+Currently, all failures are hard failures.
 
 The C<resume()> method is
 the approximate equivalent of
@@ -1000,7 +1016,8 @@ L<described above|/"Recognizer settings">.
 
 B<Return values>:
 The return value is reserved for future use.
-Failures are always thrown.
+Hard failures are thrown.
+Currently, all failures are hard failures.
 
 =head2 value()
 
@@ -1023,16 +1040,16 @@ can do this by using L<a
 valuer object|Marpa::R3::Valuer>.
 
 The C<value()> method allows one optional argument.
-If provided, the argument
+Call this argument C<$self>.
+If specified, C<$self>
 explicitly specifies the per-parse argument for the
 parse tree.
 This per-parse argument can be a Perl scalar of any type,
 but the most useful
 type for a per-parse argument is a reference
 (blessed or unblessed) to a hash or to an array.
-The per-parse argument,
-if provided,
-will be the first argument of all
+The per-parse argument
+is the first argument of all
 Perl semantics closures.
 When data does not conveniently fit into the bottom-up
 flow of parse tree evaluation,
