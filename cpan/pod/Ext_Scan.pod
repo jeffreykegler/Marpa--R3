@@ -115,9 +115,9 @@ all of the tokens must have the same literal equivalent.
 
 =head1 Completion and non-completion methods
 
-An method is called an external scanning completion method,
-or just a B<completion method>,
-if it might complete external scanning at a G1 location.
+If a method might complete external scanning at a G1 location,
+that method is called an external scanning completion method,
+or just a B<completion method>.
 Any other external scanning method is called a non-completion
 method.
 
@@ -170,8 +170,6 @@ not be changed.
 If external scanning completion succeeds and an event occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the event location.
-The current eoread of the current block will
-not be changed.
 The event location will be the same as eolexeme,
 unless the event was a pre-lexeme event.
 The current eoread of the current block will
@@ -211,20 +209,23 @@ as relevant as possible to the error.
 
 If external scanning completion succeeds,
 and a pre-lexeme event does not occur,
+a token is read and
 Marpa::R3 advances
 the current G1 location by one.
-The token read will start at the previous G1 location
+The token just read will start at the previous G1 location
 and end at the new current G1 location.
 The G1 location of the token will be considered to be
 the new current G1 location.
 
 If external scanning completion succeeds,
 and a pre-lexeme event does occur,
-the current G1 location will remain where it was
+no token is read.
+The current G1 location will remain where it was
 before external scanning.
 
 If external scanning completion has a soft failure,
-the current G1 location will remain where it was
+no token is read.
+The current G1 location will remain where it was
 before external scanning.
 
 If external scanning completion has a hard failure,
@@ -266,7 +267,8 @@ is similar, but the string is specified as a block span.
 
 The L<C<< $recce->lexeme_read_block() >> method|/"lexeme_read_block()">
 is the most general of the high-level external scanning methods.
-C<lexeme_read_block()> allows the app to specify the literal and the value separately.
+C<lexeme_read_block()> allows the app to specify the literal equivalent
+and the value separately.
 
 =head2 lexeme_read_block()
 
@@ -582,6 +584,9 @@ When the recognizer starts,
 the list of accepted tokens is empty.
 The list of accepted tokens is cleared whenever C<lexeme_complete()>
 is called.
+It is a fatal error
+if a high level scanning method is called while the list of accepted
+tokens is non-empty,
 
 C<lexeme_alternative()> has a soft failure if it rejects 
 C<$symbol_name>.
@@ -652,8 +657,7 @@ the reading of ambiguous tokens.
 C<lexeme_complete()>
 completes the reading of a set of tokens specified by
 one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
-method
-at a G1 location.
+method.
 
 The C<lexeme_complete()> method
 accepts three optional arguments.
