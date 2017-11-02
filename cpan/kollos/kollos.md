@@ -3404,16 +3404,22 @@ methods
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_alternative_literal(slr, symbol_name)
+        local accepted = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
+        if not accepted then return end
         slr.is_lo_level_scanning = true
-        return lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
+        return accepted
     end
     function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
+        local accepted = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
+        if not accepted then return end
         slr.is_lo_level_scanning = true
-        return lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
+        return accepted
     end
     function _M.class_slr.lexeme_alternative(slr, symbol_name, token)
+        local accepted = lexeme_alternative_i(slr, symbol_name, token)
+        if not accepted then return end
         slr.is_lo_level_scanning = true
-        return lexeme_alternative_i(slr, symbol_name, token)
+        return accepted
     end
 ```
 
