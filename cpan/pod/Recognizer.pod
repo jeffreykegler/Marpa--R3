@@ -1431,11 +1431,12 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<input_length()> method accepts one, optional argument.
-Its argument is the index of an input block, call it C<block_ix>.
-If C<block_ix> is omitted, the input block specified
-defaults to the
-current input block.
+The C<input_length()> method accepts one, optional, argument,
+call it C<$block_id>.
+If C<$block_ix> is defined, the specified input block is C<$block_id>.
+If C<$block_ix> is not defined,
+the specified input block is 
+the current input block of the recognizer.
 
 B<Return values>:
 C<input_length()> returns the length of the specified input block.
