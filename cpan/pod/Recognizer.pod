@@ -1586,11 +1586,16 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<literal()> method accepts three arguments,
-representing a block span.
-The C<literal()> method
+C<literal()> accepts three arguments,
+which are treated
+as a L<block span|/"Block spans">.
+
+B<Return values>:
+C<literal()>
 returns the substring of the input stream
 corresponding to that span.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 progress()
 
@@ -1601,26 +1606,37 @@ name: Scanless progress() synopsis
 
 =for Marpa::R3::Display::End
 
+C<progress()> accepts one, optional, argument.
+Call this argument, C<$g1_loc>.
+If C<$g1_loc> is defined, the specified G1 location
+is 
+C<$g1_loc>.
+Negative G1 locations are interpreted as
+L<described above|/"Ranges">.
+If C<$g1_loc> is not defined, the specified G1 location
+is the current location.
+
+C<progress()>
 Returns a reference to an array
 that describes the progress
 of a parse
 at a location.
-With no argument, C<progress()> reports progress at
-the current location.
-If a G1 location is
-given as its argument,
-C<progress()> reports progress at that G1 location.
-Negative G1 locations are interpreted as
-L<described above|/"Ranges">.
-
 The progress reports returned by
 the C<progress()> method
 identify rules by their G1 rule ID.
 G1 rule IDs can be converted to a list of the rule's
 symbols using the L<C<rule()> method
 of the grammar|Marpa::R3::Grammar/"rule()">.
-Details on progress reports can be found in
-L<their own document|Marpa::R3::Progress>.
+
+B<Return values>:
+On success,
+C<progress()>
+returns a reference to an array that contains
+a progress report.
+Details about this array can be found in
+L<the document on progress reports|Marpa::R3::Progress>.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 progress_show()
 
@@ -1633,37 +1649,45 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Returns a string showing
+C<progress_show()> takes two optional arguments,
+call them C<$g1_start> and C<$g1_count>.
+The two arguments are interpreted as a
+L<G1 span|/"Spans">.
+If C<$g1_start> is omitted or undefined,
+it defaults to the current G1 location.
+If C<$g1_count> is omitted or undefined,
+it defaults to 1.
+
+
+C<progress_show()>
+returns a string showing
 the progress of the parse.
 For a description of its output,
 see L<Marpa::R3::Progress>.
+The output
+of C<progress_show()>
+is intended only for reading by humans.
+The exact format is subject to change
+and should not be relied on by applications.
+
+As the above rules for the arguments
+of C<progress_show()>
+imply,
+the method call C<< $recce->progress_show(0, -1) >>
+will print progress reports for the entire parse.
 With no arguments,
 the string contains reports for
 the current location.
 
-Locations can be specified as arguments to
-C<progress_show()>.
-With a single integer argument I<N>,
-the string contains reports for Earley set I<N>.
-(The ID number of an Earley set is also called
-its G1 location.)
-Two numeric arguments are interpreted as a
-L<span|/"Spans"> of G1 locations,
-and the returned string contains
-reports for all locations in the span.
-For example,
-the method call C<< $recce->progress_show(0, -1) >>
-will print progress reports for the entire parse.
-
-The arguments are Earley set IDs instead of physical input stream locations,
-because Earley set IDs represent a unique point in the parse.
-By contrast,
-a single physical input stream location might be visited many times
-by a recognizer.
-
-The output is intended only for reading by humans.
-The exact format is subject to change
-and should not be relied on by applications.
+B<Return values>:
+On success,
+C<show_progress()>
+returns a string containing a human-readable
+progress report of the parse.
+Details about this report can be found in
+L<the document on progress reports|Marpa::R3::Progress>.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 terminals_expected()
 
@@ -1675,8 +1699,13 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Returns a reference to a list of strings, where the strings are the
-names of the lexemes acceptable at the current location.
+C<terminals_expected()> accepts no arguments.
+C<terminals_expected()> 
+returns a reference to a list of strings,
+where the strings are names of symbols.
+A symbol name is in this list if and only if
+the symbol is a lexemes acceptable at the current G1 location.
+
 The presence of a lexeme in this list means
 that lexeme will be acceptable in the next call of the L<C<resume()>|/"resume()"> method.
 This is highly useful for Ruby Slippers parsing.
@@ -1700,6 +1729,15 @@ mnemonic name,
 the application must provide that name explicitly,
 by specifying the character class
 or quoted string in an L0 rule.
+
+B<Return values>:
+On success,
+C<terminals_expected()>
+returns a reference to a list of strings.
+The strings will be the names of lexemes acceptable to Marpa::R3
+at the current G1 location.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head1 Details
 
