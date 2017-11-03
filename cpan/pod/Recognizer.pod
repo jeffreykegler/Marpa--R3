@@ -602,7 +602,7 @@ Event C<ev> will be handled by calling function
 C<func>.
 
 If any event occurs which does not have a handler,
-it is a fatal error.
+it is a hard failure.
 The C<event_handler> named argument is only allowed
 with the L<C<recognizer's new() method>|/"Constructor">.
 Full details of the use of event handlers,
@@ -790,7 +790,8 @@ it should be commented out in the DSL.
 
 B<Return values>:
 The return value is reserved for future use.
-Failures are always thrown.
+Current all failures are hard failures.
+Hard failures are thrown.
 
 =head2 lexeme_priority_set()
 
@@ -866,10 +867,10 @@ eoread is set to C<eoblock> + C<$length> + 1.
 If C<$length> is not defined, eoread is set to the eoblock
 of the newly created, current block.
 
-It is a fatal error
+It is a hard failure
 if C<$start> and C<$length> would produce an eoread which is after
 eoblock.
-It is also a fatal error
+It is also a hard failure
 if C<$start> and C<$length>
 would produce an eoread which is before the current offset.
 
@@ -1120,11 +1121,11 @@ Call them, in order, C<$offset> and C<$length>.
 If C<$offset> is defined and non-negative,
 C<block_move()>
 sets the current offset of the current block
-C<$offset>.
+to C<$offset>.
 If C<$offset> is defined and negative,
 C<block_move()>
 sets the current offset of the current block
-to C<eoblock> + C<$offset>.
+to C<eoblock> + C<$offset> + 1.
 If C<$offset> is omitted,
 the current offset of the current block
 is not changed.
@@ -1140,8 +1141,9 @@ the eoread of the current block
 is not changed.
 
 B<Return values>:
-Returns a Perl C<undef>.
-Failures are thrown.
+The return value is reserved for future use.
+Current all failures are hard failures.
+Hard failures are thrown.
 
 =head2 block_new ()
 
@@ -1161,15 +1163,18 @@ C<$p_string>.
 Call the ID of the newly created block,
 C<$new_block>.
 
-It is important to note that C<block_new()>
-does B<not> set the current block to block C<$new_block>.
+C<block_new()> does not change the current block settings.
+In partiucular, note that C<block_new()>
+does B<not> set the current block of the recognizer
+to block C<$new_block>.
 This is convenient for those applications which need to
 create, for later use, a series of input blocks
 based on the contents of the current block.
 
 B<Return values>:
 Returns the block ID of the newly created block.
-Failures are thrown.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 block_read ()
 
@@ -1202,9 +1207,9 @@ it returns eoread,
 which will also be the current offset.
 If C<block_read()> terminates because
 of a parse event,
-it return the event location,
-which will also be the current offset.
-All failures are thrown.
+it returns the event location.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 block_set ()
 
@@ -1221,8 +1226,11 @@ call it C<$block_id>.
 C<block_set()> set the current block to C<$block_id>.
 C<block_set()> does not change the current offset or eoread
 of any block.
-C<block_set()> does not return a value.
-Failures are thrown.
+
+B<Return values>:
+The return value is reserved for future use.
+Current all failures are hard failures.
+Hard failures are thrown.
 
 =head2 block_progress ()
 
@@ -1242,12 +1250,24 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-C<block_progress()> does not take any arguments.
-It returns, in order,
-the ID of the current block;
-the current offset of the current block;
-and the current eoread of the current block.
-Failures are thrown.
+C<block_progress()> takes one, optional, argument.
+Call this argument, C<$block_id>.
+If C<$block_id> is defined,
+the specified block is C<$block_id>.
+If C<$block_id> is undefined or missing,
+the specified block is the current block
+of the recognizer.
+It is a hard failure
+if C<$block_id> is undefined or missing,
+and there is no current block of the recognizer.
+
+B<Return values>:
+C<block_progress()> returns, in order,
+the ID of the specified block;
+the current offset of the specified block;
+and the current eoread of the specified block.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head1 Accessors
 
@@ -1680,7 +1700,7 @@ as follows:
 C<block_id> is C<$block_id_arg> if 
 C<$block_id_arg> is defined.
 Otherwise C<block_id> is the current block.
-It is a fatal error if C<block_id> is undefined
+It is a hard failure if C<block_id> is undefined
 and there is no current block.
 
 =item *
@@ -1688,7 +1708,7 @@ If
 C<$offset_arg> is defined,
 C<offset> is C<$offset_arg>,
 converted to a non-negative offset.
-It is a fatal error if C<offset_arg> cannot
+It is a hard failure if C<offset_arg> cannot
 be converted to a non-negative offset.
 If C<$offset_arg> is not defined,
 then C<offset> is the current offset
@@ -1701,7 +1721,7 @@ C<eoread> - C<offset>.
 If C<$length_arg> is defined,
 C<length> is C<$length_arg>,
 converted to a non-negative length.
-It is a fatal error if C<$length_arg> cannot
+It is a hard failure if C<$length_arg> cannot
 be converted to a non-negative length.
 If 
 C<offset> + C<length> would be greater than C<eoread>,
