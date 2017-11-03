@@ -1303,7 +1303,7 @@ name: Scanless g1_to_block_last() synopsis
 
 =for Marpa::R3::Display::End
 
-C<g1_to_block_last()> takes an G1 position as its
+C<g1_to_block_last()> takes a G1 position as its
 only argument.
 C<g1_to_block_last()> returns the block position corresponding
 to the G1 position.
