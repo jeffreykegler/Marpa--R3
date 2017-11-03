@@ -1283,11 +1283,15 @@ name: Scanless g1_to_block_first() synopsis
 
 C<g1_to_block_first()> takes an G1 position as its
 only argument.
-It returns two arguments:
+
+B<Return values>:
+C<g1_to_block_first()>
+returns two arguments:
 the block index and the block offset
 of the first block position that
 corresponds to the G1 position.
-Failure is always thrown.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 g1_to_block_last()
 
@@ -1301,11 +1305,8 @@ name: Scanless g1_to_block_last() synopsis
 
 C<g1_to_block_last()> takes an G1 position as its
 only argument.
-It returns two arguments:
-the block index and block offset
-of the last block position that
-corresponds to the G1 position.
-Failure is always thrown.
+C<g1_to_block_last()> returns the block position corresponding
+to the G1 position.
 
 The block position returned by C<g1_to_block_last()>
 will be an "actual" position,
@@ -1334,6 +1335,15 @@ will not be sufficient to
 describe the block locations that correspond
 to a G1 location.
 
+B<Return values>:
+C<g1_to_block_last()>
+returns two values:
+the block index and block offset
+of the last block position that
+corresponds to the G1 position.
+All failures are hard failures.
+Hard failures are thrown.
+
 =head2 g1_literal()
 
 =for Marpa::R3::Display
@@ -1345,12 +1355,19 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Given a G1 span -- that is, a G1 start location and a length in G1 locations --
-the C<g1_literal()> method
-returns a substring of the input
-stream.
-A G1 length of zero will produce the zero-length string.
-Failure is always thrown.
+C<g1_literal()> takes two arguments,
+call them C<$g1_start> and C<$g1_count>.
+The two argument are interpreted as a G1 span.
+C<$g1_count> may be zero.
+
+B<Return values>:
+C<g1_literal()>
+returns the substring of the input
+stream corresponding to the G1 span.
+If C<$g1_count> was zero,
+the zero-length string will be returned.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 g1_pos()
 
@@ -1361,8 +1378,13 @@ name: Scanless g1_pos() synopsis
 
 =for Marpa::R3::Display::End
 
-Returns the current G1 location.
-Failure is always thrown.
+C<g1_pos()> does not take any arguments.
+
+B<Return values>:
+C<g1_pos()>
+returns the current G1 location.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 exhausted()
 
@@ -1373,11 +1395,7 @@ name: recognizer exhausted() synopsis
 
 =for Marpa::R3::Display::End
 
-The exhausted method returns a Perl true if parsing in a
-recognizer is
-exhausted, and a Perl false otherwise.
-Failure is always thrown.
-
+The C<exhausted()> method does not take any arguments.
 Parsing is said to be "exhausted" when the
 recognizer will not accept any further input.
 Marpa usually "does what you mean" in case of parse exhaustion,
@@ -1385,6 +1403,14 @@ but this method
 allows the recognizer's exhaustion status to be discovered directly.
 Parse exhaustion is discussed in detail in
 L<a separate document|Marpa::R3::Exhaustion>.
+
+B<Return values>:
+On success,
+C<exhausted()> returns a Perl true if parsing in a
+recognizer is
+exhausted, and a Perl false otherwise.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 input_length()
 
