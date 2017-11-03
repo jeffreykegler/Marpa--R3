@@ -1593,7 +1593,7 @@ as a L<block span|/"Block spans">.
 B<Return values>:
 C<literal()>
 returns the substring of the input stream
-corresponding to that span.
+corresponding to the specified block span.
 All failures are hard failures.
 Hard failures are thrown.
 
@@ -1617,7 +1617,7 @@ If C<$g1_loc> is not defined, the specified G1 location
 is the current location.
 
 C<progress()>
-Returns a reference to an array
+returns a reference to an array
 that describes the progress
 of a parse
 at a location.
@@ -1704,10 +1704,10 @@ C<terminals_expected()>
 returns a reference to a list of strings,
 where the strings are names of symbols.
 A symbol name is in this list if and only if
-the symbol is a lexemes acceptable at the current G1 location.
+the symbol is a lexeme acceptable at the current G1 location.
 
-The presence of a lexeme in this list means
-that lexeme will be acceptable in the next call of the L<C<resume()>|/"resume()"> method.
+The presence of a lexeme in this list means, for example,
+that the lexeme will be acceptable in the next call of the L<C<resume()>|/"resume()"> method.
 This is highly useful for Ruby Slippers parsing.
 A more fine-tuned approach is to identify the lexemes of interest
 and create "predicted symbol" events for them.
@@ -1725,7 +1725,7 @@ list of strings
 returned by C<terminals_expected()>.
 If an application wants a quoted string
 or a character class to have a
-mnemonic name,
+human-friendly name,
 the application must provide that name explicitly,
 by specifying the character class
 or quoted string in an L0 rule.
