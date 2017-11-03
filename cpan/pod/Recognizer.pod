@@ -790,7 +790,7 @@ it should be commented out in the DSL.
 
 B<Return values>:
 The return value is reserved for future use.
-Current all failures are hard failures.
+Currently all failures are hard failures.
 Hard failures are thrown.
 
 =head2 lexeme_priority_set()
@@ -1142,7 +1142,7 @@ is not changed.
 
 B<Return values>:
 The return value is reserved for future use.
-Current all failures are hard failures.
+Currently all failures are hard failures.
 Hard failures are thrown.
 
 =head2 block_new ()
@@ -1229,7 +1229,7 @@ of any block.
 
 B<Return values>:
 The return value is reserved for future use.
-Current all failures are hard failures.
+Currently all failures are hard failures.
 Hard failures are thrown.
 
 =head2 block_progress ()
