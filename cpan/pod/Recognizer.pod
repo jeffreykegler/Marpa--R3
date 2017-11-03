@@ -1317,7 +1317,7 @@ the return values
 of C<g1_to_block_first()>
 and
 C<g1_to_block_last()>
-will be the elements of an
+will be the elements of a
 block range which corresponds exactly
 to the G1 position.
 But note that apps are allowed to use
@@ -1358,7 +1358,7 @@ normalize-whitespace: 1
 
 C<g1_literal()> takes two arguments,
 call them C<$g1_start> and C<$g1_count>.
-The two argument are interpreted as a G1 span.
+The two arguments are interpreted as a G1 span.
 C<$g1_count> may be zero.
 
 B<Return values>:
