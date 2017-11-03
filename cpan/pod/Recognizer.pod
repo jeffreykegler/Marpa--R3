@@ -1433,12 +1433,14 @@ normalize-whitespace: 1
 
 The C<input_length()> method accepts one, optional argument.
 Its argument is the index of an input block, call it C<block_ix>.
-If C<block_ix> is omitted, the input block defaults to the
+If C<block_ix> is omitted, the input block specified
+defaults to the
 current input block.
 
 B<Return values>:
-C<input_length()> returns the length of that input block.
-Failure is always thrown.
+C<input_length()> returns the length of the specified input block.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 last_completed()
 
@@ -1467,15 +1469,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-Given the name of a symbol,
+C<last_completed()> takes one, required, argument,
+call it C<$symbol>.
+C<$symbol> must be the name of a symbol.
+
+B<Return values>:
 C<last_completed()> returns the 2-element array
 that is the G1 location
-L<span|/"Spans"> of the most recent match.
-If there was more than one most recent match, it returns
-the longest.
-If there was no match,
-C<last_completed()> returns the empty array.
-Failure is always thrown.
+L<span|/"Spans"> of the most recent match
+for C<$symbol>.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 line_column()
 
@@ -1491,16 +1495,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The C<line_column()> method accepts two optional arguments:
-a block id, call it C<$id> and a block offset,
-call it C<$offset>.
-If $<id> is not defined, the selected block is
-the current block;
-otherwise the selected block is the block whose id
-is C<$id>.
-If C<$offset> is not defined, the selected offset
-is the current offset of the selected block;
-otherwise the selected offset is C<$offset>.
+The C<line_column()> method accepts two optional arguments.
+Call them, in order, 
+C<$id> and C<$offset>.
+If C<$id> is defined, the specified block is
+the block whose id is C<$id>.
+If C<$id> is not defined, the specified block is
+the current block of the recognizer.
+If C<$offset> is defined, the specified offset is C<$offset>.
+If C<$offset> is not defined,
+the specified offset is C<$offset>.
+is the current offset of the specified block.
 
 Numbering of lines and columns is 1-based,
 following UNIX editor tradition.
@@ -1558,19 +1563,15 @@ a PS (paragraph separator, U+2029).
 
 =back
 
-C<line_column()> never changes the current block setting
-of the recognizer,
-the current offset of the current block
-or
-eoread of the current block.
+C<line_column()> never changes the current block data.
 
 B<Return values>:
-C<line_column()> returns the line and column position
-of the selected offset in the selected block,
-as a 2-element array.
-The first element of the array is the line position,
-and the second element is the column position.
-Failure is always thrown.
+C<line_column()> returns two values.
+These are, in order,
+the line and column position
+of the specified offset in the specified block.
+All failures are hard failures.
+Hard failures are thrown.
 
 =head2 literal()
 
