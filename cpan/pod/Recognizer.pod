@@ -1475,8 +1475,10 @@ call it C<$symbol>.
 C<$symbol> must be the name of a symbol.
 
 B<Return values>:
-C<last_completed()> returns the 2-element array
-that is the G1 location
+On success,
+C<last_completed()> returns two values.
+These are in order, the G1 location and G1 count
+that is G1
 L<span|/"Spans"> of the most recent match
 for C<$symbol>.
 All failures are hard failures.
