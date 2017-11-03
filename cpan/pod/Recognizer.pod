@@ -1286,7 +1286,8 @@ only argument.
 
 B<Return values>:
 C<g1_to_block_first()>
-returns two arguments:
+returns two values.
+These are, in order,
 the block index and the block offset
 of the first block position that
 corresponds to the G1 position.
