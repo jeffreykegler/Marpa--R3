@@ -272,13 +272,19 @@ named arguments, in alphabetical order.
 
 =head2 end
 
+Mostly unchanged.
+
 =head2 event_is_active
+
+Mostly unchanged.
 
 =head2 exhaustion
 
 Removed.
 
 =head2 grammar
+
+Mostly unchanged.
 
 =head2 max_parses
 
@@ -304,11 +310,19 @@ Removed.
 
 =head2 too_many_earley_items
 
+Mostly unchanged.
+
 =head2 trace_file_handle
+
+Mostly unchanged.
 
 =head2 trace_terminals
 
+Mostly unchanged.
+
 =head2 trace_values
+
+Mostly unchanged.
 
 =head1 Marpa::R2 Recognizer methods, alphabetically
 
@@ -316,6 +330,8 @@ This section accounts for each of the Marpa::R2 recognizer's
 methods, in alphabetical order.
 
 =head2 activate()
+
+Mostly unchanged.
 
 =head2 ambiguity_metric()
 
@@ -345,7 +361,11 @@ Removed.
 
 =head2 events()
 
+Mostly unchanged.
+
 =head2 exhausted()
+
+Mostly unchanged.
 
 =head2 g1_location_to_span()
 
@@ -359,6 +379,8 @@ have changed.
 Its first parameter now is the block id.
 
 =head2 last_completed()
+
+Mostly unchanged.
 
 =head2 last_completed_range()
 
@@ -429,6 +451,8 @@ event handlers.
 
 =head2 pos()
 
+Mostly unchanged.
+
 =head2 progress()
 
 C<Marpa::R2::Scanless::R::progress()> reported
@@ -457,7 +481,11 @@ For more details see L<Marpa::R3::Recognizer>.
 
 =head2 resume()
 
+Mostly unchanged.
+
 =head2 series_restart()
+
+Removed.
 
 =head2 set()
 
@@ -466,12 +494,17 @@ in the recognizer named arguments.
 
 =head2 show_progress()
 
+Renamed to C<progress_show()>.
+Also, see L</"Rule and symbol accessors are completely different">.
+
 =head2 substring()
 
 C<< $recce->substring() >> has been renamed
 C<< $recce->g1_literal() >>.
 
 =head2 terminals_expected()
+
+Mostly unchanged.
 
 =head2 value()
 

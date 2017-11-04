@@ -1681,7 +1681,7 @@ the current location.
 
 B<Return values>:
 On success,
-C<show_progress()>
+C<progress_show()>
 returns a string containing a human-readable
 progress report of the parse.
 Details about this report can be found in
