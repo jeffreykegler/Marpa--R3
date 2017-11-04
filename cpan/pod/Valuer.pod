@@ -241,7 +241,7 @@ B<Return values>:
 The return value is reserved for future use.
 Failures are always thrown.
 
-=head2 value()
+=head2 valuer->value()
 
 =for Marpa::R3::Display
 name: Valuer synopsis
@@ -252,37 +252,33 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+The C<value()> method allows one optional argument.
+Call this argument C<$self>.
+If specified, C<$self>
+explicitly specifies the per-parse argument for the
+parse tree.
+The function of the per-parse argument
+is detailed in the description
+of the L<C<value()> method of the
+recognizer|Marpa::R3::Recognizer/"recognizer->value()">.
+
 The C<value> method call evaluates the next parse tree
 for the valuer object,
 and returns a reference to the parse result for that parse tree.
-If there are no more parse trees,
-the C<value> method returns C<undef>.
+A soft failure occurs
+if there are no more parse trees,
+in which case the C<value> method returns C<undef>.
+All other failures are hard failures.
+
 There are zero parse trees if there was no valid parse
 of the input according to the grammar.
 There will be more than one parse tree if the parse
 was ambiguous.
 
-The C<value()> method allows one optional argument.
-If provided, the argument
-explicitly specifies the per-parse argument for the
-parse tree.
-This per-parse argument can be a Perl scalar of any type,
-but the most useful
-type for a per-parse argument is a reference
-(blessed or unblessed) to a hash or to an array.
-The per-parse argument,
-if provided,
-will be the first argument of all
-Perl semantics closures.
-When data does not conveniently fit into the bottom-up
-flow of parse tree evaluation,
-the per-parse argument
-is useful for sharing it within
-the tree.
-Symbol tables are one example of the kind of data which parses often
-require, but which it is not convenient to accumulate bottom-up.
-
-TODO: Rough equivalent
+B<Return values>:
+On success, returns a reference to the parse result for a parse tree.
+If there are no more parse trees, returns a Perl C<undef>.
+Hard failures are thrown.
 
 =head1 Accessors
 
