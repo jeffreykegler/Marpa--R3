@@ -51,6 +51,7 @@ normalize-whitespace: 1
         if $length_read != length $input;
 
     my $value_ref = $recce->value();
+    die "No parse" if not $value_ref;
     my $value = ${$value_ref};
 
     sub My_Actions::do_add {
@@ -71,24 +72,19 @@ normalize-whitespace: 1
 
 =head2 Overview
 
-This document contains a second tutorial
-of the Scanless interface (SLIF),
-which demonstrates a lower level of method calls.
+This document contains a second Marpa::R3 tutorial.
+This tutorial demonstrates a lower level of method calls.
 These lower level calls
 allow access to more of Marpa's
 features.
 For example, users will need to
-use the lower level calls
+use these lower level calls
 
 =over 4
 
 =item *
 
-to use SLIF parse events;
-
-=item *
-
-to examine the values of multiple  parses of an ambiguous parse;
+to use parse events;
 
 =item *
 
@@ -121,10 +117,6 @@ The value of the
 C<grammar>
 named argument must be a Marpa::R3 SLIF
 grammar.
-
-The second argument is optional, but you will use it frequently.
-The "C<semantics_package>" named argument tells Marpa in which Perl package to
-look for the closures implementing the semantics for this grammar.
 
 =head2 Marpa::R3::Scanless::R::read
 
@@ -210,6 +202,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $value_ref = $recce->value();
+    die "No parse" if not $value_ref;
     my $value = ${$value_ref};
 
 =for Marpa::R3::Display::End

@@ -64,6 +64,7 @@ die "Read ended after $length_read of ", length $input, " characters"
     if $length_read != length $input;
 
 my $value_ref = $recce->value();
+die "No parse" if not $value_ref;
 my $value = ${$value_ref};
 
 sub My_Actions::do_add {

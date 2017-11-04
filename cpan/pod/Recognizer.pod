@@ -1067,13 +1067,13 @@ L<C<valuer object>|Marpa::R3::Valuer>
 instead of the recognizer's C<value()> call.
 
 B<Return values>:
-If C<value()> successful produced a parse value,
+If C<value()> successfully produced a parse value,
 C<value()> returns a reference to that value.
 Successful parses can have a Perl C<undef> as a parse value,
 in which case
 C<value()> returns a reference to Perl C<undef>.
 If there was no valid parse according to the grammar,
-the C<value> method returns C<undef>.
+the C<value()> method returns C<undef>.
 If the parse was ambiguous, an error is thrown.
 The error message will describe the ambiguity in detail.
 
