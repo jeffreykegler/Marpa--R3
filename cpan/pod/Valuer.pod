@@ -241,7 +241,7 @@ B<Return values>:
 The return value is reserved for future use.
 Failures are always thrown.
 
-=head2 valuer->value()
+=head2 valuer value()
 
 =for Marpa::R3::Display
 name: Valuer synopsis
@@ -259,8 +259,8 @@ explicitly specifies the per-parse argument for the
 parse tree.
 The function of the per-parse argument
 is detailed in the description
-of the L<C<value()> method of the
-recognizer|Marpa::R3::Recognizer/"recognizer->value()">.
+of the L<< C<value()> method of the
+recognizer|Marpa::R3::Recognizer/"recognizer value()" >>.
 
 The C<value> method call evaluates the next parse tree
 for the valuer object,

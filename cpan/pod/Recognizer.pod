@@ -1019,7 +1019,7 @@ The return value is reserved for future use.
 Hard failures are thrown.
 Currently, all failures are hard failures.
 
-=head2 recognizer->value()
+=head2 recognizer value()
 
 =for Marpa::R3::Display
 name: Scanless recognizer synopsis
