@@ -154,15 +154,6 @@ It has been removed.
 
 =head2 New context variable, Context::g1_span
 
-=head2 Marpa::R2::Scanless::G named arguments removed in Marpa::R3
-
-The C<actions>, C<action_object>, C<default_action>
-and C<default_empty_action>
-named arguments
-of Marpa::R2::Scanless::G named arguments
-have been
-removed in Marpa::R3.
-
 =head2 Marpa::R3::Scanless::G accessors completely different
 
 The grammar accessors changed between Marpa::R2
@@ -316,6 +307,131 @@ The second argument is a reference to an array containing
 the values of the child nodes, in lexical order.
 If there were no child nodes visible to the semantics,
 then the second argument is an empty array.
+
+=head1 Marpa::R2 Grammar named arguments, alphabetically
+
+This section accounts for each of the Marpa::R2 grammar's
+named arguments, in alphabetical order.
+
+=head2 bless_package
+
+Basically unchanged.
+
+=head2 source
+
+Basically unchanged.
+
+=head2 trace_file_handle
+
+Basically unchanged.
+
+=head2 action_object
+
+Removed.
+
+=head2 default_action
+
+Removed.
+
+=head1 Marpa::R2 Grammar methods, alphabetically
+
+This section accounts for each of the Marpa::R2 grammar's
+methods, in alphabetical order.
+
+=head2 g0_rule()
+
+=head2 g0_rule_ids()
+
+=head2 g1_rule_ids()
+
+=head2 parse()
+
+=head2 rule()
+
+=head2 rule_expand()
+
+=head2 rule_ids()
+
+=head2 rule_name()
+
+=head2 rule_show()
+
+=head2 set()
+
+=head2 show_rules()
+
+=head2 show_symbols()
+
+=head2 start_symbol_id()
+
+=head2 symbol_description()
+
+=head2 symbol_display_form()
+
+=head2 symbol_dsl_form()
+
+=head2 symbol_ids()
+
+=head2 symbol_name()
+
+
+=head1 Marpa::R2 Recognizer named arguments, alphabetically
+
+This section accounts for each of the Marpa::R2 recognizer's
+named arguments, in alphabetical order.
+
+=head2 action_object
+
+=head2 bless_package
+
+Basically unchanged.
+
+=head2 default_action
+
+=head2 source
+
+=head2 trace_file_handle
+
+=head1 Marpa::R2 Recognizer methods, alphabetically
+
+This section accounts for each of the Marpa::R2 recognizer's
+methods, in alphabetical order.
+
+=head2 g0_rule()
+
+=head2 g0_rule_ids()
+
+=head2 g1_rule_ids()
+
+=head2 parse()
+
+=head2 rule()
+
+=head2 rule_expand()
+
+=head2 rule_ids()
+
+=head2 rule_name()
+
+=head2 rule_show()
+
+=head2 set()
+
+=head2 show_rules()
+
+=head2 show_symbols()
+
+=head2 start_symbol_id()
+
+=head2 symbol_description()
+
+=head2 symbol_display_form()
+
+=head2 symbol_dsl_form()
+
+=head2 symbol_ids()
+
+=head2 symbol_name()
 
 =head1 COPYRIGHT AND LICENSE
 
