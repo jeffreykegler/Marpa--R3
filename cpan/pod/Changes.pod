@@ -409,6 +409,8 @@ Its first parameter now is the block id.
 
 =head2 lexeme_priority_set()
 
+Mostly unchanged.
+
 =head2 lexeme_read()
 
 The C<Marpa::R2::Scanless::R::lexeme_read()> method
