@@ -82,44 +82,6 @@ In Marpa::R2, the semantics was not finally settled
 until the C<< $recce->value() >> call.
 In Marpa::R3, semantics will be fully settled in the grammar.
 
-=head2 Recognizer value() method changed
-
-The recognizer value() has changed.
-Most notably, it
-now throws a fatal error if
-the parse is ambiguous -- this is
-what most applications want.
-Details are in L<its
-documentation|Marpa::R3::Recognizer/"value()">.
-
-For dealing
-with ambiguous parses, and other
-advanced techniques,
-there is a L<new
-value object|Marpa::R3::Valuer>.
-
-=head2 Recognizer named arguments
-
-The C<exhaustion>,
-C<ranking_method>,
-C<rejection>,
-C<semantics_package>,
-and C<trace_actions>
-recognizer named arguments
-of Marpa::R2
-have been removed.
-In Marpa::R3,
-they have become
-are named arguments of grammar objects.
-
-The C<max_parses>
-recognizer named argument
-of Marpa::R2
-has been removed.
-In Marpa::R3,
-it has become a named argument of
-the new valuator objects.
-
 =head2 Actions that are Perl names must resolve to subroutines
 
 It was a little noticed feature of Marpa::R2, that actions specified
@@ -251,51 +213,6 @@ has been removed.
 Its purpose is now served by the 
 C<Marpa::R2::Scanless::V::block_progress()> method.
 
-The C<Marpa::R2::Scanless::R::pause_span()> method
-has been removed.
-Event location information is now available
-as arguments to the
-event handlers.
-
-=head2 Marpa::R2::Scanless::R::line_column() changed
-
-The interface to
-C<Marpa::R2::Scanless::R::line_column()> has changed
-to allow multi-block input.
-
-=head2 Marpa::R2::Scanless::R::literal() changed
-
-The interface to
-C<Marpa::R2::Scanless::R::literal()> has changed
-to allow multi-block input.
-
-=head2 Marpa::R2::Scanless::R::progress() changed
-
-C<Marpa::R2::Scanless::R::progress()> reported
-the dot position of completions as -1.
-In Marpa::R3,
-C<< $slr->progress() >> reports
-the dot position of completions as a non-negative integer,
-consistent with other dot positions.
-As a reminder, the dot position of a completed production is always
-the same as its RHS length.
-
-=head2 The per-parse constructor has been elminated
-
-In Marpa::R2, if the semantics package has a C<new()>
-method, that method was used as the constructor of
-the per-parse object.
-In Marpa::R3, there is no per-parse constructor.
-
-=head2 The per-parse argument never affects the semantics package
-
-As of Marpa::R3, the per-parse argument has no effect on
-the semantics package.
-In Marpa::R2, if the c<semantics_package> named argument was
-not used and the per-parse argument was blessed,
-then the package into which the per-parse argument was blessed
-became the semantics package.
-
 =head2 The semantic closure now always receives exactly 2 arguments
 
 Under Marpa::R2, the semantic closure received a varying number
@@ -344,6 +261,8 @@ methods, in alphabetical order.
 
 =head2 g1_rule_ids()
 
+=head2 new()
+
 =head2 parse()
 
 =head2 rule()
@@ -373,67 +292,157 @@ methods, in alphabetical order.
 =head2 symbol_ids()
 
 =head2 symbol_name()
-
 
 =head1 Marpa::R2 Recognizer named arguments, alphabetically
 
 This section accounts for each of the Marpa::R2 recognizer's
 named arguments, in alphabetical order.
 
-=head2 action_object
+=head2 end
 
-=head2 bless_package
+=head2 event_is_active
 
-Basically unchanged.
+=head2 exhaustion
 
-=head2 default_action
+Removed.
 
-=head2 source
+=head2 grammar
+
+=head2 max_parses
+
+The C<max_parses>
+recognizer named argument
+of Marpa::R2
+has been removed.
+In Marpa::R3,
+it is a named argument of
+the new valuator objects.
+
+=head2 ranking_method
+
+Removed.
+
+=head2 rejection
+
+Removed.
+
+=head2 semantics_package
+
+Removed.
+
+=head2 too_many_earley_items
 
 =head2 trace_file_handle
+
+=head2 trace_terminals
+
+=head2 trace_values
 
 =head1 Marpa::R2 Recognizer methods, alphabetically
 
 This section accounts for each of the Marpa::R2 recognizer's
 methods, in alphabetical order.
 
-=head2 g0_rule()
+=head2 new()
 
-=head2 g0_rule_ids()
+=head2 activate()
 
-=head2 g1_rule_ids()
+=head2 ambiguity_metric()
 
-=head2 parse()
+=head2 ambiguous()
 
-=head2 rule()
+=head2 current_g1_location()
 
-=head2 rule_expand()
+=head2 event()
 
-=head2 rule_ids()
+=head2 events()
 
-=head2 rule_name()
+=head2 exhausted()
 
-=head2 rule_show()
+=head2 g1_location_to_span()
+
+=head2 input_length()
+
+=head2 last_completed()
+
+=head2 last_completed_range()
+
+=head2 last_completed_span()
+
+=head2 lexeme_alternative()
+
+=head2 lexeme_complete()
+
+=head2 lexeme_priority_set()
+
+=head2 lexeme_read()
+
+=head2 line_column()
+
+The interface to
+C<Marpa::R2::Scanless::R::line_column()> has changed
+to allow multi-block input.
+
+=head2 literal()
+
+The interface to
+C<Marpa::R2::Scanless::R::literal()> has changed
+to allow multi-block input.
+
+=head2 pause_lexeme()
+
+=head2 pause_span()
+
+The C<Marpa::R2::Scanless::R::pause_span()> method
+has been removed.
+Event location information is now available
+as arguments to the
+event handlers.
+
+=head2 pos()
+
+=head2 progress()
+
+C<Marpa::R2::Scanless::R::progress()> reported
+the dot position of completions as -1.
+In Marpa::R3,
+C<< $slr->progress() >> reports
+the dot position of completions as a non-negative integer,
+consistent with other dot positions.
+As a reminder, the dot position of a completed production is always
+the same as its RHS length.
+
+=head2 range_to_string()
+
+=head2 read()
+
+=head2 resume()
+
+=head2 series_restart()
 
 =head2 set()
 
-=head2 show_rules()
+=head2 show_progress()
 
-=head2 show_symbols()
+=head2 substring()
 
-=head2 start_symbol_id()
+=head2 terminals_expected()
 
-=head2 symbol_description()
+=head2 value()
 
-=head2 symbol_display_form()
+The recognizer value() method has changed.
+Most notably, it
+now throws a fatal error if
+the parse is ambiguous -- this is
+what most applications want.
+Details are in L<its
+documentation|Marpa::R3::Recognizer/"value()">.
 
-=head2 symbol_dsl_form()
-
-=head2 symbol_ids()
-
-=head2 symbol_name()
-
-=head1 COPYRIGHT AND LICENSE
+For dealing
+with ambiguous parses, and other
+advanced techniques,
+there is a L<new
+value object|Marpa::R3::Valuer>.
 
 =for Marpa::R3::Display
 ignore: 1
