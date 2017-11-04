@@ -264,8 +264,17 @@ recognizer|Marpa::R3::Recognizer/"recognizer value()" >>.
 
 The C<value()> method of the valuer is an iterator.
 Each call of C<value()> evaluates the next parse tree
-for the valuer object,
-and returns a reference to the parse result for that parse tree.
+for the valuer object.
+C<value()> succeeds if there is a parse tree and it can be
+evaluated.
+On success, C<value()>
+returns a reference to the parse result for that parse tree.
+The value of
+a successful evaluation of a parse tree can be a Perl C<undef>,
+in which case,
+and as implied above,
+C<value()> return a reference to Perl C<undef>.
+
 A soft failure occurs
 if there are no parse trees left to evaluate,
 in which case the C<value> method returns C<undef>.
