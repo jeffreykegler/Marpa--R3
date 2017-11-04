@@ -262,18 +262,21 @@ is detailed in the description
 of the L<< C<value()> method of the
 recognizer|Marpa::R3::Recognizer/"recognizer value()" >>.
 
-The C<value> method call evaluates the next parse tree
+The C<value()> method of the valuer is an iterator.
+Each call of C<value()> evaluates the next parse tree
 for the valuer object,
 and returns a reference to the parse result for that parse tree.
 A soft failure occurs
-if there are no more parse trees,
+if there are no parse trees left to evaluate,
 in which case the C<value> method returns C<undef>.
 All other failures are hard failures.
 
-There are zero parse trees if there was no valid parse
-of the input according to the grammar.
 There will be more than one parse tree if the parse
 was ambiguous.
+There will be zero parse trees if there was no valid parse
+of the input according to the grammar.
+If there are zero parse trees, the first call of the C<value()>
+method for a valuer will produce a soft failure.
 
 B<Return values>:
 On success, returns a reference to the parse result for a parse tree.
