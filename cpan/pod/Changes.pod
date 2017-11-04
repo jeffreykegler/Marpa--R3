@@ -116,7 +116,7 @@ It has been removed.
 
 =head2 New context variable, Context::g1_span
 
-=head2 Marpa::R3::Scanless::G accessors completely different
+=head2 Marpa::R3::Scanless::G rule and symbol accessors are completely different
 
 The grammar accessors changed between Marpa::R2
 and Marpa::R3.
@@ -126,92 +126,6 @@ to the SLG accessors
 would be essentially be a repetition of
 L<their
 documentation|Marpa::R3::Grammar/"Accessors">.
-
-=head2 Marpa::R2::Scanless::R methods changed in Marpa::R3
-
-=head3 Multiple C<< slr->read() >> calls allowed
-
-The interface to
-the C<< $recce->read() >> method has changed in major ways.
-One important change is that
-the C<< slr->read() >> method may now called multiple
-times during a parse,
-each time with a new string.
-These strings will be called B<input blocks>.
-The <input block> read by the I<n>'th 
-call of the C<< slr->read() >> method during a parse
-has block index I<n>.
-
-This change makes the previous L0 positions no
-longer adequately identify a location, 
-which necessitates many changes.
-
-The interface to 
-C< $recce->lexeme_alternative() >>
-has changed.
-Some of its functionality is taken over
-by the new
-C< $recce->lexeme_alternative_literal() >>
-method.
-
-The arguments of
-C< $recce->lexeme_complete() >>,
-C< $recce->input_length() >>,
-and
-C< $recce->literal() >>
-have changed,
-in a way which is not compatible with Marpa::R2.
-Their first parameter now is the block id.
-
-The
-C< $recce->g1_location_to_span() >> and
-C< $recce->last_completed_span() >>
-methods has been removed.
-
-For historical reasons,
-the methods dealing with input and G1 parse location in Marpa::R2
-often had unhelpful or misleading names.
-In Marpa::R3 an attempt is being made to name
-methods dealing with G1 and input parse location consistently,
-and to ensure that the
-G1 variants
-have C<g1> somewhere in their name.
-Accordingly,
-C<< $slr->substring() >> has been renamed
-C<< $slr->g1_literal() >>.
-
-The
-C<Marpa::R2::Scanless::R::event()> method,
-C<Marpa::R2::Scanless::R::last_completed_range()> method,
-C<Marpa::R2::Scanless::R::pause_lexeme()> method,
-and the
-C<Marpa::R2::Scanless::R::range_to_string()> method,
-discouraged in Marpa::R2,
-have been eliminated in Marpa::R3.
-
-The C<Marpa::R2::Scanless::R::lexeme_read()> method
-has been removed.
-Its function is provided by the new
-C<Marpa::R2::Scanless::R::lexeme_read_block()>
-and C<Marpa::R2::Scanless::R::lexeme_read_string()>
-methods.
-C<Marpa::R2::Scanless::R::lexeme_read()> may reappear
-in a non-backward-compatible form.
-
-The C<Marpa::R2::Scanless::R::ambiguity_metric()> method
-has been removed.
-Its purpose is now served by the 
-C<Marpa::R2::Scanless::V::ambiguity_level()> method.
-
-The C<Marpa::R2::Scanless::R::ambiguous()> method
-has been removed.
-Its purpose is now served by the 
-C<Marpa::R2::Scanless::V::ambiguous()> method.
-
-The C<Marpa::R2::Scanless::R::current_g1_location()> method
-has been removed.
-Its purpose is now served by the 
-C<Marpa::R2::Scanless::V::block_progress()> method.
 
 =head2 The semantic closure now always receives exactly 2 arguments
 
@@ -349,11 +263,29 @@ methods, in alphabetical order.
 
 =head2 ambiguity_metric()
 
+The C<Marpa::R2::Scanless::R::ambiguity_metric()> method
+has been removed.
+Its purpose is now served by the 
+valuer's
+C<ambiguity_level()> method.
+
 =head2 ambiguous()
+
+The C<Marpa::R2::Scanless::R::ambiguous()> method
+has been removed.
+Its purpose is now served by the 
+valuer's C<ambiguous()> method.
 
 =head2 current_g1_location()
 
+The C<Marpa::R2::Scanless::R::current_g1_location()> method
+has been removed.
+Its purpose is now served by the 
+Marpa::R3 recognizer's C<block_progress()> method.
+
 =head2 event()
+
+Removed.
 
 =head2 events()
 
@@ -361,21 +293,54 @@ methods, in alphabetical order.
 
 =head2 g1_location_to_span()
 
+Removed.
+
 =head2 input_length()
+
+The arguments of
+C< $recce->input_length() >>,
+have changed.
+Its first parameter now is the block id.
 
 =head2 last_completed()
 
 =head2 last_completed_range()
 
+Removed.
+
 =head2 last_completed_span()
+
+Removed.
 
 =head2 lexeme_alternative()
 
+The interface to 
+C< $recce->lexeme_alternative() >>
+has changed.
+Some of its functionality is taken over
+by the new
+C< $recce->lexeme_alternative_literal() >>
+method.
+
 =head2 lexeme_complete()
+
+The arguments of
+C< $recce->lexeme_complete() >>,
+have changed.
+Its first parameter now is the block id.
 
 =head2 lexeme_priority_set()
 
 =head2 lexeme_read()
+
+The C<Marpa::R2::Scanless::R::lexeme_read()> method
+has been removed.
+Its function is provided by the new
+C<Marpa::R2::Scanless::R::lexeme_read_block()>
+and C<Marpa::R2::Scanless::R::lexeme_read_string()>
+methods.
+C<Marpa::R2::Scanless::R::lexeme_read()> may reappear
+in a non-backward-compatible form.
 
 =head2 line_column()
 
@@ -390,6 +355,8 @@ C<Marpa::R2::Scanless::R::literal()> has changed
 to allow multi-block input.
 
 =head2 pause_lexeme()
+
+Removed.
 
 =head2 pause_span()
 
@@ -414,7 +381,18 @@ the same as its RHS length.
 
 =head2 range_to_string()
 
+Removed.
+
 =head2 read()
+
+The interface to
+the C<< $recce->read() >> method has changed in major ways.
+One important change is that
+the C<< slr->read() >> method may now called multiple
+times during a parse,
+each time with a new string.
+These strings will be called B<input blocks>.
+For more details see L<Marpa::R3::Recognizer>.
 
 =head2 resume()
 
@@ -425,6 +403,9 @@ the same as its RHS length.
 =head2 show_progress()
 
 =head2 substring()
+
+C<< $recce->substring() >> has been renamed
+C<< $recce->g1_literal() >>.
 
 =head2 terminals_expected()
 
