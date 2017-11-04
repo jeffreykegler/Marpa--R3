@@ -15,19 +15,33 @@ Marpa::R3::Changes - Differences between Marpa::R2 and Marpa::R3
 
 =head1 About this document
 
-This document describes the incompatible
-differences between Marpa::R2
+This document describes the significant incompatibilities
+between Marpa::R2
 and Marpa::R3.
-(Differences that do not give rise to incompatibility
-are outside of its scope.)
 It is intended for readers already familiar with Marpa::R2,
 who are writing new applications for Marpa::R3,
-and for readers migrating Marpa::XS applications
+and for readers migrating Marpa::R2 applications
 and tools to Marpa::R3.
 
-=head1 Changes
+Differences that do not give rise to a significant incompatibility
+are not included.
+Here "significant" means "likely to impact legacy Marpa::R2 code".
 
-=head2 Events
+This document is a checklist and, on its own, is not a complete guide
+for migration.
+It avoids duplicating material in the main Marpa::R3 documents.
+For example, if a Marpa::R2 method is replaced by a Marpa::R3 method,
+this document may simply note that fact and refer the reader to
+the description of the new method in the other documents.
+
+Marpa::R3 contains so many highly inter-connected changes,
+that nothing in it can safely be said to be simply "unchanged".
+Some methods and named arguments are described as "Mostly unchanged".
+Here "mostly" is used in the same sense in which Douglas Adams uses
+in the I<Hitchhiker's Guide>, which describes the Earth as
+"mostly harmless" -- it means "for most user's in typical circumstances".
+
+=head1 Events
 
 In Marpa::R3, events have been changed from an event-driven
 mechanism to a callback mechanism.
@@ -37,22 +51,22 @@ The
 C<< $slr->events() >> method has been
 removed.
 
-=head2 New valuer object
+=head1 New valuer object
 
 There is a new valuer object,
 with its own L<new
 POD document|Marpa::R3::Valuer.pod>.
 
-=head2 Marpa strings must be UTF-8
+=head1 Marpa strings must be UTF-8
 
 Marpa expects all strings passed to it to be valid UTF-8.
 (Note that all ASCII-7 string are valid UTF-8).
 
-=head2 "Eager" lexemes added
+=head1 "Eager" lexemes added
 
 See L<Marpa::R3::DSL/"eager">.
 
-=head2 Problems with kernel Earley items in progress reports fixed
+=head1 Problems with kernel Earley items in progress reports fixed
 
 Progress reports had been misreporting some
 Earley items.  The misreported items
@@ -76,58 +90,62 @@ code and realized that some corner cases were
 not being dealt with correctly.
 This bugs is now fixed.
 
-=head2 Semantics moved from recognizer to grammar
+=head1 Semantics moved from recognizer to grammar
 
 In Marpa::R2, the semantics was not finally settled
 until the C<< $recce->value() >> call.
 In Marpa::R3, semantics will be fully settled in the grammar.
 
-=head2 Actions that are Perl names must resolve to subroutines
+=head1 Actions that are Perl names must resolve to subroutines
 
 It was a little noticed feature of Marpa::R2, that actions specified
 as Perl names (like "My_Action::doit") could resolve to scalars.
 In Marpa::R3 they must resolve to Perl subroutines.
 
-=head2 The Stuifzand interface (PSIF) has been removed
+=head1 The Stuifzand interface (PSIF) has been removed
 
 The Stuifzand interface (PSIF), and its documentation,
 have been removed.
 Important in the development of Marpa,
 it now has little or no usage.
 
-=head2 The Thin interface (THIF) has been removed.
+=head1 The Thin interface (THIF) has been removed.
 
 The THIF was a "thin" Perl interface.
 It has been removed.
 
-=head2 The NAIF has been removed
+=head1 The NAIF has been removed
 
 The NAIF was an older interface using hashes of named
 variables, instead of a DSL.
 It has been removed.
 
-=head2 LATM is now the default
+=head1 LATM is now the default
 
-=head2 [name, values] is now the default action
+=head1 [name, values] is now the default action
 
-=head2 Unicode now works in the SLIF DSL
+=head1 Unicode now works in the SLIF DSL
 
-=head2 Context::location is now Context::g1_range
+=head1 Context::location is now Context::g1_range
 
-=head2 New context variable, Context::g1_span
+=head1 New context variable, Context::g1_span
 
-=head2 Marpa::R3::Scanless::G rule and symbol accessors are completely different
+=head1 Rule and symbol accessors are completely different
 
-The grammar accessors changed between Marpa::R2
+In Marpa::R3,
+symbols and rules were divided in external and internal.
+As a result,
+the grammar accessors for symbols and rules
+changed completely between Marpa::R2
 and Marpa::R3.
 The changes are so massive that
 any summary of the changes
-to the SLG accessors
+to the grammar accessors
 would be essentially be a repetition of
 L<their
 documentation|Marpa::R3::Grammar/"Accessors">.
 
-=head2 The semantic closure now always receives exactly 2 arguments
+=head1 The semantic closure now always receives exactly 2 arguments
 
 Under Marpa::R2, the semantic closure received a varying number
 of arguments, depending on circumstances.
@@ -146,15 +164,15 @@ named arguments, in alphabetical order.
 
 =head2 bless_package
 
-Basically unchanged.
+Mostly unchanged.
 
 =head2 source
 
-Basically unchanged.
+Mostly unchanged.
 
 =head2 trace_file_handle
 
-Basically unchanged.
+Mostly unchanged.
 
 =head2 action_object
 
@@ -171,41 +189,81 @@ methods, in alphabetical order.
 
 =head2 g0_rule()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 g0_rule_ids()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 g1_rule_ids()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 new()
+
+See the entries for changes
+in the grammar named arguments.
 
 =head2 parse()
 
+Mostly unchanged.
+
 =head2 rule()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 rule_expand()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 rule_ids()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 rule_name()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 rule_show()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 set()
 
+See the entries for changes
+in the grammar named arguments.
+
 =head2 show_rules()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 show_symbols()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 start_symbol_id()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 symbol_description()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 symbol_display_form()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head2 symbol_dsl_form()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 symbol_ids()
 
+See L</"Rule and symbol accessors are completely different">.
+
 =head2 symbol_name()
+
+See L</"Rule and symbol accessors are completely different">.
 
 =head1 Marpa::R2 Recognizer named arguments, alphabetically
 
@@ -256,8 +314,6 @@ Removed.
 
 This section accounts for each of the Marpa::R2 recognizer's
 methods, in alphabetical order.
-
-=head2 new()
 
 =head2 activate()
 
@@ -354,6 +410,11 @@ The interface to
 C<Marpa::R2::Scanless::R::literal()> has changed
 to allow multi-block input.
 
+=head2 new()
+
+See the entries for changes
+in the recognizer named arguments.
+
 =head2 pause_lexeme()
 
 Removed.
@@ -399,6 +460,9 @@ For more details see L<Marpa::R3::Recognizer>.
 =head2 series_restart()
 
 =head2 set()
+
+See the entries for changes
+in the recognizer named arguments.
 
 =head2 show_progress()
 
