@@ -182,7 +182,7 @@ __DATA__
     ID
     NIDSET_IDS
 
-    :package=Marpa::R3::Internal::Scanless::G
+    :package=Marpa::R3::Internal_G
 
     L { Lua Interpreter }
     REGIX { Registry index in Lua interpreter --
@@ -211,7 +211,7 @@ __DATA__
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID
 
-    :package=Marpa::R3::Internal::Scanless::R
+    :package=Marpa::R3::Internal_R
 
     SLG
 

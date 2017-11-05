@@ -22,7 +22,7 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-package Marpa::R3::Internal::Scanless::R;
+package Marpa::R3::Internal_R;
 
 use Scalar::Util qw(blessed tainted);
 use English qw( -no_match_vars );
@@ -99,10 +99,10 @@ sub Marpa::R3::Internal::Scanless::meta_recce {
 sub perl_common_set {
     my ( $slr, $flat_args ) = @_;
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] = $value;
+        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE] = $value;
     }
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
     delete $flat_args->{'trace_file_handle'};
     return $flat_args;
 }
@@ -110,11 +110,11 @@ sub perl_common_set {
 sub gen_app_event_handler {
     my ($slr) = @_;
     my $event_handlers =
-      $slr->[Marpa::R3::Internal::Scanless::R::EVENT_HANDLERS];
+      $slr->[Marpa::R3::Internal_R::EVENT_HANDLERS];
     return sub {
         my ( $event_type, $event_name, @data ) = @_;
         my $current_event =
-          $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT];
+          $slr->[Marpa::R3::Internal_R::CURRENT_EVENT];
         if ($current_event) {
             Marpa::R3::exception(
                 qq{Attempt to throw call one event handler inside another\n},
@@ -139,7 +139,7 @@ sub gen_app_event_handler {
                 qq{  A handler should be a ref to code\n}
             );
         }
-        $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = $event_name;
+        $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] = $event_name;
         my $retour = $handler->( $slr, $event_name, @data ) // 'ok';
 
         RETOUR_CHECK: {
@@ -162,16 +162,16 @@ sub gen_app_event_handler {
                 qq{  Handler must return "ok" or "pause"\n},
             );
         }
-        $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] = undef;
+        $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] = undef;
         return 'ok', $retour;
     };
 }
 
 sub gen_codepoint_event_handler {
     my ($slr) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     my $character_class_table =
-      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+      $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE];
 
     return sub {
         my ( $codepoint, $trace_terminals ) = @_;
@@ -190,7 +190,7 @@ sub gen_codepoint_event_handler {
                 if ( $trace_terminals >= 2 ) {
                     my $trace_file_handle =
                       $slr
-                      ->[ Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE ];
+                      ->[ Marpa::R3::Internal_R::TRACE_FILE_HANDLE ];
                     my $char_desc = character_describe( $slr, $codepoint );
                     say {$trace_file_handle}
 qq{Registering character $char_desc as symbol $symbol_id: },
@@ -227,11 +227,11 @@ sub Marpa::R3::Scanless::R::new {
     Marpa::R3::exception(
         qq{Marpa::R3::Scanless::R::new() called without a "grammar" argument} )
       if not defined $slg;
-    $slr->[Marpa::R3::Internal::Scanless::R::SLG] = $slg;
+    $slr->[Marpa::R3::Internal_R::SLG] = $slg;
     delete $flat_args->{grammar};
 
     my $event_handlers = $flat_args->{event_handlers} // {};
-    $slr->[Marpa::R3::Internal::Scanless::R::EVENT_HANDLERS] = $event_handlers;
+    $slr->[Marpa::R3::Internal_R::EVENT_HANDLERS] = $event_handlers;
     if ( ref $event_handlers ne 'HASH' ) {
         my $ref_type = ref $event_handlers;
         Marpa::R3::exception(
@@ -253,14 +253,14 @@ sub Marpa::R3::Scanless::R::new {
         );
     } ## end if ( not blessed $slg or not $slg->isa($slg_class) )
 
-    $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE] //=
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+    $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE] //=
+      $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
 
-    my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
-    $slr->[Marpa::R3::Internal::Scanless::R::L] = $lua;
+    my $lua = $slg->[Marpa::R3::Internal_G::L];
+    $slr->[Marpa::R3::Internal_R::L] = $lua;
 
     my ( $regix ) = $slg->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -287,7 +287,7 @@ sub Marpa::R3::Scanless::R::new {
         end)
 END_OF_LUA
 
-    $slr->[Marpa::R3::Internal::Scanless::R::REGIX]  = $regix;
+    $slr->[Marpa::R3::Internal_R::REGIX]  = $regix;
 
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -317,7 +317,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::R::DESTROY {
     # say STDERR "In Marpa::R3::Scanless::R::DESTROY before test";
     my $slr = shift;
-    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    my $lua = $slr->[Marpa::R3::Internal_R::L];
 
     # If we are destroying the Perl interpreter, then all the Marpa
     # objects will be destroyed, including Marpa's Lua interpreter.
@@ -329,7 +329,7 @@ sub Marpa::R3::Scanless::R::DESTROY {
     return if not $lua;
     # say STDERR "In Marpa::R3::Scanless::R::DESTROY after test";
 
-    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $regix = $slr->[Marpa::R3::Internal_R::REGIX];
     $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
@@ -346,7 +346,7 @@ sub Marpa::R3::Scanless::R::set {
     Marpa::R3::exception( sprintf $error_message, '$slr->set()' ) if not $flat_args;
     $flat_args = perl_common_set($slr, $flat_args);
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
 
     $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -373,16 +373,16 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->read() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
 
     my $block_id = $slr->block_new($p_string);
     $slr->block_set($block_id);
@@ -392,17 +392,17 @@ sub Marpa::R3::Scanless::R::read {
 
 sub Marpa::R3::Scanless::R::resume {
     my ( $slr, $start_pos, $length ) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->resume() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
     my $trace_file_handle =
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
     $length //= -1;
     $slr->block_move( $start_pos, $length );
     return $slr->block_read();
@@ -670,18 +670,18 @@ END_OF_LUA
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R3::Scanless::R::lexeme_complete {
     my ( $slr, $block, $offset, $length ) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->lexeme_complete() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
 
     my $trace_file_handle =
-        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
 
     my ($return_value) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -717,12 +717,12 @@ END_OF_LUA
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_literal {
     my ( $slr, $symbol_name, $block_id, $offset, $length ) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->lexeme_read_literal() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
@@ -735,7 +735,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_literal {
                trace => sub {
                     my ($msg) = @_;
                     my $trace_file_handle =
-                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
                     say {$trace_file_handle} $msg;
                     return 'ok';
                },
@@ -761,12 +761,12 @@ END_OF_LUA
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_block {
     my ( $slr, $symbol_name, $value, $block_id, $offset, $length ) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->lexeme_read_block() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
@@ -785,7 +785,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_block {
                trace => sub {
                     my ($msg) = @_;
                     my $trace_file_handle =
-                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
                     say {$trace_file_handle} $msg;
                     return 'ok';
                },
@@ -811,12 +811,12 @@ END_OF_LUA
 # undef if lexeme not accepted.
 sub Marpa::R3::Scanless::R::lexeme_read_string {
     my ( $slr, $symbol_name, $string ) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             '$recce->lexeme_read_string() called from inside a handler', "\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
@@ -830,7 +830,7 @@ sub Marpa::R3::Scanless::R::lexeme_read_string {
                trace => sub {
                     my ($msg) = @_;
                     my $trace_file_handle =
-                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
                     say {$trace_file_handle} $msg;
                     return 'ok';
                },
@@ -928,7 +928,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::block_new {
     my ( $slr, $p_string ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
 
     Marpa::R3::exception(
         q{Attempt to use a tainted input string in $slr->read()},
@@ -949,7 +949,7 @@ sub Marpa::R3::Scanless::R::block_new {
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
     my $character_class_table =
-      $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE];
+      $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE];
 
     my ($block_id) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -994,12 +994,12 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::R::block_set {
     my ($slr, $block_id) = @_;
-    if ( $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT] ) {
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
             "$slr->block_set() called from inside a handler\n",
             "   This is not allowed\n",
             "   The event was ",
-            $slr->[Marpa::R3::Internal::Scanless::R::CURRENT_EVENT],
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
             "\n",
         );
     }
@@ -1049,7 +1049,7 @@ sub Marpa::R3::Scanless::R::block_read {
                 trace => sub {
                     my ($msg) = @_;
                     my $trace_file_handle =
-                        $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+                        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
                     say {$trace_file_handle} $msg;
                     return 'ok';
                 },
@@ -1083,7 +1083,7 @@ END_OF_LUA
 # no return value documented
 sub Marpa::R3::Scanless::R::activate {
     my ( $slr, $event_name, $activate ) = @_;
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
 
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'si', $event_name, $activate);
@@ -1144,8 +1144,8 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
-    my $lua   = $slr->[Marpa::R3::Internal::Scanless::R::L];
-    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $lua   = $slr->[Marpa::R3::Internal_R::L];
+    my $regix = $slr->[Marpa::R3::Internal_R::REGIX];
 
     $DB::single = 1 if not $slr;
     $DB::single = 1 if not $regix;
@@ -1171,8 +1171,8 @@ sub Marpa::R3::Scanless::R::call_by_tag {
 # not to be documented
 sub Marpa::R3::Scanless::R::coro_by_tag {
     my ( $slr, $tag, $args, $codestr ) = @_;
-    my $lua        = $slr->[Marpa::R3::Internal::Scanless::R::L];
-    my $regix      = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $lua        = $slr->[Marpa::R3::Internal_R::L];
+    my $regix      = $slr->[Marpa::R3::Internal_R::REGIX];
     my $handler    = $args->{handlers} // {};
     my $resume_tag = $tag . '[R]';
     my $signature  = $args->{signature} // '';
@@ -1270,7 +1270,7 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::earley_set_show {
     my ( $slr, $traced_set_id ) = @_;
-    my $slg     = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg     = $slr->[Marpa::R3::Internal_R::SLG];
 
     my ($set_data) =
       $slr->call_by_tag(
@@ -1516,7 +1516,7 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::R::regix {
     my ( $slr ) = @_;
-    my $regix = $slr->[Marpa::R3::Internal::Scanless::R::REGIX];
+    my $regix = $slr->[Marpa::R3::Internal_R::REGIX];
     return $regix;
 }
 

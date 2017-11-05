@@ -31,8 +31,8 @@ use English qw( -no_match_vars );
 sub resolve_action {
     my ( $slg, $closure_name, $p_error ) = @_;
     my $trace_file_handle =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
-    my $trace_actions = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS];
+      $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
+    my $trace_actions = $slg->[Marpa::R3::Internal_G::TRACE_ACTIONS];
 
     # A reserved closure name;
     return [ q{}, undef, '::!default' ] if not defined $closure_name;
@@ -57,7 +57,7 @@ sub resolve_action {
 
     if ( not $fully_qualified_name ) {
         my $resolve_package =
-          $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE];
+          $slg->[Marpa::R3::Internal_G::SEMANTICS_PACKAGE];
         if ( not defined $resolve_package ) {
             ${$p_error} = Marpa::R3::Internal::X->new(
                 {
@@ -224,7 +224,7 @@ END_OF_LUA
 # Find the blessing for a rule.
 sub rule_blessing_find {
     my ( $slg, $irlid ) = @_;
-    my $bless_package = $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
+    my $bless_package = $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE];
 
     my ($blessing) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -256,9 +256,9 @@ sub resolve_grammar {
     my ($slg) = @_;
 
     my $trace_actions =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+      $slg->[Marpa::R3::Internal_G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+      $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
     my $resolve_error;
 
@@ -426,9 +426,9 @@ sub g1_show_rule_list {
 sub registrations_set {
     my ( $slg, $registrations ) = @_;
     my $trace_file_handle =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+      $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     my $trace_actions =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+      $slg->[Marpa::R3::Internal_G::TRACE_ACTIONS] // 0;
 
   REGISTRATION: for my $registration ( @{$registrations} ) {
         my ( $type, $id, @raw_ops ) = @{$registration};
@@ -466,10 +466,10 @@ sub registrations_set {
       OP: for my $raw_op (@raw_ops) {
             if ( ref $raw_op ) {
 
-                my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
+                my $constants = $slg->[Marpa::R3::Internal_G::CONSTANTS];
                 my $next_ix = scalar @{$constants};
                 push @ops, $next_ix;
-                $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS]->[$next_ix]
+                $slg->[Marpa::R3::Internal_G::CONSTANTS]->[$next_ix]
                     = ${$raw_op};
                 next OP;
             }
@@ -501,9 +501,9 @@ END_OF_LUA
 sub registrations_find {
     my ($slg) = @_;
     my $trace_file_handle =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+      $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     my $trace_actions =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+      $slg->[Marpa::R3::Internal_G::TRACE_ACTIONS] // 0;
 
     my @closure_by_irlid   = ();
     my @semantics_by_irlid = ();
@@ -725,7 +725,7 @@ END_OF_LUA
     # Do consistency checks
 
     # Set the object values
-    my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES] =
+    my $null_values = $slg->[Marpa::R3::Internal_G::NULL_VALUES] =
       \@null_symbol_closures;
 
     my @semantics_by_lexeme_id = ();
@@ -1228,9 +1228,9 @@ END_OF_LUA
         } ## end REGISTRATION: for my $registration (@registrations)
     } ## end SLR_NULLING_GRAMMAR_HACK:
 
-    $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID] =
+    $slg->[Marpa::R3::Internal_G::CLOSURE_BY_SYMBOL_ID] =
       \@nulling_closures;
-    $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID] =
+    $slg->[Marpa::R3::Internal_G::CLOSURE_BY_RULE_ID] =
       \@closure_by_irlid;
 
     return \@registrations;

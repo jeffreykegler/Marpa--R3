@@ -84,7 +84,7 @@ package Marpa::R3::Internal::Powerset;
 use constant ID => 0;
 use constant NIDSET_IDS => 1;
 
-package Marpa::R3::Internal::Scanless::G;
+package Marpa::R3::Internal_G;
 use constant L => 0;
 use constant REGIX => 1;
 use constant TRACE_FILE_HANDLE => 2;
@@ -100,7 +100,7 @@ use constant NULL_VALUES => 11;
 use constant CLOSURE_BY_SYMBOL_ID => 12;
 use constant CLOSURE_BY_RULE_ID => 13;
 
-package Marpa::R3::Internal::Scanless::R;
+package Marpa::R3::Internal_R;
 use constant SLG => 0;
 use constant L => 1;
 use constant REGIX => 2;

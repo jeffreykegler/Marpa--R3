@@ -176,7 +176,7 @@ sub set_last_choice {
     if ( nook_has_semantic_cause( $asf, $nook ) ) {
         my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
         my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-        my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+        my $slg = $slr->[Marpa::R3::Internal_R::SLG];
         my $and_node_id = $and_nodes->[$choice];
         my ($current_predecessor) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -297,7 +297,7 @@ sub normalize_asf_blessing {
 sub Marpa::R3::Internal::ASF::blessings_set {
     my ( $asf, $default_blessing ) = @_;
     my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg           = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg           = $slr->[Marpa::R3::Internal_R::SLG];
 
     my $default_token_blessing_package =
       $asf->[Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE];
@@ -414,7 +414,7 @@ sub Marpa::R3::ASF::new {
     $asf->[Marpa::R3::Internal::ASF::SLR] = $slr;
     $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] //= 42;
 
-    my $slg       = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg       = $slr->[Marpa::R3::Internal_R::SLG];
 
     my %v_args = (recognizer => $slr);
     $v_args{end} = $end_of_parse if $end_of_parse;
@@ -550,7 +550,7 @@ END_OF_LUA
 sub Marpa::R3::ASF::grammar {
     my ($asf)   = @_;
     my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     return $slg;
 } ## end sub Marpa::R3::ASF::grammar
 
@@ -708,7 +708,7 @@ END_OF_LUA
 sub nid_symbol_name {
     my ( $asf, $nid ) = @_;
     my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     my $symbol_id = nid_symbol_id($asf, $nid);
     return $slg->g1_symbol_name($symbol_id);
 }
@@ -716,7 +716,7 @@ sub nid_symbol_name {
 sub nid_token_name {
     my ( $asf, $nid ) = @_;
     my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     my $token_id = nid_token_id($asf, $nid);
     return if not defined $token_id;
     return $slg->g1_symbol_name($token_id);
@@ -928,7 +928,7 @@ sub glade_id_factors {
     my ($choicepoint) = @_;
     my $asf           = $choicepoint->[Marpa::R3::Internal::Choicepoint::ASF];
     my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     my $or_nodes      = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
 
     my @result;

@@ -226,12 +226,12 @@ sub Marpa::R3::Scanless::V::new {
     }
 
     $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE] //=
-      $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
+      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
 
     my $trace_file_handle =
       $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
 
-    my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
+    my $lua = $slr->[Marpa::R3::Internal_R::L];
     $slv->[Marpa::R3::Internal_V::L] = $lua;
 
     my ( $regix ) = $slr->coro_by_tag(
@@ -323,20 +323,20 @@ END_OF_LUA
 sub Marpa::R3::Scanless::V::value {
     my ( $slv, $per_parse_arg ) = @_;
     my $slr    = $slv->[Marpa::R3::Internal_V::SLR];
-    my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg    = $slr->[Marpa::R3::Internal_R::SLG];
 
     my $trace_actions =
-      $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
+      $slg->[Marpa::R3::Internal_G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
       $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
 
         my $semantics_arg0 = $per_parse_arg // {};
-        my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
-        my $null_values = $slg->[Marpa::R3::Internal::Scanless::G::NULL_VALUES];
+        my $constants = $slg->[Marpa::R3::Internal_G::CONSTANTS];
+        my $null_values = $slg->[Marpa::R3::Internal_G::NULL_VALUES];
         my $nulling_closures =
-          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_SYMBOL_ID];
+          $slg->[Marpa::R3::Internal_G::CLOSURE_BY_SYMBOL_ID];
         my $rule_closures =
-          $slg->[Marpa::R3::Internal::Scanless::G::CLOSURE_BY_RULE_ID];
+          $slg->[Marpa::R3::Internal_G::CLOSURE_BY_RULE_ID];
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::irlid = undef;
@@ -652,7 +652,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::V::verbose_or_node {
     my ( $slv, $or_node_id ) = @_;
     my $slr = $slv->[Marpa::R3::Internal_V::SLR];
-    my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
 
     my ($text, $nrl_id, $position)
         = $slv->call_by_tag(

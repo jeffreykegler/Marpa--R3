@@ -22,7 +22,7 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-package Marpa::R3::Internal::Scanless::G;
+package Marpa::R3::Internal_G;
 
 use Scalar::Util 'blessed';
 use English qw( -no_match_vars );
@@ -35,11 +35,11 @@ our $PACKAGE = 'Marpa::R3::Scanless::G';
 sub pre_construct {
     my ($class) = @_;
     my $pre_slg = bless [], $class;
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = \*STDERR;
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS] = [];
+    $pre_slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE] = \*STDERR;
+    $pre_slg->[Marpa::R3::Internal_G::CONSTANTS] = [];
 
     my $lua = Marpa::R3::Lua->new();
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::L] = $lua;
+    $pre_slg->[Marpa::R3::Internal_G::L] = $lua;
 
     my ($regix) = $lua->call_by_tag (-1,
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -64,7 +64,7 @@ sub pre_construct {
         return regix
 END_OF_LUA
 
-    $pre_slg->[Marpa::R3::Internal::Scanless::G::REGIX] = $regix;
+    $pre_slg->[Marpa::R3::Internal_G::REGIX] = $regix;
     return $pre_slg;
 }
 
@@ -73,7 +73,7 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
     my $meta_slg = pre_construct('Marpa::R3::Scanless::G');
 
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
-    Marpa::R3::Internal::Scanless::G::hash_to_runtime( $meta_slg, $hashed_metag,
+    Marpa::R3::Internal_G::hash_to_runtime( $meta_slg, $hashed_metag,
         { bless_package => 'Marpa::R3::Internal::MetaAST_Nodes' } );
 
     return $meta_slg;
@@ -85,8 +85,8 @@ sub Marpa::R3::Scanless::G::new {
 
     my $slg = pre_construct($class);
 
-    $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS]        = 1;
-    $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE] = 'warn';
+    $slg->[Marpa::R3::Internal_G::WARNINGS]        = 1;
+    $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] = 'warn';
 
     my ( $flat_args, $error_message ) =
       Marpa::R3::flatten_hash_args( \@hash_ref_args );
@@ -94,10 +94,10 @@ sub Marpa::R3::Scanless::G::new {
       if not $flat_args;
 
     my ( $p_dsl, $g1_args ) =
-      Marpa::R3::Internal::Scanless::G::set( $slg, $flat_args );
+      Marpa::R3::Internal_G::set( $slg, $flat_args );
     my $ast        = Marpa::R3::Internal::MetaAST->new($p_dsl);
     my $hashed_ast = $ast->ast_to_hash($p_dsl);
-    Marpa::R3::Internal::Scanless::G::hash_to_runtime( $slg, $hashed_ast,
+    Marpa::R3::Internal_G::hash_to_runtime( $slg, $hashed_ast,
         $g1_args );
     return $slg;
 }
@@ -105,7 +105,7 @@ sub Marpa::R3::Scanless::G::new {
 sub Marpa::R3::Scanless::G::DESTROY {
     # say STDERR "In Marpa::R3::Scanless::G::DESTROY before test";
     my $slg = shift;
-    my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
+    my $lua = $slg->[Marpa::R3::Internal_G::L];
 
     # If we are destroying the Perl interpreter, then all the Marpa
     # objects will be destroyed, including Marpa's Lua interpreter.
@@ -117,7 +117,7 @@ sub Marpa::R3::Scanless::G::DESTROY {
     return if not $lua;
     # say STDERR "In Marpa::R3::Scanless::G::DESTROY after test";
 
-    my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+    my $regix = $slg->[Marpa::R3::Internal_G::REGIX];
     $lua->call_by_tag($regix,
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $regix);
@@ -135,7 +135,7 @@ sub Marpa::R3::Scanless::G::set {
 
     my $value = $flat_args->{trace_file_handle};
     if ( defined $value ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
+        $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE] = $value;
         delete $flat_args->{trace_file_handle};
     }
 
@@ -148,7 +148,7 @@ sub Marpa::R3::Scanless::G::set {
     return;
 }
 
-sub Marpa::R3::Internal::Scanless::G::set {
+sub Marpa::R3::Internal_G::set {
     my ( $slg, $flat_args ) = @_;
 
     my $dsl = $flat_args->{'source'};
@@ -173,16 +173,16 @@ qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an unde
 
     my $value = $flat_args->{trace_file_handle};
     if ( defined $value ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE] = $value;
+        $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE] = $value;
         delete $flat_args->{'trace_file_handle'};
     }
 
     my $trace_file_handle =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+        $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
     if ( exists $flat_args->{'trace_actions'} ) {
         my $value = $flat_args->{'trace_actions'};
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] = $value;
+        $slg->[Marpa::R3::Internal_G::TRACE_ACTIONS] = $value;
         if ($value) {
             say {$trace_file_handle} 'Setting trace_actions option'
               or Marpa::R3::exception("Cannot print: $ERRNO");
@@ -244,7 +244,7 @@ END_OF_LUA
 
     if ( exists $flat_args->{'semantics_package'} ) {
         my $value = $flat_args->{'semantics_package'};
-        $slg->[Marpa::R3::Internal::Scanless::G::SEMANTICS_PACKAGE] = $value;
+        $slg->[Marpa::R3::Internal_G::SEMANTICS_PACKAGE] = $value;
         delete $flat_args->{'semantics_package'};
     }
 
@@ -274,7 +274,7 @@ END_OF_LUA
 
     return ( $dsl, $flat_args );
 
-} ## end sub Marpa::R3::Internal::Scanless::G::set
+} ## end sub Marpa::R3::Internal_G::set
 
 # The object, in computing the hash, is to get as much
 # precomputation in as possible, without using undue space.
@@ -282,12 +282,12 @@ END_OF_LUA
 # before or during hash creation, and space-intensive processing
 # should tend to be done here, in the code that converts the
 # hash to its runtime equivalent.
-sub Marpa::R3::Internal::Scanless::G::hash_to_runtime {
+sub Marpa::R3::Internal_G::hash_to_runtime {
     my ( $slg, $hashed_source, $g1_args ) = @_;
 
     my $is_meta = exists $hashed_source->{meta} ? 1 : undef;
 
-    my $trace_fh = $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+    my $trace_fh = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -303,21 +303,21 @@ END_OF_LUA
     my $if_inaccessible_default_arg =
       $hashed_source->{defaults}->{if_inaccessible};
     if ( defined $if_inaccessible_default_arg ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE] =
+        $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] =
           $if_inaccessible_default_arg;
     }
     my $if_inaccessible_default =
-      $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE];
+      $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE];
 
     # Create the the G1 grammar
 
     if ( defined( my $value = $g1_args->{'bless_package'} ) ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE] = $value;
+        $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE] = $value;
         delete $g1_args->{'bless_package'};
     }
 
     if ( defined( my $value = $g1_args->{'warnings'} ) ) {
-        $slg->[Marpa::R3::Internal::Scanless::G::WARNINGS] = $value;
+        $slg->[Marpa::R3::Internal_G::WARNINGS] = $value;
         delete $g1_args->{'warnings'};
     }
 
@@ -413,7 +413,7 @@ END_OF_LUA
 END_OF_LUA
 
     my $precompute_error =
-      Marpa::R3::Internal::Scanless::G::precompute( $slg, 'g1' );
+      Marpa::R3::Internal_G::precompute( $slg, 'g1' );
     if ( defined $precompute_error ) {
         if ( $precompute_error == $Marpa::R3::Error::UNPRODUCTIVE_START ) {
 
@@ -614,7 +614,7 @@ END_OF_LUA
     }
 
     my $lex_precompute_error =
-      Marpa::R3::Internal::Scanless::G::precompute( $slg, 'l0' );
+      Marpa::R3::Internal_G::precompute( $slg, 'l0' );
     if ( defined $lex_precompute_error ) {
         Marpa::R3::exception(
 'Internal errror: expected error code from precompute of lexer grammar ',
@@ -882,7 +882,7 @@ END_OF_LUA
     # More lexer processing
     # Determine events by lexer rule, applying the defaults
 
-    $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASS_TABLE] =
+    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE] =
       $character_class_table;
 
     # Some lexeme default adverbs are applied in earlier phases.
@@ -977,7 +977,7 @@ qq{   It contained non-word characters and that is not allowed\n},
 
             if ( $blessing !~ / :: /xms ) {
                 my $bless_package =
-                  $slg->[Marpa::R3::Internal::Scanless::G::BLESS_PACKAGE];
+                  $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE];
                 if ( not defined $bless_package ) {
                     my $lexeme_name = $slg->g1_symbol_name($g1_lexeme_id);
                     Marpa::R3::exception(
@@ -1005,13 +1005,13 @@ END_OF_LUA
 
     return $slg;
 
-} ## end sub Marpa::R3::Internal::Scanless::G::hash_to_runtime
+} ## end sub Marpa::R3::Internal_G::hash_to_runtime
 
-sub Marpa::R3::Internal::Scanless::G::precompute {
+sub Marpa::R3::Internal_G::precompute {
     my ($slg, $subg_name ) = @_;
 
     my $trace_fh =
-        $slg->[Marpa::R3::Internal::Scanless::G::TRACE_FILE_HANDLE];
+        $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
     my ($do_return, $precompute_result, $precompute_error_code)
       = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1168,7 +1168,7 @@ END_OF_LUA
     }
 
     my $default_if_inaccessible =
-        $slg->[Marpa::R3::Internal::Scanless::G::IF_INACCESSIBLE]
+        $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE]
         // 'warn';
     SYMBOL:
     for (my $iter = $slg->lmg_symbol_ids_gen($subg_name); defined(my $isyid = $iter->());) {
@@ -1209,7 +1209,7 @@ END_OF_LUA
     }
 
     # Save some memory
-    $slg->[Marpa::R3::Internal::Scanless::G::CHARACTER_CLASSES] = undef;
+    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASSES] = undef;
 
     return ;
 
@@ -1733,8 +1733,8 @@ kwgen(__LINE__, qw(production_length xpr_length i));
 
 sub Marpa::R3::Scanless::G::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
-    my $lua = $slg->[Marpa::R3::Internal::Scanless::G::L];
-    my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+    my $lua = $slg->[Marpa::R3::Internal_G::L];
+    my $regix = $slg->[Marpa::R3::Internal_G::REGIX];
     # $DB::single = 1 if not defined $lua;
     # $DB::single = 1 if not defined $regix;
     # $DB::single = 1 if not defined $tag;
@@ -1764,8 +1764,8 @@ sub Marpa::R3::Scanless::G::call_by_tag {
 # not to be documented
 sub Marpa::R3::Scanless::G::coro_by_tag {
     my ( $slg, $tag, $args, $codestr ) = @_;
-    my $lua        = $slg->[Marpa::R3::Internal::Scanless::G::L];
-    my $regix      = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+    my $lua        = $slg->[Marpa::R3::Internal_G::L];
+    my $regix      = $slg->[Marpa::R3::Internal_G::REGIX];
     my $handler    = $args->{handlers} // {};
     my $resume_tag = $tag . '[R]';
     my $signature  = $args->{signature} // '';
@@ -2008,7 +2008,7 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::G::regix {
     my ( $slg ) = @_;
-    my $regix = $slg->[Marpa::R3::Internal::Scanless::G::REGIX];
+    my $regix = $slg->[Marpa::R3::Internal_G::REGIX];
     return $regix;
 }
 
