@@ -28,7 +28,7 @@ use English qw( -no_match_vars );
 
 sub new {
     my ( $class, $p_rules_source ) = @_;
-    my $meta_recce = Marpa::R3::Internal::Scanless::meta_recce();
+    my $meta_recce = Marpa::R3::Internal::meta_recce();
     my $valuer;
     eval { $meta_recce->read($p_rules_source) }
       or Marpa::R3::exception( "Parse of BNF/Scanless source failed\n",

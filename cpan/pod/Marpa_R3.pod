@@ -137,10 +137,10 @@ normalize-whitespace: 1
 
 The code first creates a new SLIF grammar.
 SLIF grammars are
-L<C<Marpa::R3::Scanless:G>|Marpa::R3::Grammar> objects.
+L<C<Marpa::R3::Grammar>|Marpa::R3::Grammar> objects.
 They are created
 with the
-L<Marpa::R3::Scanless:G::new|Marpa::R3::Grammar/"Constructor">
+L<Marpa::R3::Grammar::new|Marpa::R3::Grammar/"Constructor">
 constructor.
 The arguments to
 L<Marpa::R3::Grammar::new|Marpa::R3::Grammar/"Constructor">

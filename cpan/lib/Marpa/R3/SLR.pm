@@ -87,13 +87,13 @@ END_OF_LUA
     return $literal;
 }
 
-sub Marpa::R3::Internal::Scanless::meta_recce {
+sub Marpa::R3::Internal::meta_recce {
     my ($hash_args) = @_;
-    state $meta_grammar = Marpa::R3::Internal::Scanless::meta_grammar();
+    state $meta_grammar = Marpa::R3::Internal::meta_grammar();
     $hash_args->{grammar} = $meta_grammar;
     my $self = Marpa::R3::Recognizer->new($hash_args);
     return $self;
-} ## end sub Marpa::R3::Internal::Scanless::meta_recce
+} ## end sub Marpa::R3::Internal::meta_recce
 
 # Set those common args which are at the Perl level.
 sub perl_common_set {

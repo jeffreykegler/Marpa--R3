@@ -68,7 +68,7 @@ END_OF_LUA
     return $pre_slg;
 }
 
-sub Marpa::R3::Internal::Scanless::meta_grammar {
+sub Marpa::R3::Internal::meta_grammar {
 
     my $meta_slg = pre_construct('Marpa::R3::Grammar');
 
@@ -78,7 +78,7 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
 
     return $meta_slg;
 
-} ## end sub Marpa::R3::Internal::Scanless::meta_grammar
+} ## end sub Marpa::R3::Internal::meta_grammar
 
 sub Marpa::R3::Grammar::new {
     my ( $class, @hash_ref_args ) = @_;
