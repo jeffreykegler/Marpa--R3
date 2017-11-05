@@ -140,7 +140,7 @@ if (
 
 # Marpa::R3::Display::End
 
-        Marpa::R3::Test::is(
+        Test::More::is_deeply(
             [ $block_id, $offset, $eoread ], [ 1, 3, 3 ],
             qq{test 1 of block_progress()}
         );
@@ -154,7 +154,7 @@ if (
 
 # Marpa::R3::Display::End
 
-        Marpa::R3::Test::is(
+        Test::More::is_deeply(
             [ $block_id, $offset, $eoread ], [ 1, 0, 3 ],
             qq{test 2 of block_progress()}
         );
