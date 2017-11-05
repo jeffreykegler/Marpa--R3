@@ -41,7 +41,7 @@ sub My_Actions::top {
     return [grep { $_ } @children ];
 }
 
-my $recce = Marpa::R2::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R2::Recognizer->new( { grammar => $grammar } );
 
 my $input = '012xxx67890xxxxx6789x1234xx7890xxxx567';
 my $length = length $input;
