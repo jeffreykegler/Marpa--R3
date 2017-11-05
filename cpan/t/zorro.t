@@ -59,7 +59,7 @@ Z ~ 'Z'
 END_OF_DSL
 
 my $g = Marpa::R3::Grammar->new( { source => \$dsl } );
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $g } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $g } );
 $recce->read( \'Z' );
 my $ref_value = $recce->value();
 my $value = $ref_value ? ${$ref_value} : 'No parse';

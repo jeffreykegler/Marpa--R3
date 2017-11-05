@@ -235,7 +235,7 @@ do_test(
 
 sub do_test {
     my ( $name, $grammar, $input, $output_re, $args ) = @_;
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     $recce->read(\$input);
     my $value_ref = $recce->value();

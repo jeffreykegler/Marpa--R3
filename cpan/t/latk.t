@@ -105,7 +105,7 @@ sub my_parser {
       Marpa::R3::Grammar->new( { source => \q(A ::= 'a' action => do_A), },
         $package_arg );
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     if ( not defined eval { $recce->read( \'a' ); 1 } ) {
 

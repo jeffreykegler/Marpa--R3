@@ -107,7 +107,7 @@ for my $n ( 1 .. 12 ) {
 
     # Set max_parses just in case there's an infinite loop.
     # This is for debugging, after all
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $g, } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $g, } );
     $recce->read( \'6-', 0, 1 );
     $recce->resume( 1, 1 ) for 1 .. $n;
     $recce->resume( 0, 1 );

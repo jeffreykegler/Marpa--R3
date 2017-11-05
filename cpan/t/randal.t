@@ -119,7 +119,7 @@ TEST: for my $test_data (@test_data) {
 
     my ( $test_name, $test_input, $test_results ) = @{$test_data};
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $g, } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $g, } );
 
     $recce->read( \$test_input );
 

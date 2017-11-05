@@ -147,7 +147,7 @@ for my $a_length ( 1 .. 4 ) {
     for my $b_length ( 0 .. $a_length ) {
 
         my $string = ( 'a' x $a_length ) . ( 'b' x $b_length );
-        my $recce = Marpa::R3::Scanless::R->new(
+        my $recce = Marpa::R3::Recognizer->new(
             {   grammar  => $grammar,
             }
         );

@@ -48,7 +48,7 @@ END_OF_SOURCE
     }
 );
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $recce->read( \'aa' );
 my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
 die 'No ASF' if not defined $asf;

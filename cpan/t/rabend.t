@@ -84,7 +84,7 @@ my $recce;
 
 # First test that duplicates are Detected
 $test_name = 'duplicate terminal 1';
-$recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
+$recce = Marpa::R3::Recognizer->new( { grammar => $grammar, } );
 $recce->read( \'abcd', 0, 0 );
 
 sub duplicate_terminal_1 {
@@ -98,7 +98,7 @@ catch_problem( $test_name, \&duplicate_terminal_1, undef, q{Duplicate token} );
 
 # 2nd test that duplicates are Detected
 $test_name = 'duplicate terminal 2';
-$recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
+$recce = Marpa::R3::Recognizer->new( { grammar => $grammar, } );
 $recce->read( \'abcd', 0, 0 );
 
 sub duplicate_terminal_2 {

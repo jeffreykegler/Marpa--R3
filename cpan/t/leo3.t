@@ -114,7 +114,7 @@ END_OF_STRING
 
 my $length = 20;
 
-my $recce = Marpa::R3::Scanless::R->new(
+my $recce = Marpa::R3::Recognizer->new(
     { grammar => $grammar } );
 
 my $i                 = 0;

@@ -76,7 +76,7 @@ Marpa::R3::Test::is( $grammar->nrls_show(),
     <<'EOS', 'Aycock/Horspool NRLs' );
 EOS
 
-my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
+my $recce = Marpa::R3::Recognizer->new( {   grammar => $grammar });
 
 # There are no nulling rules in Libmarpa,
 # and no rules means an empty progress report

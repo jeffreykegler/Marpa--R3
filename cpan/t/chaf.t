@@ -63,7 +63,7 @@ R7 [:lex_start:] ~ 'a'
 R8 'a' ~ [a]
 EOS
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 $recce->read( \q{a} );
 

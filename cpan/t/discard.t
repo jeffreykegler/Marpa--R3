@@ -83,7 +83,7 @@ my $output_re =
 
 my $length = length $input;
 my @events = ();
-my $recce  = Marpa::R3::Scanless::R->new(
+my $recce  = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar,
         event_handlers => {

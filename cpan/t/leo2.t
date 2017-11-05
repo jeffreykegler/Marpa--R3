@@ -174,7 +174,7 @@ sub do_test {
         push @events, $event_name;
         'pause';
     };
-    my $slr = Marpa::R3::Scanless::R->new(
+    my $slr = Marpa::R3::Recognizer->new(
         { grammar => $grammar },
         {
             event_handlers => {

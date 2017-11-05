@@ -63,7 +63,7 @@ my $common_handler = sub () {
     'pause';
 };
 
-my $recce = Marpa::R3::Scanless::R->new(
+my $recce = Marpa::R3::Recognizer->new(
     {
         grammar => $grammar,
         event_handlers => {

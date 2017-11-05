@@ -61,7 +61,7 @@ sub show_last_subtext {
 sub do_test {
     my ( $grammar, $string, $expected_events ) = @_;
     my @actual_events;
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar        => $grammar,
             event_handlers => {

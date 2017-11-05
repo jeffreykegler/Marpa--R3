@@ -73,7 +73,7 @@ END_OF_SOURCE
 sub my_parser {
     my ( $grammar, $p_input_string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     $recce->read($p_input_string);
 

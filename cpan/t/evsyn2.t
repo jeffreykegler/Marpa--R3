@@ -153,7 +153,7 @@ sub do_test {
     my @actual_events = ();
 
     my $recce =
-      Marpa::R3::Scanless::R->new( { grammar => $grammar,
+      Marpa::R3::Recognizer->new( { grammar => $grammar,
          event_handlers => {
              "'default" => sub () {
                  my ($recce, $event_name) = @_;

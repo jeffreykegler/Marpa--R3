@@ -59,7 +59,7 @@ my $recce;
 # name: event examples - basic
 
 @results = ();
-$recce   = Marpa::R3::Scanless::R->new(
+$recce   = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar1,
         event_handlers => {
@@ -79,7 +79,7 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 # name: event examples - default
 
 @results = ();
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar1,
         event_handlers => {
@@ -101,7 +101,7 @@ Test::More::is( ( join q{ }, @results ), 'A B C', 'example 1' );
 # name: event examples - default and explicit
 
 @results = ();
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar1,
         event_handlers => {
@@ -143,7 +143,7 @@ my $grammar2 = Marpa::R3::Grammar->new(
 );
 
 @results = ();
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar2,
         event_handlers => {
@@ -187,7 +187,7 @@ my $grammar3 = Marpa::R3::Grammar->new(
 );
 
 @results = ();
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar3,
         event_handlers => {
@@ -236,7 +236,7 @@ sub factory {
 
 sub example_closure {
     my $C_local = 'C';
-    return Marpa::R3::Scanless::R->new(
+    return Marpa::R3::Recognizer->new(
         {
             grammar        => $grammar1,
             event_handlers => {
@@ -277,7 +277,7 @@ my $grammar4 = Marpa::R3::Grammar->new(
 );
 
 @results = ();
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar4,
         event_handlers => {
@@ -325,7 +325,7 @@ END_OF_TEXT
 # name: event examples - per-location processing, using AoA
 
 @results = ();
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $grammar4,
         event_handlers => {

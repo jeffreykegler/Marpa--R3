@@ -205,7 +205,7 @@ EOS
 
 }
 
-my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
+my $recce = Marpa::R3::Recognizer->new( {   grammar => $grammar });
 my $input_length = 4;
 my $input = ('a' x $input_length);
 $recce->read( \$input );

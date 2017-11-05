@@ -74,7 +74,7 @@ my $expected_value  = \[qw(target a b c a b c)];
 
 sub test {
     my ( $grammar, $string, $read_fn, $resume_fn, $test_name ) = @_;
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     my $actual_result   = "Actual result not set";
     my $actual_value    = "Actual value not set";
   SET_RESULT: {
@@ -108,7 +108,7 @@ test( $grammar, "abc", \&block_level_read, \&block_level_resume, 'block level me
 # This block for displays of individual methods
 if (
     not defined eval {
-        my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+        my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 # Marpa::R3::Display
 # name: block_new() synopsis

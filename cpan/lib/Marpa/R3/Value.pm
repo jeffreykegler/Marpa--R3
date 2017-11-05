@@ -139,7 +139,7 @@ qq{Failed resolution of action "$closure_name" to $fully_qualified_name\n};
 }
 
 # Dump semantics for diagnostics
-sub Marpa::R3::Scanless::R::show_semantics {
+sub Marpa::R3::Recognizer::show_semantics {
     my ( $slg, @ops ) = @_;
     my @op_descs = ();
     my $op_ix    = 0;
@@ -1237,7 +1237,7 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::R::value {
+sub Marpa::R3::Recognizer::value {
     my ( $slr, $per_parse_arg ) = @_;
     my $slv = Marpa::R3::Scanless::V->new( { recognizer => $slr } );
     my $ambiguity_level = $slv->ambiguity_level();

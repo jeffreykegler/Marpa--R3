@@ -134,7 +134,7 @@ for my $test_data (@tests_data) {
             $actual_result = $abbreviated_error;
             last PROCESSING;
         } ## end if ( not defined eval { $grammar = Marpa::R3::Grammar...})
-        my $recce = Marpa::R3::Scanless::R->new(
+        my $recce = Marpa::R3::Recognizer->new(
             { grammar => $grammar,
             } );
 

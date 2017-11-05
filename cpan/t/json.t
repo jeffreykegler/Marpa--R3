@@ -306,7 +306,7 @@ sub parse {
 # name: recognizer read/resume synopsis
 
     my @pause_location;
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar        => $parser->{grammar},
             event_handlers => {
@@ -351,7 +351,7 @@ sub trace_json {
 # name: trace example
 
         my @pause_location;
-        my $recce = Marpa::R3::Scanless::R->new(
+        my $recce = Marpa::R3::Recognizer->new(
             {
                 grammar        => $parser->{grammar},
                 event_handlers => {

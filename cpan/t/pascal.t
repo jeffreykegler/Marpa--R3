@@ -41,7 +41,7 @@ sub ah_extended {
     my $full_dsl = $base_dsl . join q{ }, 'S', '::=', ( ('A') x $n );
     my $grammar   = Marpa::R3::Grammar->new( { source => \$full_dsl, } );
     my $input = 'a' x $n;
-    my $recce   = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce   = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     $recce->read( \$input );
 
     my @parse_counts = (1);

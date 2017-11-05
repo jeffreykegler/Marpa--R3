@@ -355,7 +355,7 @@ END_OF_SOURCE
         my $reader = $hash->{reader};
         my $valuer = $hash->{valuer} || \&hi_valuer;
         my $string = '42*2+7/3, 42*(2+7)/3, 2**7-3, 2**(7-3)';
-        my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+        my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 # Marpa::R3::Display
 # name: recognizer read() synopsis

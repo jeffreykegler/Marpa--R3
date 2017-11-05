@@ -284,7 +284,7 @@ sub run_test {
 
     my $grammar = Marpa::R3::Grammar->new( { source => \$this_dsl });
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     $recce->read(\'2*3+4*1trailer');
 
     my $expected  = '(((2*3)+(4*1))==10;trailer;[default null];[null])';

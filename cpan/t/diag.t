@@ -88,7 +88,7 @@ sub my_parser {
 
     my $trace_output = q{};
     open my $trace_fh, q{>}, \$trace_output;
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {   grammar               => $grammar,
             trace_terminals       => 3,
             trace_file_handle     => $trace_fh,

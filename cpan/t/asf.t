@@ -56,7 +56,7 @@ my $input = <<EOI;
 2**7-3**10
 EOI
 
-my $r = Marpa::R3::Scanless::R->new( { grammar => $g } );
+my $r = Marpa::R3::Recognizer->new( { grammar => $g } );
 $r->read( \$input );
 my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $r } );
 

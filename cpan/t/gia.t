@@ -723,7 +723,7 @@ sub do_test {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     if ( not defined eval { $recce->read( \$string ); 1 } ) {
         say $EVAL_ERROR if $DEBUG;

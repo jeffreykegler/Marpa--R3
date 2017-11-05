@@ -87,7 +87,7 @@ $grammar->set( { trace_file_handle => $trace_fh } );
 # Marpa::R3::Display
 # name: debug example, part 2
 
-my $recce = Marpa::R3::Scanless::R->new(
+my $recce = Marpa::R3::Recognizer->new(
     { grammar => $grammar,
     trace_terminals => 1,
     trace_values => 1,
@@ -441,7 +441,7 @@ $grammar = Marpa::R3::Grammar->new(
     source => \$slif_debug_source,
 });
 
-$recce = Marpa::R3::Scanless::R->new(
+$recce = Marpa::R3::Recognizer->new(
     { grammar => $grammar } );
 
 die if not defined $recce->read( \$test_input );

@@ -21,7 +21,7 @@ partial: 1
 normalize-whitespace: 1
 
     my @pause_location;
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar        => $parser->{grammar},
             event_handlers => {

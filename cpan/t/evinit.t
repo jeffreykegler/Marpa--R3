@@ -134,7 +134,7 @@ sub do_test {
 
     my @actual_events = ();
     my $recce =
-      Marpa::R3::Scanless::R->new( { grammar => $grammar,
+      Marpa::R3::Recognizer->new( { grammar => $grammar,
           event_handlers => {
               "'default" => sub () {
                   my ($slr, $event_name) = @_;

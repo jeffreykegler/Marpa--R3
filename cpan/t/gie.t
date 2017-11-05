@@ -316,7 +316,7 @@ for my $test_data (@tests_data) {
     my ( $grammar, $test_string, $expected_events, $test_name ) = @{$test_data};
     my @events        = ();
     my @event_history = ();
-    my $recce         = Marpa::R3::Scanless::R->new(
+    my $recce         = Marpa::R3::Recognizer->new(
         {
             grammar        => $grammar,
             event_handlers => {

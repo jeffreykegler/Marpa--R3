@@ -60,7 +60,7 @@ END_OF_SOURCE
     }
 );
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 # A function is used to generate the args, because some tests modify them
 # in-place.  The function ensures that each test has a fresh copy.

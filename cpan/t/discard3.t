@@ -262,7 +262,7 @@ END_OF_SOURCE
 sub gather_events {
     my ( $grammar, $extra_recce_args, $input ) = @_;
     my @actual_events;
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar        => $grammar,
             event_handlers => {

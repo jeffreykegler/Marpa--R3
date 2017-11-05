@@ -76,7 +76,7 @@ Marpa::R3::Test::is( $grammar->nrls_show(),
     <<'EOS', 'Aycock/Horspool NRLs' );
 EOS
 
-my $recce = Marpa::R3::Scanless::R->new( {   grammar => $grammar });
+my $recce = Marpa::R3::Recognizer->new( {   grammar => $grammar });
 # my $input_length = 11;
 # my $input = ('a' x $input_length);
 # $recce->read( \$input );

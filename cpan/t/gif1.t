@@ -447,7 +447,7 @@ for my $test_data (@tests_data) {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     if ( not defined eval { $recce->read( \$string ); 1 } ) {
         my $abbreviated_error = $EVAL_ERROR;

@@ -42,7 +42,7 @@ END_OF_DSL
 
 my $parse_count = 0;
 
-my $recce = Marpa::R3::Scanless::R->new(
+my $recce = Marpa::R3::Recognizer->new(
     { grammar => $grammar, too_many_earley_items => 10 } );
 
 my $trace_output;

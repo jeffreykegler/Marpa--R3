@@ -110,7 +110,7 @@ for my $lexical_class (keys %lexical_class) {
 
 for my $data ( 'time flies like an arrow', 'fruit flies like a banana' ) {
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     die 'Failed to create recognizer' if not $recce;
 
     my $lexeme_start = 0;

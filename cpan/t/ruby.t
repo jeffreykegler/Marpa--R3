@@ -89,7 +89,7 @@ sub test {
     my $pos;
 
     my $recce =
-      Marpa::R3::Scanless::R->new( { grammar => $g,
+      Marpa::R3::Recognizer->new( { grammar => $g,
          event_handlers => {
              q{'rejected} => sub {
                 $rejection = 1;

@@ -135,7 +135,7 @@ use constant SPACE => 0x60;
 
 for my $input_length ( 1 .. 4 ) {
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     my $input = substr( 'abcd', 0, $input_length );
     $recce->read( \$input );
 

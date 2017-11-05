@@ -118,7 +118,7 @@ my $after_handler = sub () {
 # Marpa::R3::Display
 # name: recognizer event_is_active named arg synopsis
 
-my $slr = Marpa::R3::Scanless::R->new(
+my $slr = Marpa::R3::Recognizer->new(
     {
         grammar         => $grammar,
         event_is_active => { 'before c' => 1, 'after b' => 0 },

@@ -156,7 +156,7 @@ sub test {
         );
 
         my $recce =
-          Marpa::R3::Scanless::R->new( { grammar => $g,
+          Marpa::R3::Recognizer->new( { grammar => $g,
               event_handlers => \%event_handlers1,
           }, $recce_debug_args );
         my $pos = $recce->read( \$string, $target_start );
@@ -186,7 +186,7 @@ sub test {
               }
         );
 
-        $recce = Marpa::R3::Scanless::R->new(
+        $recce = Marpa::R3::Recognizer->new(
             {   grammar    => $g,
               event_handlers => \%event_handlers2,
             },

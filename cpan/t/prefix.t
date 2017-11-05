@@ -74,7 +74,7 @@ sub My_Actions::show_last_expression {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar, } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar, } );
     my $self = bless { grammar => $grammar, recognizer => $recce }, 'My_Actions';
     my ( $parse_value, $parse_status, $last_expression );
 

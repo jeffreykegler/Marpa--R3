@@ -63,7 +63,7 @@ for my $maximal ( 0, 1 ) {
     my $dsl = $dsl{ $maximal ? 'low' : 'high' };
     my $grammar = Marpa::R3::Grammar->new(
         { ranking_method => 'high_rule_only', source => $dsl } );
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     my $input_length = 4;
     my $input        = 'a' x $input_length;

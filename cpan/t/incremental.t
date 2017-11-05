@@ -48,7 +48,7 @@ sub add {
 }
 
 my $grammar = Marpa::R3::Grammar->new( { source  => \$dsl } );
-my $recce   = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce   = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 my $input   = 'a' x $n;
 $recce->read( \$input, 0, 0 );
 

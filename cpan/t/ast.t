@@ -169,7 +169,7 @@ END_OF_SHOW_RULES_OUTPUT
 sub my_parser {
     my ( $grammar, $p_input_string ) = @_;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     $recce->read($p_input_string);
     my $value_ref = $recce->value();

@@ -39,7 +39,7 @@ my $grammar = Marpa::R3::Grammar->new(
     {   source => \$dsl }
 );
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $recce->read( \('T' x 20) );
 
 $progress_report = $recce->progress_show();

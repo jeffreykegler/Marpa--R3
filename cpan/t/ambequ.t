@@ -163,7 +163,7 @@ AHM 9: completion
     [:start:]['] ::= [:start:] .
 EOS
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 $recce->read( \'2-0*3+1' );
 

@@ -70,7 +70,7 @@ sub my_parser {
 
     my $parse_arg = bless { grammar => $grammar }, 'My_Actions';
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     $parse_arg->{recce} = $recce;
     my ( $parse_value, $parse_status, $sequence_so_far );
 

@@ -46,7 +46,7 @@ sub do_pairings {
     my $n           = shift;
     my $parse_count = 0;
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 
     $recce->read( \( 'a' x $n ) );

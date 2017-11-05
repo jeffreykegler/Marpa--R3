@@ -9,7 +9,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-package Marpa::R3::Scanless::R;
+package Marpa::R3::Recognizer;
 
 use 5.010001;
 use strict;
@@ -27,7 +27,7 @@ package Marpa::R3::Internal_R;
 use Scalar::Util qw(blessed tainted);
 use English qw( -no_match_vars );
 
-our $PACKAGE = 'Marpa::R3::Scanless::R';
+our $PACKAGE = 'Marpa::R3::Recognizer';
 
 # Given a scanless
 # recognizer and a symbol,
@@ -35,7 +35,7 @@ our $PACKAGE = 'Marpa::R3::Scanless::R';
 # and length
 # of the last such symbol completed,
 # undef if there was none.
-sub Marpa::R3::Scanless::R::last_completed {
+sub Marpa::R3::Recognizer::last_completed {
     my ( $slr, $symbol_name ) = @_;
     my ($start, $length) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -51,11 +51,11 @@ sub Marpa::R3::Scanless::R::last_completed {
 END_OF_LUA
     return if not defined $start;
     return $start, $length;
-} ## end sub Marpa::R3::Scanless::R::last_completed
+} ## end sub Marpa::R3::Recognizer::last_completed
 
 # Given a scanless recognizer and
 # and two earley sets, return the input string
-sub Marpa::R3::Scanless::R::g1_literal {
+sub Marpa::R3::Recognizer::g1_literal {
     my ( $slr, $g1_start, $g1_count ) = @_;
 
     my ($literal) = $slr->call_by_tag(
@@ -67,11 +67,11 @@ END_OF_LUA
 
    return $literal;
 
-} ## end sub Marpa::R3::Scanless::R::g1_literal
+} ## end sub Marpa::R3::Recognizer::g1_literal
 
 # Substring in terms of locations in the input stream
 # This is the one users will be most interested in.
-sub Marpa::R3::Scanless::R::literal {
+sub Marpa::R3::Recognizer::literal {
     my ( $slr, $block_id, $offset, $length ) = @_;
     my ($literal) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iii', $block_id, $offset, $length );
@@ -91,7 +91,7 @@ sub Marpa::R3::Internal::Scanless::meta_recce {
     my ($hash_args) = @_;
     state $meta_grammar = Marpa::R3::Internal::Scanless::meta_grammar();
     $hash_args->{grammar} = $meta_grammar;
-    my $self = Marpa::R3::Scanless::R->new($hash_args);
+    my $self = Marpa::R3::Recognizer->new($hash_args);
     return $self;
 } ## end sub Marpa::R3::Internal::Scanless::meta_recce
 
@@ -209,7 +209,7 @@ qq{Registering character $char_desc as symbol $symbol_id: },
     };
 }
 
-sub Marpa::R3::Scanless::R::new {
+sub Marpa::R3::Recognizer::new {
     my ( $class, @args ) = @_;
 
     my $slr = [];
@@ -225,7 +225,7 @@ sub Marpa::R3::Scanless::R::new {
 
     my $slg = $flat_args->{grammar};
     Marpa::R3::exception(
-        qq{Marpa::R3::Scanless::R::new() called without a "grammar" argument} )
+        qq{Marpa::R3::Recognizer::new() called without a "grammar" argument} )
       if not defined $slg;
     $slr->[Marpa::R3::Internal_R::SLG] = $slg;
     delete $flat_args->{grammar};
@@ -312,10 +312,10 @@ END_OF_LUA
 END_OF_LUA
 
     return $slr;
-} ## end sub Marpa::R3::Scanless::R::new
+} ## end sub Marpa::R3::Recognizer::new
 
-sub Marpa::R3::Scanless::R::DESTROY {
-    # say STDERR "In Marpa::R3::Scanless::R::DESTROY before test";
+sub Marpa::R3::Recognizer::DESTROY {
+    # say STDERR "In Marpa::R3::Recognizer::DESTROY before test";
     my $slr = shift;
     my $lua = $slr->[Marpa::R3::Internal_R::L];
 
@@ -327,7 +327,7 @@ sub Marpa::R3::Scanless::R::DESTROY {
     # In fact, the Lua interpreter may already have been destroyed,
     # so this test is necessary to avoid a warning message.
     return if not $lua;
-    # say STDERR "In Marpa::R3::Scanless::R::DESTROY after test";
+    # say STDERR "In Marpa::R3::Recognizer::DESTROY after test";
 
     my $regix = $slr->[Marpa::R3::Internal_R::REGIX];
     $slr->call_by_tag(
@@ -339,7 +339,7 @@ sub Marpa::R3::Scanless::R::DESTROY {
 END_OF_LUA
 }
 
-sub Marpa::R3::Scanless::R::set {
+sub Marpa::R3::Recognizer::set {
     my ( $slr, @args ) = @_;
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
@@ -369,9 +369,9 @@ sub Marpa::R3::Scanless::R::set {
         )
 END_OF_LUA
     return;
-} ## end sub Marpa::R3::Scanless::R::set
+} ## end sub Marpa::R3::Recognizer::set
 
-sub Marpa::R3::Scanless::R::read {
+sub Marpa::R3::Recognizer::read {
     my ( $slr, $p_string, $start_pos, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -390,7 +390,7 @@ sub Marpa::R3::Scanless::R::read {
     return $slr->block_read();
 }
 
-sub Marpa::R3::Scanless::R::resume {
+sub Marpa::R3::Recognizer::resume {
     my ( $slr, $start_pos, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -434,7 +434,7 @@ sub Marpa::R3::Grammar::parse {
         Marpa::R3::exception(
             q{$slr->parse(): second and later arguments must be ref to HASH});
     }
-    my $slr = Marpa::R3::Scanless::R->new( @recce_args, @more_args,
+    my $slr = Marpa::R3::Recognizer->new( @recce_args, @more_args,
         );
     my $input_length = ${$input_ref};
     my $length_read  = $slr->read($input_ref);
@@ -487,7 +487,7 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::R::progress_show {
+sub Marpa::R3::Recognizer::progress_show {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my ($text) = $slr->call_by_tag(
             ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -498,7 +498,7 @@ END_OF_LUA
     return $text;
 }
 
-sub Marpa::R3::Scanless::R::progress {
+sub Marpa::R3::Recognizer::progress {
     my ( $slr, $ordinal_arg ) = @_;
     my ($result) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -509,7 +509,7 @@ END_OF_LUA
     return $result;
 }
 
-sub Marpa::R3::Scanless::R::g1_progress_show {
+sub Marpa::R3::Recognizer::g1_progress_show {
     my ( $slr, $start_ordinal, $end_ordinal ) = @_;
     my ($text) = $slr->call_by_tag(
             ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -520,7 +520,7 @@ END_OF_LUA
     return $text;
 }
 
-sub Marpa::R3::Scanless::R::g1_progress {
+sub Marpa::R3::Recognizer::g1_progress {
     my ( $slr, $ordinal_arg ) = @_;
     my ($result) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -531,7 +531,7 @@ END_OF_LUA
     return $result;
 }
 
-sub Marpa::R3::Scanless::R::terminals_expected {
+sub Marpa::R3::Recognizer::terminals_expected {
     my ($slr)      = @_;
     my ($results) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -554,7 +554,7 @@ END_OF_LUA
     return $results;
 }
 
-sub Marpa::R3::Scanless::R::exhausted {
+sub Marpa::R3::Recognizer::exhausted {
     my ($slr) = @_;
     my ($is_exhausted) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -567,7 +567,7 @@ END_OF_LUA
 }
 
 # Latest and current G1 location are the same
-sub Marpa::R3::Scanless::R::g1_pos {
+sub Marpa::R3::Recognizer::g1_pos {
     my ($slr) = @_;
     my ($latest_earley_set) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -579,7 +579,7 @@ END_OF_LUA
     return $latest_earley_set;
 }
 
-sub Marpa::R3::Scanless::R::current_earleme {
+sub Marpa::R3::Recognizer::current_earleme {
     my ($slr) = @_;
     my ($current_earleme) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -592,7 +592,7 @@ END_OF_LUA
 }
 
 # Not documented, I think
-sub Marpa::R3::Scanless::R::furthest_earleme {
+sub Marpa::R3::Recognizer::furthest_earleme {
     my ($slr) = @_;
     my ($furthest_earleme) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -604,7 +604,7 @@ END_OF_LUA
     return $furthest_earleme;
 }
 
-sub Marpa::R3::Scanless::R::earleme {
+sub Marpa::R3::Recognizer::earleme {
     my ( $slr, $earley_set_id ) = @_;
     my ($earleme) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -616,7 +616,7 @@ END_OF_LUA
     return $earleme;
 }
 
-sub Marpa::R3::Scanless::R::lexeme_alternative_literal {
+sub Marpa::R3::Recognizer::lexeme_alternative_literal {
     my ( $slr, $symbol_name ) = @_;
 
     Marpa::R3::exception(
@@ -633,7 +633,7 @@ END_OF_LUA
     return;
 }
 
-sub Marpa::R3::Scanless::R::lexeme_alternative {
+sub Marpa::R3::Recognizer::lexeme_alternative {
     my ( $slr, $symbol_name, $value ) = @_;
 
     if ( Scalar::Util::tainted( $value ) ) {
@@ -668,7 +668,7 @@ END_OF_LUA
 }
 
 # Returns 0 on unthrown failure, current location on success
-sub Marpa::R3::Scanless::R::lexeme_complete {
+sub Marpa::R3::Recognizer::lexeme_complete {
     my ( $slr, $block, $offset, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -711,11 +711,11 @@ END_OF_LUA
 
     return $return_value;
 
-} ## end sub Marpa::R3::Scanless::R::lexeme_complete
+} ## end sub Marpa::R3::Recognizer::lexeme_complete
 
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
-sub Marpa::R3::Scanless::R::lexeme_read_literal {
+sub Marpa::R3::Recognizer::lexeme_read_literal {
     my ( $slr, $symbol_name, $block_id, $offset, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -759,7 +759,7 @@ END_OF_LUA
 
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
-sub Marpa::R3::Scanless::R::lexeme_read_block {
+sub Marpa::R3::Recognizer::lexeme_read_block {
     my ( $slr, $symbol_name, $value, $block_id, $offset, $length ) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -809,7 +809,7 @@ END_OF_LUA
 
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
-sub Marpa::R3::Scanless::R::lexeme_read_string {
+sub Marpa::R3::Recognizer::lexeme_read_string {
     my ( $slr, $symbol_name, $string ) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -853,7 +853,7 @@ END_OF_LUA
 
 }
 
-sub Marpa::R3::Scanless::R::g1_to_block_first {
+sub Marpa::R3::Recognizer::g1_to_block_first {
     my ( $slr, $g1_pos ) = @_;
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $g1_pos  );
@@ -868,7 +868,7 @@ sub Marpa::R3::Scanless::R::g1_to_block_first {
 END_OF_LUA
 }
 
-sub Marpa::R3::Scanless::R::g1_to_block_last {
+sub Marpa::R3::Recognizer::g1_to_block_last {
     my ( $slr, $g1_pos ) = @_;
     return $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $g1_pos  );
@@ -884,7 +884,7 @@ END_OF_LUA
 }
 
 # TODO -- Document this method ??
-sub Marpa::R3::Scanless::R::lc_brief {
+sub Marpa::R3::Recognizer::lc_brief {
     my ( $slr, $first_block, $first_pos, $last_block, $last_pos ) = @_;
     my ($desc) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii', $first_block, $first_pos, $last_block, $last_pos );
@@ -910,7 +910,7 @@ END_OF_LUA
     return $desc;
 }
 
-sub Marpa::R3::Scanless::R::line_column {
+sub Marpa::R3::Recognizer::line_column {
     my ( $slr, $block, $pos, ) = @_;
     $pos //= $slr->pos();
     $block //= -1;
@@ -924,9 +924,9 @@ sub Marpa::R3::Scanless::R::line_column {
 END_OF_LUA
 
     return $line_no, $column_no;
-} ## end sub Marpa::R3::Scanless::R::line_column
+} ## end sub Marpa::R3::Recognizer::line_column
 
-sub Marpa::R3::Scanless::R::block_new {
+sub Marpa::R3::Recognizer::block_new {
     my ( $slr, $p_string ) = @_;
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
 
@@ -938,13 +938,13 @@ sub Marpa::R3::Scanless::R::block_new {
     if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' ) {
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
         Marpa::R3::exception(
-            qq{Arg to Marpa::R3::Scanless::R::read() is $desc\n},
+            qq{Arg to Marpa::R3::Recognizer::read() is $desc\n},
             '  It should be a ref to scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
     if ( not defined ${$p_string} ) {
         Marpa::R3::exception(
-            qq{Arg to Marpa::R3::Scanless::R::read() is a ref to an undef\n},
+            qq{Arg to Marpa::R3::Recognizer::read() is a ref to an undef\n},
             '  It should be a ref to a defined scalar' );
     } ## end if ( ( my $ref_type = ref $p_string ) ne 'SCALAR' )
 
@@ -974,7 +974,7 @@ END_OF_LUA
     return $block_id;
 }
 
-sub Marpa::R3::Scanless::R::block_progress {
+sub Marpa::R3::Recognizer::block_progress {
     my ($slr, $block_id) = @_;
     my ($l0_pos, $l0_end);
     ($block_id, $l0_pos, $l0_end)
@@ -992,7 +992,7 @@ END_OF_LUA
     return $block_id, $l0_pos, $l0_end;
 }
 
-sub Marpa::R3::Scanless::R::block_set {
+sub Marpa::R3::Recognizer::block_set {
     my ($slr, $block_id) = @_;
     if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
         Marpa::R3::exception(
@@ -1018,7 +1018,7 @@ END_OF_LUA
 # block_id defaults to current block
 # block_offset defaults to don't set offset
 # length defaults to don't set eoread
-sub Marpa::R3::Scanless::R::block_move {
+sub Marpa::R3::Recognizer::block_move {
     my ($slr, $offset, $length) = @_;
     $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
             <<'END_OF_LUA', 'ii', $offset, $length );
@@ -1038,7 +1038,7 @@ END_OF_LUA
     return;
 }
 
-sub Marpa::R3::Scanless::R::block_read {
+sub Marpa::R3::Recognizer::block_read {
     my ($slr ) = @_;
     my ($offset) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -1067,7 +1067,7 @@ END_OF_LUA
     return $offset;
 }
 
-sub Marpa::R3::Scanless::R::input_length {
+sub Marpa::R3::Recognizer::input_length {
     my ( $slr, $block_id ) = @_;
     my ($length) = $slr->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -1081,7 +1081,7 @@ END_OF_LUA
 }
 
 # no return value documented
-sub Marpa::R3::Scanless::R::activate {
+sub Marpa::R3::Recognizer::activate {
     my ( $slr, $event_name, $activate ) = @_;
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
 
@@ -1101,7 +1101,7 @@ END_OF_LUA
 
 # On success, returns the old priority value.
 # Failures are thrown.
-sub Marpa::R3::Scanless::R::lexeme_priority_set {
+sub Marpa::R3::Recognizer::lexeme_priority_set {
     my ( $slr, $lexeme_name, $new_priority ) = @_;
     my ($old_priority) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -1142,7 +1142,7 @@ END_OF_LUA
 # Internal methods, not to be documented
 
 # not to be documented
-sub Marpa::R3::Scanless::R::call_by_tag {
+sub Marpa::R3::Recognizer::call_by_tag {
     my ( $slr, $tag, $codestr, $signature, @args ) = @_;
     my $lua   = $slr->[Marpa::R3::Internal_R::L];
     my $regix = $slr->[Marpa::R3::Internal_R::REGIX];
@@ -1169,7 +1169,7 @@ sub Marpa::R3::Scanless::R::call_by_tag {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::coro_by_tag {
+sub Marpa::R3::Recognizer::coro_by_tag {
     my ( $slr, $tag, $args, $codestr ) = @_;
     my $lua        = $slr->[Marpa::R3::Internal_R::L];
     my $regix      = $slr->[Marpa::R3::Internal_R::REGIX];
@@ -1231,7 +1231,7 @@ sub Marpa::R3::Scanless::R::coro_by_tag {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::earley_set_size {
+sub Marpa::R3::Recognizer::earley_set_size {
     my ($slr, $set_id) = @_;
     my ($size) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -1245,7 +1245,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::earley_sets_show {
+sub Marpa::R3::Recognizer::earley_sets_show {
     my ($slr)                = @_;
 
     my ($last_completed_earleme, $furthest_earleme) = $slr->call_by_tag(
@@ -1260,7 +1260,7 @@ END_OF_LUA
         . "Furthest: $furthest_earleme\n";
     LIST: for ( my $ix = 0;; $ix++ ) {
         my $set_desc =
-          $slr->Marpa::R3::Scanless::R::earley_set_show( $ix );
+          $slr->Marpa::R3::Recognizer::earley_set_show( $ix );
         last LIST if not $set_desc;
         $text .= "Earley Set $ix\n$set_desc";
     }
@@ -1268,7 +1268,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::earley_set_show {
+sub Marpa::R3::Recognizer::earley_set_show {
     my ( $slr, $traced_set_id ) = @_;
     my $slg     = $slr->[Marpa::R3::Internal_R::SLG];
 
@@ -1514,7 +1514,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::R::regix {
+sub Marpa::R3::Recognizer::regix {
     my ( $slr ) = @_;
     my $regix = $slr->[Marpa::R3::Internal_R::REGIX];
     return $regix;

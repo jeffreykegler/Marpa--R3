@@ -25,7 +25,7 @@ sub My_Actions::top {
     return [grep { $_ } @{$children} ];
 }
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 my $piece = 'yyyxxxyyyyyxxxxxyyyyxyyyyxxyyyyxxxxyyy';
 my $input = $piece x 3;

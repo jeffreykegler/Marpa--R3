@@ -4037,7 +4037,7 @@ TODO: Make `collected_progress_items a local, after development.
         if start_ordinal < 0 then start_ordinal = last_ordinal + 1 + start_ordinal end
         if start_ordinal > last_ordinal or start_ordinal < 0 then
              _M._internal_error(
-                "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
                  must be in range 0-%d",
                  inspect(start_ordinal_arg, {depth=1}),
                  last_ordinal
@@ -4047,7 +4047,7 @@ TODO: Make `collected_progress_items a local, after development.
         if end_ordinal < 0 then end_ordinal = last_ordinal + 1 + end_ordinal end
         if end_ordinal > last_ordinal or end_ordinal < 0 then
              _M._internal_error(
-                "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
                  must be in range 0-%d",
                  inspect(end_ordinal_arg, {depth=1}),
                  last_ordinal
@@ -4244,7 +4244,7 @@ TODO: Make `collected_progress_items a local, after development.
       if start_ordinal < 0 then start_ordinal = last_ordinal + 1 + start_ordinal end
       if start_ordinal > last_ordinal or start_ordinal < 0 then
         _M._internal_error(
-        "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+        "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
         must be in range 0-%d",
         inspect(start_ordinal_arg, {depth=1}),
         last_ordinal
@@ -4254,7 +4254,7 @@ TODO: Make `collected_progress_items a local, after development.
       if end_ordinal < 0 then end_ordinal = last_ordinal + 1 + end_ordinal end
       if end_ordinal > last_ordinal or end_ordinal < 0 then
         _M._internal_error(
-        "Marpa::R3::Scanless::R::g1_progress_show start index is %d, \z
+        "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
         must be in range 0-%d",
         inspect(end_ordinal_arg, {depth=1}),
         last_ordinal

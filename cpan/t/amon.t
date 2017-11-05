@@ -45,7 +45,7 @@ my $g = Marpa::R3::Grammar->new(
 );
 
 my @events = ();
-my $recce = Marpa::R3::Scanless::R->new(
+my $recce = Marpa::R3::Recognizer->new(
     {
         grammar        => $g,
         event_handlers => {

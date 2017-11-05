@@ -61,7 +61,7 @@ $grammar = Marpa::R3::Grammar->new(
         source            => \$dsl
     }
 );
-$recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+$recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $input = '2*1+3*4+5';
 $pos   = 0;
 $recce->read( \$input, 0, 0 );

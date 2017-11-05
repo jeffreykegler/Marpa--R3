@@ -113,7 +113,7 @@ my @events = ();
 my @event_history = ();
 my $next_lexeme_length = undef;
 
-my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar,
+my $slr = Marpa::R3::Recognizer->new( { grammar => $grammar,
     event_handlers => {
         "'default" => sub () {
             my ($slr, $event_name, undef, undef, undef, $length) = @_;

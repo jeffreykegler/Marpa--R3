@@ -102,7 +102,7 @@ my $sentence = 'a panda eats shoots and leaves.';
 
 my @actual = ();
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 $recce->read( \$sentence );
 
@@ -120,7 +120,7 @@ Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
 
 my $panda_grammar = Marpa::R3::Grammar->new(
     { source => \$dsl, bless_package => 'PennTags', } );
-my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
+my $panda_recce = Marpa::R3::Recognizer->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );
 my $asf = Marpa::R3::ASF->new( { recognizer => $panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );

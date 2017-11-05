@@ -69,7 +69,7 @@ END_OF_SOURCE
 );
 
 sub do_parse {
-    my $slr = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+    my $slr = Marpa::R3::Recognizer->new( { grammar => $grammar } );
     $slr->read( \'aaaaaaaaaa' );
     return $slr->value();
 } ## end sub do_parse

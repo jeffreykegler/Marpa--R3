@@ -92,7 +92,7 @@ END_OF_DSL
     }
 );
 
-my $slr = Marpa::R3::Scanless::R->new( { grammar => $slg } );
+my $slr = Marpa::R3::Recognizer->new( { grammar => $slg } );
 
 $slr->read( \'x' );
 

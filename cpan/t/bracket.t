@@ -158,7 +158,7 @@ sub test {
     my $rejection_is_fatal = undef;
     my $stalled            = undef;
 
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar        => $grammar,
             event_handlers => {

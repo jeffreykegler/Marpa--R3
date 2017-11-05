@@ -336,7 +336,7 @@ AHM 68: completion
     [:start:]['] ::= [:start:] .
 END_OF_AHMS
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $recce->read( \$input );
 my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
 my $value_ref = $valuer->value();

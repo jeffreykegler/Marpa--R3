@@ -46,7 +46,7 @@ in the I<Hitchhiker's Guide>, which describes the Earth as
 In Marpa::R3, events have been changed from an event-driven
 mechanism to a callback mechanism.
 A new C<events_handlers> named argument has been added to
-C<< Marpa::R3::Scanless::R::new() >>.
+C<< Marpa::R3::Recognizer::new() >>.
 The
 C<< $slr->events() >> method has been
 removed.
@@ -335,7 +335,7 @@ Mostly unchanged.
 
 =head2 ambiguity_metric()
 
-The C<Marpa::R2::Scanless::R::ambiguity_metric()> method
+The C<Marpa::R2::Recognizer::ambiguity_metric()> method
 has been removed.
 Its purpose is now served by the 
 valuer's
@@ -343,14 +343,14 @@ C<ambiguity_level()> method.
 
 =head2 ambiguous()
 
-The C<Marpa::R2::Scanless::R::ambiguous()> method
+The C<Marpa::R2::Recognizer::ambiguous()> method
 has been removed.
 Its purpose is now served by the 
 valuer's C<ambiguous()> method.
 
 =head2 current_g1_location()
 
-The C<Marpa::R2::Scanless::R::current_g1_location()> method
+The C<Marpa::R2::Recognizer::current_g1_location()> method
 has been removed.
 Its purpose is now served by the 
 Marpa::R3 recognizer's C<block_progress()> method.
@@ -413,25 +413,25 @@ Mostly unchanged.
 
 =head2 lexeme_read()
 
-The C<Marpa::R2::Scanless::R::lexeme_read()> method
+The C<Marpa::R2::Recognizer::lexeme_read()> method
 has been removed.
 Its function is provided by the new
-C<Marpa::R2::Scanless::R::lexeme_read_block()>
-and C<Marpa::R2::Scanless::R::lexeme_read_string()>
+C<Marpa::R2::Recognizer::lexeme_read_block()>
+and C<Marpa::R2::Recognizer::lexeme_read_string()>
 methods.
-C<Marpa::R2::Scanless::R::lexeme_read()> may reappear
+C<Marpa::R2::Recognizer::lexeme_read()> may reappear
 in a non-backward-compatible form.
 
 =head2 line_column()
 
 The interface to
-C<Marpa::R2::Scanless::R::line_column()> has changed
+C<Marpa::R2::Recognizer::line_column()> has changed
 to allow multi-block input.
 
 =head2 literal()
 
 The interface to
-C<Marpa::R2::Scanless::R::literal()> has changed
+C<Marpa::R2::Recognizer::literal()> has changed
 to allow multi-block input.
 
 =head2 new()
@@ -445,7 +445,7 @@ Removed.
 
 =head2 pause_span()
 
-The C<Marpa::R2::Scanless::R::pause_span()> method
+The C<Marpa::R2::Recognizer::pause_span()> method
 has been removed.
 Event location information is now available
 as arguments to the
@@ -457,7 +457,7 @@ Mostly unchanged.
 
 =head2 progress()
 
-C<Marpa::R2::Scanless::R::progress()> reported
+C<Marpa::R2::Recognizer::progress()> reported
 the dot position of completions as -1.
 In Marpa::R3,
 C<< $slr->progress() >> reports

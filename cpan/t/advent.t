@@ -129,7 +129,7 @@ for my $test_data (@tests) {
             my $full_dsl = $base_dsl . $suit_line;
             my $grammar =
                 Marpa::R3::Grammar->new( { source => \$full_dsl } );
-            my $re = Marpa::R3::Scanless::R->new(
+            my $re = Marpa::R3::Recognizer->new(
                 {
                     grammar        => $grammar,
                     event_handlers => {

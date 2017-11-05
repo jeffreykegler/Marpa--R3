@@ -133,7 +133,7 @@ my %s_tags = map { $_ => undef } qw{ NP VP PP period };
 my @actual = ();
 for my $sentence (split /\n/, $paragraph){
 
-    my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar  } );
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar  } );
     $recce->read( \$sentence );
 
     my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce  } );

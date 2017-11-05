@@ -215,7 +215,7 @@ sub Marpa::R3::Scanless::V::new {
     $slv->[Marpa::R3::Internal_V::SLR] = $slr;
     delete $flat_args->{recognizer};
 
-    my $slr_class = 'Marpa::R3::Scanless::R';
+    my $slr_class = 'Marpa::R3::Recognizer';
     if ( not blessed $slr or not $slr->isa($slr_class) ) {
         my $ref_type = ref $slr;
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
@@ -737,7 +737,7 @@ sub Marpa::R3::Scanless::V::ambiguous {
     my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
     my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
     return Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
-} ## end sub Marpa::R3::Scanless::R::ambiguous
+} ## end sub Marpa::R3::Recognizer::ambiguous
 
 sub Marpa::R3::Scanless::V::ambiguity_level {
     my ($slv) = @_;

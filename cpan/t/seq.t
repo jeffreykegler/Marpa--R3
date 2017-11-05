@@ -66,7 +66,7 @@ sub run_sequence_test {
             "min=$minimum;"
           . ( $separation ne 'none' ? "$separation;" : q{} )
           . ";count=$symbol_count";
-        my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+        my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
         my $separator = $separation eq 'none' ? q{} : q{!};
         my @input     = ( ('a') x $symbol_count );

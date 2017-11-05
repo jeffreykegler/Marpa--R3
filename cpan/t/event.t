@@ -129,7 +129,7 @@ EVENT: for my $event (@events) {
 sub do_test {
     my ( $test, $slg, $string, $expected_events, $reactivate_events ) = @_;
     my @actual_events = ();
-    my $recce = Marpa::R3::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar        => $grammar,
             event_handlers => {

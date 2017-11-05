@@ -150,7 +150,7 @@ sub do_test {
     };
 
     my $slr =
-      Marpa::R3::Scanless::R->new( { grammar => $grammar }, $extra_args,
+      Marpa::R3::Recognizer->new( { grammar => $grammar }, $extra_args,
         { event_handlers  => {
             'after a'  => $after_handler,
             'after b'  => $after_handler,

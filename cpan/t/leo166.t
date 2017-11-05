@@ -84,7 +84,7 @@ END_OF_STRING
 my $length = 50;
 my $input = 'a' x $length;
 
-my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $recce->read( \$input, 0, 0 );
 
 my $g1_pos = $recce->g1_pos();

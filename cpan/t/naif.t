@@ -39,7 +39,7 @@ y ~ 'z'
 END_OF_DSL
 
 my $grammar = Marpa::R3::Grammar->new( { source => \$dsl } ); 
-my $rec = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
+my $rec = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
 $rec->read( \'zz', 0, 0);
 $rec->lexeme_alternative('x',\undef);
