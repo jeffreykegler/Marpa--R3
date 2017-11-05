@@ -108,7 +108,7 @@ my @test_data = (
     ]
 );
 
-my $g = Marpa::R3::Scanless::G->new(
+my $g = Marpa::R3::Grammar->new(
     {
         semantics_package => 'main',
         source            => \$dsl

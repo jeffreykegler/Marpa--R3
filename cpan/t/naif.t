@@ -38,7 +38,7 @@ x ~ 'z'
 y ~ 'z'
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } ); 
+my $grammar = Marpa::R3::Grammar->new( { source => \$dsl } ); 
 my $rec = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
 $rec->read( \'zz', 0, 0);

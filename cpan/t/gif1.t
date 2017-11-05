@@ -31,7 +31,7 @@ use Marpa::R3;
 
 my @tests_data = ();
 
-my $aaaa_grammar = Marpa::R3::Scanless::G->new(
+my $aaaa_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
     :start ::= quartet
     quartet ::= a a a a
@@ -54,7 +54,7 @@ END_OF_ASF
     ]
     if 1;
 
-my $abcd_grammar = Marpa::R3::Scanless::G->new(
+my $abcd_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
     :start ::= quartet
     quartet ::= a b c d
@@ -71,7 +71,7 @@ END_OF_SOURCE
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 
-my $venus_grammar = Marpa::R3::Scanless::G->new(
+my $venus_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= planet
 planet ::= hesperus
@@ -129,7 +129,7 @@ END_OF_ASF
 # start-after-line: END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 
-my $bb_grammar = Marpa::R3::Scanless::G->new(
+my $bb_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= top
 top ::= b b
@@ -171,7 +171,7 @@ END_OF_OUTPUT
 
 # Marpa::R3::Display::End
 
-my $seq_grammar = Marpa::R3::Scanless::G->new(
+my $seq_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= sequence
 sequence ::= item+
@@ -245,7 +245,7 @@ END_OF_ASF
     ]
     if 1;
 
-my $venus_seq_grammar = Marpa::R3::Scanless::G->new(
+my $venus_seq_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= sequence
 sequence ::= item+
@@ -291,7 +291,7 @@ END_OF_ASF
     ]
     if 1;
 
-my $nulls_grammar = Marpa::R3::Scanless::G->new(
+my $nulls_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= top
 top ::= a a a a

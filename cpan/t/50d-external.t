@@ -302,7 +302,7 @@ sub hi_valuer {
 
 {
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
             bless_package => 'Calc_Nodes',
             source        => \(<<'END_OF_SOURCE'),

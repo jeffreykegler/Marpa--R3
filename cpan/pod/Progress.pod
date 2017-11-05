@@ -1010,7 +1010,7 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_SOURCE
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
         bless_package => 'My_Nodes',
         source => \$slif_debug_source,

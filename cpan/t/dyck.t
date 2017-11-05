@@ -53,7 +53,7 @@ event 'expecting text' = predicted <text>
 text ~ [\d\D]
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \$dsl

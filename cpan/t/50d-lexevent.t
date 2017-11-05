@@ -59,7 +59,7 @@ $rules =~ s/=off$//gxms;
 my $events_expected = <<'END_OF_EVENTS';
 END_OF_EVENTS
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     { semantics_package => 'My_Actions', source => \$rules } );
 
 my $expected_events = <<'END_OF_EVENTS';
@@ -91,7 +91,7 @@ END_OF_EVENTS
 # Yet another time, with initializers
 $expected_events =~ s/^\d+ \s after \s b \n//gxms;
 $rules   = $base_rules;
-$grammar = Marpa::R3::Scanless::G->new(
+$grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \$rules

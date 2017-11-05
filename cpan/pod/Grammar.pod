@@ -20,7 +20,7 @@ name: Scanless grammar synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
             semantics_package => 'My_Actions',
             source          => \(<<'END_OF_SOURCE'),
@@ -78,7 +78,7 @@ Specifies the name of a Perl package.
 The package is used
 for blessing node values into a Perl class,
 in conjunction with the
-L<C<bless> adverb|Marpa::R3::Scanless::DSL/"bless">.
+L<C<bless> adverb|Marpa::R3::DSL/"bless">.
 C<bless_package> should not be confused with the
 L<C<semantics_package>
 grammar setting|Marpa::R3::Grammar/"semantics_package">.
@@ -169,7 +169,7 @@ The value of the C<source> named argument must be a reference
 to a string which contains a description of the grammar.
 The string's format is a domain-specific language,
 described L<in its own
-document|Marpa::R3::Scanless::DSL>.
+document|Marpa::R3::DSL>.
 
 =head2 trace_file_handle
 
@@ -187,7 +187,7 @@ name: Landing page synopsis
 normalize-whitespace: 1
 partial: 1
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
             semantics_package => 'My_Actions',
             source            => \$dsl
@@ -396,7 +396,7 @@ name: SLG production_name() synopsis
 
 Given a production ID, returns the production name.
 A production name is as defined by
-L<the C<name> adverb|Marpa::R3::Scanless::DSL/"name">.
+L<the C<name> adverb|Marpa::R3::DSL/"name">.
 If no production name was defined,
 the production name is the name of
 the LHS symbol.

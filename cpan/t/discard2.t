@@ -30,7 +30,7 @@ use Marpa::R3::Test;
 
 use Marpa::R3;
 
-my $null_grammar = Marpa::R3::Scanless::G->new(
+my $null_grammar = Marpa::R3::Grammar->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start,g1length,name,values]
@@ -60,7 +60,7 @@ for my $input ( q{}, ' ', '  ', '   ' ) {
 } ## end for my $input ( q{}, ' ', '  ', '   ' )
 
 # Test of 2 types of events
-my $grammar2 = Marpa::R3::Scanless::G->new(
+my $grammar2 = Marpa::R3::Grammar->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start,g1length,name,values]
@@ -97,7 +97,7 @@ for my $input ( q{ (x) }, q{(x) }, q{ (x)})
 
 # Discards with a non-trivial grammar
 
-my $non_trivial_grammar = Marpa::R3::Scanless::G->new(
+my $non_trivial_grammar = Marpa::R3::Grammar->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => [g1start,g1length,name,values]

@@ -87,7 +87,7 @@ rsquare ~ <deep rsquare>
 # Marpa::R3::Display
 # name: exhaustion grammar setting synopsis part 1
 
-    my $g = Marpa::R3::Scanless::G->new(
+    my $g = Marpa::R3::Grammar->new(
         {
             source     => \$dsl,
             exhaustion => 'event',

@@ -36,7 +36,7 @@ use Scalar::Util;
 # Marpa::R3::Display
 # name: ASF low-level calls synopsis, code part 1
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= pair
 pair ::= duple | item item

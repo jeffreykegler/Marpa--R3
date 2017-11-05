@@ -108,7 +108,7 @@ for my $event_line  (split /\n/xms, $all_events_expected)
     push @events, @pos_events;
 }
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     { semantics_package => 'My_Actions', source => \$rules } );
 
 # Test of all events

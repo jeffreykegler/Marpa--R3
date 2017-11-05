@@ -404,7 +404,7 @@ for my $test_data (@tests_data) {
         my $grammar;
         if (
             not defined eval {
-                $grammar = Marpa::R3::Scanless::G->new( { source => $source } );
+                $grammar = Marpa::R3::Grammar->new( { source => $source } );
                 1;
             }
           )
@@ -418,7 +418,7 @@ for my $test_data (@tests_data) {
             $actual_value  = 'SLIF grammar failed';
             $actual_result = $abbreviated_error;
             last PROCESSING;
-        } ## end if ( not defined eval { $grammar = Marpa::R3::Scanless::G...})
+        } ## end if ( not defined eval { $grammar = Marpa::R3::Grammar...})
         my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 
         if ( not defined eval { $recce->read( \$input ); 1 } ) {

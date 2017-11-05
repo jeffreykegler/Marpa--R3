@@ -3,7 +3,7 @@ use 5.010;
 use Data::Dumper;
 use Marpa::R3;
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   source        => \(<<'END_OF_DSL'),
 :default ::= action => [name,values]
 lexeme default = action => [ start, length, value ]

@@ -48,7 +48,7 @@ sub test_grammar {
     my $trace;
     my $memory;
     my $eval_ok = eval {
-        my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+        my $grammar = Marpa::R3::Grammar->new( { source => \$dsl } );
         1;
     };
     my $eval_error = $EVAL_ERROR;

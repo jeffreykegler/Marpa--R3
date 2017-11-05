@@ -45,7 +45,7 @@ sub do_global_test {
     Test::More::is_deeply( \@actual, $expected, $test_name);
 }
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   
         source          => \(<<'END_OF_SOURCE'),
 Expression ::=

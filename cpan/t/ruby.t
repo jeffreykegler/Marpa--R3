@@ -47,7 +47,7 @@ semi ~ ';'
 # Marpa::R3::Display
 # name: rejection grammar setting synopsis part 1
 
-my $g = Marpa::R3::Scanless::G->new(
+my $g = Marpa::R3::Grammar->new(
     {
         source    => \($grammar),
         rejection => 'event'

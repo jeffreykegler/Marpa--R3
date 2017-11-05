@@ -38,7 +38,7 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
             semantics_package => 'My_Actions',
             source            => \$dsl
@@ -102,7 +102,7 @@ The explanation will assume that the reader
 understands BNF and the basics of grammars -- what rules are,
 what symbols are, what the start symbol of a grammar is, etc.
 
-=head2 Marpa::R3::Scanless::G::new
+=head2 Marpa::R3::Grammar::new
 
 =for Marpa::R3::Display
 name: Landing page synopsis
@@ -126,7 +126,7 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
             semantics_package => 'My_Actions',
             source            => \$dsl
@@ -143,7 +143,7 @@ with the
 L<Marpa::R3::Scanless:G::new|Marpa::R3::Grammar/"Constructor">
 constructor.
 The arguments to
-L<Marpa::R3::Scanless::G::new|Marpa::R3::Grammar/"Constructor">
+L<Marpa::R3::Grammar::new|Marpa::R3::Grammar/"Constructor">
 are references to
 hashes of named arguments.
 In the key/value pairs of these hashes,
@@ -366,7 +366,7 @@ then all of these ``longest'' tokens are considered in the parse.
 The logic of SLIF lexing is described with more precision in the
 L<SLIF overview document|Marpa::R3::Scanless>.
 
-=head2 Marpa::R3::Scanless::G::parse
+=head2 Marpa::R3::Grammar::parse
 
 =for Marpa::R3::Display
 name: Landing page synopsis
@@ -380,8 +380,8 @@ normalize-whitespace: 1
 
 To parse a string,
 we use
-the C<Marpa::R3::Scanless::G::parse()> method.
-C<Marpa::R3::Scanless::G::parse()> requires a reference
+the C<Marpa::R3::Grammar::parse()> method.
+C<Marpa::R3::Grammar::parse()> requires a reference
 to a string as its first argument.
 
 =head2 Semantics

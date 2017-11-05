@@ -35,7 +35,7 @@ our $DEBUG = 0;
 
 # In crediting test, JDD = Jean-Damien Durand
 if (1) {
-    my $glenn_grammar = Marpa::R3::Scanless::G->new(
+    my $glenn_grammar = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
             :default ::= action => ::array
 
@@ -69,7 +69,7 @@ END_OF_SOURCE
 # end-before-line: '^END_OF_SOURCE$'
 
 if (1) {
-    my $ic_grammar = Marpa::R3::Scanless::G->new(
+    my $ic_grammar = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
             :default ::= action => ::array
 
@@ -98,7 +98,7 @@ END_OF_SOURCE
 } ## end if (0)
 
 if (1) {
-    my $durand_grammar1 = Marpa::R3::Scanless::G->new(
+    my $durand_grammar1 = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 start symbol is test
@@ -134,7 +134,7 @@ INPUT
 # ===============
 
 if (1) {
-    my $durand_grammar2 = Marpa::R3::Scanless::G->new(
+    my $durand_grammar2 = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 test ::= 'test input' NEWLINE
@@ -168,7 +168,7 @@ INPUT
 # ===============
 
 if (1) {
-    my $durand_grammar3 = Marpa::R3::Scanless::G->new(
+    my $durand_grammar3 = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 
@@ -210,7 +210,7 @@ INPUT
 # Regression test of grammar without lexers --
 # based on one from Jean-Damien
 if (1) {
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::undef
 :start ::= null
@@ -256,7 +256,7 @@ Descriptive line
 1,10 1,10 1,30
 INPUT
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input,
         [ '130.12312', 'Descriptive line', '1,10', '1,10', '1,30' ],
@@ -280,7 +280,7 @@ END_OF_SOURCE
     my $expected_output =
         [ 'UID', ':', 'urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1' ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of LATM token from Ruslan Zakirov'
@@ -303,7 +303,7 @@ END_OF_SOURCE
     my $expected_output =
         [ 'UID', ':', 'urn:uuid:4fbe8971-0bc3-424c-9c26-36c3e1eff6b1' ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of LATM token using lexeme default statement'
@@ -346,7 +346,7 @@ END_OF_INPUT
         ]
     ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rank adverb for display'
@@ -372,7 +372,7 @@ END_OF_SOURCE
     my $expected_output =
         [ 5, 0, [ 3, 1, [ 2, undef, '42' ] ], [ 4, 2, [ 1, undef, '43' ] ] ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rule array item descriptor for action adverb'
@@ -408,7 +408,7 @@ END_OF_SOURCE
         [ 'number2', 'number 2', [ 'forty three', 'forty three', '43' ] ]
     ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rule array item descriptor for action adverb'
@@ -444,7 +444,7 @@ END_OF_SOURCE
         [ [ 'x' ] ]
     ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of "Inaccessible is ok"}
@@ -473,7 +473,7 @@ END_OF_SOURCE
 
         my $this_source = $source;
         $this_source =~ s/!START!/$this_start/;
-        my $grammar = Marpa::R3::Scanless::G->new( { source => \$this_source } );
+        my $grammar = Marpa::R3::Grammar->new( { source => \$this_source } );
         do_test(
             $grammar, $input, $expected_output,
             'Parse OK', qq{Test of changing start symbols: <$this_start>}
@@ -501,7 +501,7 @@ END_OF_SOURCE
     my $input           = "[[X]] [[Y]]";
     my $expected_output = [ $input ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test 1 of lazy long brackets}
@@ -528,7 +528,7 @@ END_OF_SOURCE
     my $input           = "[[X]] [[Y]]";
     my $expected_output = [ $input ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test 2 of lazy long brackets}
@@ -561,7 +561,7 @@ END_OF_SOURCE
     my $input           = "[[X]] [[Y]]";
     my $expected_output = [ '[[X]]', '[[Y]]' ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of eager long brackets}
@@ -600,7 +600,7 @@ END_OF_SOURCE
     my $input           = "abc//xyz\ndef";
     my $expected_output = [ 'abc', 'def' ];
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', qq{Test of eager discard}
@@ -634,7 +634,7 @@ END_OF_SOURCE
         for my $right_piece (@right_pieces) {
             my $input = join " ", $left_piece, $right_piece;
             my $expected_output = [ $left_piece, $right_piece ];
-            my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+            my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
             do_test( $grammar, $input, $expected_output, 'Parse OK',
                 qq{Test of eager discard for "$input"} );
         }
@@ -660,7 +660,7 @@ END_OF_SOURCE
     my $input           = 'X';
     my $expected_output = 'X';
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
 
 my $start_id;
 

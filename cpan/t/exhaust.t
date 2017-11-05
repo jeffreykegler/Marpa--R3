@@ -42,19 +42,19 @@ END_OF_SOURCE
 (my $source_plus = $source_template) =~ s/ %QUANTIFIER% / + /xms;
 (my $source_star = $source_template) =~ s/ %QUANTIFIER% / * /xms;
 
-my $grammar_bare = Marpa::R3::Scanless::G->new(
+my $grammar_bare = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \$source_bare
     }
 );
-my $grammar_plus = Marpa::R3::Scanless::G->new(
+my $grammar_plus = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \$source_plus
     }
 );
-my $grammar_star = Marpa::R3::Scanless::G->new(
+my $grammar_star = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \$source_star

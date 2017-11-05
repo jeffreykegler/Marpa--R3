@@ -33,7 +33,7 @@ my $tainted_grammar = q{:start ::= A A ~ 'a' # } . $^X;
 # Make sure we fail with tainted data
 # -T flag was set on first line for this script
 my $eval_ok = eval {
-    Marpa::R3::Scanless::G->new( { source => \$tainted_grammar } );
+    Marpa::R3::Grammar->new( { source => \$tainted_grammar } );
     1;
 };
 if ($eval_ok) {

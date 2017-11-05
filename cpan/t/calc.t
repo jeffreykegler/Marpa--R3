@@ -30,7 +30,7 @@ use Marpa::R3::Test;
 
 use Marpa::R3;
 
-my $calculator_grammar = Marpa::R3::Scanless::G->new(
+my $calculator_grammar = Marpa::R3::Grammar->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array bless => ::lhs
@@ -214,7 +214,7 @@ END_OF_GRAMMAR
 
 do_test(
     'Priority test 1',
-    Marpa::R3::Scanless::G->new(
+    Marpa::R3::Grammar->new(
         {   bless_package => 'My_Nodes',
             source        => \$priority_grammar,
         }
@@ -225,7 +225,7 @@ do_test(
 (my $priority_grammar2 = $priority_grammar) =~ s/priority \s+ => \s+ 1$/priority => -1/xms;
 do_test(
     'Priority test 2',
-    Marpa::R3::Scanless::G->new(
+    Marpa::R3::Grammar->new(
         {   bless_package => 'My_Nodes',
             source        => \$priority_grammar2,
         }

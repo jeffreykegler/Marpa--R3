@@ -40,7 +40,7 @@ my $input = "1\x{0A}2\x{0D}3\x{0D}\x{0A}4${NEL}5\x{0A}\x{0D}\x{0A}7"
   . ( "\x{0A}" x 3 ) # 3 lines
   . ( "\x{0A}\x{0D}" x 4 ) #  5 lines -- 3 medial CRLF, plus 2 at ends
   . '24';
-my $g = Marpa::R3::Scanless::G->new({source => \$dsl});
+my $g = Marpa::R3::Grammar->new({source => \$dsl});
 my $r = Marpa::R3::Scanless::R->new({grammar => $g});
 
 # We do not need to actually read the input

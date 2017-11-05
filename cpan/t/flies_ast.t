@@ -57,7 +57,7 @@ use Marpa::R3;
 # Marpa::R3::Display
 # name: time-flies DSL synopsis
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 
 :default     ::= action => [ name, values ]

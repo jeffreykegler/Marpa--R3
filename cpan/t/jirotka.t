@@ -33,7 +33,7 @@ use Marpa::R3;
 # Regression test for bug originally found and documented
 # by Tomas Jirotka
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'Maql_Actions',
         source            => \<<'END_OF_DSL',

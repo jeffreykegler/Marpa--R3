@@ -5,7 +5,7 @@ use Marpa::R2;
 use strict;
 use warnings;
 
-my $grammar = Marpa::R2::Scanless::G->new(
+my $grammar = Marpa::R2::Grammar->new(
     {   source        => \(<<'END_OF_DSL'),
 :default ::= action => [name,values]
 lexeme default = action => [ start, length, value ]

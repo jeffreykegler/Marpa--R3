@@ -71,7 +71,7 @@ END_OF_SOURCE
 
 # Marpa::R3::Display::End
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     { bless_package => 'PennTags', source => \$dsl, } );
 
 # Marpa::R3::Display
@@ -118,7 +118,7 @@ Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
 # Marpa::R3::Display
 # name: ASF synopsis code
 
-my $panda_grammar = Marpa::R3::Scanless::G->new(
+my $panda_grammar = Marpa::R3::Grammar->new(
     { source => \$dsl, bless_package => 'PennTags', } );
 my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );

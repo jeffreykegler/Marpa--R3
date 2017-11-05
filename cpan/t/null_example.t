@@ -72,7 +72,7 @@ sub null_R { return 'null R'; }
 sub null_X { return 'null X'; }
 sub null_Y { return 'null Y'; }
 
-my $slg = Marpa::R3::Scanless::G->new(
+my $slg = Marpa::R3::Grammar->new(
     {
         semantics_package => 'main',
         source            => \<<'END_OF_DSL',

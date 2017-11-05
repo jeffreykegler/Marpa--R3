@@ -90,7 +90,7 @@ shown above, and another which "prunes" the forest down to a single tree.
 name: ASF synopsis code
 normalize-whitespace: 1
 
-    my $panda_grammar = Marpa::R3::Scanless::G->new(
+    my $panda_grammar = Marpa::R3::Grammar->new(
         { source => \$dsl, bless_package => 'PennTags', } );
     my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
     $panda_recce->read( \$sentence );

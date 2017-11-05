@@ -77,8 +77,8 @@ require Marpa::R3::MetaG;
     and die 'Marpa::R3::MetaG::VERSION ', $version_result;
 
 require Marpa::R3::SLG;
-( $version_result = version_ok($Marpa::R3::Scanless::G::VERSION) )
-    and die 'Marpa::R3::Scanless::G::VERSION ', $version_result;
+( $version_result = version_ok($Marpa::R3::Grammar::VERSION) )
+    and die 'Marpa::R3::Grammar::VERSION ', $version_result;
 
 require Marpa::R3::SLR;
 ( $version_result = version_ok($Marpa::R3::Scanless::R::VERSION) )

@@ -66,7 +66,7 @@ EVENTS
 } ## end foreach ( qw/Script/, ( map {"digits$_"} ( 1 .. 2 ) ), ( ...))
 
 my $loc0_input = '    1 2';
-my $loc0_grammar = Marpa::R3::Scanless::G->new( { source  => \$loc0_dsl } );
+my $loc0_grammar = Marpa::R3::Grammar->new( { source  => \$loc0_dsl } );
 my $loc0_events = <<'END_OF_EXPECTED_EVENTS';
 0: ^Script ^digits1 null1[] null2[]
 1: ^digits2 digits1$ null3[] null4[]
@@ -91,7 +91,7 @@ DUP  ~ _S_ANY _S
 :discard ~ _S_MANY
 END_OF_DSL
     my $reject_dup_grammar =
-        Marpa::R3::Scanless::G->new( { source => \$reject_dup_dsl } );
+        Marpa::R3::Grammar->new( { source => \$reject_dup_dsl } );
     my $reject_dup_input = " x y\n\n";
     my $reject_dup_events = '1: DUP$' . "\n";
     push @tests_data,
@@ -125,7 +125,7 @@ END_OF_DSL
 # Marpa::R3::Display::End
 
     my $grammar =
-        Marpa::R3::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Grammar->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = <<'END_OF_EVENTS';
 1: semicolon
@@ -172,7 +172,7 @@ END_OF_DSL
 
 # Marpa::R3::Display::End
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$dsl } );
     my $input   = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events  = q{};
     if ( $default eq 'on' ) {
@@ -212,7 +212,7 @@ period ~ [.]
 END_OF_DSL
 
     my $grammar =
-        Marpa::R3::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Grammar->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events  = <<'END_OF_EVENTS';
 1: semicolon
@@ -249,7 +249,7 @@ ws ~ [\s]+
 END_OF_DSL
 
     my $grammar =
-        Marpa::R3::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Grammar->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = <<'END_OF_EVENTS';
 1: [\x3B]
@@ -292,7 +292,7 @@ END_OF_DSL
 # Marpa::R3::Display::End
 
     my $grammar =
-        Marpa::R3::Scanless::G->new( { source => \$dsl } );
+        Marpa::R3::Grammar->new( { source => \$dsl } );
     my $input = "1,2; 3,42.  1729,8675309; 8675311,711.";
     my $events = <<'END_OF_EVENTS';
 1: [\x3B]

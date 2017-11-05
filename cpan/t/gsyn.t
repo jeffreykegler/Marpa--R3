@@ -32,7 +32,7 @@ use Marpa::R3::Test;
 
 use Marpa::R3;
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \(<<'END_OF_SOURCE'),

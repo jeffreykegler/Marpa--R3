@@ -62,7 +62,7 @@ sub do_preposition       { my @v = @{$_[1]}; return "pr(${$v[0]})" }
 
 ## use critic
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'main',
         source => \<<'END_OF_DSL',

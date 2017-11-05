@@ -53,7 +53,7 @@ A ::=
 A ::= 'a'
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
+my $grammar = Marpa::R3::Grammar->new( {   source => \$dsl });
 
 Marpa::R3::Test::is( $grammar->productions_show(), <<'EOS', 'Aycock/Horspool Rules' );
 R1 [:start:] ::= S

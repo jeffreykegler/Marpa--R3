@@ -44,7 +44,7 @@ sub My_Actions::join_contents {
     return join '', @elements;
 }
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \<<'END_OF_SOURCE',

@@ -108,7 +108,7 @@ for my $pos_events  (split /\n/xms, $all_events_expected)
     push @events, @pos_events;
 }
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     { semantics_package => 'My_Actions', source => \$rules } );
 
 my $location_0_event = qq{0 ^a\n} ;

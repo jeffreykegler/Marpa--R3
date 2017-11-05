@@ -9,7 +9,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-package Marpa::R3::Scanless::G;
+package Marpa::R3::Grammar;
 
 use 5.010001;
 use strict;
@@ -28,7 +28,7 @@ use Scalar::Util 'blessed';
 use English qw( -no_match_vars );
 
 # names of packages for strings
-our $PACKAGE = 'Marpa::R3::Scanless::G';
+our $PACKAGE = 'Marpa::R3::Grammar';
 
 # The bare mininum Scanless grammer, suitable as a base
 # for both metagrammar and user grammars.
@@ -70,7 +70,7 @@ END_OF_LUA
 
 sub Marpa::R3::Internal::Scanless::meta_grammar {
 
-    my $meta_slg = pre_construct('Marpa::R3::Scanless::G');
+    my $meta_slg = pre_construct('Marpa::R3::Grammar');
 
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
     Marpa::R3::Internal_G::hash_to_runtime( $meta_slg, $hashed_metag,
@@ -80,7 +80,7 @@ sub Marpa::R3::Internal::Scanless::meta_grammar {
 
 } ## end sub Marpa::R3::Internal::Scanless::meta_grammar
 
-sub Marpa::R3::Scanless::G::new {
+sub Marpa::R3::Grammar::new {
     my ( $class, @hash_ref_args ) = @_;
 
     my $slg = pre_construct($class);
@@ -102,8 +102,8 @@ sub Marpa::R3::Scanless::G::new {
     return $slg;
 }
 
-sub Marpa::R3::Scanless::G::DESTROY {
-    # say STDERR "In Marpa::R3::Scanless::G::DESTROY before test";
+sub Marpa::R3::Grammar::DESTROY {
+    # say STDERR "In Marpa::R3::Grammar::DESTROY before test";
     my $slg = shift;
     my $lua = $slg->[Marpa::R3::Internal_G::L];
 
@@ -115,7 +115,7 @@ sub Marpa::R3::Scanless::G::DESTROY {
     # In fact, the Lua interpreter may already have been destroyed,
     # so this test is necessary to avoid a warning message.
     return if not $lua;
-    # say STDERR "In Marpa::R3::Scanless::G::DESTROY after test";
+    # say STDERR "In Marpa::R3::Grammar::DESTROY after test";
 
     my $regix = $slg->[Marpa::R3::Internal_G::REGIX];
     $lua->call_by_tag($regix,
@@ -126,7 +126,7 @@ sub Marpa::R3::Scanless::G::DESTROY {
 END_OF_LUA
 }
 
-sub Marpa::R3::Scanless::G::set {
+sub Marpa::R3::Grammar::set {
     my ( $slg, @hash_ref_args ) = @_;
     my ( $flat_args, $error_message ) =
       Marpa::R3::flatten_hash_args( \@hash_ref_args );
@@ -153,19 +153,19 @@ sub Marpa::R3::Internal_G::set {
 
     my $dsl = $flat_args->{'source'};
     Marpa::R3::exception(
-        qq{Marpa::R3::Scanless::G::new() called without a 'source' argument})
+        qq{Marpa::R3::Grammar::new() called without a 'source' argument})
       if not defined $dsl;
     my $dsl_ref_type = ref $dsl;
     if ( $dsl_ref_type ne 'SCALAR' ) {
         my $desc = $dsl_ref_type ? "a ref to $dsl_ref_type" : 'not a ref';
         Marpa::R3::exception(
-qq{'source' name argument to Marpa::R3::Scanless::G->new() is $desc\n},
+qq{'source' name argument to Marpa::R3::Grammar->new() is $desc\n},
             "  It should be a ref to a string\n"
         );
     }
     if ( not defined ${$dsl} ) {
         Marpa::R3::exception(
-qq{'source' name argument to Marpa::R3::Scanless::G->new() is a ref to a an undef\n},
+qq{'source' name argument to Marpa::R3::Grammar->new() is a ref to a an undef\n},
             "  It should be a ref to a string\n"
         );
     } ## end if ( $ref_type ne 'SCALAR' )
@@ -1465,7 +1465,7 @@ sub kwgen {
     my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
     # my $code = sprintf( 'io.stderr:write("Calling slg.%s ", table.concat(..., "")); return _M.class_slg.%s(...)', $kollos_name, $kollos_name );
     no strict 'refs';
-    *{ 'Marpa::R3::Scanless::G::' . $perl_name }
+    *{ 'Marpa::R3::Grammar::' . $perl_name }
         = sub () {
             my ($slg, @args) = @_;
             my ($retour) = $slg->call_by_tag($tag, $code, $signature, @args);
@@ -1480,7 +1480,7 @@ sub kwgen_arr {
     my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
     # my $code = sprintf( 'io.stderr:write("Calling slg.%s ", table.concat(..., "")); return _M.class_slg.%s(...)', $kollos_name, $kollos_name );
     no strict 'refs';
-    *{ 'Marpa::R3::Scanless::G::' . $perl_name }
+    *{ 'Marpa::R3::Grammar::' . $perl_name }
         = sub () {
             my ($slg, @args) = @_;
             my ($retour) = $slg->call_by_tag($tag, $code, $signature, @args);
@@ -1495,7 +1495,7 @@ sub kwgen_opt {
     my $code = sprintf( 'return _M.class_slg.%s(...)', $kollos_name );
     # my $code = sprintf( 'io.stderr:write("Calling slg.%s ", table.concat(..., "")); return _M.class_slg.%s(...)', $kollos_name, $kollos_name );
     no strict 'refs';
-    *{ 'Marpa::R3::Scanless::G::' . $perl_name }
+    *{ 'Marpa::R3::Grammar::' . $perl_name }
         = sub () {
             my ($slg, @args) = @_;
             $args[$_] //= $defaults[$_] for 0 .. $#defaults;
@@ -1505,7 +1505,7 @@ sub kwgen_opt {
     use strict;
 }
 
-sub Marpa::R3::Scanless::G::production_show {
+sub Marpa::R3::Grammar::production_show {
     my ($slg, $xprid, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1520,7 +1520,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::symbols_show {
+sub Marpa::R3::Grammar::symbols_show {
     my ($slg, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1535,7 +1535,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::symbol_show {
+sub Marpa::R3::Grammar::symbol_show {
     my ($slg, $xsyid, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1550,7 +1550,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::lmg_rule_show {
+sub Marpa::R3::Grammar::lmg_rule_show {
     my ($slg, $subg, $irlid, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1565,7 +1565,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::g1_rule_show {
+sub Marpa::R3::Grammar::g1_rule_show {
     my ($slg, $irlid, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1580,7 +1580,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::l0_rule_show {
+sub Marpa::R3::Grammar::l0_rule_show {
     my ($slg, $irlid, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1595,7 +1595,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::productions_show {
+sub Marpa::R3::Grammar::productions_show {
     my ($slg, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1610,7 +1610,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::lmg_rules_show {
+sub Marpa::R3::Grammar::lmg_rules_show {
     my ($slg, $subg, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1625,7 +1625,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::g1_rules_show {
+sub Marpa::R3::Grammar::g1_rules_show {
     my ($slg, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1640,7 +1640,7 @@ END_OF_CODE
     return $retour;
 }
 
-sub Marpa::R3::Scanless::G::l0_rules_show {
+sub Marpa::R3::Grammar::l0_rules_show {
     my ($slg, $options) = @_;
     my $verbose = $options->{verbose} or 0;
     my $diag = $options->{diag} ? 1 : 0;
@@ -1655,7 +1655,7 @@ END_OF_LUA
     return $retour;
 }
 
-# TODO: Census all uses of Marpa::R3::Scanless::G::g1_symbol_name
+# TODO: Census all uses of Marpa::R3::Grammar::g1_symbol_name
 # in pod and tests, and make sure that they are appropriate --
 # that is, that they should not be symbol_name() instead.
 
@@ -1731,7 +1731,7 @@ kwgen_arr(__LINE__, qw(l0_rule_expand l0_irl_isyids i));
 
 kwgen(__LINE__, qw(production_length xpr_length i));
 
-sub Marpa::R3::Scanless::G::call_by_tag {
+sub Marpa::R3::Grammar::call_by_tag {
     my ( $slg, $tag, $codestr, $sig, @args ) = @_;
     my $lua = $slg->[Marpa::R3::Internal_G::L];
     my $regix = $slg->[Marpa::R3::Internal_G::REGIX];
@@ -1762,7 +1762,7 @@ sub Marpa::R3::Scanless::G::call_by_tag {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::coro_by_tag {
+sub Marpa::R3::Grammar::coro_by_tag {
     my ( $slg, $tag, $args, $codestr ) = @_;
     my $lua        = $slg->[Marpa::R3::Internal_G::L];
     my $regix      = $slg->[Marpa::R3::Internal_G::REGIX];
@@ -1806,7 +1806,7 @@ sub Marpa::R3::Scanless::G::coro_by_tag {
     return @results;
 }
 
-sub Marpa::R3::Scanless::G::symbol_ids_gen {
+sub Marpa::R3::Grammar::symbol_ids_gen {
     my ($slg) = @_;
     my $next = 1;
     my $last = $slg->highest_symbol_id();
@@ -1818,7 +1818,7 @@ sub Marpa::R3::Scanless::G::symbol_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::lmg_symbol_ids_gen {
+sub Marpa::R3::Grammar::lmg_symbol_ids_gen {
     my ($slg, $subg) = @_;
     my $next = 0;
     my $last = $slg->lmg_highest_symbol_id($subg);
@@ -1830,7 +1830,7 @@ sub Marpa::R3::Scanless::G::lmg_symbol_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::g1_symbol_ids_gen {
+sub Marpa::R3::Grammar::g1_symbol_ids_gen {
     my ($slg) = @_;
     my $next = 0;
     my $last = $slg->g1_highest_symbol_id();
@@ -1842,7 +1842,7 @@ sub Marpa::R3::Scanless::G::g1_symbol_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::l0_symbol_ids_gen {
+sub Marpa::R3::Grammar::l0_symbol_ids_gen {
     my ($slg) = @_;
     my $next = 0;
     my $last = $slg->l0_highest_symbol_id();
@@ -1854,7 +1854,7 @@ sub Marpa::R3::Scanless::G::l0_symbol_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::production_ids_gen {
+sub Marpa::R3::Grammar::production_ids_gen {
     my ($slg) = @_;
     my $next = 1;
     my $last = $slg->highest_production_id();
@@ -1866,7 +1866,7 @@ sub Marpa::R3::Scanless::G::production_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::lmg_rule_ids_gen {
+sub Marpa::R3::Grammar::lmg_rule_ids_gen {
     my ($slg, $subg) = @_;
     my $next = 0;
     my $last = $slg->lmg_highest_rule_id($subg);
@@ -1878,7 +1878,7 @@ sub Marpa::R3::Scanless::G::lmg_rule_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::g1_rule_ids_gen {
+sub Marpa::R3::Grammar::g1_rule_ids_gen {
     my ($slg) = @_;
     my $next = 0;
     my $last = $slg->g1_highest_rule_id();
@@ -1890,7 +1890,7 @@ sub Marpa::R3::Scanless::G::g1_rule_ids_gen {
     }
 }
 
-sub Marpa::R3::Scanless::G::l0_rule_ids_gen {
+sub Marpa::R3::Grammar::l0_rule_ids_gen {
     my ($slg) = @_;
     my $next = 0;
     my $last = $slg->l0_highest_rule_id();
@@ -1903,7 +1903,7 @@ sub Marpa::R3::Scanless::G::l0_rule_ids_gen {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::nrls_show {
+sub Marpa::R3::Grammar::nrls_show {
     my ($slg) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -1923,7 +1923,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::nsys_show {
+sub Marpa::R3::Grammar::nsys_show {
     my ($slg) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -1942,7 +1942,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::ahms_show {
+sub Marpa::R3::Grammar::ahms_show {
     my ( $slg ) = @_;
 
     my ($text) = $slg->call_by_tag(
@@ -1958,7 +1958,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::dotted_nrl_show {
+sub Marpa::R3::Grammar::dotted_nrl_show {
     my ( $slg, $nrl_id, $dot_position ) = @_;
     my ($result) =
       $slg->call_by_tag(
@@ -1972,7 +1972,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::briefer_ahm {
+sub Marpa::R3::Grammar::briefer_ahm {
     my ( $slg, $item_id ) = @_;
 
     my ($text) = $slg->call_by_tag(
@@ -1993,7 +1993,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::brief_nrl {
+sub Marpa::R3::Grammar::brief_nrl {
     my ( $slg, $nrl_id ) = @_;
     my ($text) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $nrl_id );
@@ -2006,7 +2006,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::G::regix {
+sub Marpa::R3::Grammar::regix {
     my ( $slg ) = @_;
     my $regix = $slg->[Marpa::R3::Internal_G::REGIX];
     return $regix;

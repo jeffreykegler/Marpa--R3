@@ -31,7 +31,7 @@ use Marpa::R3::Test;
 
 use Marpa::R3;
 
-my $g = Marpa::R3::Scanless::G->new(
+my $g = Marpa::R3::Grammar->new(
     {
         source => \q{
         Top::= 'start' TOKEN OTHER_TOKEN

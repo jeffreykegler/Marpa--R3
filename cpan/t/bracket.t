@@ -78,7 +78,7 @@ my %closing_char_by_name = (
     rparen  => ')',
 );
 
-my $g = Marpa::R3::Scanless::G->new(
+my $g = Marpa::R3::Grammar->new(
     {
         source => \($dsl),
         ## Ask Marpa to generate an event on rejection

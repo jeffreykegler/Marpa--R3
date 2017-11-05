@@ -52,7 +52,7 @@ Ambiguous symch at Glade=2, Symbol=<pair>:
 END_OF_MESSAGE
 my $test_name = 'Symch ambiguity';
 
-my $grammar = Marpa::R3::Scanless::G->new( { source  => $source } );
+my $grammar = Marpa::R3::Grammar->new( { source  => $source } );
 my $recce   = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
 my $is_ambiguous_parse = 1;
 
@@ -153,7 +153,7 @@ $input = q{a b};
 
 for my $ranking_method ( 'none', 'rule', 'high_rule_only' ) {
 
-    my $ranking_grammar = Marpa::R3::Scanless::G->new(
+    my $ranking_grammar = Marpa::R3::Grammar->new(
         { ranking_method => $ranking_method, source => $source } );
 
     $recce = Marpa::R3::Scanless::R->new( { grammar => $ranking_grammar } );

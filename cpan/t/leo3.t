@@ -40,7 +40,7 @@ sub main::default_action {
 
 ## use critic
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     { 
         source => \(<<'END_OF_DSL'),
 :default ::= action => main::default_action

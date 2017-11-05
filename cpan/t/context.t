@@ -76,7 +76,7 @@ my @terminals = qw/A B C D/;
     # so we look at the symbols and productions.
     my $this_dsl = $dsl;
     $this_dsl =~ s/DOIT/main::no_bail/xms;
-    my $grammar   = Marpa::R3::Scanless::G->new(
+    my $grammar   = Marpa::R3::Grammar->new(
         {   source => \$this_dsl }
     );
     Marpa::R3::Test::is( $grammar->symbols_show(),
@@ -109,7 +109,7 @@ sub do_parse {
     my ($action) = @_;
     my $this_dsl = $dsl;
     $this_dsl =~ s/DOIT/$action/xms;
-    my $grammar   = Marpa::R3::Scanless::G->new(
+    my $grammar   = Marpa::R3::Grammar->new(
         {   source => \$this_dsl }
     );
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

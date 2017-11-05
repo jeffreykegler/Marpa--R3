@@ -218,7 +218,7 @@ sub new {
 
     my $parser = bless {}, $class;
     
-    $parser->{grammar} = Marpa::R3::Scanless::G->new(
+    $parser->{grammar} = Marpa::R3::Grammar->new(
         {
             source         => \(<<'END_OF_SOURCE'),
 

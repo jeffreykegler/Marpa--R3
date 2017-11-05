@@ -102,7 +102,7 @@ sub my_parser {
     my ( $package_arg, $ppo ) = @_;
 
     my $grammar =
-      Marpa::R3::Scanless::G->new( { source => \q(A ::= 'a' action => do_A), },
+      Marpa::R3::Grammar->new( { source => \q(A ::= 'a' action => do_A), },
         $package_arg );
 
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );

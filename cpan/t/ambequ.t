@@ -93,7 +93,7 @@ Number ~ [\d]+
 Op ~ [-+*]
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
+my $grammar = Marpa::R3::Grammar->new( {   source => \$dsl });
 
 my $actual_ref;
 $actual_ref = save_stdout();

@@ -53,7 +53,7 @@ sub run_sequence_test {
     $dsl .= "A ~'a'\n";
     $dsl .= "sep ~ [!]\n "     if $separation ne 'none';
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+    my $grammar = Marpa::R3::Grammar->new( { source => \$dsl } );
 
     # Number of symbols to test at the higher numbers is
     # more or less arbitrary.  You really need to test 0 .. 3.

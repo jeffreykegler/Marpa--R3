@@ -65,7 +65,7 @@ string ~ ['] <string contents> [']
 whitespace ~ [\s]+
 END_OF_SOURCE
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
     bless_package => 'My_Nodes',
     source => \$slif_debug_source,
@@ -435,7 +435,7 @@ $slif_debug_source =~
     s{^ [<] numeric \s+ assignment [>] \s+ [:][:][=] \s+ variable \s+ ['][=]['] \s+ expression $}
     {<numeric assignment> ::= variable '=' <numeric expression>}xms;
 
-$grammar = Marpa::R3::Scanless::G->new(
+$grammar = Marpa::R3::Grammar->new(
     {
     bless_package => 'My_Nodes',
     source => \$slif_debug_source,

@@ -27,7 +27,7 @@ use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
-my $prefix_grammar = Marpa::R3::Scanless::G->new(
+my $prefix_grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \(<<'END_OF_RULES'),

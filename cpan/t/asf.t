@@ -33,7 +33,7 @@ use Marpa::R3::Test;
 use Marpa::R3;
 use Data::Dumper;
 
-my $g = Marpa::R3::Scanless::G->new(
+my $g = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 
     lexeme default = action => [ name, value ]

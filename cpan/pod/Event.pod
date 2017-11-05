@@ -790,7 +790,7 @@ The length, in codepoints, of the lexeme.
 =for Marpa::R3::Display
 name: exhaustion grammar setting synopsis part 1
 
-    my $g = Marpa::R3::Scanless::G->new(
+    my $g = Marpa::R3::Grammar->new(
         {
             source     => \$dsl,
             exhaustion => 'event',
@@ -912,7 +912,7 @@ L<a separate document|Marpa::R3::Exhaustion>.
 name: rejection grammar setting synopsis part 1
 normalize-whitespace: 1
 
-    my $g = Marpa::R3::Scanless::G->new(
+    my $g = Marpa::R3::Grammar->new(
         {
             source    => \($grammar),
             rejection => 'event'
@@ -1442,7 +1442,7 @@ normalize-whitespace: 1
         ws ~ [\s]+
     END_OF_DSL
 
-    my $grammar1 = Marpa::R3::Scanless::G->new( { source => \$dsl1 } );
+    my $grammar1 = Marpa::R3::Grammar->new( { source => \$dsl1 } );
 
 =for Marpa::R3::Display::End
 
@@ -1538,7 +1538,7 @@ normalize-whitespace: 1
             ws ~ [\s]+
     END_OF_DSL
 
-    my $grammar2 = Marpa::R3::Scanless::G->new(
+    my $grammar2 = Marpa::R3::Grammar->new(
         {
             source => \$dsl2,
             rejection => 'event',
@@ -1581,7 +1581,7 @@ normalize-whitespace: 1
             ws ~ [\s]+
     END_OF_DSL
 
-    my $grammar3 = Marpa::R3::Scanless::G->new(
+    my $grammar3 = Marpa::R3::Grammar->new(
         {
             source => \$dsl3,
             rejection => 'event',
@@ -1735,7 +1735,7 @@ normalize-whitespace: 1
             ws ~ [\s]+
     END_OF_DSL
 
-    my $grammar4 = Marpa::R3::Scanless::G->new(
+    my $grammar4 = Marpa::R3::Grammar->new(
         {
             source => \$dsl4,
         },
@@ -1886,7 +1886,7 @@ normalize-whitespace: 1
     whitespace ~ [\s]+
     END_OF_DSL
 
-    my $grammar = Marpa::R3::Scanless::G->new(
+    my $grammar = Marpa::R3::Grammar->new(
         {
             source            => \$dsl,
             semantics_package => 'My_Actions'

@@ -282,7 +282,7 @@ sub run_test {
     $this_dsl =~ s/E_OP_ACTION_FEATURE/main::e_op_action/xmsg;
     $this_dsl =~ s/DEFAULT_ACTION_FEATURE/main::default_action/xmsg;
 
-    my $grammar = Marpa::R3::Scanless::G->new( { source => \$this_dsl });
+    my $grammar = Marpa::R3::Grammar->new( { source => \$this_dsl });
 
     my $recce = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $recce->read(\'2*3+4*1trailer');

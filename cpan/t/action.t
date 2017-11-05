@@ -80,7 +80,7 @@ D ~ 'D'
 END_OF_SOURCE
 
 sub do_parse {
-    my $grammar = Marpa::R3::Scanless::G->new( { source  => \$dsl } );
+    my $grammar = Marpa::R3::Grammar->new( { source  => \$dsl } );
     my $slr     = Marpa::R3::Scanless::R->new( { grammar => $grammar } );
     $slr->read( \'ABCD' );
     return $slr->value();

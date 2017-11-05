@@ -243,7 +243,7 @@ sub Marpa::R3::Scanless::R::new {
     }
     delete $flat_args->{event_handlers};
 
-    my $slg_class = 'Marpa::R3::Scanless::G';
+    my $slg_class = 'Marpa::R3::Grammar';
     if ( not blessed $slg or not $slg->isa($slg_class) ) {
         my $ref_type = ref $slg;
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
@@ -421,9 +421,9 @@ END__OF_LUA
     return $desc;
 } ## end sub character_describe
 
-# This is a Marpa Scanless::G method, but is included in this
+# This is a Marpa Grammar method, but is included in this
 # file because internally it is all about the recognizer.
-sub Marpa::R3::Scanless::G::parse {
+sub Marpa::R3::Grammar::parse {
     my ( $slg, $input_ref, @more_args ) = @_;
     if ( not defined $input_ref or ref $input_ref ne 'SCALAR' ) {
         Marpa::R3::exception(
@@ -459,7 +459,7 @@ sub Marpa::R3::Scanless::G::parse {
         if not $value_ref;
 
     return $value_ref;
-} ## end sub Marpa::R3::Scanless::G::parse
+} ## end sub Marpa::R3::Grammar::parse
 
 # Brief description of block/line/column for
 # an L0 range

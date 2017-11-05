@@ -33,7 +33,7 @@ my $dsl = << '=== GRAMMAR ===';
 target ::= 'a' 'b' 'c' 'a' 'b' 'c'
 === GRAMMAR ===
 
-my $grammar = Marpa::R3::Scanless::G->new( { source => \($dsl) } );
+my $grammar = Marpa::R3::Grammar->new( { source => \($dsl) } );
 
 sub hi_level_read {
    my ($recce, $p_string, $offset, $length) = @_;

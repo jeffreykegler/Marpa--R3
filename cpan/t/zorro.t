@@ -58,7 +58,7 @@ y ::= Z action => Test::rule6
 Z ~ 'Z'
 END_OF_DSL
 
-my $g = Marpa::R3::Scanless::G->new( { source => \$dsl } );
+my $g = Marpa::R3::Grammar->new( { source => \$dsl } );
 my $recce = Marpa::R3::Scanless::R->new( { grammar => $g } );
 $recce->read( \'Z' );
 my $ref_value = $recce->value();

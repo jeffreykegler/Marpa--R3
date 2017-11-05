@@ -30,7 +30,7 @@ use Marpa::R3::Test;
 
 use Marpa::R3;
 
-my $calculator_grammar = Marpa::R3::Scanless::G->new(
+my $calculator_grammar = Marpa::R3::Grammar->new(
     {   bless_package => 'My_Nodes',
         source        => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array bless => ::lhs

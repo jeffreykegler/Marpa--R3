@@ -64,7 +64,7 @@ VBZ ~ 'eats' | 'shoots' | 'leaves'
 
 END_OF_SOURCE
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     { bless_package => 'PennTags', source => \$dsl, } );
 
 my $full_expected = <<'END_OF_OUTPUT';
@@ -96,7 +96,7 @@ while ( defined( my $value_ref = $valuer->value() ) ) {
 Marpa::R3::Test::is( ( join "\n", sort @actual ) . "\n",
     $full_expected, 'Ambiguous English sentence using value()' );
 
-my $panda_grammar = Marpa::R3::Scanless::G->new(
+my $panda_grammar = Marpa::R3::Grammar->new(
     { bless_package => 'PennTags', source => \$dsl, } );
 my $panda_recce = Marpa::R3::Scanless::R->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );

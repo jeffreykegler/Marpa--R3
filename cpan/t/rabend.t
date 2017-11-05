@@ -63,7 +63,7 @@ sub catch_problem {
     return;
 } ## end sub catch_problem
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         source => \<<'END_OF_DSL',
 Top ::= Term+

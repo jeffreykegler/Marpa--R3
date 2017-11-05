@@ -30,7 +30,7 @@ use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
 
-my $grammar = Marpa::R3::Scanless::G->new(
+my $grammar = Marpa::R3::Grammar->new(
     {
         source => \<<'END_OF_DSL',
 pair ::= a a

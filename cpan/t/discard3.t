@@ -45,7 +45,7 @@ END_OF_SOURCE
 
     $null_dsl =~ s/ =on $ /$grammar_setting/xms;
 
-    my $null_grammar = Marpa::R3::Scanless::G->new(
+    my $null_grammar = Marpa::R3::Grammar->new(
         {   bless_package => 'My_Nodes',
             source        => \$null_dsl,
         }
@@ -107,7 +107,7 @@ whitespace ~ [\s]
 END_OF_SOURCE
         $non_trivial_dsl =~ s/ =on $ /$grammar_setting/xms;
 
-        my $non_trivial_grammar = Marpa::R3::Scanless::G->new(
+        my $non_trivial_grammar = Marpa::R3::Grammar->new(
             {   bless_package => 'My_Nodes',
                 source        => \$non_trivial_dsl
             }
@@ -176,7 +176,7 @@ END_OF_SOURCE
         $dsl2 =~ s/ ws=on $ /ws$ws_g_setting/xms;
         $dsl2 =~ s/ bracketed=on $ /bracketed$bracketed_g_setting/xms;
 
-        my $grammar2 = Marpa::R3::Scanless::G->new(
+        my $grammar2 = Marpa::R3::Grammar->new(
             { bless_package => 'My_Nodes', source => \$dsl2, } );
 
         for my $ws_r_setting (@settings) {

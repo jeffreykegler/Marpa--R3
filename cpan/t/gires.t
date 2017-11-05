@@ -115,7 +115,7 @@ for my $test_data (@tests_data) {
     PROCESSING: {
         my $grammar;
         my $eval_ok = eval {
-            $grammar = Marpa::R3::Scanless::G->new(
+            $grammar = Marpa::R3::Grammar->new(
                 {
                     source            => $source,
                     semantics_package => 'My_Semantics'
@@ -133,7 +133,7 @@ for my $test_data (@tests_data) {
             $actual_value  = 'SLIF grammar failed';
             $actual_result = $abbreviated_error;
             last PROCESSING;
-        } ## end if ( not defined eval { $grammar = Marpa::R3::Scanless::G...})
+        } ## end if ( not defined eval { $grammar = Marpa::R3::Grammar...})
         my $recce = Marpa::R3::Scanless::R->new(
             { grammar => $grammar,
             } );

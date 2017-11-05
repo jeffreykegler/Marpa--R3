@@ -128,7 +128,7 @@ for my $test_data (@tests) {
             # ahead of time.
             my $full_dsl = $base_dsl . $suit_line;
             my $grammar =
-                Marpa::R3::Scanless::G->new( { source => \$full_dsl } );
+                Marpa::R3::Grammar->new( { source => \$full_dsl } );
             my $re = Marpa::R3::Scanless::R->new(
                 {
                     grammar        => $grammar,

@@ -45,7 +45,7 @@ middle ::= bottom
 bottom ::= action => main::default_action
 END_OF_DSL
 
-my $grammar = Marpa::R3::Scanless::G->new( {   source => \$dsl });
+my $grammar = Marpa::R3::Grammar->new( {   source => \$dsl });
 
 Marpa::R3::Test::is( $grammar->g1_rules_show(), <<'EOS', 'Aycock/Horspool G1 Rules' );
 R0 top ::= middle

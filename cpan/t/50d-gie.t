@@ -48,7 +48,7 @@ my $dsl1 = <<'END_OF_DSL';
     ws ~ [\s]+
 END_OF_DSL
 
-my $grammar1 = Marpa::R3::Scanless::G->new( { source => \$dsl1 } );
+my $grammar1 = Marpa::R3::Grammar->new( { source => \$dsl1 } );
 
 # Marpa::R3::Display::End
 
@@ -134,7 +134,7 @@ my $dsl2 = <<'END_OF_DSL';
         ws ~ [\s]+
 END_OF_DSL
 
-my $grammar2 = Marpa::R3::Scanless::G->new(
+my $grammar2 = Marpa::R3::Grammar->new(
     {
         source => \$dsl2,
         rejection => 'event',
@@ -178,7 +178,7 @@ my $dsl3 = <<'END_OF_DSL';
         ws ~ [\s]+
 END_OF_DSL
 
-my $grammar3 = Marpa::R3::Scanless::G->new(
+my $grammar3 = Marpa::R3::Grammar->new(
     {
         source => \$dsl3,
         rejection => 'event',
@@ -270,7 +270,7 @@ my $dsl4 = <<'END_OF_DSL';
         ws ~ [\s]+
 END_OF_DSL
 
-my $grammar4 = Marpa::R3::Scanless::G->new(
+my $grammar4 = Marpa::R3::Grammar->new(
     {
         source => \$dsl4,
     },

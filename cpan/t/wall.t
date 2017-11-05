@@ -83,7 +83,7 @@ sub My_Actions::default_action {
 
 ## use critic
 
-my $g = Marpa::R3::Scanless::G->new(
+my $g = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \(<<'END_OF_SOURCE'),

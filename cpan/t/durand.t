@@ -55,7 +55,7 @@ Expression ::= Number
       whitespace ~ [\s]+
 END_OF_SOURCE
 
-$grammar = Marpa::R3::Scanless::G->new(
+$grammar = Marpa::R3::Grammar->new(
     {
         semantics_package => 'My_Actions',
         source            => \$dsl
