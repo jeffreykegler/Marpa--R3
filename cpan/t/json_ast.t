@@ -293,7 +293,7 @@ sub parse {
     my $recce =
       Marpa::R3::Recognizer->new( { grammar => $parser->{grammar}, } );
     $recce->read( \$string );
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my $ast = ${ $valuer->value() };
     return $parser->decode($ast);
 }

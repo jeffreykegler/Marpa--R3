@@ -9,7 +9,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-package Marpa::R3::Scanless::V;
+package Marpa::R3::Valuer;
 
 use 5.010001;
 use strict;
@@ -27,7 +27,7 @@ package Marpa::R3::Internal_V;
 use Scalar::Util qw(blessed tainted);
 use English qw( -no_match_vars );
 
-our $PACKAGE = 'Marpa::R3::Scanless::V';
+our $PACKAGE = 'Marpa::R3::Valuer';
 
 # Set those common args which are at the Perl level.
 sub slv_common_set {
@@ -195,7 +195,7 @@ sub code_problems {
 
 }
 
-sub Marpa::R3::Scanless::V::new {
+sub Marpa::R3::Valuer::new {
     my ( $class, @args ) = @_;
 
     my $slv = [];
@@ -210,7 +210,7 @@ sub Marpa::R3::Scanless::V::new {
 
     my $slr = $flat_args->{recognizer};
     Marpa::R3::exception(
-        qq{Marpa::R3::Scanless::V::new() called without a "recognizer" argument} )
+        qq{Marpa::R3::Valuer::new() called without a "recognizer" argument} )
       if not defined $slr;
     $slv->[Marpa::R3::Internal_V::SLR] = $slr;
     delete $flat_args->{recognizer};
@@ -262,8 +262,8 @@ END_OF_LUA
     return bless $slv, $class;
 }
 
-sub Marpa::R3::Scanless::V::DESTROY {
-    # say STDERR "In Marpa::R3::Scanless::V::DESTROY before test";
+sub Marpa::R3::Valuer::DESTROY {
+    # say STDERR "In Marpa::R3::Valuer::DESTROY before test";
     my $slv = shift;
     my $lua = $slv->[Marpa::R3::Internal_V::L];
 
@@ -275,7 +275,7 @@ sub Marpa::R3::Scanless::V::DESTROY {
     # In fact, the Lua interpreter may already have been destroyed,
     # so this test is necessary to avoid a warning message.
     return if not $lua;
-    # say STDERR "In Marpa::R3::Scanless::V::DESTROY after test";
+    # say STDERR "In Marpa::R3::Valuer::DESTROY after test";
 
     my $regix = $slv->[Marpa::R3::Internal_V::REGIX];
     $slv->call_by_tag(
@@ -287,7 +287,7 @@ sub Marpa::R3::Scanless::V::DESTROY {
 END_OF_LUA
 }
 
-sub Marpa::R3::Scanless::V::set {
+sub Marpa::R3::Valuer::set {
     my ( $slv, @args ) = @_;
 
     my ($flat_args, $error_message) = Marpa::R3::flatten_hash_args(\@args);
@@ -320,7 +320,7 @@ END_OF_LUA
 }
 
 # Returns false if no parse
-sub Marpa::R3::Scanless::V::value {
+sub Marpa::R3::Valuer::value {
     my ( $slv, $per_parse_arg ) = @_;
     my $slr    = $slv->[Marpa::R3::Internal_V::SLR];
     my $slg    = $slr->[Marpa::R3::Internal_R::SLG];
@@ -459,7 +459,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::call_by_tag {
+sub Marpa::R3::Valuer::call_by_tag {
     my ( $slv, $tag, $codestr, $signature, @args ) = @_;
     my $lua   = $slv->[Marpa::R3::Internal_V::L];
     my $regix = $slv->[Marpa::R3::Internal_V::REGIX];
@@ -483,7 +483,7 @@ sub Marpa::R3::Scanless::V::call_by_tag {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::coro_by_tag {
+sub Marpa::R3::Valuer::coro_by_tag {
     my ( $slv, $tag, $args, $codestr ) = @_;
     my $lua        = $slv->[Marpa::R3::Internal_V::L];
     my $regix      = $slv->[Marpa::R3::Internal_V::REGIX];
@@ -545,7 +545,7 @@ sub Marpa::R3::Scanless::V::coro_by_tag {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::tree_show {
+sub Marpa::R3::Valuer::tree_show {
     my ( $slv, $verbose ) = @_;
     my $text = q{};
     NOOK: for ( my $nook_id = 0; 1; $nook_id++ ) {
@@ -557,7 +557,7 @@ sub Marpa::R3::Scanless::V::tree_show {
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::nook_show {
+sub Marpa::R3::Valuer::nook_show {
     my ( $slv, $nook_id, $verbose ) = @_;
     my $slr = $slv->[Marpa::R3::Internal_V::SLR];
 
@@ -636,7 +636,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::and_node_tag {
+sub Marpa::R3::Valuer::and_node_tag {
     my ( $slv, $and_node_id ) = @_;
 
     my ($tag) = $slv->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -649,7 +649,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::verbose_or_node {
+sub Marpa::R3::Valuer::verbose_or_node {
     my ( $slv, $or_node_id ) = @_;
     my $slr = $slv->[Marpa::R3::Internal_V::SLR];
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
@@ -685,7 +685,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::bocage_show {
+sub Marpa::R3::Valuer::bocage_show {
     my ($slv)     = @_;
 
     my ($result) = $slv->call_by_tag(
@@ -699,7 +699,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::or_nodes_show {
+sub Marpa::R3::Valuer::or_nodes_show {
     my ( $slv ) = @_;
 
     my ($result) = $slv->call_by_tag(
@@ -713,7 +713,7 @@ END_OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::and_nodes_show {
+sub Marpa::R3::Valuer::and_nodes_show {
     my ( $slv ) = @_;
     my ($result) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -725,7 +725,7 @@ END_OF_LUA
     return $result;
 }
 
-sub Marpa::R3::Scanless::V::ambiguous {
+sub Marpa::R3::Valuer::ambiguous {
     my ($slv) = @_;
     my $slr = $slv->[Marpa::R3::Internal_V::SLR];
     my $ambiguity_level = $slv->ambiguity_level();
@@ -739,7 +739,7 @@ sub Marpa::R3::Scanless::V::ambiguous {
     return Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
 } ## end sub Marpa::R3::Recognizer::ambiguous
 
-sub Marpa::R3::Scanless::V::ambiguity_level {
+sub Marpa::R3::Valuer::ambiguity_level {
     my ($slv) = @_;
 
     my ($metric) = $slv->call_by_tag(
@@ -751,7 +751,7 @@ END__OF_LUA
     return $metric;
 }
 
-sub Marpa::R3::Scanless::V::g1_pos {
+sub Marpa::R3::Valuer::g1_pos {
     my ( $slv ) = @_;
     my ($g1_pos) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -763,7 +763,7 @@ END__OF_LUA
 }
 
 # not to be documented
-sub Marpa::R3::Scanless::V::regix {
+sub Marpa::R3::Valuer::regix {
     my ( $slv ) = @_;
     my $regix = $slv->[Marpa::R3::Internal_V::REGIX];
     return $regix;

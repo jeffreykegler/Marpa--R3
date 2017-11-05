@@ -114,7 +114,7 @@ sub calculate {
         chomp $eval_error;
         die $self->show_last_expression(), "\n", $eval_error, "\n";
     } ## end if ( not defined eval { $event_count = $recce->read...})
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my $value_ref = $valuer->value( $self );
     if ( not defined $value_ref ) {
         die $self->show_last_expression(), "\n",

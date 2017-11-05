@@ -124,7 +124,7 @@ TEST: for my $test_data (@test_data) {
     $recce->read( \$test_input );
 
     my @parses;
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     while ( defined( my $value_ref = $valuer->value() ) ) {
         push @parses, ${$value_ref};
     }

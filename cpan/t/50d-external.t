@@ -268,7 +268,7 @@ qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexem
 
     sub recce_value_equivalent {
         my ($recce, $per_parse_arg) = @_;
-        my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+        my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
         my $ambiguity_level = $valuer->ambiguity_level();
         return if $ambiguity_level == 0;
         if ( $ambiguity_level != 1 ) {

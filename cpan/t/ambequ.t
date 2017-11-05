@@ -343,7 +343,7 @@ my $i = 0;
 # max_parses is set to 10 just in case there's an infinite loop.
 # This is for debugging, after all
 my $valuer =
-  Marpa::R3::Scanless::V->new( { recognizer => $recce, max_parses => 10 } );
+  Marpa::R3::Valuer->new( { recognizer => $recce, max_parses => 10 } );
 while ( defined( my $value = $valuer->value() ) ) {
     my $value = ${$value};
     if ( defined $expected_value{$value} ) {

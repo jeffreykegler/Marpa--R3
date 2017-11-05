@@ -52,7 +52,7 @@ normalize-whitespace: 1
     die "Read ended after $length_read of ", length $input, " characters"
         if $length_read != length $input;
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my $value_ref = $valuer->value();
     my $value = ${$value_ref};
 
@@ -203,7 +203,7 @@ name: Valuer synopsis
 partial: 1
 normalize-whitespace: 1
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
 
 =for Marpa::R3::Display::End
 

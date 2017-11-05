@@ -209,7 +209,7 @@ END_OF_TEXT
 
 for my $i ( 0 .. $input_length ) {
 
-    my $valuer = Marpa::R3::Scanless::V->new(
+    my $valuer = Marpa::R3::Valuer->new(
         { recognizer => $recce, end => $i, max_parses => 20 } );
 
     my $expected = $expected[$i];

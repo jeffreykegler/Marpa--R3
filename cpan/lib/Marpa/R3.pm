@@ -81,8 +81,8 @@ require Marpa::R3::SLR;
     and die 'Marpa::R3::Recognizer::VERSION ', $version_result;
 
 require Marpa::R3::SLV;
-( $version_result = version_ok($Marpa::R3::Scanless::V::VERSION) )
-    and die 'Marpa::R3::Scanless::V::VERSION ', $version_result;
+( $version_result = version_ok($Marpa::R3::Valuer::VERSION) )
+    and die 'Marpa::R3::Valuer::VERSION ', $version_result;
 
 require Marpa::R3::MetaAST;
 ( $version_result = version_ok($Marpa::R3::MetaAST::VERSION) )

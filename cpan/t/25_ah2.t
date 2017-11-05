@@ -362,7 +362,7 @@ END_OF_TEXT
 
 for my $i ( 0 .. $input_length ) {
 
-    my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce, end => $i } );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce, end => $i } );
     my $expected = $expected[$i];
 
     my $ambiguity_level = $valuer->ambiguity_level();

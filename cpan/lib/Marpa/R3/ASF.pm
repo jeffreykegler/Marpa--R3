@@ -418,7 +418,7 @@ sub Marpa::R3::ASF::new {
 
     my %v_args = (recognizer => $slr);
     $v_args{end} = $end_of_parse if $end_of_parse;
-    my $slv = Marpa::R3::Scanless::V->new(\%v_args);
+    my $slv = Marpa::R3::Valuer->new(\%v_args);
     Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
     $asf->[Marpa::R3::Internal::ASF::SLV] = $slv;
 

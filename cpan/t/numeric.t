@@ -85,7 +85,7 @@ for my $maximal ( 0, 1 ) {
         my $expected = $maximal ? \@maximal : \@minimal;
         my $name     = $maximal ? 'maximal' : 'minimal';
 
-        my $valuer = Marpa::R3::Scanless::V->new(
+        my $valuer = Marpa::R3::Valuer->new(
             {
                 recognizer => $recce,
                 end        => $i,

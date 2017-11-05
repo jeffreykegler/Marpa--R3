@@ -112,7 +112,7 @@ for my $n ( 1 .. 12 ) {
     $recce->resume( 1, 1 ) for 1 .. $n;
     $recce->resume( 0, 1 );
     my $parse_count = 0;
-    my $valuer      = Marpa::R3::Scanless::V->new(
+    my $valuer      = Marpa::R3::Valuer->new(
         {
             recognizer => $recce,
             max_parses => 300

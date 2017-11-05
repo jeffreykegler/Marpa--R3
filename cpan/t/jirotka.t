@@ -338,7 +338,7 @@ END_OF_AHMS
 
 my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $recce->read( \$input );
-my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
 my $value_ref = $valuer->value();
 
 Marpa::R3::Test::is( $recce->earley_sets_show(),

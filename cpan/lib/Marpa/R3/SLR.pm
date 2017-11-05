@@ -445,7 +445,7 @@ sub Marpa::R3::Grammar::parse {
             "  The cause may be an event\n",
             "  The $slr->parse() method does not allow parses to trigger events";
     } ## end if ( $length_read != length $input_length )
-    my $slv = Marpa::R3::Scanless::V->new( { recognizer => $slr });
+    my $slv = Marpa::R3::Valuer->new( { recognizer => $slr });
     my $ambiguity_level = $slv->ambiguity_level();
     if ( $ambiguity_level != 1 ) {
         my $ambiguous_status = $slv->ambiguous();
@@ -1569,7 +1569,7 @@ sub g1_show_rule_list {
 
 sub Marpa::R3::Recognizer::value {
     my ( $slr, $per_parse_arg ) = @_;
-    my $slv = Marpa::R3::Scanless::V->new( { recognizer => $slr } );
+    my $slv = Marpa::R3::Valuer->new( { recognizer => $slr } );
     my $ambiguity_level = $slv->ambiguity_level();
     return if $ambiguity_level == 0;
     if ( $ambiguity_level != 1 ) {

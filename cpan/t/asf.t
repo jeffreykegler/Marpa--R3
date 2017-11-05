@@ -58,7 +58,7 @@ EOI
 
 my $r = Marpa::R3::Recognizer->new( { grammar => $g } );
 $r->read( \$input );
-my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $r } );
+my $valuer = Marpa::R3::Valuer->new( { recognizer => $r } );
 
 {
  my $ambiguous_status = $valuer->ambiguous();

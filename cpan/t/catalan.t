@@ -53,7 +53,7 @@ sub do_pairings {
 
     # An arbitrary maximum is put on the number of parses -- this is for
     # debugging, and infinite loops happen.
-    my $valuer = Marpa::R3::Scanless::V->new(
+    my $valuer = Marpa::R3::Valuer->new(
         { recognizer => $recce, max_parses => 999 } );
     while ( my $value_ref = $valuer->value() ) {
         $parse_count++;

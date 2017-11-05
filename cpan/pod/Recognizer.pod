@@ -1086,7 +1086,7 @@ normalize-whitespace: 1
 
     sub recce_value_equivalent {
         my ($recce, $per_parse_arg) = @_;
-        my $valuer = Marpa::R3::Scanless::V->new( { recognizer => $recce } );
+        my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
         my $ambiguity_level = $valuer->ambiguity_level();
         return if $ambiguity_level == 0;
         if ( $ambiguity_level != 1 ) {
