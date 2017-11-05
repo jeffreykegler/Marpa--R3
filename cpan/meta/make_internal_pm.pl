@@ -197,8 +197,6 @@ __DATA__
     BLESS_PACKAGE { Default package into which nodes are blessed }
     IF_INACCESSIBLE { default for symbols }
 
-    WARNINGS { print warnings about grammar? }
-
     CHARACTER_CLASSES { an hash of
     character class regex by symbol name.
     Used before precomputation. }

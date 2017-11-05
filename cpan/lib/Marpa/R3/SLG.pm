@@ -85,7 +85,6 @@ sub Marpa::R3::Grammar::new {
 
     my $slg = pre_construct($class);
 
-    $slg->[Marpa::R3::Internal_G::WARNINGS]        = 1;
     $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] = 'warn';
 
     my ( $flat_args, $error_message ) =
@@ -314,11 +313,6 @@ END_OF_LUA
     if ( defined( my $value = $g1_args->{'bless_package'} ) ) {
         $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE] = $value;
         delete $g1_args->{'bless_package'};
-    }
-
-    if ( defined( my $value = $g1_args->{'warnings'} ) ) {
-        $slg->[Marpa::R3::Internal_G::WARNINGS] = $value;
-        delete $g1_args->{'warnings'};
     }
 
     $slg->call_by_tag(
