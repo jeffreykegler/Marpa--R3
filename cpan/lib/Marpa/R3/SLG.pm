@@ -1202,9 +1202,6 @@ END_OF_LUA
             or Marpa::R3::exception("Could not print: $ERRNO");
     }
 
-    # Save some memory
-    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASSES] = undef;
-
     return ;
 
 }
