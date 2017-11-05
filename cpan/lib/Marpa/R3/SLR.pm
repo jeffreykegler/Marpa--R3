@@ -1520,6 +1520,71 @@ sub Marpa::R3::Recognizer::regix {
     return $regix;
 }
 
+# Dump semantics for diagnostics
+sub Marpa::R3::Recognizer::show_semantics {
+    my ( $slg, @ops ) = @_;
+    my @op_descs = ();
+    my $op_ix    = 0;
+  OP: while ( $op_ix < scalar @ops ) {
+        my $op = $ops[ $op_ix++ ];
+
+        my $op_name = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+            <<'END_OF_LUA', 'i', $op );
+    local grammar, op = ...
+    return _M.op_names[op]
+END_OF_LUA
+
+        push @op_descs, $op_name;
+        if ( $op_name eq 'lua' ) {
+
+            my ($lua_op_name) = op_fn_name_by_key( $slg, $ops[$op_ix] );
+            push @op_descs, $lua_op_name;
+            $op_ix++;
+            if ( $lua_op_name eq 'callback' ) {
+                push @op_descs, op_fn_name_by_key( $slg, $ops[$op_ix] );
+            }
+            else {
+                push @op_descs, $ops[$op_ix];
+            }
+            $op_ix++;
+            next OP;
+        }
+        if ( $op_name eq 'alternative' ) {
+            push @op_descs, $ops[$op_ix];
+            $op_ix++;
+            push @op_descs, $ops[$op_ix];
+            $op_ix++;
+            next OP;
+        } ## end if ( $op_name eq 'alternative' )
+    } ## end OP: while ( $op_ix < scalar @ops )
+    return join q{ }, @op_descs;
+} ## end sub show_semantics
+
+# For diagnostics
+sub g1_show_rule_list {
+    my ( $slg, $rule_ids ) = @_;
+    my @rules = map { $slg->g1_rule_show($_) } @{$rule_ids};
+    return join q{}, map { q{    } . $_ . "\n" } @rules;
+}
+
+sub Marpa::R3::Recognizer::value {
+    my ( $slr, $per_parse_arg ) = @_;
+    my $slv = Marpa::R3::Scanless::V->new( { recognizer => $slr } );
+    my $ambiguity_level = $slv->ambiguity_level();
+    return if $ambiguity_level == 0;
+    if ( $ambiguity_level != 1 ) {
+        my $ambiguous_status = $slv->ambiguous();
+        Marpa::R3::exception( "Parse of the input is ambiguous\n",
+            $ambiguous_status );
+    }
+    my $value_ref = $slv->value($per_parse_arg);
+    Marpa::R3::exception("$slr->value(): No parse\n")
+      if not $value_ref;
+    return $value_ref;
+}
+
+# INTERNAL OK AFTER HERE _marpa_
+
 1;
 
 # vim: expandtab shiftwidth=4:

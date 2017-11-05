@@ -51,7 +51,6 @@ cpan/lib/Marpa/R3.pm
 cpan/lib/Marpa/R3/SLG.pm
 cpan/lib/Marpa/R3/SLR.pm
 cpan/lib/Marpa/R3/SLV.pm
-cpan/lib/Marpa/R3/Value.pm
 cpan/lib/Marpa/R3/X.pm
 cpan/kollos/Makefile.PL
 cpan/lua/Makefile.PL

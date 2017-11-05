@@ -134,7 +134,6 @@ lib/Marpa/R3/MetaG.pm
 lib/Marpa/R3/SLG.pm
 lib/Marpa/R3/SLR.pm
 lib/Marpa/R3/SLV.pm
-lib/Marpa/R3/Value.pm
 lib/Marpa/R3/X.pm
 lib/Marpa/R3/meta/Makefile
 lib/Marpa/R3/meta/metag.bnf

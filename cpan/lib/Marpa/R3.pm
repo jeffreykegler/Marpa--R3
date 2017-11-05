@@ -68,10 +68,6 @@ require Marpa::R3::Common;
 ( $version_result = version_ok($Marpa::R3::Common::VERSION) )
     and die 'Marpa::R3::Common::VERSION ', $version_result;
 
-require Marpa::R3::Value;
-( $version_result = version_ok($Marpa::R3::Value::VERSION) )
-    and die 'Marpa::R3::Value::VERSION ', $version_result;
-
 require Marpa::R3::MetaG;
 ( $version_result = version_ok($Marpa::R3::MetaG::VERSION) )
     and die 'Marpa::R3::MetaG::VERSION ', $version_result;

@@ -272,12 +272,12 @@ File::Find::find(
 # die Data::Dumper::Dumper(\%pm_files);
 
 my @no_index_namespace_inclusive = qw(
-    Marpa::R3::Value
     Marpa::R3::Perl
     Marpa::R3::Test
     Marpa::R3::Display
-    Marpa::R3::Inner
-    Marpa::R3::Internal
+    Marpa::R3::Internal_G
+    Marpa::R3::Internal_R
+    Marpa::R3::Internal_V
     Marpa::R3::MetaAST
     Marpa::R3::MetaG
 );
@@ -448,7 +448,6 @@ WriteMakefile(
         q[lib/Marpa/R3/SLG.pm]       => q[$(INST_LIB)/Marpa/R3/SLG.pm],
         q[lib/Marpa/R3/SLR.pm]       => q[$(INST_LIB)/Marpa/R3/SLR.pm],
         q[lib/Marpa/R3/SLV.pm]       => q[$(INST_LIB)/Marpa/R3/SLV.pm],
-        q[lib/Marpa/R3/Value.pm]   => q[$(INST_LIB)/Marpa/R3/Value.pm],
         q[lib/Marpa/R3/Version.pm] => q[$(INST_LIB)/Marpa/R3/Version.pm],
         q[lib/Marpa/R3/X.pm]       => q[$(INST_LIB)/Marpa/R3/X.pm]
       },
