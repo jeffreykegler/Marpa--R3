@@ -108,7 +108,7 @@ use constant TRACE_FILE_HANDLE => 3;
 use constant EVENT_HANDLERS => 4;
 use constant CURRENT_EVENT => 5;
 
-package Marpa::R3::Internal::Scanless::V;
+package Marpa::R3::Internal_V;
 use constant SLR => 0;
 use constant L => 1;
 use constant REGIX => 2;

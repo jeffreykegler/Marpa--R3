@@ -223,7 +223,7 @@ __DATA__
     EVENT_HANDLERS { Application-level event handlers }
     CURRENT_EVENT
 
-    :package=Marpa::R3::Internal::Scanless::V
+    :package=Marpa::R3::Internal_V
 
     SLR
 

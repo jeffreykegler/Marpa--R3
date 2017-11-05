@@ -22,7 +22,7 @@ $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 ## use critic
 
-package Marpa::R3::Internal::Scanless::V;
+package Marpa::R3::Internal_V;
 
 use Scalar::Util qw(blessed tainted);
 use English qw( -no_match_vars );
@@ -33,10 +33,10 @@ our $PACKAGE = 'Marpa::R3::Scanless::V';
 sub slv_common_set {
     my ( $slv, $flat_args ) = @_;
     if ( my $value = $flat_args->{'trace_file_handle'} ) {
-        $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] = $value;
+        $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE] = $value;
     }
     my $trace_file_handle =
-      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+      $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
     delete $flat_args->{'trace_file_handle'};
     return $flat_args;
 }
@@ -212,7 +212,7 @@ sub Marpa::R3::Scanless::V::new {
     Marpa::R3::exception(
         qq{Marpa::R3::Scanless::V::new() called without a "recognizer" argument} )
       if not defined $slr;
-    $slv->[Marpa::R3::Internal::Scanless::V::SLR] = $slr;
+    $slv->[Marpa::R3::Internal_V::SLR] = $slr;
     delete $flat_args->{recognizer};
 
     my $slr_class = 'Marpa::R3::Scanless::R';
@@ -225,14 +225,14 @@ sub Marpa::R3::Scanless::V::new {
         );
     }
 
-    $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE] //=
+    $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE] //=
       $slr->[Marpa::R3::Internal::Scanless::R::TRACE_FILE_HANDLE];
 
     my $trace_file_handle =
-      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+      $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
 
     my $lua = $slr->[Marpa::R3::Internal::Scanless::R::L];
-    $slv->[Marpa::R3::Internal::Scanless::V::L] = $lua;
+    $slv->[Marpa::R3::Internal_V::L] = $lua;
 
     my ( $regix ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -257,7 +257,7 @@ sub Marpa::R3::Scanless::V::new {
 END_OF_LUA
 
     return if $regix < 0;
-    $slv->[Marpa::R3::Internal::Scanless::V::REGIX]  = $regix;
+    $slv->[Marpa::R3::Internal_V::REGIX]  = $regix;
 
     return bless $slv, $class;
 }
@@ -265,7 +265,7 @@ END_OF_LUA
 sub Marpa::R3::Scanless::V::DESTROY {
     # say STDERR "In Marpa::R3::Scanless::V::DESTROY before test";
     my $slv = shift;
-    my $lua = $slv->[Marpa::R3::Internal::Scanless::V::L];
+    my $lua = $slv->[Marpa::R3::Internal_V::L];
 
     # If we are destroying the Perl interpreter, then all the Marpa
     # objects will be destroyed, including Marpa's Lua interpreter.
@@ -277,7 +277,7 @@ sub Marpa::R3::Scanless::V::DESTROY {
     return if not $lua;
     # say STDERR "In Marpa::R3::Scanless::V::DESTROY after test";
 
-    my $regix = $slv->[Marpa::R3::Internal::Scanless::V::REGIX];
+    my $regix = $slv->[Marpa::R3::Internal_V::REGIX];
     $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
@@ -294,7 +294,7 @@ sub Marpa::R3::Scanless::V::set {
     Marpa::R3::exception( sprintf $error_message, '$slv->set()' ) if not $flat_args;
     $flat_args = slv_common_set($slv, $flat_args);
     my $trace_file_handle =
-      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+      $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
 
     $slv->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -322,13 +322,13 @@ END_OF_LUA
 # Returns false if no parse
 sub Marpa::R3::Scanless::V::value {
     my ( $slv, $per_parse_arg ) = @_;
-    my $slr    = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+    my $slr    = $slv->[Marpa::R3::Internal_V::SLR];
     my $slg    = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my $trace_actions =
       $slg->[Marpa::R3::Internal::Scanless::G::TRACE_ACTIONS] // 0;
     my $trace_file_handle =
-      $slv->[Marpa::R3::Internal::Scanless::V::TRACE_FILE_HANDLE];
+      $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
 
         my $semantics_arg0 = $per_parse_arg // {};
         my $constants = $slg->[Marpa::R3::Internal::Scanless::G::CONSTANTS];
@@ -461,8 +461,8 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::V::call_by_tag {
     my ( $slv, $tag, $codestr, $signature, @args ) = @_;
-    my $lua   = $slv->[Marpa::R3::Internal::Scanless::V::L];
-    my $regix = $slv->[Marpa::R3::Internal::Scanless::V::REGIX];
+    my $lua   = $slv->[Marpa::R3::Internal_V::L];
+    my $regix = $slv->[Marpa::R3::Internal_V::REGIX];
 
     my @results;
     my $eval_error;
@@ -485,8 +485,8 @@ sub Marpa::R3::Scanless::V::call_by_tag {
 # not to be documented
 sub Marpa::R3::Scanless::V::coro_by_tag {
     my ( $slv, $tag, $args, $codestr ) = @_;
-    my $lua        = $slv->[Marpa::R3::Internal::Scanless::V::L];
-    my $regix      = $slv->[Marpa::R3::Internal::Scanless::V::REGIX];
+    my $lua        = $slv->[Marpa::R3::Internal_V::L];
+    my $regix      = $slv->[Marpa::R3::Internal_V::REGIX];
     my $handler    = $args->{handlers} // {};
     my $resume_tag = $tag . '[R]';
     my $signature  = $args->{signature} // '';
@@ -559,7 +559,7 @@ sub Marpa::R3::Scanless::V::tree_show {
 # not to be documented
 sub Marpa::R3::Scanless::V::nook_show {
     my ( $slv, $nook_id, $verbose ) = @_;
-    my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+    my $slr = $slv->[Marpa::R3::Internal_V::SLR];
 
     my ($or_node_id, $text) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -651,7 +651,7 @@ END_OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::V::verbose_or_node {
     my ( $slv, $or_node_id ) = @_;
-    my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+    my $slr = $slv->[Marpa::R3::Internal_V::SLR];
     my $slg = $slr->[Marpa::R3::Internal::Scanless::R::SLG];
 
     my ($text, $nrl_id, $position)
@@ -727,7 +727,7 @@ END_OF_LUA
 
 sub Marpa::R3::Scanless::V::ambiguous {
     my ($slv) = @_;
-    my $slr = $slv->[Marpa::R3::Internal::Scanless::V::SLR];
+    my $slr = $slv->[Marpa::R3::Internal_V::SLR];
     my $ambiguity_level = $slv->ambiguity_level();
     return q{No parse} if $ambiguity_level <= 0;
     return q{} if $ambiguity_level == 1;
@@ -765,7 +765,7 @@ END__OF_LUA
 # not to be documented
 sub Marpa::R3::Scanless::V::regix {
     my ( $slv ) = @_;
-    my $regix = $slv->[Marpa::R3::Internal::Scanless::V::REGIX];
+    my $regix = $slv->[Marpa::R3::Internal_V::REGIX];
     return $regix;
 }
 
