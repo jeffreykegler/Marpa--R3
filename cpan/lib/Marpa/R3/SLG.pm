@@ -73,8 +73,9 @@ sub Marpa::R3::Internal::meta_grammar {
     my $meta_slg = pre_construct('Marpa::R3::Grammar');
 
     state $hashed_metag = Marpa::R3::Internal::MetaG::hashed_grammar();
-    Marpa::R3::Internal_G::hash_to_runtime( $meta_slg, $hashed_metag,
-        { bless_package => 'Marpa::R3::Internal::MetaAST_Nodes' } );
+    $meta_slg->[Marpa::R3::Internal_G::BLESS_PACKAGE] =
+      'Marpa::R3::Internal::MetaAST_Nodes';
+    Marpa::R3::Internal_G::hash_to_runtime( $meta_slg, $hashed_metag );
 
     return $meta_slg;
 
@@ -92,12 +93,10 @@ sub Marpa::R3::Grammar::new {
     Marpa::R3::exception( sprintf $error_message, '$slg->new' )
       if not $flat_args;
 
-    my ( $p_dsl, $g1_args ) =
-      Marpa::R3::Internal_G::set( $slg, $flat_args );
+    my $p_dsl = Marpa::R3::Internal_G::set( $slg, $flat_args );
     my $ast        = Marpa::R3::Internal::MetaAST->new($p_dsl);
     my $hashed_ast = $ast->ast_to_hash($p_dsl);
-    Marpa::R3::Internal_G::hash_to_runtime( $slg, $hashed_ast,
-        $g1_args );
+    Marpa::R3::Internal_G::hash_to_runtime( $slg, $hashed_ast);
     return $slg;
 }
 
@@ -189,6 +188,12 @@ qq{'source' name argument to Marpa::R3::Grammar->new() is a ref to a an undef\n}
         delete $flat_args->{'trace_actions'};
     }
 
+    if ( defined( exists $flat_args->{'bless_package'} ) ) {
+        my $value = $flat_args->{'bless_package'};
+        $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE] = $value;
+        delete $flat_args->{'bless_package'};
+    }
+
     if ( exists $flat_args->{'exhaustion'} ) {
 
         my $value = $flat_args->{'exhaustion'} // '';
@@ -271,9 +276,9 @@ END_OF_LUA
         delete $flat_args->{'ranking_method'};
     }
 
-    return ( $dsl, $flat_args );
+    return $dsl;
 
-} ## end sub Marpa::R3::Internal_G::set
+}
 
 # The object, in computing the hash, is to get as much
 # precomputation in as possible, without using undue space.
@@ -282,7 +287,7 @@ END_OF_LUA
 # should tend to be done here, in the code that converts the
 # hash to its runtime equivalent.
 sub Marpa::R3::Internal_G::hash_to_runtime {
-    my ( $slg, $hashed_source, $g1_args ) = @_;
+    my ( $slg, $hashed_source ) = @_;
 
     my $is_meta = exists $hashed_source->{meta} ? 1 : undef;
 
@@ -310,11 +315,6 @@ END_OF_LUA
 
     # Create the the G1 grammar
 
-    if ( defined( my $value = $g1_args->{'bless_package'} ) ) {
-        $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE] = $value;
-        delete $g1_args->{'bless_package'};
-    }
-
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', '');
@@ -329,15 +329,6 @@ END_OF_LUA
     }
 
     add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
-
-    my @bad_arguments = keys %{$g1_args};
-    if ( scalar @bad_arguments ) {
-        Marpa::R3::exception(
-            q{Internal error: Bad named argument(s) to hash_to_runtime() method}
-              . join q{ },
-            @bad_arguments
-        );
-    }
 
     my $completion_events_by_name = $hashed_source->{completion_events};
     my $nulled_events_by_name = $hashed_source->{nulled_events};
@@ -986,7 +977,7 @@ END_OF_LUA
 
     return $slg;
 
-} ## end sub Marpa::R3::Internal_G::hash_to_runtime
+}
 
 sub Marpa::R3::Internal_G::precompute {
     my ($slg, $subg_name ) = @_;
@@ -2000,7 +1991,6 @@ sub registrations_find {
     my @closure_by_irlid   = ();
     my @semantics_by_irlid = ();
     my @blessing_by_irlid  = ();
-    $slg->[Marpa::R3::Internal_G::BLESSING_BY_IRLID] = \@blessing_by_irlid;
 
     my ( $rule_resolutions, $lexeme_resolutions ) = resolve_grammar($slg);
 
@@ -2223,7 +2213,6 @@ END_OF_LUA
 
     my @semantics_by_lexeme_id = ();
     my @blessing_by_lexeme_id  = ();
-    $slg->[Marpa::R3::Internal_G::BLESSING_BY_ISYID] = \@blessing_by_lexeme_id;
 
     # Check the lexeme semantics
     {

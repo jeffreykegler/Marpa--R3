@@ -194,8 +194,6 @@ __DATA__
 
     { Semantics }
     BLESS_PACKAGE { Default package into which nodes are blessed }
-    BLESSING_BY_IRLID { Blessings of rules, by IRLID }
-    BLESSING_BY_ISYID { Blessings of lexemes, by ISYID }
     SEMANTICS_PACKAGE
     TRACE_ACTIONS
 

@@ -337,10 +337,6 @@ sub Marpa::R3::Valuer::value {
       $slg->[Marpa::R3::Internal_G::CLOSURE_BY_SYMBOL_ID];
     my $rule_closures =
       $slg->[Marpa::R3::Internal_G::CLOSURE_BY_RULE_ID];
-    my $rule_blessings =
-      $slg->[Marpa::R3::Internal_G::BLESSING_BY_IRLID];
-    my $lexeme_blessings =
-      $slg->[Marpa::R3::Internal_G::BLESSING_BY_ISYID];
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::irlid = undef;
