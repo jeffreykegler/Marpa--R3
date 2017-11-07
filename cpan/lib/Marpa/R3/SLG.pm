@@ -2530,7 +2530,7 @@ qq{    Semantics were specified as "$original_semantics"\n}
 
             my @bless_ops = ();
             if ( $blessing ne '::undef' ) {
-                push @bless_ops, $op_lua, $op_bless_key, \$blessing;
+                push @bless_ops, $op_lua, $op_bless_key, \[$irlid, $lexeme_id, $blessing];
             }
 
             Marpa::R3::exception(qq{Unknown semantics: "$semantics"})

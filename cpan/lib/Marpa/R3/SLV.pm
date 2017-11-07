@@ -371,7 +371,8 @@ sub Marpa::R3::Valuer::value {
         },
         bless => sub {
             my ( $value, $blessing_ix ) = @_;
-            my $blessing = $constants->[$blessing_ix];
+            my $blessing_data = $constants->[$blessing_ix];
+            my ($irlid, $lexeme_id, $blessing) = @{$blessing_data};
             return 'sig', [ 'S', ( bless $value, $blessing ) ];
         },
         perl_nulling_semantics => sub {
@@ -439,12 +440,6 @@ sub Marpa::R3::Valuer::value {
                         }
                     );
                 } ## end if ( not $eval_ok or @warnings )
-            }
-            my $blessing = $rule_blessings->[$irlid];
-            if ($blessing ne '::undef') {
-                say STDERR 'blessing: ', Data::Dumper::Dumper( $blessing );
-                say STDERR 'result: ', Data::Dumper::Dumper( $result );
-                $result = bless $result, $blessing if defined $blessing;
             }
             return 'sig', [ 'S', $result ];
         }
