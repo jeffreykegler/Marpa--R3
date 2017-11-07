@@ -440,6 +440,12 @@ sub Marpa::R3::Valuer::value {
                     );
                 } ## end if ( not $eval_ok or @warnings )
             }
+            my $blessing = $rule_blessings->[$irlid];
+            if ($blessing ne '::undef') {
+                say STDERR 'blessing: ', Data::Dumper::Dumper( $blessing );
+                say STDERR 'result: ', Data::Dumper::Dumper( $result );
+                $result = bless $result, $blessing if defined $blessing;
+            }
             return 'sig', [ 'S', $result ];
         }
     );
