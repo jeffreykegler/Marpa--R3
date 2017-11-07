@@ -969,19 +969,6 @@ qq{   It contained non-word characters and that is not allowed\n},
                 } ## end if ( $default_blessing =~ / [\W] /xms )
             }
 
-            if ( $blessing !~ / :: /xms ) {
-                my $bless_package =
-                  $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE];
-                if ( not defined $bless_package ) {
-                    my $lexeme_name = $slg->g1_symbol_name($g1_lexeme_id);
-                    Marpa::R3::exception(
-qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
-                        qq{  The blessing for "$lexeme_name" was "$blessing"\n}
-                    );
-                } ## end if ( not defined $bless_package )
-                $blessing = $bless_package . q{::} . $blessing;
-            }
-
             $slg->call_by_tag(
                 ('@' .__FILE__ . ':' .  __LINE__),
                 <<'END_OF_LUA', 'is', $g1_lexeme_id, $blessing);
@@ -3012,31 +2999,19 @@ END_OF_LUA
 # Find the blessing for a rule.
 sub rule_blessing_find {
     my ( $slg, $irlid ) = @_;
-    my $bless_package = $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE];
-
     my ($blessing) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is>*', $irlid, ($bless_package // ''));
-        local slg, irlid, bless_package = ...
+        <<'END_OF_LUA', 'i', $irlid);
+        local slg, irlid = ...
         local irl = slg.g1.irls[irlid]
         local blessing = '::undef'
         local xpr = irl.xpr
         if xpr then
             blessing = xpr.bless or '::undef'
         end
-        if blessing == '::undef' then return blessing end
-        if #bless_package == 0 then
-            error(string.format(
-                'A blessed rule is in a grammar with no bless_package\n'
-                .. '  The rule was blessed as %q\n',
-                blessing
-            ))
-        end
-        return bless_package .. '::' .. blessing
+        return blessing
 END_OF_LUA
-
     return $blessing;
-
 }
 
 # Find the semantics for a lexeme.
