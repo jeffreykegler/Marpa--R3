@@ -61,6 +61,7 @@ sub pre_construct {
         slg.per_codepoint = {}
 
         slg.ranking_method = 'none'
+        slg.if_inaccessible = 'warn'
         return regix
 END_OF_LUA
 

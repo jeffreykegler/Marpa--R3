@@ -54,9 +54,9 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [SLIF recognizer (SLR) class](#slif-recognizer-slr-class)
   * [SLR fields](#slr-fields-DUP)
   * [SLR constructors](#slr-constructors)
-  * [Reading](#reading)
-    * [External reading](#external-reading)
-      * [Methods](#methods)
+  * [Internal reading](#internal-reading)
+  * [High-level external reading](#high-level-external-reading)
+  * [Low-level external reading](#low-level-external-reading)
   * [Evaluation](#evaluation)
   * [Locations](#locations)
   * [Events](#events)
@@ -537,29 +537,30 @@ perhaps because it is buggy.
 
 ```
     -- miranda: section+ class_slg field declarations
-    class_slg_fields['g1'] = true
-    class_slg_fields['l0'] = true
+    class_slg_fields.g1 = true
+    class_slg_fields.l0 = true
 
-    class_slg_fields['completion_event_by_isy'] = true
-    class_slg_fields['completion_event_by_name'] = true
-    class_slg_fields['discard_event_by_irl'] = true
-    class_slg_fields['discard_event_by_name'] = true
-    class_slg_fields['lexeme_event_by_isy'] = true
-    class_slg_fields['lexeme_event_by_name'] = true
-    class_slg_fields['nulled_event_by_isy'] = true
-    class_slg_fields['nulled_event_by_name'] = true
-    class_slg_fields['prediction_event_by_isy'] = true
-    class_slg_fields['prediction_event_by_name'] = true
+    class_slg_fields.completion_event_by_isy = true
+    class_slg_fields.completion_event_by_name = true
+    class_slg_fields.discard_event_by_irl = true
+    class_slg_fields.discard_event_by_name = true
+    class_slg_fields.lexeme_event_by_isy = true
+    class_slg_fields.lexeme_event_by_name = true
+    class_slg_fields.nulled_event_by_isy = true
+    class_slg_fields.nulled_event_by_name = true
+    class_slg_fields.prediction_event_by_isy = true
+    class_slg_fields.prediction_event_by_name = true
 
-    class_slg_fields['exhaustion_action'] = true
-    class_slg_fields['rejection_action'] = true
+    class_slg_fields.exhaustion_action = true
+    class_slg_fields.rejection_action = true
 
-    class_slg_fields['nulling_semantics'] = true
-    class_slg_fields['per_codepoint'] = true
-    class_slg_fields['ranking_method'] = true
+    class_slg_fields.nulling_semantics = true
+    class_slg_fields.per_codepoint = true
+    class_slg_fields.ranking_method = true
+    class_slg_fields.if_inaccessible = true
 
-    class_slg_fields['rule_semantics'] = true
-    class_slg_fields['token_semantics'] = true
+    class_slg_fields.rule_semantics = true
+    class_slg_fields.token_semantics = true
 
     class_slg_fields.xrls = true
     class_slg_fields.xprs = true
