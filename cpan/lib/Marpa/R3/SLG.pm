@@ -2013,6 +2013,7 @@ sub registrations_find {
     my @closure_by_irlid   = ();
     my @semantics_by_irlid = ();
     my @blessing_by_irlid  = ();
+    $slg->[Marpa::R3::Internal_G::BLESSING_BY_IRLID] = \@blessing_by_irlid;
 
     my ( $rule_resolutions, $lexeme_resolutions ) = resolve_grammar($slg);
 
@@ -2235,6 +2236,7 @@ END_OF_LUA
 
     my @semantics_by_lexeme_id = ();
     my @blessing_by_lexeme_id  = ();
+    $slg->[Marpa::R3::Internal_G::BLESSING_BY_ISYID] = \@blessing_by_lexeme_id;
 
     # Check the lexeme semantics
     {

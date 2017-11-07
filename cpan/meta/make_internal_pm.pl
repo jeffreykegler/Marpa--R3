@@ -192,18 +192,20 @@ __DATA__
     CONSTANTS
     CHARACTER_CLASS_TABLE
 
-    { TODO -- Convert fields after here to Lua? }
-
-    BLESS_PACKAGE { Default package into which nodes are blessed }
-    IF_INACCESSIBLE { default for symbols }
-
     { Semantics }
+    BLESS_PACKAGE { Default package into which nodes are blessed }
+    BLESSING_BY_IRLID { Blessings of rules, by IRLID }
+    BLESSING_BY_ISYID { Blessings of lexemes, by ISYID }
     SEMANTICS_PACKAGE
     TRACE_ACTIONS
 
     NULL_VALUES
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID
+
+    { TODO -- Convert fields after here to Lua? }
+
+    IF_INACCESSIBLE { default for symbols }
 
     :package=Marpa::R3::Internal_R
 

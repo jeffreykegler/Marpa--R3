@@ -330,13 +330,17 @@ sub Marpa::R3::Valuer::value {
     my $trace_file_handle =
       $slv->[Marpa::R3::Internal_V::TRACE_FILE_HANDLE];
 
-        my $semantics_arg0 = $per_parse_arg // {};
-        my $constants = $slg->[Marpa::R3::Internal_G::CONSTANTS];
-        my $null_values = $slg->[Marpa::R3::Internal_G::NULL_VALUES];
-        my $nulling_closures =
-          $slg->[Marpa::R3::Internal_G::CLOSURE_BY_SYMBOL_ID];
-        my $rule_closures =
-          $slg->[Marpa::R3::Internal_G::CLOSURE_BY_RULE_ID];
+    my $semantics_arg0 = $per_parse_arg // {};
+    my $constants = $slg->[Marpa::R3::Internal_G::CONSTANTS];
+    my $null_values = $slg->[Marpa::R3::Internal_G::NULL_VALUES];
+    my $nulling_closures =
+      $slg->[Marpa::R3::Internal_G::CLOSURE_BY_SYMBOL_ID];
+    my $rule_closures =
+      $slg->[Marpa::R3::Internal_G::CLOSURE_BY_RULE_ID];
+    my $rule_blessings =
+      $slg->[Marpa::R3::Internal_G::BLESSING_BY_IRLID];
+    my $lexeme_blessings =
+      $slg->[Marpa::R3::Internal_G::BLESSING_BY_ISYID];
 
     local $Marpa::R3::Context::rule = undef;
     local $Marpa::R3::Context::irlid = undef;
