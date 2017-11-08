@@ -293,18 +293,15 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             end
         end
         slg.if_inaccessible = if_inaccessible
+
+        -- Create the G1 grammar
+
+        local g1g = slg.g1
+        g1g.start_name = '[:start:]'
         return if_inaccessible
 END_OF_LUA
 
     # Create the the G1 grammar
-
-    $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', '');
-        local grammar = ...
-        local g1g = grammar.g1
-        g1g.start_name = '[:start:]'
-END_OF_LUA
 
     for my $symbol ( sort keys %{ $hashed_source->{symbols}->{g1} } ) {
         assign_G1_symbol( $slg, $symbol,
@@ -312,9 +309,6 @@ END_OF_LUA
     }
 
     add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
-
-    my $completion_events_by_name = $hashed_source->{completion_events};
-    my $nulled_events_by_name = $hashed_source->{nulled_events};
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
