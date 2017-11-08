@@ -286,6 +286,16 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         slg:xsys_populate( source_hash)
         slg:xrls_populate(source_hash)
         slg:xprs_populate(source_hash)
+        -- print(inspect(source_hash))
+        do
+            local defaults = source_hash.defaults
+            if defaults then
+                local if_inaccessible_arg = defaults.if_inaccessible
+                if if_inaccessible_arg then
+                    slg.if_inaccessible = if_inaccessible_arg
+                end
+            end
+        end
 END_OF_LUA
 
     my $if_inaccessible_default_arg =
