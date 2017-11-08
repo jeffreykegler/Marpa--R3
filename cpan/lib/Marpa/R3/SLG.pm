@@ -1144,6 +1144,10 @@ END_OF_LUA
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'sis', $subg_name, $isyid, $default_if_inaccessible);
         local slg, subg_name, isyid, default_treatment = ...
+        if default_treatment ~= slg.if_inaccessible then
+            io.stderr:write('arg from Perl, default treatment: ', inspect(default_treatment), '\n')
+            io.stderr:write('slg.if_inaccessible', inspect(slg.if_inaccessible), '\n')
+        end
         local lmw_g = slg[subg_name].lmw_g
         local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
         if is_accessible then
