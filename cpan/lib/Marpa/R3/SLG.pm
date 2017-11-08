@@ -278,7 +278,7 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
     my $trace_fh = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    my ($if_inaccessible_default) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
         slg.g1 = _M.grammar_new(slg)
@@ -287,25 +287,20 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         slg:xrls_populate(source_hash)
         slg:xprs_populate(source_hash)
         -- print(inspect(source_hash))
+        local if_inaccessible = slg.if_inaccessible
         do
             local defaults = source_hash.defaults
             if defaults then
-                local if_inaccessible_arg = defaults.if_inaccessible
-                if if_inaccessible_arg then
-                    slg.if_inaccessible = if_inaccessible_arg
-                end
+                if_inaccessible = defaults.if_inaccessible or if_inaccessible
             end
         end
+        slg.if_inaccessible = if_inaccessible
+        return if_inaccessible
 END_OF_LUA
 
-    my $if_inaccessible_default_arg =
-      $hashed_source->{defaults}->{if_inaccessible};
-    if ( defined $if_inaccessible_default_arg ) {
-        $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] =
-          $if_inaccessible_default_arg;
-    }
-    my $if_inaccessible_default =
-      $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE];
+    # say STDERR 'Lua if_inaccessible: ', Data::Dumper::Dumper( $if_inaccessible_default );
+    # say STDERR 'Perl if_inaccessible: ', Data::Dumper::Dumper( $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] );
+    $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] = $if_inaccessible_default;
 
     # Create the the G1 grammar
 
