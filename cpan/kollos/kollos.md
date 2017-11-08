@@ -537,6 +537,7 @@ perhaps because it is buggy.
 
 ```
     -- miranda: section+ class_slg field declarations
+    class_slg_fields.regix = true
     class_slg_fields.g1 = true
     class_slg_fields.l0 = true
 
@@ -582,6 +583,34 @@ This is a registry object.
       { NULL, NULL },
     };
 
+```
+
+### SLG constructor
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.slg_new(flat_args)
+        local slg = {}
+        setmetatable(slg, _M.class_slg)
+        local regix = _M.register(_M.registry, slg)
+        slg.regix = regix
+
+        slg.exhaustion_action = 'fatal'
+        slg.rejection_action = 'fatal'
+
+        slg.nulling_semantics = {}
+        slg.rule_semantics = {}
+        slg.token_semantics = {}
+
+        -- The codepoint data is populated, as needed, by the recognizers but,
+        -- once populated, depends only on the codepoint and the
+        -- grammar.
+        slg.per_codepoint = {}
+
+        slg.ranking_method = 'none'
+        slg.if_inaccessible = 'warn'
+        return slg
+    end
 ```
 
 ### SLG accessors

@@ -44,25 +44,8 @@ sub pre_construct {
     my ($regix) = $lua->call_by_tag (-1,
         ('@' .__FILE__ . ':' .  __LINE__),
        <<'END_OF_LUA', '');
-        local slg = {}
-        setmetatable(slg, _M.class_slg)
-        local regix = _M.register(_M.registry, slg)
-
-        slg.exhaustion_action = 'fatal'
-        slg.rejection_action = 'fatal'
-
-        slg.nulling_semantics = {}
-        slg.rule_semantics = {}
-        slg.token_semantics = {}
-
-        -- The codepoint data is populated, as needed, by the recognizers but,
-        -- once populated, depends only on the codepoint and the
-        -- grammar.
-        slg.per_codepoint = {}
-
-        slg.ranking_method = 'none'
-        slg.if_inaccessible = 'warn'
-        return regix
+        local slg = _M.slg_new()
+        return slg.regix
 END_OF_LUA
 
     $pre_slg->[Marpa::R3::Internal_G::REGIX] = $regix;
