@@ -321,17 +321,6 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
            end
         end
 
-        return if_inaccessible
-END_OF_LUA
-
-    # add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
-
-    $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', $hashed_source );
-        local slg, hashed_source = ...
-        local g1g = slg.g1
-
         local function event_setup(g1g, events, set_fn, activate_fn)
             local event_by_isy = {}
             local event_by_name = {}
@@ -369,25 +358,26 @@ END_OF_LUA
 
         slg.completion_event_by_isy, slg.completion_event_by_name
             = event_setup(g1g,
-                (hashed_source.completion_events or {}),
+                (source_hash.completion_events or {}),
                 g1g.symbol_is_completion_event_set,
                 g1g.completion_symbol_activate
             )
 
         slg.nulled_event_by_isy, slg.nulled_event_by_name
             = event_setup(g1g,
-                (hashed_source.nulled_events or {}),
+                (source_hash.nulled_events or {}),
                 g1g.symbol_is_nulled_event_set,
                 g1g.nulled_symbol_activate
             )
 
         slg.prediction_event_by_isy, slg.prediction_event_by_name
             = event_setup(g1g,
-                (hashed_source.prediction_events or {}),
+                (source_hash.prediction_events or {}),
                 g1g.symbol_is_prediction_event_set,
                 g1g.prediction_symbol_activate
             )
 
+        return if_inaccessible
 END_OF_LUA
 
     my $precompute_error =
@@ -1175,7 +1165,6 @@ END_OF_LUA
 
 }
 
-
 sub assign_L0_symbol {
     my ( $slg, $name, $options ) = @_;
     my ($symbol_id) =
@@ -1185,14 +1174,6 @@ sub assign_L0_symbol {
     return slg:l0_symbol_assign(symbol_name, options)
 END_OF_LUA
     return $symbol_id;
-}
-
-sub add_G1_user_rules {
-    my ( $slg, $rules ) = @_;
-    for my $rule (@{$rules}) {
-        add_G1_user_rule( $slg, $rule );
-    }
-    return;
 }
 
 sub add_L0_user_rules {
@@ -1210,16 +1191,6 @@ sub proto_rule_describe {
     # wrap symbol names with whitespaces allowed by SLIF
     $lhs_name = "<$lhs_name>" if $lhs_name =~ / /;
     return "$lhs_name -> " . ( join q{ }, map { / / ? "<$_>" : $_ } @{$rhs_names} );
-}
-
-sub add_G1_user_rule {
-    my ( $slg, $options ) = @_;
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $options );
-    local slg, options = ...
-    return slg:g1_rule_add(options)
-END_OF_LUA
-
 }
 
 sub add_L0_user_rule {
