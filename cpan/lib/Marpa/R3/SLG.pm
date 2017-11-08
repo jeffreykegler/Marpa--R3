@@ -298,15 +298,30 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
         local g1g = slg.g1
         g1g.start_name = '[:start:]'
+
+        do
+           local g1_symbols = source_hash.symbols.g1
+           local g1_symbol_names = {}
+           for symbol_name, _ in pairs(g1_symbols) do
+               g1_symbol_names[#g1_symbol_names+1] = symbol_name
+           end
+           table.sort(g1_symbol_names)
+           for ix = 1,#g1_symbol_names do
+               local symbol_name = g1_symbol_names[ix]
+               local options = g1_symbols[symbol_name]
+               slg:g1_symbol_assign(symbol_name, options)
+           end
+        end
+
         return if_inaccessible
 END_OF_LUA
 
     # Create the the G1 grammar
 
-    for my $symbol ( sort keys %{ $hashed_source->{symbols}->{g1} } ) {
-        assign_G1_symbol( $slg, $symbol,
-            $hashed_source->{symbols}->{g1}->{$symbol} );
-    }
+    # for my $symbol ( sort keys %{ $hashed_source->{symbols}->{g1} } ) {
+        # assign_G1_symbol( $slg, $symbol,
+            # $hashed_source->{symbols}->{g1}->{$symbol} );
+    # }
 
     add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
 
