@@ -313,17 +313,18 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
            end
         end
 
+        do
+           local g1_rules = source_hash.rules.g1
+           for ix = 1,#g1_rules do
+               local options = g1_rules[ix]
+               slg:g1_rule_add(options)
+           end
+        end
+
         return if_inaccessible
 END_OF_LUA
 
-    # Create the the G1 grammar
-
-    # for my $symbol ( sort keys %{ $hashed_source->{symbols}->{g1} } ) {
-        # assign_G1_symbol( $slg, $symbol,
-            # $hashed_source->{symbols}->{g1}->{$symbol} );
-    # }
-
-    add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
+    # add_G1_user_rules( $slg, $hashed_source->{rules}->{g1} );
 
     $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -1174,18 +1175,6 @@ END_OF_LUA
 
 }
 
-
-sub assign_G1_symbol {
-    # $slg will be needed for the XSY's
-    my ( $slg, $name, $options ) = @_;
-    my ($symbol_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ss', $name, $options );
-    local slg, symbol_name, options = ...
-    return slg:g1_symbol_assign(symbol_name, options)
-END_OF_LUA
-    return $symbol_id;
-}
 
 sub assign_L0_symbol {
     my ( $slg, $name, $options ) = @_;
