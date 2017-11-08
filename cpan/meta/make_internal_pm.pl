@@ -201,10 +201,6 @@ __DATA__
     CLOSURE_BY_SYMBOL_ID
     CLOSURE_BY_RULE_ID
 
-    { TODO -- Convert fields after here to Lua? }
-
-    IF_INACCESSIBLE { default for symbols }
-
     :package=Marpa::R3::Internal_R
 
     SLG

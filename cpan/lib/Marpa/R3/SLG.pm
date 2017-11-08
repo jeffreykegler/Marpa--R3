@@ -70,8 +70,6 @@ sub Marpa::R3::Grammar::new {
 
     my $slg = pre_construct($class);
 
-    $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] = 'warn';
-
     my ( $flat_args, $error_message ) =
       Marpa::R3::flatten_hash_args( \@hash_ref_args );
     Marpa::R3::exception( sprintf $error_message, '$slg->new' )
@@ -297,10 +295,6 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         slg.if_inaccessible = if_inaccessible
         return if_inaccessible
 END_OF_LUA
-
-    # say STDERR 'Lua if_inaccessible: ', Data::Dumper::Dumper( $if_inaccessible_default );
-    # say STDERR 'Perl if_inaccessible: ', Data::Dumper::Dumper( $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] );
-    $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE] = $if_inaccessible_default;
 
     # Create the the G1 grammar
 
@@ -1128,9 +1122,6 @@ END_OF_LUA
         Marpa::R3::exception('Cycles in grammar, fatal error');
     }
 
-    my $default_if_inaccessible =
-        $slg->[Marpa::R3::Internal_G::IF_INACCESSIBLE]
-        // 'warn';
     SYMBOL:
     for (my $iter = $slg->lmg_symbol_ids_gen($subg_name); defined(my $isyid = $iter->());) {
         # Inaccessible internal symbols may be created

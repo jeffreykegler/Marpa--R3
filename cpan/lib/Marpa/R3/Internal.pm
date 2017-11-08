@@ -96,7 +96,6 @@ use constant TRACE_ACTIONS => 7;
 use constant NULL_VALUES => 8;
 use constant CLOSURE_BY_SYMBOL_ID => 9;
 use constant CLOSURE_BY_RULE_ID => 10;
-use constant IF_INACCESSIBLE => 11;
 
 package Marpa::R3::Internal_R;
 use constant SLG => 0;
