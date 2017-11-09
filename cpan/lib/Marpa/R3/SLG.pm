@@ -1122,45 +1122,38 @@ END_OF_LUA
         Marpa::R3::exception('Cycles in grammar, fatal error');
     }
 
-    SYMBOL:
-    for (my $iter = $slg->lmg_symbol_ids_gen($subg_name); defined(my $isyid = $iter->());) {
-        # Inaccessible internal symbols may be created
-        # from inaccessible use symbols -- ignore these.
-        # This assumes that Marpa's logic
-        # is correct and that
-        # it is not creating inaccessible symbols from
-        # accessible ones.
+    # Inaccessible internal symbols may be created
+    # from inaccessible use symbols -- ignore these.
+    # This assumes that Marpa's logic
+    # is correct and that
+    # it is not creating inaccessible symbols from
+    # accessible ones.
 
-        my ($cmd, $treatment) = $slg->coro_by_tag(
-            ('@' .__FILE__ . ':' .  __LINE__),
-            {
-                signature => 'si',
-                args => [ $subg_name, $isyid ],
-                handlers  => {
-                    trace => sub {
-                        my ($msg) = @_;
-                        say {$trace_file_handle} $msg;
-                        return 'ok';
-                    },
-                }
-            },
-            <<'END_OF_LUA');
-        local slg, subg_name, isyid = ...
-        _M.wrap(function ()
-            local default_treatment = slg.if_inaccessible
-            local lmw_g = slg[subg_name].lmw_g
+    my ($cmd, $treatment) = $slg->coro_by_tag(
+        ('@' .__FILE__ . ':' .  __LINE__),
+        {
+            signature => 's',
+            args => [ $subg_name ],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+    local slg, subg_name = ...
+    _M.wrap(function ()
+        local default_treatment = slg.if_inaccessible
+        local lmw_g = slg[subg_name].lmw_g
+        for isyid = 0, lmw_g:highest_symbol_id() do
             local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
-            if is_accessible then
-                return 'ok', 'next symbol', default_treatment
-            end
+            if is_accessible then goto NEXT_SYMBOL end
             local xsy = slg[subg_name].xsys[isyid]
-            if not xsy then
-                return 'ok', 'next symbol', default_treatment
-            end
+            if not xsy then goto NEXT_SYMBOL end
             local treatment = xsy.if_inaccessible or default_treatment
-            if treatment == 'ok' then
-                return 'ok', 'next symbol', treatment
-            end
+            if treatment == 'ok' then goto NEXT_SYMBOL end
             -- return 'ok', 'ok', treatment
             local symbol_name = slg:lmg_symbol_name(subg_name, isyid)
             local message = string.format(
@@ -1168,10 +1161,11 @@ END_OF_LUA
             )
             if treatment == 'fatal' then _M.userX(message) end
             coroutine.yield('trace', message)
-        end)
+            ::NEXT_SYMBOL::
+        end
+        return 'ok'
+    end)
 END_OF_LUA
-
-    }
 
     return ;
 
