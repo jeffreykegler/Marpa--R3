@@ -1106,9 +1106,20 @@ END_OF_LUA
             defined(my $rule_id = $iter->()) ;
           )
         {
-            my ($rule_is_loop) =
-              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'si', $subg_name, $rule_id );
+            my ($rule_is_loop) = $slg->coro_by_tag(
+                ('@' .__FILE__ . ':' .  __LINE__),
+                {
+                    signature => 'si',
+                    args => [ $subg_name, $rule_id ],
+                    handlers  => {
+                        trace => sub {
+                            my ($msg) = @_;
+                            say {$trace_file_handle} $msg;
+                            return 'ok';
+                        },
+                    }
+                },
+                <<'END_OF_LUA');
         local grammar, subg_name, rule_id = ...
         local lmw_g = grammar[subg_name].lmw_g
         return lmw_g:rule_is_loop(rule_id)
@@ -1121,13 +1132,6 @@ END_OF_LUA
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
     }
-
-    # Inaccessible internal symbols may be created
-    # from inaccessible use symbols -- ignore these.
-    # This assumes that Marpa's logic
-    # is correct and that
-    # it is not creating inaccessible symbols from
-    # accessible ones.
 
     my ($cmd, $treatment) = $slg->coro_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
@@ -1147,6 +1151,12 @@ END_OF_LUA
     _M.wrap(function ()
         local default_treatment = slg.if_inaccessible
         local lmw_g = slg[subg_name].lmw_g
+
+        -- This logic assumes that Marpa's logic
+        -- is correct and that its rewrites are
+        -- it is not creating inaccessible symbols from
+        -- accessible ones.
+
         for isyid = 0, lmw_g:highest_symbol_id() do
             local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
             if is_accessible then goto NEXT_SYMBOL end
