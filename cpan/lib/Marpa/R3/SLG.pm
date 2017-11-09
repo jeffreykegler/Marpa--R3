@@ -965,7 +965,7 @@ END_OF_LUA
 sub Marpa::R3::Internal_G::precompute {
     my ($slg, $subg_name ) = @_;
 
-    my $trace_fh =
+    my $trace_file_handle =
         $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
     my ($do_return, $precompute_result, $precompute_error_code)
@@ -1115,7 +1115,7 @@ END_OF_LUA
 END_OF_LUA
 
             next RULE unless $rule_is_loop;
-            print {$trace_fh} 'Cycle found involving rule: ',
+            print {$trace_file_handle} 'Cycle found involving rule: ',
               $slg->lmg_rule_show( $subg_name, $rule_id ), "\n"
               or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
@@ -1131,25 +1131,38 @@ END_OF_LUA
         # it is not creating inaccessible symbols from
         # accessible ones.
 
-        my ($cmd, $treatment) = $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'si', $subg_name, $isyid);
+        my ($cmd, $treatment) = $slg->coro_by_tag(
+            ('@' .__FILE__ . ':' .  __LINE__),
+            {
+                signature => 'si',
+                args => [ $subg_name, $isyid ],
+                handlers  => {
+                    trace => sub {
+                        my ($msg) = @_;
+                        say {$trace_file_handle} $msg;
+                        return 'ok';
+                    },
+                }
+            },
+            <<'END_OF_LUA');
         local slg, subg_name, isyid = ...
-        local default_treatment = slg.if_inaccessible
-        local lmw_g = slg[subg_name].lmw_g
-        local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
-        if is_accessible then
-            return 'next symbol', default_treatment
-        end
-        local xsy = slg[subg_name].xsys[isyid]
-        if not xsy then
-            return 'next symbol', default_treatment
-        end
-        local treatment = xsy.if_inaccessible or default_treatment
-        if treatment == 'ok' then
-            return 'next symbol', treatment
-        end
-        return 'ok', treatment
+        _M.wrap(function ()
+            local default_treatment = slg.if_inaccessible
+            local lmw_g = slg[subg_name].lmw_g
+            local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
+            if is_accessible then
+                return 'ok', 'next symbol', default_treatment
+            end
+            local xsy = slg[subg_name].xsys[isyid]
+            if not xsy then
+                return 'ok', 'next symbol', default_treatment
+            end
+            local treatment = xsy.if_inaccessible or default_treatment
+            if treatment == 'ok' then
+                return 'ok', 'next symbol', treatment
+            end
+            return 'ok', 'ok', treatment
+        end)
 END_OF_LUA
 
         next SYMBOL if $cmd ne 'ok';
@@ -1157,7 +1170,7 @@ END_OF_LUA
         my $symbol_name = $slg->lmg_symbol_name($subg_name, $isyid);
         my $message = "Inaccessible $subg_name symbol: $symbol_name";
         Marpa::R3::exception($message) if $treatment eq 'fatal';
-        say {$trace_fh} $message
+        say {$trace_file_handle} $message
             or Marpa::R3::exception("Could not print: $ERRNO");
     }
 
