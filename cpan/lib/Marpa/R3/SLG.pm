@@ -1161,17 +1161,16 @@ END_OF_LUA
             if treatment == 'ok' then
                 return 'ok', 'next symbol', treatment
             end
-            return 'ok', 'ok', treatment
+            -- return 'ok', 'ok', treatment
+            local symbol_name = slg:lmg_symbol_name(subg_name, isyid)
+            local message = string.format(
+                "Inaccessible %s symbol: %s", subg_name, symbol_name
+            )
+            if treatment == 'fatal' then _M.userX(message) end
+            coroutine.yield('trace', message)
         end)
 END_OF_LUA
 
-        next SYMBOL if $cmd ne 'ok';
-
-        my $symbol_name = $slg->lmg_symbol_name($subg_name, $isyid);
-        my $message = "Inaccessible $subg_name symbol: $symbol_name";
-        Marpa::R3::exception($message) if $treatment eq 'fatal';
-        say {$trace_file_handle} $message
-            or Marpa::R3::exception("Could not print: $ERRNO");
     }
 
     return ;
