@@ -619,6 +619,30 @@ TODO: Before end of development, convert to a local.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.precompute_inaccessibles(slg, subg)
+        local default_treatment = slg.if_inaccessible
+        local lmw_g = subg.lmw_g
+
+        -- This logic assumes that Marpa's logic
+        -- is correct and that its rewrites are
+        -- it is not creating inaccessible symbols from
+        -- accessible ones.
+
+        for isyid = 0, lmw_g:highest_symbol_id() do
+            local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
+            if is_accessible then goto NEXT_SYMBOL end
+            local xsy = subg.xsys[isyid]
+            if not xsy then goto NEXT_SYMBOL end
+            local treatment = xsy.if_inaccessible or default_treatment
+            if treatment == 'ok' then goto NEXT_SYMBOL end
+            -- return 'ok', 'ok', treatment
+            local symbol_name = subg:symbol_name(isyid)
+            local message = string.format(
+                "Inaccessible %s symbol: %s", subg.name, symbol_name
+            )
+            if treatment == 'fatal' then _M.userX(message) end
+            coroutine.yield('trace', message)
+            ::NEXT_SYMBOL::
+        end
     end
 ```
 

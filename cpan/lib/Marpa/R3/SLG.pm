@@ -1143,30 +1143,7 @@ END_OF_LUA
     local slg, subg_name = ...
     _M.wrap(function ()
         local subg = slg[subg_name]
-        local default_treatment = slg.if_inaccessible
-        local lmw_g = slg[subg_name].lmw_g
-
-        -- This logic assumes that Marpa's logic
-        -- is correct and that its rewrites are
-        -- it is not creating inaccessible symbols from
-        -- accessible ones.
-
-        for isyid = 0, lmw_g:highest_symbol_id() do
-            local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
-            if is_accessible then goto NEXT_SYMBOL end
-            local xsy = slg[subg_name].xsys[isyid]
-            if not xsy then goto NEXT_SYMBOL end
-            local treatment = xsy.if_inaccessible or default_treatment
-            if treatment == 'ok' then goto NEXT_SYMBOL end
-            -- return 'ok', 'ok', treatment
-            local symbol_name = slg:lmg_symbol_name(subg_name, isyid)
-            local message = string.format(
-                "Inaccessible %s symbol: %s", subg_name, symbol_name
-            )
-            if treatment == 'fatal' then _M.userX(message) end
-            coroutine.yield('trace', message)
-            ::NEXT_SYMBOL::
-        end
+        slg:precompute_inaccessibles(subg)
         return 'ok'
     end)
 END_OF_LUA
