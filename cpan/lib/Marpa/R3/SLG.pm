@@ -1120,15 +1120,19 @@ END_OF_LUA
                     }
                 },
                 <<'END_OF_LUA');
-        local grammar, subg_name, rule_id = ...
-        local lmw_g = grammar[subg_name].lmw_g
-        return lmw_g:rule_is_loop(rule_id)
+        local slg, subg_name, rule_id = ...
+        _M.wrap(function ()
+            local lmw_g = slg[subg_name].lmw_g
+            local is_loop = lmw_g:rule_is_loop(rule_id)
+            if is_loop then
+                local rule_desc = slg:lmg_rule_show(subg_name, rule_id)
+                local message = string.format(
+                    "Cycle found involving rule: %s\n", rule_desc
+                )
+                coroutine.yield('trace', message)
+            end
+        end)
 END_OF_LUA
-
-            next RULE unless $rule_is_loop;
-            print {$trace_file_handle} 'Cycle found involving rule: ',
-              $slg->lmg_rule_show( $subg_name, $rule_id ), "\n"
-              or Marpa::R3::exception("Could not print: $ERRNO");
         } ## end for my $rule_id (@loop_rules)
         Marpa::R3::exception('Cycles in grammar, fatal error');
     }
