@@ -44,6 +44,7 @@ cd kollos && ../lua/lua toc.lua < kollos.md
 * [Kollos registry objects](#kollos-registry-objects)
 * [SLIF grammar (SLG) class](#slif-grammar-slg-class)
   * [SLG fields](#slg-fields)
+  * [SLG constructor](#slg-constructor)
   * [SLG accessors](#slg-accessors)
   * [Mutators](#mutators)
   * [Hash to runtime processing](#hash-to-runtime-processing)
@@ -610,6 +611,14 @@ This is a registry object.
         slg.ranking_method = 'none'
         slg.if_inaccessible = 'warn'
         return slg
+    end
+```
+
+TODO: Before end of development, convert to a local.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.precompute_inaccessibles(slg, subg)
     end
 ```
 
@@ -6284,6 +6293,13 @@ to set and discover various Lua values.
     class_grammar_fields.xpr_by_irlid = true
 ```
 
+The `name` is used for diagnostics and errors.
+
+```
+    -- miranda: section+ class_grammar field declarations
+    class_grammar_fields.name = true
+```
+
 A per-grammar table of the XSY's,
 indexed by isyid.
 
@@ -6334,9 +6350,10 @@ indexed by isyid.
     _M.class_grammar._ahm_irl = nil
 
     -- miranda: section+ most Lua function definitions
-    function _M.grammar_new(slg)
+    function _M.grammar_new(slg, name)
         local grammar = _M.metal.grammar_new()
         setmetatable(grammar, _M.class_grammar)
+        grammar.name = name
         grammar:force_valued()
         grammar.isyid_by_name = {}
         grammar.name_by_isyid = {}

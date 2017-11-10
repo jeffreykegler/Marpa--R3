@@ -279,8 +279,8 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
     my ($if_inaccessible_default) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        slg.g1 = _M.grammar_new(slg)
-        slg.l0 = _M.grammar_new(slg)
+        slg.g1 = _M.grammar_new(slg, 'g1')
+        slg.l0 = _M.grammar_new(slg, 'l0')
         slg:xsys_populate( source_hash)
         slg:xrls_populate(source_hash)
         slg:xprs_populate(source_hash)
@@ -1142,6 +1142,7 @@ END_OF_LUA
         <<'END_OF_LUA');
     local slg, subg_name = ...
     _M.wrap(function ()
+        local subg = slg[subg_name]
         local default_treatment = slg.if_inaccessible
         local lmw_g = slg[subg_name].lmw_g
 
