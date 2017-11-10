@@ -1098,54 +1098,11 @@ END_OF_LUA
             <<'END_OF_LUA');
         local slg, subg_name = ...
         _M.wrap(function ()
-            local loop_rule_count = 0
-            local lmw_g = slg[subg_name].lmw_g
-            local events = lmw_g:events()
-            for i = 1, #events, 2 do
-                local event_type = events[i]
-                if event_type == _M.event["LOOP_RULES"] then
-                    error(string.format(
-                       "Unknown grammar precomputation event; type=%q"))
-                end
-                loop_rule_count = events[i+1]
-            end
-            if loop_rule_count > 0 then
-                for rule_id = 0, lmw_g:highest_rule_id() do
-                    local lmw_g = slg[subg_name].lmw_g
-                    local is_loop = lmw_g:rule_is_loop(rule_id)
-                    if is_loop then
-                        local rule_desc = slg:lmg_rule_show(subg_name, rule_id)
-                        local message = string.format(
-                            "Cycle found involving rule: %s\n", rule_desc
-                        )
-                        coroutine.yield('trace', message)
-                    end
-                end
-                error('Cycles in grammar, fatal error')
-            end
+            local subg = slg[subg_name]
+            slg:precompute_inaccessibles(subg)
+            slg:precompute_inaccessibles(subg)
+            return 'ok'
         end)
-END_OF_LUA
-
-    my ($cmd, $treatment) = $slg->coro_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        {
-            signature => 's',
-            args => [ $subg_name ],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-            }
-        },
-        <<'END_OF_LUA');
-    local slg, subg_name = ...
-    _M.wrap(function ()
-        local subg = slg[subg_name]
-        slg:precompute_inaccessibles(subg)
-        return 'ok'
-    end)
 END_OF_LUA
 
     return ;

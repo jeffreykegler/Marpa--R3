@@ -618,6 +618,39 @@ TODO: Before end of development, convert to a local.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slg.precompute_cycles(slg, subg)
+        local loop_rule_count = 0
+        local lmw_g = subg.lmw_g
+        local events = lmw_g:events()
+        for i = 1, #events, 2 do
+            local event_type = events[i]
+            if event_type == _M.event["LOOP_RULES"] then
+                error(string.format(
+                   "Unknown grammar precomputation event; type=%q"))
+            end
+            loop_rule_count = events[i+1]
+        end
+        if loop_rule_count > 0 then
+            for rule_id = 0, lmw_g:highest_rule_id() do
+                local lmw_g = subg.lmw_g
+                local is_loop = lmw_g:rule_is_loop(rule_id)
+                if is_loop then
+                    local rule_desc = subg:rule_show(rule_id)
+                    local message = string.format(
+                        "Cycle found involving rule: %s\n", rule_desc
+                    )
+                    coroutine.yield('trace', message)
+                end
+            end
+            error('Cycles in grammar, fatal error')
+        end
+    end
+```
+
+TODO: Before end of development, convert to a local.
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slg.precompute_inaccessibles(slg, subg)
         local default_treatment = slg.if_inaccessible
         local lmw_g = subg.lmw_g
