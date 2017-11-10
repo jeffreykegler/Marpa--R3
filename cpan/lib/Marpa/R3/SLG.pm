@@ -1081,25 +1081,7 @@ END_OF_LUA
     # Above I went through the error events
     # Here I go through the events for situations where there was no
     # hard error returned from libmarpa
-      my ($loop_rule_count) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $subg_name );
-        local grammar, subg_name = ...
-        local loop_rule_count = 0
-        local lmw_g = grammar[subg_name].lmw_g
-        local events = lmw_g:events()
-        for i = 1, #events, 2 do
-            local event_type = events[i]
-            if event_type == _M.event["LOOP_RULES"] then
-                error(string.format(
-                   "Unknown grammar precomputation event; type=%q"))
-            end
-            loop_rule_count = events[i+1]
-        end
-        return loop_rule_count
-END_OF_LUA
 
-    if ($loop_rule_count) {
         $slg->coro_by_tag(
             ( '@' . __FILE__ . ':' . __LINE__ ),
             {
@@ -1116,21 +1098,33 @@ END_OF_LUA
             <<'END_OF_LUA');
         local slg, subg_name = ...
         _M.wrap(function ()
-            for rule_id = 0, lmw_g:highest_rule_id() do
-                local lmw_g = slg[subg_name].lmw_g
-                local is_loop = lmw_g:rule_is_loop(rule_id)
-                if is_loop then
-                    local rule_desc = slg:lmg_rule_show(subg_name, rule_id)
-                    local message = string.format(
-                        "Cycle found involving rule: %s\n", rule_desc
-                    )
-                    coroutine.yield('trace', message)
+            local loop_rule_count = 0
+            local lmw_g = slg[subg_name].lmw_g
+            local events = lmw_g:events()
+            for i = 1, #events, 2 do
+                local event_type = events[i]
+                if event_type == _M.event["LOOP_RULES"] then
+                    error(string.format(
+                       "Unknown grammar precomputation event; type=%q"))
                 end
+                loop_rule_count = events[i+1]
             end
-            error('Cycles in grammar, fatal error')
+            if loop_rule_count > 0 then
+                for rule_id = 0, lmw_g:highest_rule_id() do
+                    local lmw_g = slg[subg_name].lmw_g
+                    local is_loop = lmw_g:rule_is_loop(rule_id)
+                    if is_loop then
+                        local rule_desc = slg:lmg_rule_show(subg_name, rule_id)
+                        local message = string.format(
+                            "Cycle found involving rule: %s\n", rule_desc
+                        )
+                        coroutine.yield('trace', message)
+                    end
+                end
+                error('Cycles in grammar, fatal error')
+            end
         end)
 END_OF_LUA
-    }
 
     my ($cmd, $treatment) = $slg->coro_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
