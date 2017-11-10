@@ -1100,41 +1100,36 @@ END_OF_LUA
 END_OF_LUA
 
     if ($loop_rule_count) {
-      RULE:
-        for (
-            my $iter    = $slg->lmg_rule_ids_gen($subg_name) ;
-            defined(my $rule_id = $iter->()) ;
-          )
-        {
-            my ($rule_is_loop) = $slg->coro_by_tag(
-                ('@' .__FILE__ . ':' .  __LINE__),
-                {
-                    signature => 'si',
-                    args => [ $subg_name, $rule_id ],
-                    handlers  => {
-                        trace => sub {
-                            my ($msg) = @_;
-                            say {$trace_file_handle} $msg;
-                            return 'ok';
-                        },
-                    }
-                },
-                <<'END_OF_LUA');
-        local slg, subg_name, rule_id = ...
+        $slg->coro_by_tag(
+            ( '@' . __FILE__ . ':' . __LINE__ ),
+            {
+                signature => 's',
+                args      => [$subg_name],
+                handlers  => {
+                    trace => sub {
+                        my ($msg) = @_;
+                        say {$trace_file_handle} $msg;
+                        return 'ok';
+                    },
+                }
+            },
+            <<'END_OF_LUA');
+        local slg, subg_name = ...
         _M.wrap(function ()
-            local lmw_g = slg[subg_name].lmw_g
-            local is_loop = lmw_g:rule_is_loop(rule_id)
-            if is_loop then
-                local rule_desc = slg:lmg_rule_show(subg_name, rule_id)
-                local message = string.format(
-                    "Cycle found involving rule: %s\n", rule_desc
-                )
-                coroutine.yield('trace', message)
+            for rule_id = 0, lmw_g:highest_rule_id() do
+                local lmw_g = slg[subg_name].lmw_g
+                local is_loop = lmw_g:rule_is_loop(rule_id)
+                if is_loop then
+                    local rule_desc = slg:lmg_rule_show(subg_name, rule_id)
+                    local message = string.format(
+                        "Cycle found involving rule: %s\n", rule_desc
+                    )
+                    coroutine.yield('trace', message)
+                end
             end
+            error('Cycles in grammar, fatal error')
         end)
 END_OF_LUA
-        } ## end for my $rule_id (@loop_rules)
-        Marpa::R3::exception('Cycles in grammar, fatal error');
     }
 
     my ($cmd, $treatment) = $slg->coro_by_tag(
