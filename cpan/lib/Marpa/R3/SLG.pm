@@ -974,7 +974,7 @@ sub Marpa::R3::Internal_G::precompute {
     local grammar, subg_name = ...
     local lmw_g = grammar[subg_name].lmw_g
     if lmw_g:is_precomputed() ~= 0 then
-        return "return"
+        _M.userX('Attempted to precompute grammar twice')
     end
     if lmw_g:force_valued() < 0 then
         error( lmw_g:error_description() )
@@ -1008,30 +1008,15 @@ sub Marpa::R3::Internal_G::precompute {
     if cooked_code == _M.err.GRAMMAR_HAS_CYCLE then
         cooked_code = _M.err.NONE
     end
-    if cooked_code == _M.err.PRECOMPUTED then
-        _M.userX( '%s', lmw_g:error_description() )
-    end
-    return "no", -1, cooked_code
-END_OF_LUA
-
-    return if $do_return eq "return";
-
-    if ( $precompute_error_code != $Marpa::R3::Error::NONE ) {
-
-      my ($ok, $result) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'si', $subg_name, $precompute_error_code );
-    local grammar, subg_name, error_code = ...
-    local lmw_g = grammar[subg_name].lmw_g
-    if error_code == _M.err["NO_RULES"] then
+    if cooked_code == _M.err.NO_RULES then
         _M.userX('Attempted to precompute grammar with no rules')
     end
-    if error_code == _M.err["NULLING_TERMINAL"] then
+    if cooked_code == _M.err.NULLING_TERMINAL then
         local msgs = {}
         local events = lmw_g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
-            if event_type == _M.event["NULLING_TERMINAL"] then
+            if event_type == _M.event.NULLING_TERMINAL then
                 msgs[#msgs+1] =
                    string.format("Nullable symbol %q is also a terminal\n",
                        lmw_g:symbol_name(events[i+1])
@@ -1041,12 +1026,12 @@ END_OF_LUA
         msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
         _M.userX( '%s', table.concat(msgs) )
     end
-    if error_code == _M.err["COUNTED_NULLABLE"] then
+    if cooked_code == _M.err.COUNTED_NULLABLE then
         local msgs = {}
         local events = lmw_g:events()
         for i = 1, #events, 2 do
             local event_type = events[i]
-            if event_type == _M.event["COUNTED_NULLABLE"] then
+            if event_type == _M.event.COUNTED_NULLABLE then
                 msgs[#msgs+1] =
                    string.format("Nullable symbol %q is on RHS of counted rule\n",
                        lmw_g:symbol_name(events[i+1])
@@ -1056,24 +1041,23 @@ END_OF_LUA
         msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
         _M.userX( '%s', table.concat(msgs) )
     end
-    if error_code == _M.err["START_NOT_LHS"] then
+    if cooked_code == _M.err.START_NOT_LHS then
         _M.userX( "Start symbol %s not on LHS of any rule",
             lmw_g.start_name);
     end
-    if error_code == _M.err["NO_START_SYMBOL"] then
+    if cooked_code == _M.err.NO_START_SYMBOL then
             _M.userX('No start symbol')
     end
-    if error_code ~= _M.err["UNPRODUCTIVE_START"] then
+    if cooked_code ~= _M.err.UNPRODUCTIVE_START then
             _M.userX( '%s', lmw_g:error_description() )
     end
-    return "ok"
+    if cooked_code ~= _M.err.NONE then
+        _M.userX( '%s', lmw_g:error_description() )
+    end
+    return "no", -1, cooked_code
 END_OF_LUA
 
-    if ($ok ne "ok") { Marpa::R3::exception( $result ); }
-
-    return $precompute_error_code;
-
-    } ## end if ( $precompute_error_code != $Marpa::R3::Error::NONE)
+    return if $do_return eq "return";
 
     # Above I went through the error events
     # Here I go through the events for situations where there was no
