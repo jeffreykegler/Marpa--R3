@@ -974,7 +974,7 @@ sub Marpa::R3::Internal_G::precompute {
     local grammar, subg_name = ...
     local lmw_g = grammar[subg_name].lmw_g
     if lmw_g:is_precomputed() ~= 0 then
-        return "false"
+        return "return"
     end
     if lmw_g:force_valued() < 0 then
         error( lmw_g:error_description() )
@@ -997,27 +997,24 @@ sub Marpa::R3::Internal_G::precompute {
     local result, error = lmw_g:precompute()
     _M.throw = true
     if result then return "no", result, 0 end
-    return "no", -1, error.code
+    -- if here, error is an error object
+
+    -- We want to "hack" the error code, but we
+    -- do not want to overwrite the original, so
+    -- we create a "cooked" error code, which will
+    -- basically be the error code with a few hacks.
+    local cooked_code = error.code
+
+    if cooked_code == _M.err.GRAMMAR_HAS_CYCLE then
+        cooked_code = _M.err.NONE
+    end
+    if cooked_code == _M.err.PRECOMPUTED then
+        _M.userX( '%s', lmw_g:error_description() )
+    end
+    return "no", -1, cooked_code
 END_OF_LUA
 
-    return if $do_return eq "false";
-
-    if ( $precompute_result < 0 ) {
-        if ( not defined $precompute_error_code ) {
-            Marpa::R3::exception(
-                'libmarpa error, but no error code returned');
-        }
-
-        # If already precomputed, let higher level know
-        return $precompute_error_code
-            if $precompute_error_code == $Marpa::R3::Error::PRECOMPUTED;
-
-        # We'll collect the 'MARPA_EVENT_LOOP_RULES' events later,
-        # and use them to give a detailed error message
-        $precompute_error_code = $Marpa::R3::Error::NONE
-            if $precompute_error_code == $Marpa::R3::Error::GRAMMAR_HAS_CYCLE;
-
-    } ## end if ( $precompute_result < 0 )
+    return if $do_return eq "return";
 
     if ( $precompute_error_code != $Marpa::R3::Error::NONE ) {
 
