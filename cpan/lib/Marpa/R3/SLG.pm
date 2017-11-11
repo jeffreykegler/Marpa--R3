@@ -984,7 +984,8 @@ sub Marpa::R3::Internal_G::precompute {
             <<'END_OF_LUA');
     local slg, subg_name = ...
     _M.wrap(function ()
-        local lmw_g = slg[subg_name].lmw_g
+        local subg = slg[subg_name]
+        local lmw_g = subg.lmw_g
         if lmw_g:is_precomputed() ~= 0 then
             _M.userX('Attempted to precompute grammar twice')
         end
@@ -1011,39 +1012,15 @@ sub Marpa::R3::Internal_G::precompute {
         if not result then
             slg:do_precompute_errors(lmw_g)
         end
+        -- Above I went through the error events
+        -- Now I go through the events for situations where there was no
+        -- hard error returned from libmarpa
+        slg:precompute_cycles(subg)
+        slg:precompute_inaccessibles(subg)
         return
     end)
 END_OF_LUA
-
-    # Above I went through the error events
-    # Here I go through the events for situations where there was no
-    # hard error returned from libmarpa
-
-        $slg->coro_by_tag(
-            ( '@' . __FILE__ . ':' . __LINE__ ),
-            {
-                signature => 's',
-                args      => [$subg_name],
-                handlers  => {
-                    trace => sub {
-                        my ($msg) = @_;
-                        say {$trace_file_handle} $msg;
-                        return 'ok';
-                    },
-                }
-            },
-            <<'END_OF_LUA');
-        local slg, subg_name = ...
-        _M.wrap(function ()
-            local subg = slg[subg_name]
-            slg:precompute_cycles(subg)
-            slg:precompute_inaccessibles(subg)
-            return 'ok'
-        end)
-END_OF_LUA
-
     return ;
-
 }
 
 sub assign_L0_symbol {
