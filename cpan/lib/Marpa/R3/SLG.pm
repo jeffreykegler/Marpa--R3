@@ -377,21 +377,9 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
                 g1g.prediction_symbol_activate
             )
 
+        slg:precompute(g1g)
         return if_inaccessible
 END_OF_LUA
-
-    my $precompute_error =
-      Marpa::R3::Internal_G::precompute( $slg, 'g1' );
-    if ( defined $precompute_error ) {
-        if ( $precompute_error == $Marpa::R3::Error::UNPRODUCTIVE_START ) {
-
-            # Maybe someday improve this by finding the start rule and showing
-            # its RHS -- for now it is clear enough
-            Marpa::R3::exception(qq{Unproductive start symbol});
-        } ## end if ( $precompute_error == ...)
-        Marpa::R3::exception( 'Internal errror: unnkown precompute error code ',
-            $precompute_error );
-    } ## end if ( defined( my $precompute_error = ...))
 
     # G1 is now precomputed
 
@@ -581,14 +569,7 @@ END_OF_LUA
 
     }
 
-    my $lex_precompute_error =
       Marpa::R3::Internal_G::precompute( $slg, 'l0' );
-    if ( defined $lex_precompute_error ) {
-        Marpa::R3::exception(
-'Internal errror: expected error code from precompute of lexer grammar ',
-            $precompute_error
-        );
-    }
 
     # L0 is now precomputed
 
