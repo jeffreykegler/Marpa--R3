@@ -741,6 +741,45 @@ in `lmw_g`.
     end
 ```
 
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.precompute(slg, subg)
+        local lmw_g = subg.lmw_g
+        if lmw_g:is_precomputed() ~= 0 then
+            _M.userX('Attempted to precompute grammar twice')
+        end
+        if lmw_g:force_valued() < 0 then
+            error( lmw_g:error_description() )
+        end
+        local start_name = lmw_g.start_name
+        local start_id = lmw_g.isyid_by_name[start_name]
+        if not start_id then
+            error(string.format(
+    "Internal error: Start symbol %q missing from grammar", start_name))
+        end
+        local result = lmw_g:start_symbol_set(start_id)
+        if result < 0 then
+            error(string.format(
+                "Internal error: start_symbol_set() of %q failed; %s",
+                    start_name,
+                    lmw_g:error_description()
+            ))
+        end
+        _M.throw = false
+        local result, error = lmw_g:precompute()
+        _M.throw = true
+        if not result then
+            slg:do_precompute_errors(lmw_g)
+        end
+        -- Above I went through the error events
+        -- Now I go through the events for situations where there was no
+        -- hard error returned from libmarpa
+        slg:precompute_cycles(subg)
+        slg:precompute_inaccessibles(subg)
+        return
+    end
+```
+
 ### SLG accessors
 
 Display any XPR
