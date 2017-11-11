@@ -679,6 +679,68 @@ TODO: Before end of development, convert to a local.
     end
 ```
 
+TODO before end of development, convert to local
+
+Assumes that caller has found an error code
+in `lmw_g`.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.do_precompute_errors(slg, lmw_g)
+        local error_code = lmw_g:error_code()
+
+        -- We do not handle cycles here -- we catch the
+        -- events later and process them
+        if error_code == _M.err.GRAMMAR_HAS_CYCLE then
+            return
+        end
+        if error_code == _M.err.NO_RULES then
+            _M.userX('Attempted to precompute grammar with no rules')
+        end
+        if error_code == _M.err.NULLING_TERMINAL then
+            local msgs = {}
+            local events = lmw_g:events()
+            for i = 1, #events, 2 do
+                local event_type = events[i]
+                if event_type == _M.event.NULLING_TERMINAL then
+                    msgs[#msgs+1] =
+                       string.format("Nullable symbol %q is also a terminal\n",
+                           lmw_g:symbol_name(events[i+1])
+                       )
+                end
+            end
+            msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
+            _M.userX( '%s', table.concat(msgs) )
+        end
+        if error_code == _M.err.COUNTED_NULLABLE then
+            local msgs = {}
+            local events = lmw_g:events()
+            for i = 1, #events, 2 do
+                local event_type = events[i]
+                if event_type == _M.event.COUNTED_NULLABLE then
+                    msgs[#msgs+1] =
+                       string.format("Nullable symbol %q is on RHS of counted rule\n",
+                           lmw_g:symbol_name(events[i+1])
+                       )
+                end
+            end
+            msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
+            _M.userX( '%s', table.concat(msgs) )
+        end
+        if error_code == _M.err.START_NOT_LHS then
+            _M.userX( "Start symbol %s not on LHS of any rule",
+                lmw_g.start_name);
+        end
+        if error_code == _M.err.NO_START_SYMBOL then
+                _M.userX('No start symbol')
+        end
+        if error_code ~= _M.err.UNPRODUCTIVE_START then
+                _M.userX( '%s', lmw_g:error_description() )
+        end
+        _M.userX( '%s', lmw_g:error_description() )
+    end
+```
+
 ### SLG accessors
 
 Display any XPR

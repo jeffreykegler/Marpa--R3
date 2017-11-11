@@ -1008,63 +1008,8 @@ sub Marpa::R3::Internal_G::precompute {
         _M.throw = false
         local result, error = lmw_g:precompute()
         _M.throw = true
-        if result then return end
-        -- if here, error is an error object
-
-        -- We want to "hack" the error code, but we
-        -- do not want to overwrite the original, so
-        -- we create a "cooked" error code, which will
-        -- basically be the error code with a few hacks.
-        local cooked_code = error.code
-
-        if cooked_code == _M.err.GRAMMAR_HAS_CYCLE then
-            cooked_code = _M.err.NONE
-        end
-        if cooked_code == _M.err.NO_RULES then
-            _M.userX('Attempted to precompute grammar with no rules')
-        end
-        if cooked_code == _M.err.NULLING_TERMINAL then
-            local msgs = {}
-            local events = lmw_g:events()
-            for i = 1, #events, 2 do
-                local event_type = events[i]
-                if event_type == _M.event.NULLING_TERMINAL then
-                    msgs[#msgs+1] =
-                       string.format("Nullable symbol %q is also a terminal\n",
-                           lmw_g:symbol_name(events[i+1])
-                       )
-                end
-            end
-            msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-            _M.userX( '%s', table.concat(msgs) )
-        end
-        if cooked_code == _M.err.COUNTED_NULLABLE then
-            local msgs = {}
-            local events = lmw_g:events()
-            for i = 1, #events, 2 do
-                local event_type = events[i]
-                if event_type == _M.event.COUNTED_NULLABLE then
-                    msgs[#msgs+1] =
-                       string.format("Nullable symbol %q is on RHS of counted rule\n",
-                           lmw_g:symbol_name(events[i+1])
-                       )
-                end
-            end
-            msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
-            _M.userX( '%s', table.concat(msgs) )
-        end
-        if cooked_code == _M.err.START_NOT_LHS then
-            _M.userX( "Start symbol %s not on LHS of any rule",
-                lmw_g.start_name);
-        end
-        if cooked_code == _M.err.NO_START_SYMBOL then
-                _M.userX('No start symbol')
-        end
-        if cooked_code ~= _M.err.UNPRODUCTIVE_START then
-                _M.userX( '%s', lmw_g:error_description() )
-        end
-        if cooked_code ~= _M.err.NONE then
-            _M.userX( '%s', lmw_g:error_description() )
+        if not result then
+            slg:do_precompute_errors(lmw_g)
         end
         return
     end)
