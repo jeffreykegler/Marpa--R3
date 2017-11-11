@@ -968,92 +968,106 @@ sub Marpa::R3::Internal_G::precompute {
     my $trace_file_handle =
         $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $subg_name );
+        $slg->coro_by_tag(
+            ( '@' . __FILE__ . ':' . __LINE__ ),
+            {
+                signature => 's',
+                args      => [$subg_name],
+                handlers  => {
+                    trace => sub {
+                        my ($msg) = @_;
+                        say {$trace_file_handle} $msg;
+                        return 'ok';
+                    },
+                }
+            },
+            <<'END_OF_LUA');
     local slg, subg_name = ...
-    local lmw_g = slg[subg_name].lmw_g
-    if lmw_g:is_precomputed() ~= 0 then
-        _M.userX('Attempted to precompute grammar twice')
-    end
-    if lmw_g:force_valued() < 0 then
-        error( lmw_g:error_description() )
-    end
-    local start_name = lmw_g.start_name
-    local start_id = lmw_g.isyid_by_name[start_name]
-    if not start_id then
-        error(string.format(
-"Internal error: Start symbol %q missing from grammar", start_name))
-    end
-    local result = lmw_g:start_symbol_set(start_id)
-    if result < 0 then
-        error(string.format(
-            "Internal error: start_symbol_set() of %q failed; %s",
-                start_name,
-                lmw_g:error_description()
-        ))
-    end
-    _M.throw = false
-    local result, error = lmw_g:precompute()
-    _M.throw = true
-    if result then return end
-    -- if here, error is an error object
-
-    -- We want to "hack" the error code, but we
-    -- do not want to overwrite the original, so
-    -- we create a "cooked" error code, which will
-    -- basically be the error code with a few hacks.
-    local cooked_code = error.code
-
-    if cooked_code == _M.err.GRAMMAR_HAS_CYCLE then
-        cooked_code = _M.err.NONE
-    end
-    if cooked_code == _M.err.NO_RULES then
-        _M.userX('Attempted to precompute grammar with no rules')
-    end
-    if cooked_code == _M.err.NULLING_TERMINAL then
-        local msgs = {}
-        local events = lmw_g:events()
-        for i = 1, #events, 2 do
-            local event_type = events[i]
-            if event_type == _M.event.NULLING_TERMINAL then
-                msgs[#msgs+1] =
-                   string.format("Nullable symbol %q is also a terminal\n",
-                       lmw_g:symbol_name(events[i+1])
-                   )
-            end
+    _M.wrap(function ()
+        local lmw_g = slg[subg_name].lmw_g
+        if lmw_g:is_precomputed() ~= 0 then
+            _M.userX('Attempted to precompute grammar twice')
         end
-        msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
-        _M.userX( '%s', table.concat(msgs) )
-    end
-    if cooked_code == _M.err.COUNTED_NULLABLE then
-        local msgs = {}
-        local events = lmw_g:events()
-        for i = 1, #events, 2 do
-            local event_type = events[i]
-            if event_type == _M.event.COUNTED_NULLABLE then
-                msgs[#msgs+1] =
-                   string.format("Nullable symbol %q is on RHS of counted rule\n",
-                       lmw_g:symbol_name(events[i+1])
-                   )
-            end
+        if lmw_g:force_valued() < 0 then
+            error( lmw_g:error_description() )
         end
-        msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
-        _M.userX( '%s', table.concat(msgs) )
-    end
-    if cooked_code == _M.err.START_NOT_LHS then
-        _M.userX( "Start symbol %s not on LHS of any rule",
-            lmw_g.start_name);
-    end
-    if cooked_code == _M.err.NO_START_SYMBOL then
-            _M.userX('No start symbol')
-    end
-    if cooked_code ~= _M.err.UNPRODUCTIVE_START then
+        local start_name = lmw_g.start_name
+        local start_id = lmw_g.isyid_by_name[start_name]
+        if not start_id then
+            error(string.format(
+    "Internal error: Start symbol %q missing from grammar", start_name))
+        end
+        local result = lmw_g:start_symbol_set(start_id)
+        if result < 0 then
+            error(string.format(
+                "Internal error: start_symbol_set() of %q failed; %s",
+                    start_name,
+                    lmw_g:error_description()
+            ))
+        end
+        _M.throw = false
+        local result, error = lmw_g:precompute()
+        _M.throw = true
+        if result then return end
+        -- if here, error is an error object
+
+        -- We want to "hack" the error code, but we
+        -- do not want to overwrite the original, so
+        -- we create a "cooked" error code, which will
+        -- basically be the error code with a few hacks.
+        local cooked_code = error.code
+
+        if cooked_code == _M.err.GRAMMAR_HAS_CYCLE then
+            cooked_code = _M.err.NONE
+        end
+        if cooked_code == _M.err.NO_RULES then
+            _M.userX('Attempted to precompute grammar with no rules')
+        end
+        if cooked_code == _M.err.NULLING_TERMINAL then
+            local msgs = {}
+            local events = lmw_g:events()
+            for i = 1, #events, 2 do
+                local event_type = events[i]
+                if event_type == _M.event.NULLING_TERMINAL then
+                    msgs[#msgs+1] =
+                       string.format("Nullable symbol %q is also a terminal\n",
+                           lmw_g:symbol_name(events[i+1])
+                       )
+                end
+            end
+            msgs[#msgs+1] = 'A terminal symbol cannot also be a nulling symbol'
+            _M.userX( '%s', table.concat(msgs) )
+        end
+        if cooked_code == _M.err.COUNTED_NULLABLE then
+            local msgs = {}
+            local events = lmw_g:events()
+            for i = 1, #events, 2 do
+                local event_type = events[i]
+                if event_type == _M.event.COUNTED_NULLABLE then
+                    msgs[#msgs+1] =
+                       string.format("Nullable symbol %q is on RHS of counted rule\n",
+                           lmw_g:symbol_name(events[i+1])
+                       )
+                end
+            end
+            msgs[#msgs+1] = 'Counted nullables confuse Marpa -- please rewrite the grammar\n'
+            _M.userX( '%s', table.concat(msgs) )
+        end
+        if cooked_code == _M.err.START_NOT_LHS then
+            _M.userX( "Start symbol %s not on LHS of any rule",
+                lmw_g.start_name);
+        end
+        if cooked_code == _M.err.NO_START_SYMBOL then
+                _M.userX('No start symbol')
+        end
+        if cooked_code ~= _M.err.UNPRODUCTIVE_START then
+                _M.userX( '%s', lmw_g:error_description() )
+        end
+        if cooked_code ~= _M.err.NONE then
             _M.userX( '%s', lmw_g:error_description() )
-    end
-    if cooked_code ~= _M.err.NONE then
-        _M.userX( '%s', lmw_g:error_description() )
-    end
-    return
+        end
+        return
+    end)
 END_OF_LUA
 
     # Above I went through the error events
