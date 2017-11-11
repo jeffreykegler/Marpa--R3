@@ -1091,7 +1091,7 @@ END_OF_LUA
         local slg, subg_name = ...
         _M.wrap(function ()
             local subg = slg[subg_name]
-            slg:precompute_inaccessibles(subg)
+            slg:precompute_cycles(subg)
             slg:precompute_inaccessibles(subg)
             return 'ok'
         end)
