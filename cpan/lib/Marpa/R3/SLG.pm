@@ -968,11 +968,10 @@ sub Marpa::R3::Internal_G::precompute {
     my $trace_file_handle =
         $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
 
-    my ($do_return, $precompute_result, $precompute_error_code)
-      = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $subg_name );
-    local grammar, subg_name = ...
-    local lmw_g = grammar[subg_name].lmw_g
+    local slg, subg_name = ...
+    local lmw_g = slg[subg_name].lmw_g
     if lmw_g:is_precomputed() ~= 0 then
         _M.userX('Attempted to precompute grammar twice')
     end
@@ -996,7 +995,7 @@ sub Marpa::R3::Internal_G::precompute {
     _M.throw = false
     local result, error = lmw_g:precompute()
     _M.throw = true
-    if result then return "no", result, 0 end
+    if result then return end
     -- if here, error is an error object
 
     -- We want to "hack" the error code, but we
@@ -1054,10 +1053,8 @@ sub Marpa::R3::Internal_G::precompute {
     if cooked_code ~= _M.err.NONE then
         _M.userX( '%s', lmw_g:error_description() )
     end
-    return "no", -1, cooked_code
+    return
 END_OF_LUA
-
-    return if $do_return eq "return";
 
     # Above I went through the error events
     # Here I go through the events for situations where there was no
