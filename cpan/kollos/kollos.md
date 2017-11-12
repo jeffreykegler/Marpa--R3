@@ -614,11 +614,11 @@ This is a registry object.
     end
 ```
 
-TODO: Before end of development, convert to a local.
-
 ```
+    -- miranda: section+ forward declarations
+    local precompute_cycles
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_cycles(slg, subg)
+    function precompute_cycles(slg, subg)
         local loop_rule_count = 0
         local lmw_g = subg.lmw_g
         local events = lmw_g:events()
@@ -647,11 +647,11 @@ TODO: Before end of development, convert to a local.
     end
 ```
 
-TODO: Before end of development, convert to a local.
-
 ```
+    -- miranda: section+ forward declarations
+    local precompute_inaccessibles
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_inaccessibles(slg, subg)
+    function precompute_inaccessibles(slg, subg)
         local default_treatment = slg.if_inaccessible
         local lmw_g = subg.lmw_g
 
@@ -685,8 +685,10 @@ Assumes that caller has found an error code
 in `lmw_g`.
 
 ```
+    -- miranda: section+ forward declarations
+    local do_precompute_errors
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.do_precompute_errors(slg, lmw_g)
+    function do_precompute_errors(slg, lmw_g)
         local error_code = lmw_g:error_code()
 
         -- We do not handle cycles here -- we catch the
@@ -769,13 +771,13 @@ in `lmw_g`.
         local result, error = lmw_g:precompute()
         _M.throw = true
         if not result then
-            slg:do_precompute_errors(lmw_g)
+            do_precompute_errors(slg, lmw_g)
         end
         -- Above I went through the error events
         -- Now I go through the events for situations where there was no
         -- hard error returned from libmarpa
-        slg:precompute_cycles(subg)
-        slg:precompute_inaccessibles(subg)
+        precompute_cycles(slg, subg)
+        precompute_inaccessibles(slg, subg)
         return
     end
 ```
