@@ -296,15 +296,8 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
         slg.l0 = _M.grammar_new(slg, 'l0')
 
-        return if_inaccessible
-END_OF_LUA
-
-    # G1 is now precomputed
-
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', '' );
-        local slg = ...
         local g1g = slg.g1
+
         for g1_isyid = 0, g1g:highest_symbol_id() do
             local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
 
@@ -340,7 +333,8 @@ END_OF_LUA
                  end
             end
         end
-        return
+
+        return if_inaccessible
 END_OF_LUA
 
     # A first phase of applying defaults
