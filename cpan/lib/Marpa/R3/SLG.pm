@@ -279,12 +279,10 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
     my ($if_inaccessible_default) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 's', $hashed_source );
         local slg, source_hash = ...
-        slg.g1 = _M.grammar_new(slg, 'g1')
-        slg.l0 = _M.grammar_new(slg, 'l0')
+
         slg:xsys_populate( source_hash)
         slg:xrls_populate(source_hash)
         slg:xprs_populate(source_hash)
-        -- print(inspect(source_hash))
         local if_inaccessible = slg.if_inaccessible
         do
             local defaults = source_hash.defaults
@@ -294,90 +292,10 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         end
         slg.if_inaccessible = if_inaccessible
 
-        -- Create the G1 grammar
+        slg:g1_precompute(source_hash);
 
-        local g1g = slg.g1
-        g1g.start_name = '[:start:]'
+        slg.l0 = _M.grammar_new(slg, 'l0')
 
-        do
-           local g1_symbols = source_hash.symbols.g1
-           local g1_symbol_names = {}
-           for symbol_name, _ in pairs(g1_symbols) do
-               g1_symbol_names[#g1_symbol_names+1] = symbol_name
-           end
-           table.sort(g1_symbol_names)
-           for ix = 1,#g1_symbol_names do
-               local symbol_name = g1_symbol_names[ix]
-               local options = g1_symbols[symbol_name]
-               slg:g1_symbol_assign(symbol_name, options)
-           end
-        end
-
-        do
-           local g1_rules = source_hash.rules.g1
-           for ix = 1,#g1_rules do
-               local options = g1_rules[ix]
-               slg:g1_rule_add(options)
-           end
-        end
-
-        local function event_setup(g1g, events, set_fn, activate_fn)
-            local event_by_isy = {}
-            local event_by_name = {}
-            for isy_name, event in pairs(events) do
-                local event_name = event[1]
-                local is_active = (event[2] ~= "0")
-                local isyid = g1g.isyid_by_name[isy_name]
-                if not isyid then
-                    error(string.format(
-                        "Event defined for non-existent symbol: %s\n",
-                        isy_name
-                    ))
-                end
-                local event_desc = {
-                   name = event_name,
-                   isyid = isyid
-                }
-                event_by_isy[isyid] = event_desc
-                event_by_isy[isy_name] = event_desc
-                local name_entry = event_by_name[event_name]
-                if not name_entry then
-                    event_by_name[event_name] = { event_desc }
-                else
-                    name_entry[#name_entry+1] = event_desc
-                end
-
-
-                --  NOT serializable
-                --  Must be done before precomputation
-                set_fn(g1g, isyid, 1)
-                if not is_active then activate_fn(g1g, isyid, 0) end
-            end
-        return event_by_isy, event_by_name
-        end
-
-        slg.completion_event_by_isy, slg.completion_event_by_name
-            = event_setup(g1g,
-                (source_hash.completion_events or {}),
-                g1g.symbol_is_completion_event_set,
-                g1g.completion_symbol_activate
-            )
-
-        slg.nulled_event_by_isy, slg.nulled_event_by_name
-            = event_setup(g1g,
-                (source_hash.nulled_events or {}),
-                g1g.symbol_is_nulled_event_set,
-                g1g.nulled_symbol_activate
-            )
-
-        slg.prediction_event_by_isy, slg.prediction_event_by_name
-            = event_setup(g1g,
-                (source_hash.prediction_events or {}),
-                g1g.symbol_is_prediction_event_set,
-                g1g.prediction_symbol_activate
-            )
-
-        slg:precompute(g1g)
         return if_inaccessible
 END_OF_LUA
 
