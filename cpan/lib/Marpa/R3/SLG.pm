@@ -301,56 +301,47 @@ END_OF_LUA
 
     # G1 is now precomputed
 
-    # Find out the list of lexemes according to G1
-  SYMBOL: for (my $iter = $slg->g1_symbol_ids_gen(); defined(my $symbol_id = $iter->()); ) {
-
-        my ($is_lexeme) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', $symbol_id );
-        local slg, g1_isyid = ...
+            <<'END_OF_LUA', '' );
+        local slg = ...
         local g1g = slg.g1
-        local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
-        local is_lexeme
+        for g1_isyid = 0, g1g:highest_symbol_id() do
+            local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
 
-        if is_terminal then
-             local g1_isy = g1g.isys[g1_isyid]
-             local lexeme = { g1_isy = g1_isy }
-             g1g.isys[g1_isyid].lexeme = lexeme
-             local xsy = g1g:_xsy(g1_isyid)
-             if xsy then
-                 if xsy.lexeme then
+            if is_terminal then
+                 local g1_isy = g1g.isys[g1_isyid]
+                 local lexeme = { g1_isy = g1_isy }
+                 g1g.isys[g1_isyid].lexeme = lexeme
+                 local xsy = g1g:_xsy(g1_isyid)
+                 if xsy then
+                     if xsy.lexeme then
 
-                     local g1_isyid2 = xsy.lexeme.g1_isy.id
-                     _M._internal_error(
-                         "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
-                         \u{20}   %q (id=%d), and\n\z
-                         \u{20}   %q (id=%d)\n",
-                         xsy:display_name(), xsy.id,
-                         g1g:symbol_name(g1_isyid), g1_isyid,
-                         g1g:symbol_name(g1_isyid2), g1_isyid2
-                     )
+                         local g1_isyid2 = xsy.lexeme.g1_isy.id
+                         _M._internal_error(
+                             "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
+                             \u{20}   %q (id=%d), and\n\z
+                             \u{20}   %q (id=%d)\n",
+                             xsy:display_name(), xsy.id,
+                             g1g:symbol_name(g1_isyid), g1_isyid,
+                             g1g:symbol_name(g1_isyid2), g1_isyid2
+                         )
+                     end
+                     lexeme.xsy = xsy
+                     xsy.lexeme = lexeme
+
+                     -- TODO delete this check after development
+                     if xsy.name ~= slg.g1:symbol_name(g1_isyid) then
+                         _M._internal_error(
+                             "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
+                             xsy.name,
+                             slg.g1:symbol_name(g1_isyid)
+                         )
+                     end
                  end
-                 lexeme.xsy = xsy
-                 xsy.lexeme = lexeme
-
-                 -- TODO delete this check after development
-                 if xsy.name ~= slg.g1:symbol_name(g1_isyid) then
-                     _M._internal_error(
-                         "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
-                         xsy.name,
-                         slg.g1:symbol_name(g1_isyid)
-                     )
-                 end
-
-                 return true
-             end
-             return true
+            end
         end
-
         return
 END_OF_LUA
-
-    }
 
     # A first phase of applying defaults
     my $discard_default_adverbs = $hashed_source->{discard_default_adverbs};
