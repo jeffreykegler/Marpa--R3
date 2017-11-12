@@ -273,7 +273,7 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
     my $is_meta = exists $hashed_source->{meta} ? 1 : undef;
 
-    my $trace_fh = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
+    my $trace_file_handle = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
     my ($if_inaccessible_default) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -302,7 +302,6 @@ END_OF_LUA
     # G1 is now precomputed
 
     # Find out the list of lexemes according to G1
-    my %g1_id_by_lexeme_name = ();
   SYMBOL: for (my $iter = $slg->g1_symbol_ids_gen(); defined(my $symbol_id = $iter->()); ) {
 
         my ($is_lexeme) =
@@ -350,12 +349,6 @@ END_OF_LUA
 
         return
 END_OF_LUA
-
-        # Not a lexeme, according to G1
-        next SYMBOL if not $is_lexeme;
-
-        my $symbol_name = $slg->g1_symbol_name($symbol_id);
-        $g1_id_by_lexeme_name{$symbol_name} = $symbol_id;
 
     }
 
@@ -410,15 +403,36 @@ END_OF_LUA
   LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
         next LEXEME_NAME if $lexeme_name eq $lex_start_symbol_name;
-        my $g1_symbol_id = $g1_id_by_lexeme_name{$lexeme_name};
+
+    my ($g1_symbol_id) = $slg->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [$lexeme_name],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slg, lexeme_name = ...
+        _M.wrap(function ()
+            return 'ok', slg:g1_symbol_by_name(lexeme_name)
+        end)
+END_OF_LUA
+
         if ( not $slg->g1_symbol_is_accessible($g1_symbol_id) ) {
             my $message =
 "A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
-            say {$trace_fh} $message
+            say {$trace_file_handle} $message
               if $if_inaccessible_default eq 'warn';
             Marpa::R3::exception($message)
               if $if_inaccessible_default eq 'fatal';
         }
+
         my $lex_symbol_id = $slg->l0_symbol_by_name($lexeme_name);
         $lexeme_data{$lexeme_name}{lexer}{'id'} =
           $lex_symbol_id;
