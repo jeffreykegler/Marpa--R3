@@ -988,6 +988,12 @@ sub add_L0_user_rule {
         rhs_ids[ix] = slg:l0_symbol_assign(rhs_names[ix])
     end
 
+    if not is_ordinary_rule then
+        if #rhs_names ~= 1 then
+            error('Only one rhs symbol allowed for counted rule')
+        end
+    end
+
     return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids
 END_OF_LUA
 
@@ -1015,8 +1021,6 @@ END_OF_LUA
 
     } ## end if ($is_ordinary_rule)
     else {
-        Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
-          if scalar @{$rhs_names} != 1;
 
         # The original rule for a sequence rule is
         # not actually used in parsing,
