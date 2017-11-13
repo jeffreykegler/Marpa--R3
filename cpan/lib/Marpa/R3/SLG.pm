@@ -1018,12 +1018,6 @@ END_OF_LUA
         Marpa::R3::exception('Only one rhs symbol allowed for counted rule')
           if scalar @{$rhs_names} != 1;
 
-        # create the separator symbol, if we're using one
-        if ( defined $separator_name ) {
-            $separator_id = assign_L0_symbol( $slg, $separator_name );
-        } ## end if ( defined $separator_name )
-
-
         # The original rule for a sequence rule is
         # not actually used in parsing,
         # but some of the rewritten sequence rules are its
@@ -1032,7 +1026,7 @@ END_OF_LUA
         my $arg_hash = {
             lhs => $lhs_id,
             rhs => $rhs_ids->[0],
-            separator => $separator_id,
+            separator => $separator_name,
             proper    => $proper_separation,
             min       => $min,
         };
@@ -1040,17 +1034,20 @@ END_OF_LUA
       ($base_irl_id) =
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'i', $arg_hash);
-    local g, arg_hash = ...
+    local slg, arg_hash = ...
     arg_hash.proper = (arg_hash.proper ~= 0)
+    if arg_hash.separator then
+        arg_hash.separator = slg:l0_symbol_assign(arg_hash.separator)
+    end
     _M.throw = false
-    local base_irl_id = g.l0:sequence_new(arg_hash)
+    local base_irl_id = slg.l0:sequence_new(arg_hash)
     _M.throw = true
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
     if not base_irl_id or base_irl_id < 0 then return end
     local l0_rule = setmetatable({}, _M.class_irl)
     l0_rule.id = base_irl_id
-    g.l0.irls[base_irl_id] = l0_rule
+    slg.l0.irls[base_irl_id] = l0_rule
     return base_irl_id
 END_OF_LUA
 
