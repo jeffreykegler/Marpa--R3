@@ -992,7 +992,7 @@ sub add_L0_user_rule {
         rule[ix+1] = rhs_id
     end
 
-    local base_irl_id = -1
+    local base_irl_id
     if is_ordinary_rule then
         -- remove the test for nil or less than zero
         -- once refactoring is complete?
@@ -1025,31 +1025,23 @@ sub add_L0_user_rule {
         slg.l0.irls[base_irl_id] = l0_rule
     end
 
+    if not base_irl_id and base_irl_id < 0 then
+        local rule_description = _M._raw_rule_show(lhs_id, rhs_ids)
+        local error_code = l0g:error_code()
+        local problem_description
+        if error_code == _M.err.DUPLICATE_RULE then
+            problem_description = "Duplicate rule"
+        else
+            problem_description = _M.err[error_code].description
+        end
+        error(problem_description .. ': ' .. rule_description)
+    end
+
     return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids, base_irl_id
 END_OF_LUA
 
     $rank //= $default_rank;
     $null_ranking //= 'low';
-
-    if ( not defined $base_irl_id or $base_irl_id < 0 ) {
-        my $rule_description = proto_rule_describe( $lhs_name, $rhs_names );
-        my ($ok, $problem) =
-        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 's', $rule_description );
-            local slg, rule_description = ...
-            local l0g = slg.l0
-            local error_code = l0g:error_code()
-            local problem_description
-            if error_code == _M.err.DUPLICATE_RULE then
-                problem_description = "Duplicate rule"
-            else
-                problem_description = _M.err[error_code].description
-            end
-            return "abend", (problem_description .. ': ' .. rule_description)
-END_OF_LUA
-
-        Marpa::R3::exception($problem) if $ok ne 'fail';
-    }
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'iiii',
