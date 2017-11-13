@@ -1005,6 +1005,24 @@ sub add_L0_user_rule {
         if #rhs_names ~= 1 then
             error('Only one rhs symbol allowed for counted rule')
         end
+        local sequence_options = {
+            lhs = rule[1],
+            rhs = rule[2],
+            min = min
+        }
+        sequence_options.proper = (options.proper ~= 0)
+        if separator_name then
+            sequence_options.separator = slg:l0_symbol_assign(separator_name)
+        end
+        _M.throw = false
+        base_irl_id = slg.l0:sequence_new(sequence_options)
+        _M.throw = true
+        -- remove the test for nil or less than zero
+        -- once refactoring is complete?
+        if not base_irl_id or base_irl_id < 0 then return end
+        local l0_rule = setmetatable({}, _M.class_irl)
+        l0_rule.id = base_irl_id
+        slg.l0.irls[base_irl_id] = l0_rule
     end
 
     return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids, base_irl_id
@@ -1012,45 +1030,6 @@ END_OF_LUA
 
     $rank //= $default_rank;
     $null_ranking //= 'low';
-
-    my $separator_id = -1;
-
-    if (not $is_ordinary_rule) {
-
-        # The original rule for a sequence rule is
-        # not actually used in parsing,
-        # but some of the rewritten sequence rules are its
-        # semantic equivalents.
-
-        my $arg_hash = {
-            lhs => $lhs_id,
-            rhs => $rhs_ids->[0],
-            separator => $separator_name,
-            proper    => $proper_separation,
-            min       => $min,
-        };
-
-      ($base_irl_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i', $arg_hash);
-    local slg, arg_hash = ...
-    arg_hash.proper = (arg_hash.proper ~= 0)
-    if arg_hash.separator then
-        arg_hash.separator = slg:l0_symbol_assign(arg_hash.separator)
-    end
-    _M.throw = false
-    local base_irl_id = slg.l0:sequence_new(arg_hash)
-    _M.throw = true
-    -- remove the test for nil or less than zero
-    -- once refactoring is complete?
-    if not base_irl_id or base_irl_id < 0 then return end
-    local l0_rule = setmetatable({}, _M.class_irl)
-    l0_rule.id = base_irl_id
-    slg.l0.irls[base_irl_id] = l0_rule
-    return base_irl_id
-END_OF_LUA
-
-    }
 
     if ( not defined $base_irl_id or $base_irl_id < 0 ) {
         my $rule_description = proto_rule_describe( $lhs_name, $rhs_names );
