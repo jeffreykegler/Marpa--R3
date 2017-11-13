@@ -961,7 +961,8 @@ sub add_L0_user_rule {
     my $is_ordinary_rule;
     my $lhs_id;
     my $rhs_ids;
-    ($default_rank, $xpr_id, $is_ordinary_rule, $lhs_id, $rhs_ids) =
+    my $base_irl_id;
+    ($default_rank, $xpr_id, $is_ordinary_rule, $lhs_id, $rhs_ids, $base_irl_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $options);
     local slg, options = ...
@@ -984,43 +985,37 @@ sub add_L0_user_rule {
     local lhs_name = options.lhs
     local lhs_id = slg:l0_symbol_assign(lhs_name)
     local rhs_ids = {}
+    local rule = { lhs_id }
     for ix = 1, #rhs_names do
-        rhs_ids[ix] = slg:l0_symbol_assign(rhs_names[ix])
+        local rhs_id = slg:l0_symbol_assign(rhs_names[ix])
+        rhs_ids[ix] = rhs_id
+        rule[ix+1] = rhs_id
     end
 
-    if not is_ordinary_rule then
+    local base_irl_id = -1
+    if is_ordinary_rule then
+        -- remove the test for nil or less than zero
+        -- once refactoring is complete?
+        _M.throw = false
+        base_irl_id = slg.l0:rule_new(rule)
+        _M.throw = true
+        if not base_irl_id or base_irl_id < 0 then return -1 end
+        slg.l0.irls[base_irl_id] = { id = base_irl_id }
+    else
         if #rhs_names ~= 1 then
             error('Only one rhs symbol allowed for counted rule')
         end
     end
 
-    return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids
+    return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids, base_irl_id
 END_OF_LUA
 
     $rank //= $default_rank;
     $null_ranking //= 'low';
 
-    my $base_irl_id;
     my $separator_id = -1;
 
-    if ($is_ordinary_rule) {
-
-        ($base_irl_id) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', [ $lhs_id, @{$rhs_ids} ] );
-    local g, rule  = ...
-    -- remove the test for nil or less than zero
-    -- once refactoring is complete?
-    _M.throw = false
-    local base_irl_id = g.l0:rule_new(rule)
-    _M.throw = true
-    if not base_irl_id or base_irl_id < 0 then return -1 end
-    g.l0.irls[base_irl_id] = { id = base_irl_id }
-    return base_irl_id
-END_OF_LUA
-
-    } ## end if ($is_ordinary_rule)
-    else {
+    if (not $is_ordinary_rule) {
 
         # The original rule for a sequence rule is
         # not actually used in parsing,
