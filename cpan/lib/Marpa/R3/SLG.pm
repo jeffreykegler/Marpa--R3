@@ -350,6 +350,14 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             end
         end
 
+        do
+           local l0_rules = source_hash.rules.l0
+           for ix = 1,#l0_rules do
+               local options = l0_rules[ix]
+               slg:l0_rule_add(options)
+           end
+        end
+
         return if_inaccessible
 END_OF_LUA
 
@@ -374,7 +382,7 @@ END_OF_LUA
 
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
 
-    add_L0_user_rules( $slg, $lexer_rules );
+    # add_L0_user_rules( $slg, $lexer_rules );
 
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
@@ -886,26 +894,6 @@ sub Marpa::R3::Internal_G::precompute {
         return 'ok'
     end)
 END_OF_LUA
-    return;
-}
-
-sub add_L0_user_rules {
-    my ( $slg, $rules ) = @_;
-    for my $rule (@{$rules}) {
-        add_L0_user_rule( $slg, $rule );
-    }
-    return;
-}
-
-sub add_L0_user_rule {
-    my ( $slg, $options ) = @_;
-
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $options );
-    local slg, options = ...
-    return slg:l0_rule_add(options)
-END_OF_LUA
-
     return;
 }
 
