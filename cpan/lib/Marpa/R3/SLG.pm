@@ -965,8 +965,9 @@ sub add_L0_user_rule {
     my $default_rank;
     ($default_rank, $xpr_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', ($xpr_name // ''));
-    local slg, xpr_name = ...
+          <<'END_OF_LUA', 's', $options);
+    local slg, options = ...
+    local xpr_name = options.xprid or ''
     local default_rank = slg.l0:default_rank()
     -- io.stderr:write('xpr_name: ', inspect(xpr_name), '\n')
     local xpr_id = -1
