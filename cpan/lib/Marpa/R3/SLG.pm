@@ -294,9 +294,25 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
         slg:g1_precompute(source_hash);
 
-        slg.l0 = _M.grammar_new(slg, 'l0')
+        local l0g = _M.grammar_new(slg, 'l0')
+        slg.l0 = l0g
+        l0g.start_name = '[:lex_start:]'
 
         local g1g = slg.g1
+
+        do
+           local l0_symbols = source_hash.symbols.l0
+           local l0_symbol_names = {}
+           for symbol_name, _ in pairs(l0_symbols) do
+               l0_symbol_names[#l0_symbol_names+1] = symbol_name
+           end
+           table.sort(l0_symbol_names)
+           for ix = 1,#l0_symbol_names do
+               local symbol_name = l0_symbol_names[ix]
+               local options = l0_symbols[symbol_name]
+               slg:l0_symbol_assign(symbol_name, options)
+           end
+        end
 
         for g1_isyid = 0, g1g:highest_symbol_id() do
             local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
@@ -355,22 +371,8 @@ END_OF_LUA
 
     my $lexer_rules          = $hashed_source->{rules}->{'l0'};
     my $character_class_hash = $hashed_source->{character_classes};
-    my $lexer_symbols        = $hashed_source->{symbols}->{'l0'};
 
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
-
-    $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', $lex_start_symbol_name);
-        local grammar, start_name = ...
-        local l0g = grammar.l0
-        l0g.start_name = start_name
-END_OF_LUA
-
-    for my $symbol ( sort keys %{$lexer_symbols} ) {
-        my $properties = $lexer_symbols->{$symbol};
-        assign_L0_symbol( $slg, $symbol, $properties );
-    }
 
     add_L0_user_rules( $slg, $lexer_rules );
 
