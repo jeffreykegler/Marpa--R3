@@ -959,7 +959,9 @@ sub add_L0_user_rule {
 
     my $default_rank;
     my $is_ordinary_rule;
-    ($default_rank, $xpr_id, $is_ordinary_rule) =
+    my $lhs_id;
+    my $rhs_ids;
+    ($default_rank, $xpr_id, $is_ordinary_rule, $lhs_id, $rhs_ids) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $options);
     local slg, options = ...
@@ -979,16 +981,18 @@ sub add_L0_user_rule {
         error( 'separator defined for rule without repetitions')
     end
 
-    return default_rank, xpr_id, is_ordinary_rule
+    local lhs_name = options.lhs
+    local lhs_id = slg:l0_symbol_assign(lhs_name)
+    local rhs_ids = {}
+    for ix = 1, #rhs_names do
+        rhs_ids[ix] = slg:l0_symbol_assign(rhs_names[ix])
+    end
+
+    return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids
 END_OF_LUA
 
     $rank //= $default_rank;
     $null_ranking //= 'low';
-
-    my @rhs_ids = map {
-                assign_L0_symbol( $slg, $_ )
-        } @{$rhs_names};
-    my $lhs_id = assign_L0_symbol( $slg, $lhs_name );
 
     my $base_irl_id;
     my $separator_id = -1;
@@ -997,7 +1001,7 @@ END_OF_LUA
 
         ($base_irl_id) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i', [ $lhs_id, @rhs_ids ] );
+            <<'END_OF_LUA', 'i', [ $lhs_id, @{$rhs_ids} ] );
     local g, rule  = ...
     -- remove the test for nil or less than zero
     -- once refactoring is complete?
@@ -1027,7 +1031,7 @@ END_OF_LUA
 
         my $arg_hash = {
             lhs => $lhs_id,
-            rhs => $rhs_ids[0],
+            rhs => $rhs_ids->[0],
             separator => $separator_id,
             proper    => $proper_separation,
             min       => $min,
