@@ -889,17 +889,6 @@ END_OF_LUA
     return;
 }
 
-sub assign_L0_symbol {
-    my ( $slg, $name, $options ) = @_;
-    my ($symbol_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'ss', $name, $options );
-    local slg, symbol_name, options = ...
-    return slg:l0_symbol_assign(symbol_name, options)
-END_OF_LUA
-    return $symbol_id;
-}
-
 sub add_L0_user_rules {
     my ( $slg, $rules ) = @_;
     for my $rule (@{$rules}) {
@@ -908,63 +897,11 @@ sub add_L0_user_rules {
     return;
 }
 
-# For diagnostics, describe a rule we were unable to create,
-# and for which we have only the symbol names
-sub proto_rule_describe {
-    my ( $lhs_name, $rhs_names ) = @_;
-    # wrap symbol names with whitespaces allowed by SLIF
-    $lhs_name = "<$lhs_name>" if $lhs_name =~ / /;
-    return "$lhs_name -> " . ( join q{ }, map { / / ? "<$_>" : $_ } @{$rhs_names} );
-}
-
 sub add_L0_user_rule {
     my ( $slg, $options ) = @_;
 
-    my ( $lhs_name, $rhs_names, $action, $blessing );
-    my ( $min, $separator_name );
-    my $rank;
-    my $null_ranking;
-    my $proper_separation = 0;
-    my $xpr_id;
-    my $subgrammar;
-    my $xpr_dot;
-    my $xpr_top;
-
-  OPTION: for my $option ( keys %{$options} ) {
-        my $value = $options->{$option};
-        if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
-        if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
-        if ( $option eq 'action' ) { $action    = $value; next OPTION }
-        if ( $option eq 'rank' )   { $rank      = $value; next OPTION }
-        if ( $option eq 'null_ranking' ) {
-            $null_ranking = $value;
-            next OPTION;
-        }
-        if ( $option eq 'min' ) { $min = $value; next OPTION }
-        if ( $option eq 'separator' ) {
-            $separator_name = $value;
-            next OPTION;
-        }
-        if ( $option eq 'proper' ) {
-            $proper_separation = $value;
-            next OPTION;
-        }
-        if ( $option eq 'subgrammar' ) { $subgrammar = $value; next OPTION }
-        if ( $option eq 'xpr_dot' )    { $xpr_dot    = $value; next OPTION }
-        if ( $option eq 'xpr_top' )    { $xpr_top    = $value; next OPTION }
-        # Marpa::R3::exception("Unknown uper rule option: $option");
-    }
-
-    $rhs_names //= [];
-
-    my $default_rank;
-    my $is_ordinary_rule;
-    my $lhs_id;
-    my $rhs_ids;
-    my $base_irl_id;
-    ($default_rank, $xpr_id, $is_ordinary_rule, $lhs_id, $rhs_ids, $base_irl_id) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-          <<'END_OF_LUA', 's', $options);
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 's', $options );
     local slg, options = ...
     local l0g = slg.l0
 
@@ -1054,8 +991,6 @@ sub add_L0_user_rule {
         irl.action = xpr.action
         irl.mask = xpr.mask
     end
-
-    return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids, base_irl_id
 END_OF_LUA
 
     return;
