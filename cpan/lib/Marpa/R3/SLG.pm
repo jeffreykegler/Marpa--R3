@@ -925,7 +925,6 @@ sub add_L0_user_rule {
     my $rank;
     my $null_ranking;
     my $proper_separation = 0;
-    my $xpr_name;
     my $xpr_id;
     my $subgrammar;
     my $xpr_dot;
@@ -933,10 +932,6 @@ sub add_L0_user_rule {
 
   OPTION: for my $option ( keys %{$options} ) {
         my $value = $options->{$option};
-        if ( $option eq 'xprid' ) {
-            $xpr_name = $value;
-            next OPTION;
-        }
         if ( $option eq 'rhs' )    { $rhs_names = $value; next OPTION }
         if ( $option eq 'lhs' )    { $lhs_name  = $value; next OPTION }
         if ( $option eq 'action' ) { $action    = $value; next OPTION }
@@ -957,13 +952,14 @@ sub add_L0_user_rule {
         if ( $option eq 'subgrammar' ) { $subgrammar = $value; next OPTION }
         if ( $option eq 'xpr_dot' )    { $xpr_dot    = $value; next OPTION }
         if ( $option eq 'xpr_top' )    { $xpr_top    = $value; next OPTION }
-        Marpa::R3::exception("Unknown user rule option: $option");
+        # Marpa::R3::exception("Unknown uper rule option: $option");
     }
 
     $rhs_names //= [];
 
     my $default_rank;
-    ($default_rank, $xpr_id) =
+    my $is_ordinary_rule;
+    ($default_rank, $xpr_id, $is_ordinary_rule) =
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $options);
     local slg, options = ...
@@ -974,20 +970,20 @@ sub add_L0_user_rule {
     if #xpr_name > 0 then
         xpr_id = slg.xprs[xpr_name].id
     end
-    return default_rank, xpr_id
+
+    local rhs_names = options.rhs or {}
+    local min = options.min
+    local separator_name = options.separator
+    local is_ordinary_rule = not min or #rhs_names == 0
+    if separator_name and is_ordinary_rule then
+        error( 'separator defined for rule without repetitions')
+    end
+
+    return default_rank, xpr_id, is_ordinary_rule
 END_OF_LUA
 
     $rank //= $default_rank;
     $null_ranking //= 'low';
-
-    # Is this is an ordinary, non-counted rule?
-    my $is_ordinary_rule = scalar @{$rhs_names} == 0 || !defined $min;
-    if ( defined $separator_name and $is_ordinary_rule ) {
-        if ( defined $separator_name ) {
-            Marpa::R3::exception(
-                'separator defined for rule without repetitions');
-        }
-    } ## end if ( defined $separator_name and $is_ordinary_rule )
 
     my @rhs_ids = map {
                 assign_L0_symbol( $slg, $_ )
