@@ -876,6 +876,102 @@ TODO before end of development, convert to local
     end
 ```
 
+TODO before the end of development, convert to local
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.l0_rule_add(slg, options)
+        local l0g = slg.l0
+
+        local xpr_name = options.xprid or ''
+        local default_rank = l0g:default_rank()
+        -- io.stderr:write('xpr_name: ', inspect(xpr_name), '\n')
+        local xpr_id = -1
+        if #xpr_name > 0 then
+            xpr_id = slg.xprs[xpr_name].id
+        end
+
+        local rhs_names = options.rhs or {}
+        local min = options.min
+        local separator_name = options.separator
+        local is_ordinary_rule = not min or #rhs_names == 0
+        if separator_name and is_ordinary_rule then
+            error( 'separator defined for rule without repetitions')
+        end
+
+        local lhs_name = options.lhs
+        local lhs_id = slg:l0_symbol_assign(lhs_name)
+        local rhs_ids = {}
+        local rule = { lhs_id }
+        for ix = 1, #rhs_names do
+            local rhs_id = slg:l0_symbol_assign(rhs_names[ix])
+            rhs_ids[ix] = rhs_id
+            rule[ix+1] = rhs_id
+        end
+
+        local base_irl_id
+        if is_ordinary_rule then
+            -- remove the test for nil or less than zero
+            -- once refactoring is complete?
+            _M.throw = false
+            base_irl_id = l0g:rule_new(rule)
+            _M.throw = true
+            if not base_irl_id or base_irl_id < 0 then return -1 end
+            l0g.irls[base_irl_id] = { id = base_irl_id }
+        else
+            if #rhs_names ~= 1 then
+                error('Only one rhs symbol allowed for counted rule')
+            end
+            local sequence_options = {
+                lhs = rule[1],
+                rhs = rule[2],
+                min = min
+            }
+            sequence_options.proper = (options.proper ~= 0)
+            if separator_name then
+                sequence_options.separator = slg:l0_symbol_assign(separator_name)
+            end
+            _M.throw = false
+            base_irl_id = l0g:sequence_new(sequence_options)
+            _M.throw = true
+            -- remove the test for nil or less than zero
+            -- once refactoring is complete?
+            if not base_irl_id or base_irl_id < 0 then return end
+            local l0_rule = setmetatable({}, _M.class_irl)
+            l0_rule.id = base_irl_id
+            l0g.irls[base_irl_id] = l0_rule
+        end
+
+        if not base_irl_id and base_irl_id < 0 then
+            local rule_description = _M._raw_rule_show(lhs_id, rhs_ids)
+            local error_code = l0g:error_code()
+            local problem_description
+            if error_code == _M.err.DUPLICATE_RULE then
+                problem_description = "Duplicate rule"
+            else
+                problem_description = _M.err[error_code].description
+            end
+            error(problem_description .. ': ' .. rule_description)
+        end
+
+        local null_ranking_is_high = options.null_ranking == 'high' and 1 or 0
+        local rank = options.rank or default_rank
+
+        l0g:rule_null_high_set(base_irl_id, null_ranking_is_high)
+        l0g:rule_rank_set(base_irl_id, rank)
+        if xpr_id >= 0 then
+            local xpr = slg.xprs[xpr_id]
+            local irl = l0g.irls[base_irl_id]
+            irl.xpr = xpr
+            -- right now, the action & mask of an irl
+            -- is always the action/mask of its xpr.
+            -- But some day each irl may need its own.
+            irl.action = xpr.action
+            irl.mask = xpr.mask
+        end
+    end
+```
+
 ### SLG accessors
 
 Display any XPR
