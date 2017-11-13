@@ -966,8 +966,10 @@ sub add_L0_user_rule {
           $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
           <<'END_OF_LUA', 's', $options);
     local slg, options = ...
+    local l0g = slg.l0
+
     local xpr_name = options.xprid or ''
-    local default_rank = slg.l0:default_rank()
+    local default_rank = l0g:default_rank()
     -- io.stderr:write('xpr_name: ', inspect(xpr_name), '\n')
     local xpr_id = -1
     if #xpr_name > 0 then
@@ -997,10 +999,10 @@ sub add_L0_user_rule {
         -- remove the test for nil or less than zero
         -- once refactoring is complete?
         _M.throw = false
-        base_irl_id = slg.l0:rule_new(rule)
+        base_irl_id = l0g:rule_new(rule)
         _M.throw = true
         if not base_irl_id or base_irl_id < 0 then return -1 end
-        slg.l0.irls[base_irl_id] = { id = base_irl_id }
+        l0g.irls[base_irl_id] = { id = base_irl_id }
     else
         if #rhs_names ~= 1 then
             error('Only one rhs symbol allowed for counted rule')
@@ -1015,14 +1017,14 @@ sub add_L0_user_rule {
             sequence_options.separator = slg:l0_symbol_assign(separator_name)
         end
         _M.throw = false
-        base_irl_id = slg.l0:sequence_new(sequence_options)
+        base_irl_id = l0g:sequence_new(sequence_options)
         _M.throw = true
         -- remove the test for nil or less than zero
         -- once refactoring is complete?
         if not base_irl_id or base_irl_id < 0 then return end
         local l0_rule = setmetatable({}, _M.class_irl)
         l0_rule.id = base_irl_id
-        slg.l0.irls[base_irl_id] = l0_rule
+        l0g.irls[base_irl_id] = l0_rule
     end
 
     if not base_irl_id and base_irl_id < 0 then
@@ -1037,34 +1039,26 @@ sub add_L0_user_rule {
         error(problem_description .. ': ' .. rule_description)
     end
 
+    local null_ranking_is_high = options.null_ranking == 'high' and 1 or 0
+    local rank = options.rank or default_rank
+
+    l0g:rule_null_high_set(base_irl_id, null_ranking_is_high)
+    l0g:rule_rank_set(base_irl_id, rank)
+    if xpr_id >= 0 then
+        local xpr = slg.xprs[xpr_id]
+        local irl = l0g.irls[base_irl_id]
+        irl.xpr = xpr
+        -- right now, the action & mask of an irl
+        -- is always the action/mask of its xpr.
+        -- But some day each irl may need its own.
+        irl.action = xpr.action
+        irl.mask = xpr.mask
+    end
+
     return default_rank, xpr_id, is_ordinary_rule, lhs_id, rhs_ids, base_irl_id
 END_OF_LUA
 
-    $rank //= $default_rank;
-    $null_ranking //= 'low';
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'iiii',
-        local slg, irl_id, ranking_is_high, rank, xpr_id = ...
-        local l0g = slg.l0
-        l0g:rule_null_high_set(irl_id, ranking_is_high)
-        l0g:rule_rank_set(irl_id, rank)
-        if xpr_id >= 0 then
-            local xpr = slg.xprs[xpr_id]
-            local irl = slg.l0.irls[irl_id]
-            irl.xpr = xpr
-            -- right now, the action & mask of an irl
-            -- is always the action/mask of its xpr.
-            -- But some day each irl may need its own.
-            irl.action = xpr.action
-            irl.mask = xpr.mask
-        end
-END_OF_LUA
-            $base_irl_id, ( $null_ranking eq 'high' ? 1 : 0 ),
-            $rank, $xpr_id);
-
     return;
-
 }
 
 our $kwgen_code_template = <<'END_OF_TEMPLATE';
