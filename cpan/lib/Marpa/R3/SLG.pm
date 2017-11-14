@@ -314,6 +314,14 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
            end
         end
 
+        do
+           local l0_rules = source_hash.rules.l0
+           for ix = 1,#l0_rules do
+               local options = l0_rules[ix]
+               slg:l0_rule_add(options)
+           end
+        end
+
         for g1_isyid = 0, g1g:highest_symbol_id() do
             local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
 
@@ -350,14 +358,6 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             end
         end
 
-        do
-           local l0_rules = source_hash.rules.l0
-           for ix = 1,#l0_rules do
-               local options = l0_rules[ix]
-               slg:l0_rule_add(options)
-           end
-        end
-
         return if_inaccessible
 END_OF_LUA
 
@@ -377,12 +377,9 @@ END_OF_LUA
     state $lex_start_symbol_name = '[:lex_start:]';
     state $discard_symbol_name   = '[:discard:]';
 
-    my $lexer_rules          = $hashed_source->{rules}->{'l0'};
     my $character_class_hash = $hashed_source->{character_classes};
 
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
-
-    # add_L0_user_rules( $slg, $lexer_rules );
 
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
