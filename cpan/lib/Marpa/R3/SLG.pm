@@ -426,8 +426,6 @@ END_OF_LUA
         }
 
         my $lex_symbol_id = $slg->l0_symbol_by_name($lexeme_name);
-        $lexeme_data{$lexeme_name}{lexer}{'id'} =
-          $lex_symbol_id;
         $lex_lexeme_to_g1_symbol[$lex_symbol_id] = $g1_symbol_id;
     } ## end LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names)
 
