@@ -457,37 +457,39 @@ END_OF_LUA
     return l0g:rule_rhs(rule_id, 0)
 END_OF_LUA
 
-        if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
-            $lex_rule_to_g1_lexeme[$rule_id] = -1;
-            next RULE_ID;
-        }
-        my $lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
-        $lex_rule_to_g1_lexeme[$rule_id] = $lexeme_id;
-        next RULE_ID if $lexeme_id < 0;
-        my $lexeme_name = $slg->g1_symbol_name($lexeme_id);
+        {
+            if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
+                $lex_rule_to_g1_lexeme[$rule_id] = -1;
+                next RULE_ID;
+            }
+            my $lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
+            $lex_rule_to_g1_lexeme[$rule_id] = $lexeme_id;
+            next RULE_ID if $lexeme_id < 0;
+            my $lexeme_name = $slg->g1_symbol_name($lexeme_id);
 
-        my $assertion_id =
-          $lexeme_data{$lexeme_name}{lexer}{'assertion'};
-        if ( not defined $assertion_id ) {
+            my $assertion_id =
+              $lexeme_data{$lexeme_name}{lexer}{'assertion'};
+            if ( not defined $assertion_id ) {
 
-            ($assertion_id) =
-              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', '>*' );
+                ($assertion_id) =
+                  $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                    <<'END_OF_LUA', '>*' );
     local grammar = ...
     local l0g = grammar.l0
     return l0g:zwa_new(0)
 END_OF_LUA
 
-            $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
-              $assertion_id;
-        } ## end if ( not defined $assertion_id )
+                $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
+                  $assertion_id;
+            } ## end if ( not defined $assertion_id )
 
-        $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
+            $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+                <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
     local grammar, assertion_id, rule_id = ...
     local l0g = grammar.l0
     l0g:zwa_place(assertion_id, rule_id, 0)
 END_OF_LUA
+        }
 
     }
 
