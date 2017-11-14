@@ -366,11 +366,6 @@ END_OF_LUA
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
 
-    # Current lexeme data is spread out in many places.
-    # Change so that it all resides in this hash, indexed by
-    # name
-    my %lexeme_data = ();
-
     # Lexers
 
     my @discard_event_by_lexer_rule_id = ();
@@ -479,9 +474,6 @@ END_OF_LUA
     slg.g1.isys[g1_lexeme_id].assertion = assertion_id
     return assertion_id
 END_OF_LUA
-
-                $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
-                  $assertion_id;
 
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
@@ -691,16 +683,12 @@ END_OF_LUA
 
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
-        my $assertion_id = -1;
         my $lexeme_name  = $slg->g1_symbol_name($g1_lexeme_id);
-        if (defined $lexeme_name) {
-            $assertion_id = $lexeme_data{$lexeme_name}{lexer}{'assertion'};
-        }
         my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
-    local g, lexer_rule_id, g1_lexeme_id, assertion_id, discard_symbol_id = ...
+    local g, lexer_rule_id, g1_lexeme_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
         g.l0.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
@@ -712,11 +700,8 @@ END_OF_LUA
             g.l0.irls[lexer_rule_id].eager = true
         end
     end
-    if g1_lexeme_id >= 0 then
-        g.g1.isys[g1_lexeme_id].assertion = assertion_id
-    end
 END_OF_LUA
-        'iiii', $lexer_rule_id, $g1_lexeme_id, $assertion_id, $discard_symbol_id );
+        'iii', $lexer_rule_id, $g1_lexeme_id, $discard_symbol_id );
 
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
 
