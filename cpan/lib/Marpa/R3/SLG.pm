@@ -467,23 +467,21 @@ END_OF_LUA
             next RULE_ID if $g1_lexeme_id < 0;
             my $lexeme_name = $slg->g1_symbol_name($g1_lexeme_id);
 
-            my $assertion_id =
-              $lexeme_data{$lexeme_name}{lexer}{'assertion'};
-            if ( not defined $assertion_id ) {
-
-                ($assertion_id) =
+                my ($assertion_id) =
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>*', $g1_lexeme_id );
     local slg, g1_lexeme_id = ...
     local l0g = slg.l0
-    local assertion_id = l0g:zwa_new(0)
+    local assertion_id = slg.g1.isys[g1_lexeme_id].assertion
+    if not assertion_id then
+        assertion_id = l0g:zwa_new(0)
+    end
     slg.g1.isys[g1_lexeme_id].assertion = assertion_id
     return assertion_id
 END_OF_LUA
 
                 $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
                   $assertion_id;
-            } ## end if ( not defined $assertion_id )
 
             $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'ii>*', $assertion_id, $rule_id );
