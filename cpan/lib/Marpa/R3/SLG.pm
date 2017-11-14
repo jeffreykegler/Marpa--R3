@@ -462,10 +462,10 @@ END_OF_LUA
                 $lex_rule_to_g1_lexeme[$rule_id] = -1;
                 next RULE_ID;
             }
-            my $lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
-            $lex_rule_to_g1_lexeme[$rule_id] = $lexeme_id;
-            next RULE_ID if $lexeme_id < 0;
-            my $lexeme_name = $slg->g1_symbol_name($lexeme_id);
+            my $g1_lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
+            $lex_rule_to_g1_lexeme[$rule_id] = $g1_lexeme_id;
+            next RULE_ID if $g1_lexeme_id < 0;
+            my $lexeme_name = $slg->g1_symbol_name($g1_lexeme_id);
 
             my $assertion_id =
               $lexeme_data{$lexeme_name}{lexer}{'assertion'};
@@ -473,10 +473,12 @@ END_OF_LUA
 
                 ($assertion_id) =
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', '>*' );
-    local grammar = ...
-    local l0g = grammar.l0
-    return l0g:zwa_new(0)
+                    <<'END_OF_LUA', 'i>*', $g1_lexeme_id );
+    local slg, g1_lexeme_id = ...
+    local l0g = slg.l0
+    local assertion_id = l0g:zwa_new(0)
+    slg.g1.isys[g1_lexeme_id].assertion = assertion_id
+    return assertion_id
 END_OF_LUA
 
                 $lexeme_data{$lexeme_name}{lexer}{'assertion'} =
