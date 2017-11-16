@@ -325,40 +325,46 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         for g1_isyid = 0, g1g:highest_symbol_id() do
             local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
 
-            if is_terminal then
-                 local g1_isy = g1g.isys[g1_isyid]
-                 local lexeme = setmetatable( {}, _M.class_lexeme )
-                 lexeme.g1_isy = g1_isy
-                 g1g.isys[g1_isyid].lexeme = lexeme
-                 local xsy = g1g:_xsy(g1_isyid)
-                 if xsy then
-                     if xsy.lexeme then
+            if not is_terminal then goto NEXT_G1_ISY end
 
-                         local g1_isyid2 = xsy.lexeme.g1_isy.id
-                         _M._internal_error(
-                             "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
-                             \u{20}   %q (id=%d), and\n\z
-                             \u{20}   %q (id=%d)\n",
-                             xsy:display_name(), xsy.id,
-                             g1g:symbol_name(g1_isyid), g1_isyid,
-                             g1g:symbol_name(g1_isyid2), g1_isyid2
-                         )
-                     end
-                     lexeme.xsy = xsy
-                     xsy.lexeme = lexeme
+            local g1_isy = g1g.isys[g1_isyid]
+            local lexeme = setmetatable( {}, _M.class_lexeme )
+            lexeme.g1_isy = g1_isy
+            g1g.isys[g1_isyid].lexeme = lexeme
+            local xsy = g1g:_xsy(g1_isyid)
+            if not xsy then goto NEXT_G1_ISY end
 
-                     local lexeme_name = xsy.name
-
-                     -- TODO delete this check after development
-                     if lexeme_name ~= slg.g1:symbol_name(g1_isyid) then
-                         _M._internal_error(
-                             "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
-                             lexeme_name,
-                             slg.g1:symbol_name(g1_isyid)
-                         )
-                     end
-                 end
+            -- TODO delete this check after development ?
+            if xsy.lexeme then
+                local g1_isyid2 = xsy.lexeme.g1_isy.id
+                _M._internal_error(
+                    "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
+                    \u{20}   %q (id=%d), and\n\z
+                    \u{20}   %q (id=%d)\n",
+                    xsy:display_name(), xsy.id,
+                    g1g:symbol_name(g1_isyid), g1_isyid,
+                    g1g:symbol_name(g1_isyid2), g1_isyid2
+                 )
             end
+
+            lexeme.xsy = xsy
+            xsy.lexeme = lexeme
+
+            local lexeme_name = xsy.name
+
+            -- TODO delete this check after development ?
+            if lexeme_name ~= slg.g1:symbol_name(g1_isyid) then
+                _M._internal_error(
+                    "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
+                    lexeme_name,
+                    slg.g1:symbol_name(g1_isyid)
+                 )
+            end
+
+            local l0_isy = slg:l0_symbol_by_name(lexeme_name)
+            lexeme.l0_isy = l0_isy
+
+            ::NEXT_G1_ISY::
         end
 
         return if_inaccessible
