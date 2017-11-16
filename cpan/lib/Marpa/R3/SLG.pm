@@ -369,6 +369,11 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             ::NEXT_G1_ISY::
         end
 
+        local l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
+        local l0_lex_top_isyid = slg:l0_symbol_by_name('[:lex_start:]')
+        for l0_irlid = 0, l0g:highest_rule_id() do
+        end
+
         return if_inaccessible
 END_OF_LUA
 
@@ -720,7 +725,6 @@ END_OF_LUA
 
   RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
         my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
-        my $lexeme_name  = $slg->g1_symbol_name($g1_lexeme_id);
         my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
