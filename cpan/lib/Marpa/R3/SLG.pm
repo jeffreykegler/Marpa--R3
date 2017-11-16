@@ -361,8 +361,10 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
                  )
             end
 
-            local l0_isy = slg:l0_symbol_by_name(lexeme_name)
+            local l0_isyid = slg:l0_symbol_by_name(lexeme_name)
+            local l0_isy = l0g.isys[l0_isyid]
             lexeme.l0_isy = l0_isy
+            l0_isy.lexeme = lexeme
 
             ::NEXT_G1_ISY::
         end
