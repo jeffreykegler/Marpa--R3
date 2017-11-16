@@ -2179,6 +2179,33 @@ one for each subgrammar.
     end
 ```
 
+## Lexeme class
+
+```
+    -- miranda: section+ class_lexeme field declarations
+    class_lexeme_fields.g1_isy = true
+    class_lexeme_fields.xsy = true
+    class_lexeme_fields.l0_isy = true
+    class_lexeme_fields.l0_irl = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_lexeme = {}
+    -- miranda: section+ populate metatables
+    local class_lexeme_fields = {}
+    -- miranda: insert class_lexeme field declarations
+    declarations(_M.class_lexeme, class_lexeme_fields, 'lexeme')
+    do
+        local old_new_index = _M.class_lexeme.__newindex
+        -- allow integer keys
+        _M.class_lexeme.__newindex = function (t, n, v)
+            if type(n) == 'number' then return rawset(t, n, v) end
+            return old_new_index(t, n, v)
+            end
+    end
+```
+
 ## Block class
 
 ### SLR fields

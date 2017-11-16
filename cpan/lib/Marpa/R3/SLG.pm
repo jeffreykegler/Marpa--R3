@@ -327,7 +327,8 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
             if is_terminal then
                  local g1_isy = g1g.isys[g1_isyid]
-                 local lexeme = { g1_isy = g1_isy }
+                 local lexeme = setmetatable( {}, _M.class_lexeme )
+                 lexeme.g1_isy = g1_isy
                  g1g.isys[g1_isyid].lexeme = lexeme
                  local xsy = g1g:_xsy(g1_isyid)
                  if xsy then
@@ -346,11 +347,13 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
                      lexeme.xsy = xsy
                      xsy.lexeme = lexeme
 
+                     local lexeme_name = xsy.name
+
                      -- TODO delete this check after development
-                     if xsy.name ~= slg.g1:symbol_name(g1_isyid) then
+                     if lexeme_name ~= slg.g1:symbol_name(g1_isyid) then
                          _M._internal_error(
                              "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
-                             xsy.name,
+                             lexeme_name,
                              slg.g1:symbol_name(g1_isyid)
                          )
                      end
@@ -407,24 +410,25 @@ END_OF_LUA
         <<'END_OF_LUA');
         local slg, lexeme_name = ...
         _M.wrap(function ()
-            return 'ok', slg:g1_symbol_by_name(lexeme_name)
+            local g1_symbol_id = slg:g1_symbol_by_name(lexeme_name)
+            if not slg:g1_symbol_is_accessible(g1_symbol_id) then
+                local message = "A lexeme in L0 is not accessible from the G1 start symbol: "
+                    .. lexeme_name
+                if slg.if_inaccessible == 'warn' then
+                    coroutine.yield('trace', message)
+                end
+                if slg.if_inaccessible == 'fatal' then
+                    _M.userX('%s', message)
+                end
+            end
+            return 'ok', g1_symbol_id
         end)
 END_OF_LUA
-
-        if ( not $slg->g1_symbol_is_accessible($g1_symbol_id) ) {
-            my $message =
-"A lexeme in L0 is not accessible from the G1 start symbol: $lexeme_name";
-            say {$trace_file_handle} $message
-              if $if_inaccessible_default eq 'warn';
-            Marpa::R3::exception($message)
-              if $if_inaccessible_default eq 'fatal';
-        }
 
         my $lex_symbol_id = $slg->l0_symbol_by_name($lexeme_name);
         $lex_lexeme_to_g1_symbol[$lex_symbol_id] = $g1_symbol_id;
     } ## end LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names)
 
-    my @lex_rule_to_g1_lexeme;
     my $lex_start_symbol_id =
       $slg->l0_symbol_by_name($lex_start_symbol_name);
   RULE_ID: for (my $iter = $slg->l0_rule_ids_gen(); defined ( my $rule_id = $iter->());) {
@@ -437,11 +441,9 @@ END_OF_LUA
 END_OF_LUA
 
         if ( $lhs_id == $lex_discard_symbol_id ) {
-            $lex_rule_to_g1_lexeme[$rule_id] = -2;
             next RULE_ID;
         }
         if ( $lhs_id != $lex_start_symbol_id ) {
-            $lex_rule_to_g1_lexeme[$rule_id] = -1;
             next RULE_ID;
         }
         my ($lexer_lexeme_id) =
@@ -454,11 +456,9 @@ END_OF_LUA
 
         {
             if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
-                $lex_rule_to_g1_lexeme[$rule_id] = -1;
                 next RULE_ID;
             }
             my $g1_lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
-            $lex_rule_to_g1_lexeme[$rule_id] = $g1_lexeme_id;
             next RULE_ID if $g1_lexeme_id < 0;
 
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -481,6 +481,42 @@ END_OF_LUA
       Marpa::R3::Internal_G::precompute( $slg, 'l0' );
 
     # L0 is now precomputed
+
+    my @lex_rule_to_g1_lexeme;
+RULE_ID:
+for ( my $iter = $slg->l0_rule_ids_gen() ;
+    defined( my $rule_id = $iter->() ) ; )
+{
+    my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i>*', $rule_id );
+    local grammar, rule_id = ...
+    local l0g = grammar.l0
+    return l0g:rule_lhs(rule_id)
+END_OF_LUA
+
+    if ( $lhs_id == $lex_discard_symbol_id ) {
+        $lex_rule_to_g1_lexeme[$rule_id] = -2;
+        next RULE_ID;
+    }
+    if ( $lhs_id != $lex_start_symbol_id ) {
+        $lex_rule_to_g1_lexeme[$rule_id] = -1;
+        next RULE_ID;
+    }
+    my ($lexer_lexeme_id) =
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i>*', $rule_id );
+    local grammar, rule_id = ...
+    local l0g = grammar.l0
+    return l0g:rule_rhs(rule_id, 0)
+END_OF_LUA
+
+    if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
+        $lex_rule_to_g1_lexeme[$rule_id] = -1;
+        next RULE_ID;
+    }
+    my $g1_lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
+    $lex_rule_to_g1_lexeme[$rule_id] = $g1_lexeme_id;
+}
 
     my @class_table = ();
 
