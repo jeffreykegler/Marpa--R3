@@ -469,23 +469,14 @@ END_OF_LUA
       $slg->l0_symbol_by_name($lex_start_symbol_name);
   RULE_ID: for (my $iter = $slg->l0_rule_ids_gen(); defined ( my $rule_id = $iter->());) {
 
-        my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i>*', $rule_id );
-    local grammar, rule_id = ...
-    local l0g = grammar.l0
-    return l0g:rule_lhs(rule_id)
-END_OF_LUA
-
-        if ( $lhs_id == $lex_discard_symbol_id ) {
-            next RULE_ID;
-        }
-        if ( $lhs_id != $lex_start_symbol_id ) {
-            next RULE_ID;
-        }
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'i>*', $rule_id );
     local slg, rule_id = ...
     local l0g = slg.l0
+    local lhs_id = l0g:rule_lhs(rule_id)
+    if lhs_id == slg.l0_discard_isyid or lhs_id ~= slg.l0_top_isyid then
+        goto NEXT_IRL
+    end
     local l0_lexeme_id = l0g:rule_rhs(rule_id, 0)
     if l0_lexeme_id == slg.l0_discard_isyid then
         goto NEXT_IRL
