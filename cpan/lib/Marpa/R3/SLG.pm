@@ -424,7 +424,6 @@ END_OF_LUA
 
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
-    my @lex_lexeme_to_g1_symbol;
 
   LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
@@ -461,12 +460,8 @@ END_OF_LUA
         end)
 END_OF_LUA
 
-        my $lex_symbol_id = $slg->l0_symbol_by_name($lexeme_name);
-        $lex_lexeme_to_g1_symbol[$lex_symbol_id] = $g1_symbol_id;
     } ## end LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names)
 
-    my $lex_start_symbol_id =
-      $slg->l0_symbol_by_name($lex_start_symbol_name);
   RULE_ID: for (my $iter = $slg->l0_rule_ids_gen(); defined ( my $rule_id = $iter->());) {
 
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
