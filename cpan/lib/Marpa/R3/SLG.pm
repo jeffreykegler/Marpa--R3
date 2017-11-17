@@ -276,135 +276,149 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
     my $trace_file_handle = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
-    my ($if_inaccessible_default) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $hashed_source );
+    $slg->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [$hashed_source],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
         local slg, source_hash = ...
+        _M.wrap(function ()
 
-        slg:xsys_populate( source_hash)
-        slg:xrls_populate(source_hash)
-        slg:xprs_populate(source_hash)
-        local if_inaccessible = slg.if_inaccessible
-        do
-            local defaults = source_hash.defaults
-            if defaults then
-                if_inaccessible = defaults.if_inaccessible or if_inaccessible
+            slg:xsys_populate( source_hash)
+            slg:xrls_populate(source_hash)
+            slg:xprs_populate(source_hash)
+            local if_inaccessible = slg.if_inaccessible
+            do
+                local defaults = source_hash.defaults
+                if defaults then
+                    if_inaccessible = defaults.if_inaccessible or if_inaccessible
+                end
             end
+            slg.if_inaccessible = if_inaccessible
+
+            slg:g1_precompute(source_hash);
+
+            local l0g = _M.grammar_new(slg, 'l0')
+            slg.l0 = l0g
+            l0g.start_name = '[:lex_start:]'
+
+            local g1g = slg.g1
+
+            do
+               local l0_symbols = source_hash.symbols.l0
+               local l0_symbol_names = {}
+               for symbol_name, _ in pairs(l0_symbols) do
+                   l0_symbol_names[#l0_symbol_names+1] = symbol_name
+               end
+               table.sort(l0_symbol_names)
+               for ix = 1,#l0_symbol_names do
+                   local symbol_name = l0_symbol_names[ix]
+                   local options = l0_symbols[symbol_name]
+                   slg:l0_symbol_assign(symbol_name, options)
+               end
+            end
+
+            do
+               local l0_rules = source_hash.rules.l0
+               for ix = 1,#l0_rules do
+                   local options = l0_rules[ix]
+                   slg:l0_rule_add(options)
+               end
+            end
+
+            for g1_isyid = 0, g1g:highest_symbol_id() do
+                local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
+
+                if not is_terminal then goto NEXT_G1_ISY end
+
+                local g1_isy = g1g.isys[g1_isyid]
+                local lexeme = setmetatable( {}, _M.class_lexeme )
+                lexeme.g1_isy = g1_isy
+                g1g.isys[g1_isyid].lexeme = lexeme
+                local xsy = g1g:_xsy(g1_isyid)
+                if not xsy then goto NEXT_G1_ISY end
+
+                -- TODO delete this check after development ?
+                if xsy.lexeme then
+                    local g1_isyid2 = xsy.lexeme.g1_isy.id
+                    _M._internal_error(
+                        "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
+                        \u{20}   %q (id=%d), and\n\z
+                        \u{20}   %q (id=%d)\n",
+                        xsy:display_name(), xsy.id,
+                        g1g:symbol_name(g1_isyid), g1_isyid,
+                        g1g:symbol_name(g1_isyid2), g1_isyid2
+                     )
+                end
+
+                lexeme.xsy = xsy
+                xsy.lexeme = lexeme
+
+                local lexeme_name = xsy.name
+
+                -- TODO delete this check after development ?
+                if lexeme_name ~= slg.g1:symbol_name(g1_isyid) then
+                    _M._internal_error(
+                        "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
+                        lexeme_name,
+                        slg.g1:symbol_name(g1_isyid)
+                     )
+                end
+
+                local l0_isyid = slg:l0_symbol_by_name(lexeme_name)
+                local l0_isy = l0g.isys[l0_isyid]
+                lexeme.l0_isy = l0_isy
+                l0_isy.lexeme = lexeme
+
+                ::NEXT_G1_ISY::
+            end
+
+            slg.l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
+            slg.l0_top_isyid = slg:l0_symbol_by_name(l0g.start_name)
+            for l0_irlid = 0, l0g:highest_rule_id() do
+                local irl = l0g.irls[l0_irlid]
+                local lhs_id = l0g:rule_lhs(l0_irlid)
+                -- a discard rule
+                if lhs_id == slg.l0_discard_isyid then
+                    irl.g1_lexeme = -2
+                    goto NEXT_L0_IRL
+                end
+                -- not a lexeme or discard rule
+                if lhs_id ~= slg.l0_top_isyid then
+                    irl.g1_lexeme = -1
+                    goto NEXT_L0_IRL
+                end
+                -- a lexeme rule
+                local l0_rhs_id = l0g:rule_rhs(l0_irlid, 0)
+
+                -- the rule '[:lex_start:] ::= [:discard:]'
+                if l0_rhs_id == slg.l0_discard_isyid then
+                    irl.g1_lexeme = -1
+                    goto NEXT_L0_IRL
+                end
+
+                -- a lexeme rule?
+                local l0_rhs_lexeme = l0g.isys[l0_rhs_id].lexeme
+                if not l0_rhs_lexeme then
+                    irl.g1_lexeme = -1
+                    goto NEXT_L0_IRL
+                end
+                irl.g1_lexeme = l0_rhs_lexeme.g1_isy.id
+
+                ::NEXT_L0_IRL::
         end
-        slg.if_inaccessible = if_inaccessible
+    end)
 
-        slg:g1_precompute(source_hash);
-
-        local l0g = _M.grammar_new(slg, 'l0')
-        slg.l0 = l0g
-        l0g.start_name = '[:lex_start:]'
-
-        local g1g = slg.g1
-
-        do
-           local l0_symbols = source_hash.symbols.l0
-           local l0_symbol_names = {}
-           for symbol_name, _ in pairs(l0_symbols) do
-               l0_symbol_names[#l0_symbol_names+1] = symbol_name
-           end
-           table.sort(l0_symbol_names)
-           for ix = 1,#l0_symbol_names do
-               local symbol_name = l0_symbol_names[ix]
-               local options = l0_symbols[symbol_name]
-               slg:l0_symbol_assign(symbol_name, options)
-           end
-        end
-
-        do
-           local l0_rules = source_hash.rules.l0
-           for ix = 1,#l0_rules do
-               local options = l0_rules[ix]
-               slg:l0_rule_add(options)
-           end
-        end
-
-        for g1_isyid = 0, g1g:highest_symbol_id() do
-            local is_terminal = 0 ~= g1g:symbol_is_terminal(g1_isyid)
-
-            if not is_terminal then goto NEXT_G1_ISY end
-
-            local g1_isy = g1g.isys[g1_isyid]
-            local lexeme = setmetatable( {}, _M.class_lexeme )
-            lexeme.g1_isy = g1_isy
-            g1g.isys[g1_isyid].lexeme = lexeme
-            local xsy = g1g:_xsy(g1_isyid)
-            if not xsy then goto NEXT_G1_ISY end
-
-            -- TODO delete this check after development ?
-            if xsy.lexeme then
-                local g1_isyid2 = xsy.lexeme.g1_isy.id
-                _M._internal_error(
-                    "Xsymbol %q (id=%d) has 2 g1 lexemes: \n\z
-                    \u{20}   %q (id=%d), and\n\z
-                    \u{20}   %q (id=%d)\n",
-                    xsy:display_name(), xsy.id,
-                    g1g:symbol_name(g1_isyid), g1_isyid,
-                    g1g:symbol_name(g1_isyid2), g1_isyid2
-                 )
-            end
-
-            lexeme.xsy = xsy
-            xsy.lexeme = lexeme
-
-            local lexeme_name = xsy.name
-
-            -- TODO delete this check after development ?
-            if lexeme_name ~= slg.g1:symbol_name(g1_isyid) then
-                _M._internal_error(
-                    "1: Lexeme name mismatch xsy=%q, g1 isy = %q",
-                    lexeme_name,
-                    slg.g1:symbol_name(g1_isyid)
-                 )
-            end
-
-            local l0_isyid = slg:l0_symbol_by_name(lexeme_name)
-            local l0_isy = l0g.isys[l0_isyid]
-            lexeme.l0_isy = l0_isy
-            l0_isy.lexeme = lexeme
-
-            ::NEXT_G1_ISY::
-        end
-
-        slg.l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
-        slg.l0_top_isyid = slg:l0_symbol_by_name(l0g.start_name)
-        for l0_irlid = 0, l0g:highest_rule_id() do
-            local irl = l0g.irls[l0_irlid]
-            local lhs_id = l0g:rule_lhs(l0_irlid)
-            -- a discard rule
-            if lhs_id == slg.l0_discard_isyid then
-                irl.g1_lexeme = -2
-                goto NEXT_L0_IRL
-            end
-            -- not a lexeme or discard rule
-            if lhs_id ~= slg.l0_top_isyid then
-                irl.g1_lexeme = -1
-                goto NEXT_L0_IRL
-            end
-            -- a lexeme rule
-            local l0_rhs_id = l0g:rule_rhs(l0_irlid, 0)
-
-            -- the rule '[:lex_start:] ::= [:discard:]'
-            if l0_rhs_id == slg.l0_discard_isyid then
-                irl.g1_lexeme = -1
-                goto NEXT_L0_IRL
-            end
-
-            -- a lexeme rule?
-            local l0_rhs_lexeme = l0g.isys[l0_rhs_id].lexeme
-            if not l0_rhs_lexeme then
-                irl.g1_lexeme = -1
-                goto NEXT_L0_IRL
-            end
-            irl.g1_lexeme = l0_rhs_lexeme.g1_isy.id
-
-            ::NEXT_L0_IRL::
-        end
-
-        return if_inaccessible
+    return slg.if_inaccessible
 END_OF_LUA
 
     # A first phase of applying defaults

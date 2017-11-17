@@ -666,7 +666,7 @@ This is a registry object.
 
         -- This logic assumes that Marpa's logic
         -- is correct and that its rewrites are
-        -- it is not creating inaccessible symbols from
+        -- not creating inaccessible symbols from
         -- accessible ones.
 
         for isyid = 0, lmw_g:highest_symbol_id() do
