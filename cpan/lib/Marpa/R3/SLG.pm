@@ -509,24 +509,6 @@ END_OF_LUA
         defined( my $lexer_rule_id = $iter->() ) ;
       )
     {
-        my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
-    local g, lexer_rule_id, discard_symbol_id = ...
-    local irl = g.l0.irls[lexer_rule_id]
-    local g1_lexeme_id = irl.g1_lexeme
-    if g1_lexeme_id >= 0 then
-        local eager = g.g1.isys[g1_lexeme_id].eager
-        if eager then irl.eager = true end
-    end
-    local eager = g.l0.isys[discard_symbol_id].eager
-    if eager then
-        irl.eager = true
-    end
-END_OF_LUA
-        'ii', $lexer_rule_id, $discard_symbol_id );
-
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
@@ -554,6 +536,31 @@ END_OF_LUA
         end
 END_OF_LUA
 
+    }
+
+  RULE_ID:
+    for (
+        my $iter = $slg->l0_rule_ids_gen() ;
+        defined( my $lexer_rule_id = $iter->() ) ;
+      )
+    {
+        my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA',
+    local g, lexer_rule_id, discard_symbol_id = ...
+    local irl = g.l0.irls[lexer_rule_id]
+    local g1_lexeme_id = irl.g1_lexeme
+    if g1_lexeme_id >= 0 then
+        local eager = g.g1.isys[g1_lexeme_id].eager
+        if eager then irl.eager = true end
+    end
+    local eager = g.l0.isys[discard_symbol_id].eager
+    if eager then
+        irl.eager = true
+    end
+END_OF_LUA
+        'ii', $lexer_rule_id, $discard_symbol_id );
     }
 
     # Second phase of G1 processing
@@ -676,7 +683,6 @@ END_OF_LUA
     my $character_class_hash = $hashed_source->{character_classes};
 
     my @class_table = ();
-
   CLASS_SYMBOL:
     for my $class_symbol ( sort keys %{$character_class_hash} ) {
         my $symbol_id = $slg->l0_symbol_by_name($class_symbol);
@@ -691,10 +697,7 @@ END_OF_LUA
         }
         push @class_table, [ $symbol_id, $compiled_re ];
     } ## end CLASS_SYMBOL: for my $class_symbol ( sort keys %{...})
-    my $character_class_table = \@class_table;
-
-    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE] =
-      $character_class_table;
+    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE] = \@class_table;
 
     return $slg;
 
