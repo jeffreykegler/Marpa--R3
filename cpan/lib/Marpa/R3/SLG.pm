@@ -525,42 +525,6 @@ END_OF_LUA
 
     # L0 is now precomputed
 
-    my @lex_rule_to_g1_lexeme;
-RULE_ID:
-for ( my $iter = $slg->l0_rule_ids_gen() ;
-    defined( my $rule_id = $iter->() ) ; )
-{
-    my ($lhs_id) = $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i>*', $rule_id );
-    local grammar, rule_id = ...
-    local l0g = grammar.l0
-    return l0g:rule_lhs(rule_id)
-END_OF_LUA
-
-    if ( $lhs_id == $lex_discard_symbol_id ) {
-        $lex_rule_to_g1_lexeme[$rule_id] = -2;
-        next RULE_ID;
-    }
-    if ( $lhs_id != $lex_start_symbol_id ) {
-        $lex_rule_to_g1_lexeme[$rule_id] = -1;
-        next RULE_ID;
-    }
-    my ($lexer_lexeme_id) =
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'i>*', $rule_id );
-    local grammar, rule_id = ...
-    local l0g = grammar.l0
-    return l0g:rule_rhs(rule_id, 0)
-END_OF_LUA
-
-    if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
-        $lex_rule_to_g1_lexeme[$rule_id] = -1;
-        next RULE_ID;
-    }
-    my $g1_lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
-    $lex_rule_to_g1_lexeme[$rule_id] = $g1_lexeme_id;
-}
-
     my @class_table = ();
 
   CLASS_SYMBOL:
