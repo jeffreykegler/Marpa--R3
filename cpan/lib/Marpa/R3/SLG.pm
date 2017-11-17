@@ -439,43 +439,6 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
 
-  LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
-        next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
-        next LEXEME_NAME if $lexeme_name eq $lex_start_symbol_name;
-
-    my ($g1_symbol_id) = $slg->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 's',
-            args      => [$lexeme_name],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-            }
-        },
-        <<'END_OF_LUA');
-        local slg, lexeme_name = ...
-        _M.wrap(function ()
-            local g1_symbol_id = slg:g1_symbol_by_name(lexeme_name)
-            if not slg:g1_symbol_is_accessible(g1_symbol_id) then
-                local message = "A lexeme in L0 is not accessible from the G1 start symbol: "
-                    .. lexeme_name
-                if slg.if_inaccessible == 'warn' then
-                    coroutine.yield('trace', message)
-                end
-                if slg.if_inaccessible == 'fatal' then
-                    _M.userX('%s', message)
-                end
-            end
-            return 'ok', g1_symbol_id
-        end)
-END_OF_LUA
-
-    } ## end LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names)
-
   RULE_ID: for (my $iter = $slg->l0_rule_ids_gen(); defined ( my $rule_id = $iter->());) {
 
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
