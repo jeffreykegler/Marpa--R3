@@ -369,18 +369,18 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             ::NEXT_G1_ISY::
         end
 
-        local l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
-        local l0_lex_top_isyid = slg:l0_symbol_by_name('[:lex_start:]')
+        slg.l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
+        slg.l0_top_isyid = slg:l0_symbol_by_name(l0g.start_name)
         for l0_irlid = 0, l0g:highest_rule_id() do
             local irl = l0g.irls[l0_irlid]
             local lhs_id = l0g:rule_lhs(l0_irlid)
             -- a discard rule
-            if lhs_id == l0_discard_isyid then
+            if lhs_id == slg.l0_discard_isyid then
                 irl.g1_lexeme = -2
                 goto NEXT_L0_IRL
             end
             -- not a lexeme or discard rule
-            if lhs_id ~= l0_lex_top_isyid then
+            if lhs_id ~= slg.l0_top_isyid then
                 irl.g1_lexeme = -1
                 goto NEXT_L0_IRL
             end
@@ -388,7 +388,7 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             local l0_rhs_id = l0g:rule_rhs(l0_irlid, 0)
 
             -- the rule '[:lex_start:] ::= [:discard:]'
-            if l0_rhs_id == l0_discard_isyid then
+            if l0_rhs_id == slg.l0_discard_isyid then
                 irl.g1_lexeme = -1
                 goto NEXT_L0_IRL
             end

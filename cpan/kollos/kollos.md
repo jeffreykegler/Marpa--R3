@@ -569,6 +569,15 @@ perhaps because it is buggy.
     class_slg_fields.xsys = true
 ```
 
+These two memoize two of the special ISYIDs
+in the L0 grammar.
+
+```
+    -- miranda: section+ class_slg field declarations
+    class_slg_fields.l0_discard_isyid = true
+    class_slg_fields.l0_top_isyid = true
+```
+
 ```
     -- miranda: section+ populate metatables
     local class_slg_fields = {}
