@@ -425,13 +425,6 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
     my @lex_lexeme_to_g1_symbol;
-    for (
-        my $iter = $slg->g1_symbol_ids_gen() ;
-        defined( my $lexeme_id = $iter->() ) ;
-      )
-    {
-        $lex_lexeme_to_g1_symbol[$lexeme_id] = -1;
-    }
 
   LEXEME_NAME: for my $lexeme_name (@lex_lexeme_names) {
         next LEXEME_NAME if $lexeme_name eq $discard_symbol_name;
