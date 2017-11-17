@@ -498,16 +498,19 @@ END_OF_LUA
             next RULE_ID if $g1_lexeme_id < 0;
 
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'ii>*', $g1_lexeme_id, $rule_id );
-    local slg, g1_lexeme_id, rule_id = ...
+                    <<'END_OF_LUA', 'ii>*', $lexer_lexeme_id, $rule_id );
+    local slg, l0_lexeme_id, rule_id = ...
     local l0g = slg.l0
-    local assertion_id = slg.g1.isys[g1_lexeme_id].assertion
-    if not assertion_id then
-        assertion_id = l0g:zwa_new(0)
+    local lexeme = l0g.isys[l0_lexeme_id].lexeme
+    if lexeme then
+        local g1_lexeme_id = lexeme.g1_isy.id
+        local assertion_id = slg.g1.isys[g1_lexeme_id].assertion
+        if not assertion_id then
+            assertion_id = l0g:zwa_new(0)
+        end
+        slg.g1.isys[g1_lexeme_id].assertion = assertion_id
+        l0g:zwa_place(assertion_id, rule_id, 0)
     end
-    slg.g1.isys[g1_lexeme_id].assertion = assertion_id
-    l0g:zwa_place(assertion_id, rule_id, 0)
-    return assertion_id
 END_OF_LUA
 
         }
