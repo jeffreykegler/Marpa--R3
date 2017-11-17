@@ -482,21 +482,14 @@ END_OF_LUA
         if ( $lhs_id != $lex_start_symbol_id ) {
             next RULE_ID;
         }
-        my ($lexer_lexeme_id) =
-          $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i>*', $rule_id );
-    local grammar, rule_id = ...
-    local l0g = grammar.l0
-    return l0g:rule_rhs(rule_id, 0)
-END_OF_LUA
-
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'ii>*', $lexer_lexeme_id, $rule_id );
-    local slg, l0_lexeme_id, rule_id = ...
+                    <<'END_OF_LUA', 'i>*', $rule_id );
+    local slg, rule_id = ...
+    local l0g = slg.l0
+    local l0_lexeme_id = l0g:rule_rhs(rule_id, 0)
     if l0_lexeme_id == slg.l0_discard_isyid then
         goto NEXT_IRL
     end
-    local l0g = slg.l0
     local lexeme = l0g.isys[l0_lexeme_id].lexeme
     if lexeme then
         local g1_lexeme_id = lexeme.g1_isy.id
