@@ -439,34 +439,32 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
 
-  RULE_ID: for (my $iter = $slg->l0_rule_ids_gen(); defined ( my $rule_id = $iter->());) {
-
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                    <<'END_OF_LUA', 'i>*', $rule_id );
-    local slg, rule_id = ...
+                    <<'END_OF_LUA', '');
+    local slg = ...
     local l0g = slg.l0
-    local lhs_id = l0g:rule_lhs(rule_id)
-    if lhs_id == slg.l0_discard_isyid or lhs_id ~= slg.l0_top_isyid then
-        goto NEXT_IRL
-    end
-    local l0_lexeme_id = l0g:rule_rhs(rule_id, 0)
-    if l0_lexeme_id == slg.l0_discard_isyid then
-        goto NEXT_IRL
-    end
-    local lexeme = l0g.isys[l0_lexeme_id].lexeme
-    if lexeme then
-        local g1_lexeme_id = lexeme.g1_isy.id
-        local assertion_id = slg.g1.isys[g1_lexeme_id].assertion
-        if not assertion_id then
-            assertion_id = l0g:zwa_new(0)
+    for l0_irlid = 0, l0g:highest_rule_id() do
+        local lhs_id = l0g:rule_lhs(l0_irlid)
+        if lhs_id == slg.l0_discard_isyid or lhs_id ~= slg.l0_top_isyid then
+            goto NEXT_IRL
         end
-        slg.g1.isys[g1_lexeme_id].assertion = assertion_id
-        l0g:zwa_place(assertion_id, rule_id, 0)
+        local l0_lexeme_id = l0g:rule_rhs(l0_irlid, 0)
+        if l0_lexeme_id == slg.l0_discard_isyid then
+            goto NEXT_IRL
+        end
+        local lexeme = l0g.isys[l0_lexeme_id].lexeme
+        if lexeme then
+            local g1_lexeme_id = lexeme.g1_isy.id
+            local assertion_id = slg.g1.isys[g1_lexeme_id].assertion
+            if not assertion_id then
+                assertion_id = l0g:zwa_new(0)
+            end
+            slg.g1.isys[g1_lexeme_id].assertion = assertion_id
+            l0g:zwa_place(assertion_id, l0_irlid, 0)
+        end
+        ::NEXT_IRL::
     end
-    ::NEXT_IRL::
 END_OF_LUA
-
-    }
 
       Marpa::R3::Internal_G::precompute( $slg, 'l0' );
 
