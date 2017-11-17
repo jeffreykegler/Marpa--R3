@@ -464,10 +464,6 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
 
-    #   Marpa::R3::Internal_G::precompute( $slg, 'l0' );
-
-    # L0 is now precomputed
-
     my @class_table = ();
 
   CLASS_SYMBOL:
@@ -831,33 +827,6 @@ END_OF_LUA
 
     return $slg;
 
-}
-
-sub Marpa::R3::Internal_G::precompute {
-    my ( $slg, $subg_name ) = @_;
-    my $trace_file_handle = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
-    $slg->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 's',
-            args      => [$subg_name],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-            }
-        },
-        <<'END_OF_LUA');
-    local slg, subg_name = ...
-    _M.wrap(function ()
-        local subg = slg[subg_name]
-        slg:precompute(subg)
-        return 'ok'
-    end)
-END_OF_LUA
-    return;
 }
 
 our $kwgen_code_template = <<'END_OF_TEMPLATE';
