@@ -372,6 +372,36 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         local l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
         local l0_lex_top_isyid = slg:l0_symbol_by_name('[:lex_start:]')
         for l0_irlid = 0, l0g:highest_rule_id() do
+            local irl = l0g.irls[l0_irlid]
+            local lhs_id = l0g:rule_lhs(l0_irlid)
+            -- a discard rule
+            if lhs_id == l0_discard_isyid then
+                irl.g1_lexeme = -2
+                goto NEXT_L0_IRL
+            end
+            -- not a lexeme or discard rule
+            if lhs_id ~= l0_lex_top_isyid then
+                irl.g1_lexeme = -1
+                goto NEXT_L0_IRL
+            end
+            -- a lexeme rule
+            local l0_rhs_id = l0g:rule_rhs(l0_irlid, 0)
+
+            -- the rule '[:lex_start:] ::= [:discard:]'
+            if l0_rhs_id == l0_discard_isyid then
+                irl.g1_lexeme = -1
+                goto NEXT_L0_IRL
+            end
+
+            -- a lexeme rule?
+            local l0_rhs_lexeme = l0g.isys[l0_rhs_id].lexeme
+            if not l0_rhs_lexeme then
+                irl.g1_lexeme = -1
+                goto NEXT_L0_IRL
+            end
+            irl.g1_lexeme = l0_rhs_lexeme.g1_isy.id
+
+            ::NEXT_L0_IRL::
         end
 
         return if_inaccessible
@@ -731,7 +761,6 @@ END_OF_LUA
         <<'END_OF_LUA',
     local g, lexer_rule_id, g1_lexeme_id, discard_symbol_id = ...
     if lexer_rule_id >= 0 then
-        g.l0.irls[lexer_rule_id].g1_lexeme = g1_lexeme_id
         if g1_lexeme_id >= 0 then
             local eager = g.g1.isys[g1_lexeme_id].eager
             if eager then g.l0.irls[lexer_rule_id].eager = true end

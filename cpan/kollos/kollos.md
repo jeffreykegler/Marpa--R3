@@ -6551,9 +6551,23 @@ to set and discover various Lua values.
     class_irl_fields.xpr = true
     class_irl_fields.action = true
     class_irl_fields.mask = true
-    class_irl_fields.g1_lexeme = true
     class_irl_fields.xpr_dot = true
     class_irl_fields.xpr_top = true
+```
+
+`g1_lexeme` records the G1 ISYID for the lexeme
+if there is one.
+If this is a "discard" rule, `g1_lexeme` is -2.
+If this is not a "discard" rule or a lexeme rule,
+`g1_lexeme` is -1.
+
+An alternative is to have a pointer to a lexeme object
+here, but this would require having a way to deal with
+the "no lexeme" and "discard" situations.
+
+```
+    -- miranda: section+ class_irl field declarations
+    class_irl_fields.g1_lexeme = true
 ```
 
 ```
