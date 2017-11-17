@@ -439,6 +439,8 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             ::NEXT_IRL::
         end
 
+        slg:precompute(l0g)
+
     end)
 
     return slg.if_inaccessible
@@ -462,7 +464,7 @@ END_OF_LUA
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
 
-      Marpa::R3::Internal_G::precompute( $slg, 'l0' );
+    #   Marpa::R3::Internal_G::precompute( $slg, 'l0' );
 
     # L0 is now precomputed
 
