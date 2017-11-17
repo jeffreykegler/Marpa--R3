@@ -490,16 +490,12 @@ END_OF_LUA
     return l0g:rule_rhs(rule_id, 0)
 END_OF_LUA
 
-        {
-            if ( $lexer_lexeme_id == $lex_discard_symbol_id ) {
-                next RULE_ID;
-            }
-            my $g1_lexeme_id = $lex_lexeme_to_g1_symbol[$lexer_lexeme_id] // -1;
-            next RULE_ID if $g1_lexeme_id < 0;
-
                   $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                     <<'END_OF_LUA', 'ii>*', $lexer_lexeme_id, $rule_id );
     local slg, l0_lexeme_id, rule_id = ...
+    if l0_lexeme_id == slg.l0_discard_isyid then
+        goto NEXT_IRL
+    end
     local l0g = slg.l0
     local lexeme = l0g.isys[l0_lexeme_id].lexeme
     if lexeme then
@@ -511,9 +507,8 @@ END_OF_LUA
         slg.g1.isys[g1_lexeme_id].assertion = assertion_id
         l0g:zwa_place(assertion_id, rule_id, 0)
     end
+    ::NEXT_IRL::
 END_OF_LUA
-
-        }
 
     }
 
