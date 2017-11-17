@@ -324,30 +324,10 @@ END_OF_LUA
     state $lex_start_symbol_name = '[:lex_start:]';
     state $discard_symbol_name   = '[:discard:]';
 
-    my $character_class_hash = $hashed_source->{character_classes};
-
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
 
     my $lex_discard_symbol_id =
       $slg->l0_symbol_by_name($discard_symbol_name) // -1;
-
-    my @class_table = ();
-
-  CLASS_SYMBOL:
-    for my $class_symbol ( sort keys %{$character_class_hash} ) {
-        my $symbol_id = $slg->l0_symbol_by_name($class_symbol);
-        next CLASS_SYMBOL if not defined $symbol_id;
-        my $cc_components = $character_class_hash->{$class_symbol};
-        my ( $compiled_re, $error ) =
-          Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
-        if ( not $compiled_re ) {
-            $error =~ s/^/  /gxms;    #indent all lines
-            Marpa::R3::exception(
-                "Failed belatedly to evaluate character class\n", $error );
-        }
-        push @class_table, [ $symbol_id, $compiled_re ];
-    } ## end CLASS_SYMBOL: for my $class_symbol ( sort keys %{...})
-    my $character_class_table = \@class_table;
 
     # Apply defaults to determine the discard event for every
     # rule id of the lexer.
@@ -584,9 +564,6 @@ END_OF_LUA
     # More lexer processing
     # Determine events by lexer rule, applying the defaults
 
-    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE] =
-      $character_class_table;
-
     # Some lexeme default adverbs are applied in earlier phases.
   {
 
@@ -691,6 +668,33 @@ END_OF_LUA
 
     my $registrations = registrations_find($slg );
     registrations_set($slg, $registrations );
+
+    #
+    # Code after this point must remain in Perl
+    #
+
+    my $character_class_hash = $hashed_source->{character_classes};
+
+    my @class_table = ();
+
+  CLASS_SYMBOL:
+    for my $class_symbol ( sort keys %{$character_class_hash} ) {
+        my $symbol_id = $slg->l0_symbol_by_name($class_symbol);
+        next CLASS_SYMBOL if not defined $symbol_id;
+        my $cc_components = $character_class_hash->{$class_symbol};
+        my ( $compiled_re, $error ) =
+          Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
+        if ( not $compiled_re ) {
+            $error =~ s/^/  /gxms;    #indent all lines
+            Marpa::R3::exception(
+                "Failed belatedly to evaluate character class\n", $error );
+        }
+        push @class_table, [ $symbol_id, $compiled_re ];
+    } ## end CLASS_SYMBOL: for my $class_symbol ( sort keys %{...})
+    my $character_class_table = \@class_table;
+
+    $slg->[Marpa::R3::Internal_G::CHARACTER_CLASS_TABLE] =
+      $character_class_table;
 
     return $slg;
 
