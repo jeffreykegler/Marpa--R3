@@ -760,14 +760,15 @@ END_OF_LUA
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
     local g, lexer_rule_id, g1_lexeme_id, discard_symbol_id = ...
+    local irl = g.l0.irls[lexer_rule_id]
     if lexer_rule_id >= 0 then
         if g1_lexeme_id >= 0 then
             local eager = g.g1.isys[g1_lexeme_id].eager
-            if eager then g.l0.irls[lexer_rule_id].eager = true end
+            if eager then irl.eager = true end
         end
         local eager = g.l0.isys[discard_symbol_id].eager
         if eager then
-            g.l0.irls[lexer_rule_id].eager = true
+            irl.eager = true
         end
     end
 END_OF_LUA
