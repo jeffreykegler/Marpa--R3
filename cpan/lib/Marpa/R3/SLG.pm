@@ -753,26 +753,29 @@ END_OF_LUA
         slg.discard_event_by_name = {}
 END_OF_LUA
 
-  RULE_ID: for my $lexer_rule_id ( 0 .. $#lex_rule_to_g1_lexeme ) {
-        my $g1_lexeme_id = $lex_rule_to_g1_lexeme[$lexer_rule_id];
+  RULE_ID:
+    for (
+        my $iter = $slg->l0_rule_ids_gen() ;
+        defined( my $lexer_rule_id = $iter->() ) ;
+      )
+    {
         my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA',
-    local g, lexer_rule_id, g1_lexeme_id, discard_symbol_id = ...
+    local g, lexer_rule_id, discard_symbol_id = ...
     local irl = g.l0.irls[lexer_rule_id]
-    if lexer_rule_id >= 0 then
-        if g1_lexeme_id >= 0 then
-            local eager = g.g1.isys[g1_lexeme_id].eager
-            if eager then irl.eager = true end
-        end
-        local eager = g.l0.isys[discard_symbol_id].eager
-        if eager then
-            irl.eager = true
-        end
+    local g1_lexeme_id = irl.g1_lexeme
+    if g1_lexeme_id >= 0 then
+        local eager = g.g1.isys[g1_lexeme_id].eager
+        if eager then irl.eager = true end
+    end
+    local eager = g.l0.isys[discard_symbol_id].eager
+    if eager then
+        irl.eager = true
     end
 END_OF_LUA
-        'iii', $lexer_rule_id, $g1_lexeme_id, $discard_symbol_id );
+        'ii', $lexer_rule_id, $discard_symbol_id );
 
         my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
 
