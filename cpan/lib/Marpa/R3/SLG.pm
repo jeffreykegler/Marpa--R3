@@ -521,6 +521,8 @@ END_OF_LUA
             local name_entry = slg.discard_event_by_name[event_name]
             if not name_entry then
                 slg.discard_event_by_name[event_name] = { event_desc }
+            else
+                name_entry[#name_entry+1] = event_desc
             end
 
             l0_rules[lexer_rule_id].event_on_discard = true
