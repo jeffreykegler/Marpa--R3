@@ -329,18 +329,13 @@ END_OF_LUA
         my $iter = $slg->l0_rule_ids_gen() ;
         defined( my $irlid = $iter->() ) ;
       )
-    {
-
-        # There may be gaps in the IRLIDs
-        my $event;
-      FIND_EVENT: {
-
+      {
             my ( $cmd, $event_name, $event_starts_active ) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
                 <<'END_OF_LUA', 'is>*', $irlid, $hashed_source );
     local slg, irlid, source_hash = ...
-    local lyr_l0 = slg.l0
-    local irl = lyr_l0.irls[irlid]
+    local l0g = slg.l0
+    local irl = l0g.irls[irlid]
     local xpr = irl.xpr
     if not xpr then
         goto NEXT_IRL_ID
@@ -353,7 +348,6 @@ END_OF_LUA
              goto EVENT_FOUND
         end
         do
-            local l0g = lyr_l0
             local lhs_id = l0g:rule_lhs(irlid)
             if lhs_id == slg.l0_discard_isyid then
                 local adverbs = source_hash.discard_default_adverbs
@@ -365,48 +359,26 @@ END_OF_LUA
             return ''
         end
         ::EVENT_FOUND::
+        if event_name == "'symbol" then
+            local irl = l0g.irls[irlid]
+            -- at this point, xpr must be defined
+            local xpr = irl.xpr
+            event_name = xpr.symbol_as_event
+        end
+        if event_name:sub(1, 1) == "'" then
+            _M.userX("Discard event has unknown name: %q", event_name)
+        end
         return 'ok', event_name, is_active
     end
     ::NEXT_IRL_ID::
     return 'next RULE_ID'
 END_OF_LUA
 
-            if ( $cmd eq 'ok' ) {
-                $event = [ $event_name, $event_starts_active ];
-                last FIND_EVENT;
-            }
+        next RULE_ID if $cmd ne 'ok';
 
-            next RULE_ID;
-
-        } ## end FIND_EVENT:
-
-        next RULE_ID if not defined $event;
-
-        my ( $event_name, $event_starts_active ) = @{$event};
-        if ( $event_name eq q{'symbol} ) {
-
-            my ($symbol_as_event) =
-              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'i>*', $irlid );
-    local slg, irlid = ...
-    local irl = slg.l0.irls[irlid]
-    -- at this point, xpr must be defined
-    local xpr = irl.xpr
-    return xpr.symbol_as_event
-END_OF_LUA
-
-            $event = $symbol_as_event;
-            my @event = ( $event, $event_starts_active );
-            $discard_event_by_lexer_rule_id[$irlid] = \@event;
-            next RULE_ID;
-        } ## end if ( $event_name eq q{'symbol} )
-        if ( ( substr $event_name, 0, 1 ) ne q{'} ) {
-            $discard_event_by_lexer_rule_id[$irlid] = $event;
-            next RULE_ID;
+        my $event = [ $event_name, $event_starts_active ];
+        $discard_event_by_lexer_rule_id[$irlid] = $event;
         }
-        Marpa::R3::exception(qq{Discard event has unknown name: "$event_name"});
-
-    }
 
     # Post-lexer G1 processing
 
