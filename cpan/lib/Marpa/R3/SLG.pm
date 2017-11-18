@@ -307,20 +307,14 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
             slg:precompute_g1(source_hash);
             slg:precompute_l0(source_hash);
+            slg:precompute_discard_events(source_hash)
 
     end)
 
-    return slg.if_inaccessible
 END_OF_LUA
 
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
-
-              $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 's>*', $hashed_source );
-    local slg, source_hash = ...
-    slg:precompute_discard_events(source_hash)
-END_OF_LUA
 
     # Post-lexer G1 processing
 
