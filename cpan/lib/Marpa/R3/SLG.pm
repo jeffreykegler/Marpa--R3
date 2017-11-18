@@ -377,7 +377,6 @@ END_OF_LUA
         if discard_event then
             local event_name = discard_event[1]
             local is_active = discard_event[2] == "1"
-            local l0_rules = l0g.irls
 
             local event_desc = {
                name = event_name,
