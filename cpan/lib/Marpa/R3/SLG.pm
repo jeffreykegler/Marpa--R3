@@ -314,25 +314,16 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 END_OF_LUA
 
     # A first phase of applying defaults
-    my $discard_default_adverbs = $hashed_source->{discard_default_adverbs};
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
 
-    # Lexers
-
     my @discard_event_by_lexer_rule_id = ();
-    state $lex_start_symbol_name = '[:lex_start:]';
-    state $discard_symbol_name   = '[:discard:]';
 
     my @lex_lexeme_names = sort keys %{$lexeme_declarations};
-
-    my $lex_discard_symbol_id =
-      $slg->l0_symbol_by_name($discard_symbol_name) // -1;
 
     # Apply defaults to determine the discard event for every
     # rule id of the lexer.
 
-    my $default_discard_event = $discard_default_adverbs->{event};
   RULE_ID:
     for (
         my $iter = $slg->l0_rule_ids_gen() ;
@@ -352,22 +343,25 @@ END_OF_LUA
     local irl = lyr_l0.irls[irlid]
     local xpr = irl.xpr
     if not xpr then
-        return 'next RULE_ID'
+        goto NEXT_IRL_ID
     end
-    local event_name = xpr.event_name
-    if event_name then
-         return 'ok', event_name, xpr.event_starts_active
+    do
+        local event_name = xpr.event_name
+        if event_name then
+             return 'ok', event_name, xpr.event_starts_active
+        end
+        local l0g = lyr_l0
+        local lhs_id = l0g:rule_lhs(irlid)
+        if lhs_id == slg.l0_discard_isyid then
+            local adverbs = source_hash.discard_default_adverbs
+            local event = adverbs and adverbs.event
+            if not event then return '' end
+            local is_active
+            event_name, is_active = table.unpack(event)
+            return 'ok', event_name, is_active
+        end
     end
-    local l0g = lyr_l0
-    local lhs_id = l0g:rule_lhs(irlid)
-    if lhs_id == slg.l0_discard_isyid then
-        local adverbs = source_hash.discard_default_adverbs
-        local event = adverbs and adverbs.event
-        if not event then return '' end
-        local is_active
-        event_name, is_active = table.unpack(event)
-        return 'ok', event_name, is_active
-    end
+    ::NEXT_IRL_ID::
     return 'next RULE_ID'
 END_OF_LUA
 
@@ -376,9 +370,8 @@ END_OF_LUA
                 last FIND_EVENT;
             }
 
-            next RULE_ID if $cmd eq 'next RULE_ID';
+            next RULE_ID;
 
-            $event = $default_discard_event;
         } ## end FIND_EVENT:
 
         next RULE_ID if not defined $event;
