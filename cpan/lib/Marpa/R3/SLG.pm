@@ -346,8 +346,8 @@ END_OF_LUA
 
             my ( $cmd, $event_name, $event_starts_active ) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'i>*', $irlid );
-    local slg, irlid = ...
+                <<'END_OF_LUA', 'is>*', $irlid, $hashed_source );
+    local slg, irlid, source_hash = ...
     local lyr_l0 = slg.l0
     local irl = lyr_l0.irls[irlid]
     local xpr = irl.xpr
@@ -361,7 +361,12 @@ END_OF_LUA
     local l0g = lyr_l0
     local lhs_id = l0g:rule_lhs(irlid)
     if lhs_id == slg.l0_discard_isyid then
-        return ''
+        local adverbs = source_hash.discard_default_adverbs
+        local event = adverbs and adverbs.event
+        if not event then return '' end
+        local is_active
+        event_name, is_active = table.unpack(event)
+        return 'ok', event_name, is_active
     end
     return 'next RULE_ID'
 END_OF_LUA
