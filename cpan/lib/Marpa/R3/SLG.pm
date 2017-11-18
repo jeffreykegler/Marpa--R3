@@ -380,6 +380,41 @@ END_OF_LUA
         $discard_event_by_lexer_rule_id[$irlid] = $event;
         }
 
+  RULE_ID:
+    for (
+        my $iter = $slg->l0_rule_ids_gen() ;
+        defined( my $lexer_rule_id = $iter->() ) ;
+      )
+    {
+        my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
+
+      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event );
+        local slg, lexer_rule_id, discard_event = ...
+        if discard_event then
+            local event_name = discard_event[1]
+            local is_active = discard_event[2] == "1"
+            local l0_rules = slg.l0.irls
+
+            local event_desc = {
+               name = event_name,
+               irlid = lexer_rule_id
+            }
+            slg.discard_event_by_irl[lexer_rule_id] = event_desc
+            local name_entry = slg.discard_event_by_name[event_name]
+            if not name_entry then
+                slg.discard_event_by_name[event_name] = { event_desc }
+            else
+                name_entry[#name_entry+1] = event_desc
+            end
+
+            l0_rules[lexer_rule_id].event_on_discard = true
+            l0_rules[lexer_rule_id].event_on_discard_active = is_active
+        end
+END_OF_LUA
+
+    }
+
     # Post-lexer G1 processing
 
     # At this point we know which symbols are lexemes.
@@ -472,41 +507,6 @@ END_OF_LUA
 END_OF_LUA
 
     # Second phase of lexer processing
-
-  RULE_ID:
-    for (
-        my $iter = $slg->l0_rule_ids_gen() ;
-        defined( my $lexer_rule_id = $iter->() ) ;
-      )
-    {
-        my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event );
-        local slg, lexer_rule_id, discard_event = ...
-        if discard_event then
-            local event_name = discard_event[1]
-            local is_active = discard_event[2] == "1"
-            local l0_rules = slg.l0.irls
-
-            local event_desc = {
-               name = event_name,
-               irlid = lexer_rule_id
-            }
-            slg.discard_event_by_irl[lexer_rule_id] = event_desc
-            local name_entry = slg.discard_event_by_name[event_name]
-            if not name_entry then
-                slg.discard_event_by_name[event_name] = { event_desc }
-            else
-                name_entry[#name_entry+1] = event_desc
-            end
-
-            l0_rules[lexer_rule_id].event_on_discard = true
-            l0_rules[lexer_rule_id].event_on_discard_active = is_active
-        end
-END_OF_LUA
-
-    }
 
   RULE_ID:
     for (
