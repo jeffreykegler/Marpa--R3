@@ -328,8 +328,12 @@ END_OF_LUA
     local slg, irlid, source_hash = ...
     local l0g = slg.l0
     local irl = l0g.irls[irlid]
+    local lhs_id = l0g:rule_lhs(irlid)
     local xpr = irl.xpr
     if not xpr then
+        goto NEXT_IRL_ID
+    end
+    if lhs_id ~= slg.l0_discard_isyid then
         goto NEXT_IRL_ID
     end
     do
@@ -340,15 +344,10 @@ END_OF_LUA
              goto EVENT_FOUND
         end
         do
-            local lhs_id = l0g:rule_lhs(irlid)
-            if lhs_id == slg.l0_discard_isyid then
-                local adverbs = source_hash.discard_default_adverbs
-                local event = adverbs and adverbs.event
-                if not event then return '' end
-                event_name, is_active = table.unpack(event)
-                goto EVENT_FOUND
-            end
-            return ''
+            local adverbs = source_hash.discard_default_adverbs
+            local event = adverbs and adverbs.event
+            if not event then return '' end
+            event_name, is_active = table.unpack(event)
         end
         ::EVENT_FOUND::
         if event_name == "'symbol" then
