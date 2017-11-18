@@ -348,6 +348,7 @@ END_OF_LUA
             local event = adverbs and adverbs.event
             if not event then return '' end
             event_name, is_active = table.unpack(event)
+            is_active = is_active == '1'
         end
         ::EVENT_FOUND::
         if event_name == "'symbol" then
@@ -359,24 +360,6 @@ END_OF_LUA
         if event_name:sub(1, 1) == "'" then
             _M.userX("Discard event has unknown name: %q", event_name)
         end
-        return 'ok', event_name, is_active
-    end
-    ::NEXT_IRL_ID::
-    return 'next RULE_ID'
-END_OF_LUA
-
-        next RULE_ID if $cmd ne 'ok';
-
-        my $discard_event = [ $event_name, $event_starts_active ];
-
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $irlid, $discard_event );
-        local slg, irlid, discard_event = ...
-        local l0g = slg.l0
-        local irl = l0g.irls[irlid]
-        if discard_event then
-            local event_name = discard_event[1]
-            local is_active = discard_event[2] == "1"
 
             local event_desc = {
                name = event_name,
@@ -392,7 +375,10 @@ END_OF_LUA
 
             irl.event_on_discard = true
             irl.event_on_discard_active = is_active
-        end
+
+    end
+    ::NEXT_IRL_ID::
+    return 'next RULE_ID'
 END_OF_LUA
 
     }
