@@ -371,17 +371,19 @@ END_OF_LUA
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
         <<'END_OF_LUA', 'is', $irlid, $discard_event );
-        local slg, lexer_rule_id, discard_event = ...
+        local slg, irlid, discard_event = ...
+        local l0g = slg.l0
+        local irl = l0g.irls[irlid]
         if discard_event then
             local event_name = discard_event[1]
             local is_active = discard_event[2] == "1"
-            local l0_rules = slg.l0.irls
+            local l0_rules = l0g.irls
 
             local event_desc = {
                name = event_name,
-               irlid = lexer_rule_id
+               irlid = irlid
             }
-            slg.discard_event_by_irl[lexer_rule_id] = event_desc
+            slg.discard_event_by_irl[irlid] = event_desc
             local name_entry = slg.discard_event_by_name[event_name]
             if not name_entry then
                 slg.discard_event_by_name[event_name] = { event_desc }
@@ -389,8 +391,8 @@ END_OF_LUA
                 name_entry[#name_entry+1] = event_desc
             end
 
-            l0_rules[lexer_rule_id].event_on_discard = true
-            l0_rules[lexer_rule_id].event_on_discard_active = is_active
+            irl.event_on_discard = true
+            irl.event_on_discard_active = is_active
         end
 END_OF_LUA
 
