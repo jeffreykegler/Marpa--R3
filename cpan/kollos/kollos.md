@@ -798,7 +798,7 @@ TODO before end of development, convert to local
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.g1_precompute(slg, source_hash)
+    function _M.class_slg.precompute_g1(slg, source_hash)
         slg.g1 = _M.grammar_new(slg, 'g1')
         -- print(inspect(source_hash))
         -- Create the G1 grammar
@@ -892,7 +892,7 @@ TODO before the end of development, convert to local
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.l0_precompute(slg, source_hash)
+    function _M.class_slg.precompute_l0(slg, source_hash)
         local l0g = _M.grammar_new(slg, 'l0')
         slg.l0 = l0g
         l0g.start_name = '[:lex_start:]'

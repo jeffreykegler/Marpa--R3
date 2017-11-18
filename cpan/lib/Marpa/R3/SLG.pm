@@ -305,8 +305,8 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             end
             slg.if_inaccessible = if_inaccessible
 
-            slg:g1_precompute(source_hash);
-            slg:l0_precompute(source_hash);
+            slg:precompute_g1(source_hash);
+            slg:precompute_l0(source_hash);
 
     end)
 
@@ -316,72 +316,64 @@ END_OF_LUA
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
 
-  RULE_ID:
-    for (
-        my $iter = $slg->l0_rule_ids_gen() ;
-        defined( my $irlid = $iter->() ) ;
-      )
-      {
-            my ( $cmd, $event_name, $event_starts_active ) =
               $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-                <<'END_OF_LUA', 'is>*', $irlid, $hashed_source );
-    local slg, irlid, source_hash = ...
+                <<'END_OF_LUA', 's>*', $hashed_source );
+    local slg, source_hash = ...
     local l0g = slg.l0
-    local irl = l0g.irls[irlid]
-    local lhs_id = l0g:rule_lhs(irlid)
-    local xpr = irl.xpr
-    if not xpr then
-        goto NEXT_IRL_ID
-    end
-    if lhs_id ~= slg.l0_discard_isyid then
-        goto NEXT_IRL_ID
-    end
-    do
-        local is_active
-        local event_name = xpr.event_name
-        if event_name then
-             is_active = xpr.event_starts_active
-             goto EVENT_FOUND
+    for irlid = 0, l0g:highest_rule_id() do
+        local irl = l0g.irls[irlid]
+        local lhs_id = l0g:rule_lhs(irlid)
+        local xpr = irl.xpr
+        if not xpr then
+            goto NEXT_IRL_ID
+        end
+        if lhs_id ~= slg.l0_discard_isyid then
+            goto NEXT_IRL_ID
         end
         do
-            local adverbs = source_hash.discard_default_adverbs
-            local event = adverbs and adverbs.event
-            if not event then return '' end
-            event_name, is_active = table.unpack(event)
-            is_active = is_active == '1'
-        end
-        ::EVENT_FOUND::
-        if event_name == "'symbol" then
-            local irl = l0g.irls[irlid]
-            -- at this point, xpr must be defined
-            local xpr = irl.xpr
-            event_name = xpr.symbol_as_event
-        end
-        if event_name:sub(1, 1) == "'" then
-            _M.userX("Discard event has unknown name: %q", event_name)
-        end
-
-            local event_desc = {
-               name = event_name,
-               irlid = irlid
-            }
-            slg.discard_event_by_irl[irlid] = event_desc
-            local name_entry = slg.discard_event_by_name[event_name]
-            if not name_entry then
-                slg.discard_event_by_name[event_name] = { event_desc }
-            else
-                name_entry[#name_entry+1] = event_desc
+            local is_active
+            local event_name = xpr.event_name
+            if event_name then
+                 is_active = xpr.event_starts_active
+                 goto EVENT_FOUND
+            end
+            do
+                local adverbs = source_hash.discard_default_adverbs
+                local event = adverbs and adverbs.event
+                if not event then return '' end
+                event_name, is_active = table.unpack(event)
+                is_active = is_active == '1'
+            end
+            ::EVENT_FOUND::
+            if event_name == "'symbol" then
+                local irl = l0g.irls[irlid]
+                -- at this point, xpr must be defined
+                local xpr = irl.xpr
+                event_name = xpr.symbol_as_event
+            end
+            if event_name:sub(1, 1) == "'" then
+                _M.userX("Discard event has unknown name: %q", event_name)
             end
 
-            irl.event_on_discard = true
-            irl.event_on_discard_active = is_active
+                local event_desc = {
+                   name = event_name,
+                   irlid = irlid
+                }
+                slg.discard_event_by_irl[irlid] = event_desc
+                local name_entry = slg.discard_event_by_name[event_name]
+                if not name_entry then
+                    slg.discard_event_by_name[event_name] = { event_desc }
+                else
+                    name_entry[#name_entry+1] = event_desc
+                end
 
+                irl.event_on_discard = true
+                irl.event_on_discard_active = is_active
+
+        end
+        ::NEXT_IRL_ID::
     end
-    ::NEXT_IRL_ID::
-    return 'next RULE_ID'
 END_OF_LUA
-
-    }
 
     # Post-lexer G1 processing
 
