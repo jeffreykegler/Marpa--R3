@@ -346,20 +346,26 @@ END_OF_LUA
         goto NEXT_IRL_ID
     end
     do
+        local is_active
         local event_name = xpr.event_name
         if event_name then
-             return 'ok', event_name, xpr.event_starts_active
+             is_active = xpr.event_starts_active
+             goto EVENT_FOUND
         end
-        local l0g = lyr_l0
-        local lhs_id = l0g:rule_lhs(irlid)
-        if lhs_id == slg.l0_discard_isyid then
-            local adverbs = source_hash.discard_default_adverbs
-            local event = adverbs and adverbs.event
-            if not event then return '' end
-            local is_active
-            event_name, is_active = table.unpack(event)
-            return 'ok', event_name, is_active
+        do
+            local l0g = lyr_l0
+            local lhs_id = l0g:rule_lhs(irlid)
+            if lhs_id == slg.l0_discard_isyid then
+                local adverbs = source_hash.discard_default_adverbs
+                local event = adverbs and adverbs.event
+                if not event then return '' end
+                event_name, is_active = table.unpack(event)
+                goto EVENT_FOUND
+            end
+            return ''
         end
+        ::EVENT_FOUND::
+        return 'ok', event_name, is_active
     end
     ::NEXT_IRL_ID::
     return 'next RULE_ID'
