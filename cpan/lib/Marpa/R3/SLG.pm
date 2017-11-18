@@ -313,16 +313,8 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
     return slg.if_inaccessible
 END_OF_LUA
 
-    # A first phase of applying defaults
     my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
-
-    my @discard_event_by_lexer_rule_id = ();
-
-    my @lex_lexeme_names = sort keys %{$lexeme_declarations};
-
-    # Apply defaults to determine the discard event for every
-    # rule id of the lexer.
 
   RULE_ID:
     for (
@@ -376,20 +368,10 @@ END_OF_LUA
 
         next RULE_ID if $cmd ne 'ok';
 
-        my $event = [ $event_name, $event_starts_active ];
-        $discard_event_by_lexer_rule_id[$irlid] = $event;
-        }
-
-  RULE_ID:
-    for (
-        my $iter = $slg->l0_rule_ids_gen() ;
-        defined( my $lexer_rule_id = $iter->() ) ;
-      )
-    {
-        my $discard_event = $discard_event_by_lexer_rule_id[$lexer_rule_id];
+        my $discard_event = [ $event_name, $event_starts_active ];
 
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'is', $lexer_rule_id, $discard_event );
+        <<'END_OF_LUA', 'is', $irlid, $discard_event );
         local slg, lexer_rule_id, discard_event = ...
         if discard_event then
             local event_name = discard_event[1]
