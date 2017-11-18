@@ -612,6 +612,9 @@ This is a registry object.
         slg.rule_semantics = {}
         slg.token_semantics = {}
 
+        slg.discard_event_by_irl = {}
+        slg.discard_event_by_name = {}
+
         -- The codepoint data is populated, as needed, by the recognizers but,
         -- once populated, depends only on the codepoint and the
         -- grammar.
