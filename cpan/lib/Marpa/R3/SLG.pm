@@ -313,8 +313,6 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
 END_OF_LUA
 
-    my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
-
     # Post-lexer G1 processing
 
     # At this point we know which symbols are lexemes.
@@ -423,32 +421,23 @@ END_OF_LUA
     end
 END_OF_LUA
 
-    # Second phase of G1 processing
-    # The grammar can be thought to be "precomputed" at this point,
-    # although I don't think the concept is as relevant as it is
-    # for the Libmarpa grammars.
-
-    # More lexer processing
-    # Determine events by lexer rule, applying the defaults
-
-    # Some lexeme default adverbs are applied in earlier phases.
-  {
-
-        my $default_lexeme_action = $lexeme_default_adverbs->{action};
-
         $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', $default_lexeme_action);
-        local slg, default_lexeme_action = ...
-        for _, xsy in pairs(slg.xsys) do
-            local name_source = xsy.name_source
-            if name_source == 'lexical' and not xsy.lexeme_semantics then
-                xsy.lexeme_semantics = default_lexeme_action
+        <<'END_OF_LUA', 's', $hashed_source);
+        local slg, source_hash = ...
+        local lexeme_default_adverbs = source_hash.lexeme_default_adverbs or {}
+        local default_lexeme_action = lexeme_default_adverbs.action
+        if default_lexeme_action then
+            for _, xsy in pairs(slg.xsys) do
+                local name_source = xsy.name_source
+                if name_source == 'lexical' and not xsy.lexeme_semantics then
+                    xsy.lexeme_semantics = default_lexeme_action
+                end
             end
         end
 END_OF_LUA
 
-    }
+    my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
 
   APPLY_DEFAULT_LEXEME_BLESSING: {
         my $default_blessing = $lexeme_default_adverbs->{bless};
