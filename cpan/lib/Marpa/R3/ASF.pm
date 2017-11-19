@@ -294,91 +294,6 @@ sub normalize_asf_blessing {
     return $name;
 } ## end sub normalize_asf_blessing
 
-sub Marpa::R3::Internal::ASF::blessings_set {
-    my ( $asf, $default_blessing ) = @_;
-    my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
-    my $slg           = $slr->[Marpa::R3::Internal_R::SLG];
-
-    my $default_token_blessing_package =
-      $asf->[Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE];
-    my $default_rule_blessing_package =
-      $asf->[Marpa::R3::Internal::ASF::DEFAULT_RULE_BLESSING_PACKAGE];
-
-    my @rule_blessing = ();
-    my ($highest_irlid) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '>*' );
-    local recce = ...
-    local grammar = recce.slg
-    local g1g = grammar.g1
-    return g1g:highest_rule_id()
-END_OF_LUA
-
-  RULE: for ( my $irlid = 0 ; $irlid <= $highest_irlid ; $irlid++ ) {
-
-        my ($cmd, $blessing) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i>*', $irlid );
-    local recce, irlid = ...
-    local slg = recce.slg
-    local irl = slg.g1.irls[irlid]
-    local xpr = irl.xpr
-    if xpr then
-        local blessing = xpr.bless
-        if blessing and string.sub(blessing, 1, 2) ~= '::' then
-            return 'ok', blessing
-        end
-    end
-
-    local g1g = slg.g1
-    local lhs_id = g1g:rule_lhs(irlid)
-    return 'continue', g1g:symbol_name(lhs_id)
-END_OF_LUA
-
-        if ($cmd eq 'ok') {
-            $rule_blessing[$irlid] = $blessing;
-            next RULE;
-        }
-
-        $rule_blessing[$irlid] = join q{::}, $default_rule_blessing_package,
-          normalize_asf_blessing($blessing);
-    }
-
-    my @symbol_blessing = ();
-
-    my ($highest_isyid) =
-      $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '>*' );
-    local recce = ...
-    local grammar = recce.slg
-    local g1g = grammar.g1
-    return g1g:highest_symbol_id()
-END_OF_LUA
-
-  SYMBOL:
-    for ( my $isyid = 0 ; $isyid <= $highest_isyid ; $isyid++ ) {
-        my ($blessing) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'i>*', $isyid );
-                local recce, isyid = ...
-                local slg = recce.slg
-                local xsy = slg.g1.xsys[isyid]
-                if not xsy then return '' end
-                return xsy.blessing or ''
-END_OF_LUA
-
-        if ( $blessing ne '' and q{::} ne substr $blessing, 0, 2 ) {
-            $symbol_blessing[$isyid] = $blessing;
-            next SYMBOL;
-        }
-        my $name = $slg->g1_symbol_name($isyid);
-        $symbol_blessing[$isyid] = join q{::},
-          $default_token_blessing_package,
-          normalize_asf_blessing($name);
-    }
-    $asf->[Marpa::R3::Internal::ASF::RULE_BLESSINGS]   = \@rule_blessing;
-    $asf->[Marpa::R3::Internal::ASF::SYMBOL_BLESSINGS] = \@symbol_blessing;
-    return $asf;
-}
-
 # Returns undef if no parse
 sub Marpa::R3::ASF::new {
     my ( $class, @arg_hashes ) = @_;
@@ -488,7 +403,6 @@ END_OF_LUA
 
     } ## end OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ )
 
-    blessings_set($asf);
     return $asf;
 
 } ## end sub Marpa::R3::ASF::new
