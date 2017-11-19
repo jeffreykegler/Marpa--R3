@@ -325,6 +325,7 @@ END_OF_LUA
     local slg, source_hash = ...
     local lexeme_declarations = source_hash.lexeme_declarations or {}
     local g1g = slg.g1
+    local l0g = slg.l0
 
     local lexeme_event_by_isy = {}
     slg.lexeme_event_by_isy = lexeme_event_by_isy
@@ -404,13 +405,7 @@ END_OF_LUA
         end
         ::NEXT_SYMBOL::
     end
-END_OF_LUA
 
-      $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', '' );
-    local slg = ...
-    local l0g = slg.l0
-    local g1g = slg.g1
     for irlid = 0, l0g:highest_rule_id() do
         local irl = l0g.irls[irlid]
         if l0g:rule_length(irlid) > 0 then
