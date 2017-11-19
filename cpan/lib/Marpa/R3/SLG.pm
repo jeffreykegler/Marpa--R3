@@ -406,32 +406,27 @@ END_OF_LUA
     end
 END_OF_LUA
 
-    # Second phase of lexer processing
-
-  RULE_ID:
-    for (
-        my $iter = $slg->l0_rule_ids_gen() ;
-        defined( my $lexer_rule_id = $iter->() ) ;
-      )
-    {
-        my ( $discard_symbol_id ) = $slg->l0_rule_expand($lexer_rule_id);
-
       $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA',
-    local g, lexer_rule_id, discard_symbol_id = ...
-    local irl = g.l0.irls[lexer_rule_id]
-    local g1_lexeme_id = irl.g1_lexeme
-    if g1_lexeme_id >= 0 then
-        local eager = g.g1.isys[g1_lexeme_id].eager
-        if eager then irl.eager = true end
-    end
-    local eager = g.l0.isys[discard_symbol_id].eager
-    if eager then
-        irl.eager = true
+        <<'END_OF_LUA', '' );
+    local slg = ...
+    local l0g = slg.l0
+    local g1g = slg.g1
+    for irlid = 0, l0g:highest_rule_id() do
+        local irl = l0g.irls[irlid]
+        if l0g:rule_length(irlid) > 0 then
+            local discard_symbol_id = l0g:rule_rhs(irlid, 0)
+            local g1_lexeme_id = irl.g1_lexeme
+            if g1_lexeme_id >= 0 then
+                local eager = g1g.isys[g1_lexeme_id].eager
+                if eager then irl.eager = true end
+            end
+            local eager = l0g.isys[discard_symbol_id].eager
+            if eager then
+                irl.eager = true
+            end
+        end
     end
 END_OF_LUA
-        'ii', $lexer_rule_id, $discard_symbol_id );
-    }
 
     # Second phase of G1 processing
     # The grammar can be thought to be "precomputed" at this point,
