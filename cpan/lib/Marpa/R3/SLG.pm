@@ -308,20 +308,10 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             slg:precompute_g1(source_hash);
             slg:precompute_l0(source_hash);
             slg:precompute_discard_events(source_hash)
+            slg:precompute_lexeme_adverbs(source_hash)
 
     end)
 
-END_OF_LUA
-
-    # Post-lexer G1 processing
-
-    # At this point we know which symbols are lexemes.
-    # So now let's check for inconsistencies
-
-    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $hashed_source);
-    local slg, source_hash = ...
-    slg:precompute_lexeme_adverbs(source_hash)
 END_OF_LUA
 
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
@@ -411,10 +401,6 @@ END_OF_LUA
 
     my $registrations = registrations_find($slg );
     registrations_set($slg, $registrations );
-
-    #
-    # Code after this point must remain in Perl
-    #
 
     my $character_class_hash = $hashed_source->{character_classes};
 
