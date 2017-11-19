@@ -313,7 +313,6 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
 END_OF_LUA
 
-    my $lexeme_declarations     = $hashed_source->{lexeme_declarations};
     my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
 
     # Post-lexer G1 processing
@@ -322,10 +321,10 @@ END_OF_LUA
     # So now let's check for inconsistencies
 
     $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', ($lexeme_declarations // {}));
-    local slg, lexeme_declarations = ...
+        <<'END_OF_LUA', 's', $hashed_source);
+    local slg, source_hash = ...
+    local lexeme_declarations = source_hash.lexeme_declarations or {}
     local g1g = slg.g1
-    -- local slg, lexeme_name, g1_lexeme_id, declarations = ...
 
     local lexeme_event_by_isy = {}
     slg.lexeme_event_by_isy = lexeme_event_by_isy
