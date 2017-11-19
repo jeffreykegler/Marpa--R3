@@ -285,15 +285,6 @@ our $NID_LEAF_BASE = -43;
 sub and_node_to_nid { return -$_[0] + $NID_LEAF_BASE; }
 sub nid_to_and_node { return -$_[0] + $NID_LEAF_BASE; }
 
-sub normalize_asf_blessing {
-    my ($name) = @_;
-    $name =~ s/\A \s * //xms;
-    $name =~ s/ \s * \z//xms;
-    $name =~ s/ \s+ / /gxms;
-    $name =~ s/ \W /_/gxms;
-    return $name;
-} ## end sub normalize_asf_blessing
-
 # Returns undef if no parse
 sub Marpa::R3::ASF::new {
     my ( $class, @arg_hashes ) = @_;
@@ -336,15 +327,6 @@ sub Marpa::R3::ASF::new {
     my $slv = Marpa::R3::Valuer->new(\%v_args);
     Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
     $asf->[Marpa::R3::Internal::ASF::SLV] = $slv;
-
-    (   $asf->[Marpa::R3::Internal::ASF::RULE_RESOLUTIONS],
-        $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]
-    ) = Marpa::R3::Internal_G::resolve_grammar( $slg );
-
-    $asf->[Marpa::R3::Internal::ASF::DEFAULT_RULE_BLESSING_PACKAGE] =
-        'My_Rule';
-    $asf->[Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE] =
-        'My_Token';
 
     $asf->[Marpa::R3::Internal::ASF::NEXT_INTSET_ID] = 0;
     $asf->[Marpa::R3::Internal::ASF::INTSET_BY_KEY]  = {};
