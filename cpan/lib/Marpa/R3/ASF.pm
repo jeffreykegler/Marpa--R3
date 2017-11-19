@@ -426,10 +426,6 @@ sub Marpa::R3::ASF::new {
         $asf->[Marpa::R3::Internal::ASF::LEXEME_RESOLUTIONS]
     ) = Marpa::R3::Internal_G::resolve_grammar( $slg );
 
-    $asf->[Marpa::R3::Internal::ASF::SYMCH_BLESSING_PACKAGE] = 'My_Symch';
-    $asf->[Marpa::R3::Internal::ASF::FACTORING_BLESSING_PACKAGE] =
-        'My_Factoring';
-    $asf->[Marpa::R3::Internal::ASF::PROBLEM_BLESSING_PACKAGE] = 'My_Problem';
     $asf->[Marpa::R3::Internal::ASF::DEFAULT_RULE_BLESSING_PACKAGE] =
         'My_Rule';
     $asf->[Marpa::R3::Internal::ASF::DEFAULT_TOKEN_BLESSING_PACKAGE] =

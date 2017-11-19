@@ -23,6 +23,10 @@
 # will *not* be the basis of a new "thin interface".  There may not
 # be a new "thin IF".   If there is, I expect that
 # it will be created from scratch.
+#
+# Any time-consuming problems with this interface will dissolved by deleting
+# this test.  I could delete it now, but as it stands it might be "early
+# warning" of an issue.
 
 use 5.010001;
 
