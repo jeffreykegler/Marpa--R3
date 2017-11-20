@@ -2356,6 +2356,7 @@ one for each subgrammar.
             runtime_xpr.separator = xpr_source.separator
             runtime_xpr.proper = xpr_source.proper
             runtime_xpr.bless = xpr_source.bless
+            runtime_xpr.new_blessing = xpr_source.new_blessing
             runtime_xpr.action = xpr_source.action
             runtime_xpr.start = xpr_source.start
             runtime_xpr.length = xpr_source.length
@@ -6841,7 +6842,6 @@ to set and discover various Lua values.
 ```
     -- miranda: section+ class_xpr field declarations
     class_xpr_fields.action = true
-    class_xpr_fields.bless = true
     class_xpr_fields.discard_separation = true
     class_xpr_fields.event_name = true
     class_xpr_fields.event_starts_active = true
@@ -6861,6 +6861,12 @@ to set and discover various Lua values.
     class_xpr_fields.subgrammar = true
     class_xpr_fields.symbol_as_event = true
     class_xpr_fields.xrl_name = true
+```
+
+```
+    -- miranda: section+ class_xpr field declarations
+    class_xpr_fields.bless = true
+    class_xpr_fields.new_blessing = true
 ```
 
 ```
