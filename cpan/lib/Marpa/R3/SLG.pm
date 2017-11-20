@@ -356,12 +356,6 @@ END_OF_LUA
 
             next G1_SYMBOL if $cmd eq 'next G1_SYMBOL';
 
-          FIND_BASE_BLESSING: {
-                if ( $blessing eq '::undef' ) {
-                    last FIND_BASE_BLESSING;
-                }
-            }
-
             $slg->call_by_tag(
                 ('@' .__FILE__ . ':' .  __LINE__),
                 <<'END_OF_LUA', 'is', $g1_lexeme_id, $blessing);
@@ -1203,6 +1197,7 @@ END_OF_LUA
 
             my ( $semantics, $blessing ) =
               @{ $lexeme_resolutions->[$lexeme_id] };
+          $blessing = '::undef' if not defined $blessing;
           CHECK_SEMANTICS: {
                 if ( not $semantics ) {
                     $semantics = '::!default';
@@ -1225,11 +1220,6 @@ END_OF_LUA
                 } ## end if ( not $allowed_semantics->{$semantics} )
 
             } ## end CHECK_SEMANTICS:
-          CHECK_BLESSING: {
-                if ( not $blessing ) {
-                    $blessing = '::undef';
-                }
-            } ## end CHECK_BLESSING:
             $semantics_by_lexeme_id[$lexeme_id] = $semantics;
             $blessing_by_lexeme_id[$lexeme_id]  = $blessing;
 
