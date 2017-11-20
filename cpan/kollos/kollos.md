@@ -569,6 +569,17 @@ perhaps because it is buggy.
     class_slg_fields.xsys = true
 ```
 
+The "blessing" facility exists to provide strings
+for interpretation by the upper layer.
+The Perl upper layer uses these string to bless
+Kollos results into Perl packages,
+whence the name.
+
+```
+    -- miranda: section+ class_slg field declarations
+    class_slg_fields.default_blessing = true
+```
+
 These two memoize two of the special ISYIDs
 in the L0 grammar.
 
@@ -6863,6 +6874,14 @@ to set and discover various Lua values.
     class_xpr_fields.xrl_name = true
 ```
 
+The "blessing" facility exists to provide strings
+for interpretation by the upper layer.
+The Perl upper layer uses these string to bless
+Kollos results into Perl packages,
+whence the name.
+
+TODO: Delete `bless`.  Rename `new_blessing`.
+
 ```
     -- miranda: section+ class_xpr field declarations
     class_xpr_fields.bless = true
@@ -6934,6 +6953,14 @@ the "no lexeme" and "discard" situations.
     class_xsy_fields.name_source = true
     class_xsy_fields.lexeme = true
 ```
+
+The "blessing" facility exists to provide strings
+for interpretation by the upper layer.
+The Perl upper layer uses these string to bless
+Kollos results into Perl packages,
+whence the name.
+
+TODO: Delete `old_blessing`.  Rename `new_blessing`.
 
 ```
     -- miranda: section+ class_xsy field declarations
