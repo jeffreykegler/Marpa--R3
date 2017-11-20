@@ -314,15 +314,12 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
 
 END_OF_LUA
 
-    my $lexeme_default_adverbs  = $hashed_source->{lexeme_default_adverbs} // {};
-
-  APPLY_DEFAULT_LEXEME_BLESSING: {
-        my $default_blessing = $lexeme_default_adverbs->{bless};
-
         $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', ($default_blessing // '::undef'));
-        local slg, default_blessing = ...
+        <<'END_OF_LUA', 's', $hashed_source);
+        local slg, source_hash = ...
+        local lexeme_default_adverbs = source_hash.lexeme_default_adverbs or {}
+        local default_blessing = lexeme_default_adverbs.bless or '::undef'
         local xsys = slg.xsys
         for xsyid = 1, #xsys do
             local xsy = xsys[xsyid]
@@ -335,7 +332,6 @@ END_OF_LUA
                     xsy.blessing = default_blessing
                     goto NEXT_XSYID
                 end
-                local g1_lexeme_id = lexeme.g1_isy.id
                 local name_source = xsy.name_source
                 if name_source ~= 'lexical' then
                     xsy.blessing = default_blessing
@@ -347,6 +343,7 @@ END_OF_LUA
                 end
 
                 -- TODO delete the following check after development
+                local g1_lexeme_id = lexeme.g1_isy.id
                 if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
                     _M._internal_error(
                         "Lexeme name mismatch xsy=%q, g1 isy = %q",
@@ -358,8 +355,6 @@ END_OF_LUA
             ::NEXT_XSYID::
         end
 END_OF_LUA
-
-    }
 
     my $registrations = registrations_find($slg );
     registrations_set($slg, $registrations );
