@@ -6919,14 +6919,6 @@ the "no lexeme" and "discard" situations.
 ```
     -- miranda: section+ class_xsy field declarations
     class_xsy_fields.assertion = true
-```
-
-```
-    -- miranda: section+ create nonmetallic metatables
-    _M.class_xsy = {}
-    -- miranda: section+ populate metatables
-    local class_xsy_fields = {}
-
     class_xsy_fields.id = true
     class_xsy_fields.name = true
     class_xsy_fields.lexeme_semantics = true
@@ -6935,6 +6927,13 @@ the "no lexeme" and "discard" situations.
     class_xsy_fields.if_inaccessible = true
     class_xsy_fields.name_source = true
     class_xsy_fields.lexeme = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_xsy = {}
+    -- miranda: section+ populate metatables
+    local class_xsy_fields = {}
 
     -- miranda: insert class_xsy field declarations
     declarations(_M.class_xsy, class_xsy_fields, 'xsy')
