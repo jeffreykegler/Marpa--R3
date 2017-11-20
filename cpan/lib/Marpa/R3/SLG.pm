@@ -60,6 +60,8 @@ sub Marpa::R3::Internal::meta_grammar {
     $meta_slg->[Marpa::R3::Internal_G::BLESS_PACKAGE] =
       'Marpa::R3::Internal::MetaAST_Nodes';
     Marpa::R3::Internal_G::hash_to_runtime( $meta_slg, $hashed_metag );
+    my $registrations = registrations_find($meta_slg );
+    registrations_set($meta_slg, $registrations );
 
     return $meta_slg;
 
@@ -79,6 +81,8 @@ sub Marpa::R3::Grammar::new {
     my $ast        = Marpa::R3::Internal::MetaAST->new($p_dsl);
     my $hashed_ast = $ast->ast_to_hash($p_dsl);
     Marpa::R3::Internal_G::hash_to_runtime( $slg, $hashed_ast);
+    my $registrations = registrations_find($slg );
+    registrations_set($slg, $registrations );
     return $slg;
 }
 
@@ -356,8 +360,6 @@ END_OF_LUA
         end
 END_OF_LUA
 
-    my $registrations = registrations_find($slg );
-    registrations_set($slg, $registrations );
 
     my $character_class_hash = $hashed_source->{character_classes};
 
