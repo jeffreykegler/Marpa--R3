@@ -360,31 +360,6 @@ END_OF_LUA
                 if ( $blessing eq '::undef' ) {
                     last FIND_BASE_BLESSING;
                 }
-                if ( $blessing eq '::name' ) {
-                    if ( $lexeme_name =~ / [^ [:alnum:]] /xms ) {
-                        Marpa::R3::exception(
-qq{Lexeme blessing by '::name' only allowed if lexeme name is whitespace and alphanumerics\n},
-                            qq{   Problematic lexeme was <$lexeme_name>\n}
-                        );
-                    } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
-                    $blessing = $lexeme_name;
-                    $blessing =~ s/[ ]/_/gxms;
-                    last FIND_BASE_BLESSING;
-                } ## end if ( $default_blessing eq '::name' )
-                if ( $blessing =~ /^ :: /xms ) {
-                    Marpa::R3::exception(
-                        qq{Blessing lexeme as '$blessing' is not allowed\n},
-qq{   It is in pseudo-blessing form, but there is no such psuedo-blessing\n},
-                        qq{   Problematic lexeme was <$lexeme_name>\n}
-                    );
-                }
-                if ( $blessing =~ / [\W] /xms ) {
-                    Marpa::R3::exception(
-                        qq{Blessing lexeme as '$blessing' is not allowed\n},
-qq{   It contained non-word characters and that is not allowed\n},
-                        qq{   Problematic lexeme was <$lexeme_name>\n}
-                    );
-                } ## end if ( $default_blessing =~ / [\W] /xms )
             }
 
             $slg->call_by_tag(
@@ -1253,17 +1228,7 @@ END_OF_LUA
           CHECK_BLESSING: {
                 if ( not $blessing ) {
                     $blessing = '::undef';
-                    last CHECK_BLESSING;
                 }
-                last CHECK_BLESSING if $blessing eq '::undef';
-                last CHECK_BLESSING
-                  if $blessing =~ /\A [[:alpha:]] [:\w]* \z /xms;
-                Marpa::R3::exception(
-                    q{Unknown blessing for lexeme },
-                    $slg->g1_symbol_display($lexeme_id),
-                    "\n",
-                    qq{    Blessing as specified as "$blessing"\n}
-                );
             } ## end CHECK_BLESSING:
             $semantics_by_lexeme_id[$lexeme_id] = $semantics;
             $blessing_by_lexeme_id[$lexeme_id]  = $blessing;

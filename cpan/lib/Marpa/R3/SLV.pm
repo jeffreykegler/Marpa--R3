@@ -368,27 +368,55 @@ sub Marpa::R3::Valuer::value {
         bless => sub {
             my ( $value, $blessing_ix ) = @_;
             my $blessing_data = $constants->[$blessing_ix];
-            my ($irlid, $lexeme_id, $blessing) = @{$blessing_data};
+            my ( $irlid, $lexeme_id, $blessing ) = @{$blessing_data};
+            my $lexeme_name;
+            if ( defined $lexeme_id ) {
+                $lexeme_name = $slg->g1_symbol_name($lexeme_id);
+            }
+            else {
+                $lexeme_name = "[IRL# $irlid]";
+            }
+
+          FIND_BASE_BLESSING: {
+                if ( $blessing eq '::name' ) {
+                    if ( $lexeme_name =~ / [^ [:alnum:]] /xms ) {
+                        Marpa::R3::exception(
+qq{Lexeme blessing by '::name' only allowed if lexeme name is whitespace and alphanumerics\n},
+                            qq{   Problematic lexeme was <$lexeme_name>\n}
+                        );
+                    } ## end if ( $lexeme_name =~ / [^ [:alnum:]] /xms )
+                    $blessing = $lexeme_name;
+                    $blessing =~ s/[ ]/_/gxms;
+                    last FIND_BASE_BLESSING;
+                } ## end if ( $default_blessing eq '::name' )
+                if ( $blessing =~ /^ :: /xms ) {
+                    Marpa::R3::exception(
+                        qq{Blessing lexeme as '$blessing' is not allowed\n},
+qq{   It is in pseudo-blessing form, but there is no such psuedo-blessing\n},
+                        qq{   Problematic lexeme was <$lexeme_name>\n}
+                    );
+                }
+                if ( $blessing =~ / [\W] /xms ) {
+                    Marpa::R3::exception(
+                        qq{Blessing lexeme as '$blessing' is not allowed\n},
+qq{   It contained non-word characters and that is not allowed\n},
+                        qq{   Problematic lexeme was <$lexeme_name>\n}
+                    );
+                } ## end if ( $default_blessing =~ / [\W] /xms )
+            }
+
             if ( $blessing !~ / :: /xms ) {
                 my $bless_package =
                   $slg->[Marpa::R3::Internal_G::BLESS_PACKAGE];
                 if ( not defined $bless_package ) {
-                    if (defined $lexeme_id) {
-                        my $lexeme_name = $slg->g1_symbol_name($lexeme_id);
-                        Marpa::R3::exception(
-qq{Symbol "$lexeme_name" needs a blessing package, but grammar has none\n},
-                            qq{  The blessing for "$lexeme_name" was "$blessing"\n}
-                    );
-                    }
                     Marpa::R3::exception(
-qq{Blessing package needed, but grammar has none\n},
-                            qq{  The blessing was "$blessing"\n}
-                    );
+                        qq{Blessing package needed, but grammar has none\n},
+                        qq{  The blessing was "$blessing"\n} );
                 } ## end if ( not defined $bless_package )
                 $blessing = $bless_package . q{::} . $blessing;
             }
             return 'sig', [ 'S', ( bless $value, $blessing ) ];
-        },
+          },
         perl_nulling_semantics => sub {
             my ($token_id) = @_;
             my $value_ref = $nulling_closures->[$token_id];
