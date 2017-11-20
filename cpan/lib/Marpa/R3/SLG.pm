@@ -323,45 +323,38 @@ END_OF_LUA
         for (my $iter = $slg->symbol_ids_gen();
         defined(my $xsyid = $iter->()); ) {
 
-        my ($cmd, $blessing, $g1_lexeme_id, $lexeme_name) = $slg->call_by_tag(
+        $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
         <<'END_OF_LUA', 'is', $xsyid, ($default_blessing // '::undef'));
         local slg, xsyid, default_blessing = ...
         local xsy = slg.xsys[xsyid]
-        if not xsy then
-            return 'next G1_SYMBOL', default_blessing
-        end
-        local lexeme = xsy.lexeme
-        if not lexeme then
-            return 'next G1_SYMBOL', default_blessing
-        end
-        local g1_lexeme_id = lexeme.g1_isy.id
-        local name_source = xsy.name_source
-        if name_source ~= 'lexical' then return 'next G1_SYMBOL', default_blessing end
-        if not xsy.blessing then
-            xsy.blessing = default_blessing
-        end
+        do
+            if not xsy then
+                goto NEXT_XSYID
+            end
+            local lexeme = xsy.lexeme
+            if not lexeme then
+                xsy.blessing = default_blessing
+                goto NEXT_XSYID
+            end
+            local g1_lexeme_id = lexeme.g1_isy.id
+            local name_source = xsy.name_source
+            if name_source ~= 'lexical' then return 'next G1_SYMBOL', default_blessing end
+            if not xsy.blessing then
+                xsy.blessing = default_blessing
+                goto NEXT_XSYID
+            end
 
-        -- TODO delete the following check after development
-        if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
-            _M._internal_error(
-                "Lexeme name mismatch xsy=%q, g1 isy = %q",
-                xsy.name,
-                slg.g1:symbol_name(g1_lexeme_id)
-            )
+            -- TODO delete the following check after development
+            if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
+                _M._internal_error(
+                    "Lexeme name mismatch xsy=%q, g1 isy = %q",
+                    xsy.name,
+                    slg.g1:symbol_name(g1_lexeme_id)
+                )
+            end
         end
-
-        return 'ok', xsy.blessing, g1_lexeme_id, xsy.name
-END_OF_LUA
-
-            next G1_SYMBOL if $cmd eq 'next G1_SYMBOL';
-
-            $slg->call_by_tag(
-                ('@' .__FILE__ . ':' .  __LINE__),
-                <<'END_OF_LUA', 'is', $g1_lexeme_id, $blessing);
-            local slg, isyid, blessing = ...
-            local xsy = slg.g1.xsys[isyid]
-            xsy.blessing = blessing
+        ::NEXT_XSYID::
 END_OF_LUA
 
         }
