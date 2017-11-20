@@ -1222,6 +1222,54 @@ TODO before the end of development, convert to local
 
 TODO before the end of development, convert to local
 
+This information is serializable, I think,
+and so this function should really be run in
+the AST-to-serializable phase.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.precompute_xsy_blessings(slg, source_hash)
+        local lexeme_default_adverbs = source_hash.lexeme_default_adverbs or {}
+        local default_blessing = lexeme_default_adverbs.bless or '::undef'
+        local xsys = slg.xsys
+        for xsyid = 1, #xsys do
+            local xsy = xsys[xsyid]
+            do
+                if not xsy then
+                    goto NEXT_XSYID
+                end
+                local lexeme = xsy.lexeme
+                if not lexeme then
+                    xsy.blessing = default_blessing
+                    goto NEXT_XSYID
+                end
+                local name_source = xsy.name_source
+                if name_source ~= 'lexical' then
+                    xsy.blessing = default_blessing
+                    goto NEXT_XSYID
+                end
+                if not xsy.blessing then
+                    xsy.blessing = default_blessing
+                    goto NEXT_XSYID
+                end
+
+                -- TODO delete the following check after development
+                local g1_lexeme_id = lexeme.g1_isy.id
+                if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
+                    _M._internal_error(
+                        "Lexeme name mismatch xsy=%q, g1 isy = %q",
+                        xsy.name,
+                        slg.g1:symbol_name(g1_lexeme_id)
+                    )
+                end
+            end
+            ::NEXT_XSYID::
+        end
+    end
+```
+
+TODO before the end of development, convert to local
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.l0_rule_add(slg, options)

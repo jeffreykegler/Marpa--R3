@@ -313,53 +313,11 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             slg:precompute_l0(source_hash);
             slg:precompute_discard_events(source_hash)
             slg:precompute_lexeme_adverbs(source_hash)
+            slg:precompute_xsy_blessings(source_hash)
 
     end)
 
 END_OF_LUA
-
-        $slg->call_by_tag(
-        ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 's', $hashed_source);
-        local slg, source_hash = ...
-        local lexeme_default_adverbs = source_hash.lexeme_default_adverbs or {}
-        local default_blessing = lexeme_default_adverbs.bless or '::undef'
-        local xsys = slg.xsys
-        for xsyid = 1, #xsys do
-            local xsy = xsys[xsyid]
-            do
-                if not xsy then
-                    goto NEXT_XSYID
-                end
-                local lexeme = xsy.lexeme
-                if not lexeme then
-                    xsy.blessing = default_blessing
-                    goto NEXT_XSYID
-                end
-                local name_source = xsy.name_source
-                if name_source ~= 'lexical' then
-                    xsy.blessing = default_blessing
-                    goto NEXT_XSYID
-                end
-                if not xsy.blessing then
-                    xsy.blessing = default_blessing
-                    goto NEXT_XSYID
-                end
-
-                -- TODO delete the following check after development
-                local g1_lexeme_id = lexeme.g1_isy.id
-                if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
-                    _M._internal_error(
-                        "Lexeme name mismatch xsy=%q, g1 isy = %q",
-                        xsy.name,
-                        slg.g1:symbol_name(g1_lexeme_id)
-                    )
-                end
-            end
-            ::NEXT_XSYID::
-        end
-END_OF_LUA
-
 
     my $character_class_hash = $hashed_source->{character_classes};
 
@@ -369,8 +327,16 @@ END_OF_LUA
         my $symbol_id = $slg->l0_symbol_by_name($class_symbol);
         next CLASS_SYMBOL if not defined $symbol_id;
         my $cc_components = $character_class_hash->{$class_symbol};
-        my ( $compiled_re, $error ) =
-          Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
+
+        my ( $char_class, $flags ) = @{$cc_components};
+        $flags = $flags ? '(' . q{?} . $flags . ')' : q{};
+        my $compiled_re;
+        my $error;
+        if ( not defined eval { $compiled_re = qr/$flags$char_class/xms; 1; } ) {
+            $error = qq{Problem in evaluating character class: "$char_class"\n};
+            $error .= qq{  Flags were "$flags"\n} if $flags;
+            $error .= $EVAL_ERROR;
+        }
         if ( not $compiled_re ) {
             $error =~ s/^/  /gxms;    #indent all lines
             Marpa::R3::exception(

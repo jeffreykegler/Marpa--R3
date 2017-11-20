@@ -1757,21 +1757,6 @@ sub combine {
     return bless $self, $class;
 } ## end sub combine
 
-sub Marpa::R3::Internal::MetaAST::char_class_to_re {
-    my ($cc_components) = @_;
-    die if ref $cc_components ne 'ARRAY';
-    my ( $char_class, $flags ) = @{$cc_components};
-    $flags = $flags ? '(' . q{?} . $flags . ')' : q{};
-    my $regex;
-    my $error;
-    if ( not defined eval { $regex = qr/$flags$char_class/xms; 1; } ) {
-        $error = qq{Problem in evaluating character class: "$char_class"\n};
-        $error .= qq{  Flags were "$flags"\n} if $flags;
-        $error .= $EVAL_ERROR;
-    }
-    return $regex, $error;
-}
-
 sub Marpa::R3::Internal::MetaAST::flag_string_to_flags {
     my ($raw_flag_string) = @_;
     return q{} if not $raw_flag_string;
@@ -1816,14 +1801,6 @@ sub char_class_to_symbol {
     if ( not defined $symbol ) {
 
         my $cc_components = [ $unmodified_char_class, $flags ];
-
- # Fast fail on badly formed char_class -- we re-evaluate the regex just in time
- # before we register characters.
-        my ( $regex, $eval_error ) =
-          Marpa::R3::Internal::MetaAST::char_class_to_re($cc_components);
-        Carp::croak( 'Bad Character class: ',
-            $char_class, "\n", 'Perl said ', $eval_error )
-          if not $regex;
 
         $symbol = Marpa::R3::Internal::MetaAST::Symbol_List->new($symbol_name);
         $cc_hash->{$symbol_name} = [ $cc_components, $symbol ];
