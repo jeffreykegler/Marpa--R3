@@ -2196,7 +2196,8 @@ Populate the `xsys` table.
             runtime_xsy.name = xsy_name
             -- copy, so that we can destroy `source_hash`
             runtime_xsy.lexeme_semantics = xsy_source.action
-            runtime_xsy.blessing = xsy_source.blessing
+            runtime_xsy.old_blessing = xsy_source.old_blessing
+            runtime_xsy.new_blessing = xsy_source.new_blessing
             runtime_xsy.dsl_form = xsy_source.dsl_form
             runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
             runtime_xsy.name_source = xsy_source.name_source
@@ -6922,11 +6923,16 @@ the "no lexeme" and "discard" situations.
     class_xsy_fields.id = true
     class_xsy_fields.name = true
     class_xsy_fields.lexeme_semantics = true
-    class_xsy_fields.blessing = true
     class_xsy_fields.dsl_form = true
     class_xsy_fields.if_inaccessible = true
     class_xsy_fields.name_source = true
     class_xsy_fields.lexeme = true
+```
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.old_blessing = true
+    class_xsy_fields.new_blessing = true
 ```
 
 ```

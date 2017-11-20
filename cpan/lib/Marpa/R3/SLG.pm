@@ -338,8 +338,8 @@ END_OF_LUA
         local g1_lexeme_id = lexeme.g1_isy.id
         local name_source = xsy.name_source
         if name_source ~= 'lexical' then return 'next G1_SYMBOL', default_blessing end
-        if not xsy.blessing then
-            xsy.blessing = default_blessing
+        if not xsy.old_blessing then
+            xsy.old_blessing = default_blessing
         end
 
         -- TODO delete the following check after development
@@ -351,7 +351,7 @@ END_OF_LUA
             )
         end
 
-        return 'ok', xsy.blessing, g1_lexeme_id, xsy.name
+        return 'ok', xsy.old_blessing, g1_lexeme_id, xsy.name
 END_OF_LUA
 
             next G1_SYMBOL if $cmd eq 'next G1_SYMBOL';
@@ -392,7 +392,7 @@ qq{   It contained non-word characters and that is not allowed\n},
                 <<'END_OF_LUA', 'is', $g1_lexeme_id, $blessing);
             local slg, isyid, blessing = ...
             local xsy = slg.g1.xsys[isyid]
-            xsy.blessing = blessing
+            xsy.old_blessing = blessing
 END_OF_LUA
 
         }
@@ -2029,7 +2029,7 @@ sub lexeme_blessing_find {
       local slg, isyid = ...
       local xsy = slg.g1.xsys[isyid]
       if not xsy then return '::undef' end
-      local blessing = xsy.blessing
+      local blessing = xsy.old_blessing
       return blessing or '::undef'
 END_OF_LUA
 
