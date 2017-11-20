@@ -319,45 +319,45 @@ END_OF_LUA
   APPLY_DEFAULT_LEXEME_BLESSING: {
         my $default_blessing = $lexeme_default_adverbs->{bless};
 
-      G1_SYMBOL:
-        for (my $iter = $slg->symbol_ids_gen();
-        defined(my $xsyid = $iter->()); ) {
-
         $slg->call_by_tag(
         ('@' .__FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', 'is', $xsyid, ($default_blessing // '::undef'));
-        local slg, xsyid, default_blessing = ...
-        local xsy = slg.xsys[xsyid]
-        do
-            if not xsy then
-                goto NEXT_XSYID
-            end
-            local lexeme = xsy.lexeme
-            if not lexeme then
-                xsy.blessing = default_blessing
-                goto NEXT_XSYID
-            end
-            local g1_lexeme_id = lexeme.g1_isy.id
-            local name_source = xsy.name_source
-            if name_source ~= 'lexical' then return 'next G1_SYMBOL', default_blessing end
-            if not xsy.blessing then
-                xsy.blessing = default_blessing
-                goto NEXT_XSYID
-            end
+        <<'END_OF_LUA', 's', ($default_blessing // '::undef'));
+        local slg, default_blessing = ...
+        local xsys = slg.xsys
+        for xsyid = 1, #xsys do
+            local xsy = xsys[xsyid]
+            do
+                if not xsy then
+                    goto NEXT_XSYID
+                end
+                local lexeme = xsy.lexeme
+                if not lexeme then
+                    xsy.blessing = default_blessing
+                    goto NEXT_XSYID
+                end
+                local g1_lexeme_id = lexeme.g1_isy.id
+                local name_source = xsy.name_source
+                if name_source ~= 'lexical' then
+                    xsy.blessing = default_blessing
+                    goto NEXT_XSYID
+                end
+                if not xsy.blessing then
+                    xsy.blessing = default_blessing
+                    goto NEXT_XSYID
+                end
 
-            -- TODO delete the following check after development
-            if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
-                _M._internal_error(
-                    "Lexeme name mismatch xsy=%q, g1 isy = %q",
-                    xsy.name,
-                    slg.g1:symbol_name(g1_lexeme_id)
-                )
+                -- TODO delete the following check after development
+                if xsy.name ~= slg.g1:symbol_name(g1_lexeme_id) then
+                    _M._internal_error(
+                        "Lexeme name mismatch xsy=%q, g1 isy = %q",
+                        xsy.name,
+                        slg.g1:symbol_name(g1_lexeme_id)
+                    )
+                end
             end
+            ::NEXT_XSYID::
         end
-        ::NEXT_XSYID::
 END_OF_LUA
-
-        }
 
     }
 
