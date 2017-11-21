@@ -7063,6 +7063,8 @@ TODO: Delete `blessing`.  Rename `new_blessing`.
     class_isy_fields.priority = true
     class_isy_fields.lexeme = true
     class_isy_fields.eager = true
+    class_isy_fields.character_class = true
+    class_isy_fields.character_flags = true
 ```
 
 ```
