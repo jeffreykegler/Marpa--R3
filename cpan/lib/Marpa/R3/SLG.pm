@@ -367,7 +367,9 @@ END_OF_LUA
         _M.wrap(function ()
             local isys = slg.l0.isys
             local character_pairs = {}
-            for isyid = 0, #isys do
+            -- In reverse order, so when Perl pops them off,
+            -- they are back in symbol ID order
+            for isyid = #isys, 0, -1 do
                 local isy = isys[isyid]
                 local perl_re = isy.character_class
                 if perl_re then
