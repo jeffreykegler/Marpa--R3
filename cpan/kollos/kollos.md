@@ -702,8 +702,6 @@ This is a registry object.
     end
 ```
 
-TODO before end of development, convert to local
-
 Assumes that caller has found an error code
 in `lmw_g`.
 
@@ -805,11 +803,11 @@ in `lmw_g`.
     end
 ```
 
-TODO before end of development, convert to local
-
 ```
+    -- miranda: section+ forward declarations
+    local precompute_g1
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_g1(slg, source_hash)
+    function precompute_g1(slg, source_hash)
         slg.g1 = _M.grammar_new(slg, 'g1')
         -- print(inspect(source_hash))
         -- Create the G1 grammar
@@ -899,11 +897,11 @@ TODO before end of development, convert to local
     end
 ```
 
-TODO before the end of development, convert to local
-
 ```
+    -- miranda: section+ forward declarations
+    local precompute_l0
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_l0(slg, source_hash)
+    function precompute_l0(slg, source_hash)
         local l0g = _M.grammar_new(slg, 'l0')
         slg.l0 = l0g
         l0g.start_name = '[:lex_start:]'
@@ -1310,8 +1308,8 @@ and creates the "runtime" version, as a side effect.
         end
         slg.if_inaccessible = if_inaccessible
 
-        slg:precompute_g1(source_hash);
-        slg:precompute_l0(source_hash);
+        precompute_g1(slg, source_hash);
+        precompute_l0(slg, source_hash);
         slg:precompute_discard_events(source_hash)
         slg:precompute_lexeme_adverbs(source_hash)
         slg:precompute_xsy_blessings(source_hash)
