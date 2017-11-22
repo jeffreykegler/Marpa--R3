@@ -825,7 +825,7 @@ in `lmw_g`.
            for ix = 1,#g1_symbol_names do
                local symbol_name = g1_symbol_names[ix]
                local options = g1_symbols[symbol_name]
-               slg:g1_symbol_assign(symbol_name, options)
+               g1_symbol_assign(slg, symbol_name, options)
            end
         end
 
@@ -833,7 +833,7 @@ in `lmw_g`.
            local g1_rules = source_hash.rules.g1
            for ix = 1,#g1_rules do
                local options = g1_rules[ix]
-               slg:g1_rule_add(options)
+               g1_rule_add(slg, options)
            end
         end
 
@@ -918,7 +918,7 @@ in `lmw_g`.
            for ix = 1,#l0_symbol_names do
                local symbol_name = l0_symbol_names[ix]
                local options = l0_symbols[symbol_name]
-               slg:l0_symbol_assign(symbol_name, options)
+               l0_symbol_assign(slg, symbol_name, options)
            end
         end
 
@@ -926,7 +926,7 @@ in `lmw_g`.
            local l0_rules = source_hash.rules.l0
            for ix = 1,#l0_rules do
                local options = l0_rules[ix]
-               slg:l0_rule_add(options)
+               l0_rule_add(slg, options)
            end
         end
 
@@ -1317,11 +1317,11 @@ and creates the "runtime" version, as a side effect.
     end
 ```
 
-TODO before the end of development, convert to local
-
 ```
+    -- miranda: section+ forward declarations
+    local l0_rule_add
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.l0_rule_add(slg, options)
+    function l0_rule_add(slg, options)
         local l0g = slg.l0
 
         local xpr_name = options.xprid or ''
@@ -1341,11 +1341,11 @@ TODO before the end of development, convert to local
         end
 
         local lhs_name = options.lhs
-        local lhs_id = slg:l0_symbol_assign(lhs_name)
+        local lhs_id = l0_symbol_assign(slg, lhs_name)
         local rhs_ids = {}
         local rule = { lhs_id }
         for ix = 1, #rhs_names do
-            local rhs_id = slg:l0_symbol_assign(rhs_names[ix])
+            local rhs_id = l0_symbol_assign(slg, rhs_names[ix])
             rhs_ids[ix] = rhs_id
             rule[ix+1] = rhs_id
         end
@@ -1370,7 +1370,7 @@ TODO before the end of development, convert to local
             }
             sequence_options.proper = (options.proper ~= 0)
             if separator_name then
-                sequence_options.separator = slg:l0_symbol_assign(separator_name)
+                sequence_options.separator = l0_symbol_assign(slg, separator_name)
             end
             _M.throw = false
             base_irl_id = l0g:sequence_new(sequence_options)
@@ -2158,8 +2158,10 @@ Lowest ISYID is 0.
 ### Mutators
 
 ```
+    -- miranda: section+ forward declarations
+    local g1_symbol_assign
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.g1_symbol_assign(slg, symbol_name, options)
+    function g1_symbol_assign(slg, symbol_name, options)
         local isyid = slg:g1_symbol_by_name(symbol_name)
         if isyid then
             -- symbol already exists
@@ -2208,8 +2210,10 @@ Lowest ISYID is 0.
 ```
 
 ```
+    -- miranda: section+ forward declarations
+    local l0_symbol_assign
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.l0_symbol_assign(slg, symbol_name, options)
+    function l0_symbol_assign(slg, symbol_name, options)
         local isyid = slg:l0_symbol_by_name(symbol_name)
         if isyid then
             -- symbol already exists
@@ -2515,8 +2519,10 @@ one for each subgrammar.
 #### Add a G1 rule
 
 ```
+    -- miranda: section+ forward declarations
+    local g1_rule_add
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.g1_rule_add(slg, options)
+    function g1_rule_add(slg, options)
         local g1g = slg.g1
         local allowed = {
             action = true,
@@ -2560,9 +2566,9 @@ one for each subgrammar.
         local is_ordinary = #rhs_names == 0 or not options.min
         local separator = options.separator
         local base_irl_id
-        local rule_symids = { slg:g1_symbol_assign(options.lhs) }
+        local rule_symids = { g1_symbol_assign(slg, options.lhs) }
         for ix = 1, #rhs_names do
-            rule_symids[ix+1] = slg:g1_symbol_assign(rhs_names[ix])
+            rule_symids[ix+1] = g1_symbol_assign(slg, rhs_names[ix])
         end
         if is_ordinary then
             if separator then
@@ -2585,7 +2591,7 @@ one for each subgrammar.
                     _M._raw_rule_show(options.lhs, rhs_names))
             end
             local separator_id
-                = separator and slg:g1_symbol_assign(separator)
+                = separator and g1_symbol_assign(slg, separator)
                   or -1
             local proper = (options.proper and options.proper ~= 0)
             _M.throw = false
