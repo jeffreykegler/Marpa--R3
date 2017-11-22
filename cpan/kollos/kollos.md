@@ -1299,7 +1299,7 @@ and creates the "runtime" version, as a side effect.
     function _M.class_slg.seriable_to_runtime(slg, source_hash)
         xsys_populate(slg, source_hash)
         xrls_populate(slg, source_hash)
-        slg:xprs_populate(source_hash)
+        xprs_populate(slg, source_hash)
 
         local if_inaccessible = slg.if_inaccessible
         do
@@ -2378,8 +2378,10 @@ one for each subgrammar.
 (The subgrammars are only visible internally.)
 
 ```
+    -- miranda: section+ forward declarations
+    local xprs_subg_populate
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xprs_subg_populate(slg, source_hash, subgrammar)
+    function xprs_subg_populate(slg, source_hash, subgrammar)
         local subg = slg[subgrammar]
         local xprs = slg.xprs
         -- io.stderr:write(inspect(source_hash))
@@ -2502,10 +2504,13 @@ one for each subgrammar.
             -- print('runtime_xpr:', inspect(runtime_xpr))
         end
     end
-    function _M.class_slg.xprs_populate(slg, source_hash)
+    -- miranda: section+ forward declarations
+    local xprs_populate
+    -- miranda: section+ most Lua function definitions
+    function xprs_populate(slg, source_hash)
         slg.xprs = {}
-        slg:xprs_subg_populate(source_hash, 'g1')
-        return slg:xprs_subg_populate(source_hash, 'l0')
+        xprs_subg_populate(slg, source_hash, 'g1')
+        return xprs_subg_populate(slg, source_hash, 'l0')
     end
 ```
 
