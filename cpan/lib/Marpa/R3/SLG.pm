@@ -275,8 +275,6 @@ END_OF_LUA
 sub Marpa::R3::Internal_G::hash_to_runtime {
     my ( $slg, $hashed_source ) = @_;
 
-    my $is_meta = exists $hashed_source->{meta} ? 1 : undef;
-
     my $trace_file_handle = $slg->[Marpa::R3::Internal_G::TRACE_FILE_HANDLE];
     # Pre-lexer G1 processing
 
@@ -296,30 +294,14 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         <<'END_OF_LUA');
         local slg, source_hash = ...
         _M.wrap(function ()
-
-            slg:xsys_populate( source_hash)
-            slg:xrls_populate(source_hash)
-            slg:xprs_populate(source_hash)
-            local if_inaccessible = slg.if_inaccessible
-            do
-                local defaults = source_hash.defaults
-                if defaults then
-                    if_inaccessible = defaults.if_inaccessible or if_inaccessible
-                end
-            end
-            slg.if_inaccessible = if_inaccessible
-
-            slg:precompute_g1(source_hash);
-            slg:precompute_l0(source_hash);
-            slg:precompute_discard_events(source_hash)
-            slg:precompute_lexeme_adverbs(source_hash)
-            slg:precompute_xsy_blessings(source_hash)
-            slg:precompute_character_classes(source_hash)
-
-    end)
-
+            slg:seriable_to_runtime(source_hash)
+        end)
 END_OF_LUA
 
+    # For the Kollos interface, we need to create some kind
+    # of SLG method which allows access to the character_class,
+    # character_flags data.  For now we just grab it from the
+    # structure
     my ($character_pairs) = $slg->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {

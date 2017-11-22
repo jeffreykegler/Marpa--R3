@@ -24,9 +24,10 @@
 # be a new "thin IF".   If there is, I expect that
 # it will be created from scratch.
 #
-# Any time-consuming problems with this interface will dissolved by deleting
-# this test.  I could delete it now, but as it stands it might be "early
-# warning" of an issue.
+# Any time-consuming problems one of these tests may be best solved
+# by deleting the test.  I do not want to delete this whole file,
+# however, because it is a template for using the Lua interface
+# to the TAP from within Perl.
 
 use 5.010001;
 

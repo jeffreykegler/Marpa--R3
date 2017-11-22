@@ -1291,6 +1291,34 @@ the AST-to-serializable phase.
     end
 ```
 
+Takes the serializable form of the grammar as an argument,
+and creates the "runtime" version, as a side effect.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.seriable_to_runtime(slg, source_hash)
+        slg:xsys_populate( source_hash)
+        slg:xrls_populate(source_hash)
+        slg:xprs_populate(source_hash)
+
+        local if_inaccessible = slg.if_inaccessible
+        do
+            local defaults = source_hash.defaults
+            if defaults then
+                if_inaccessible = defaults.if_inaccessible or if_inaccessible
+            end
+        end
+        slg.if_inaccessible = if_inaccessible
+
+        slg:precompute_g1(source_hash);
+        slg:precompute_l0(source_hash);
+        slg:precompute_discard_events(source_hash)
+        slg:precompute_lexeme_adverbs(source_hash)
+        slg:precompute_xsy_blessings(source_hash)
+        slg:precompute_character_classes(source_hash)
+    end
+```
+
 TODO before the end of development, convert to local
 
 ```
