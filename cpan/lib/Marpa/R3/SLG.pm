@@ -314,39 +314,10 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
             slg:precompute_discard_events(source_hash)
             slg:precompute_lexeme_adverbs(source_hash)
             slg:precompute_xsy_blessings(source_hash)
+            slg:precompute_character_classes(source_hash)
 
     end)
 
-END_OF_LUA
-
-    $slg->coro_by_tag(
-        ( '@' . __FILE__ . ':' . __LINE__ ),
-        {
-            signature => 's',
-            args      => [$hashed_source],
-            handlers  => {
-                trace => sub {
-                    my ($msg) = @_;
-                    say {$trace_file_handle} $msg;
-                    return 'ok';
-                },
-            }
-        },
-        <<'END_OF_LUA');
-        local slg, source_hash = ...
-        _M.wrap(function ()
-            local character_class_hash = source_hash.character_classes
-            local isys = slg.l0.isys
-            for symbol_name, components in pairs(character_class_hash) do
-                local char_class, flags = table.unpack(components)
-                local isyid = slg:l0_symbol_by_name(symbol_name)
-                local isy = isys[isyid]
-                isy.character_class = char_class
-                if flags then
-                    isy.character_flags = flags
-                end
-            end
-        end)
 END_OF_LUA
 
     my ($character_pairs) = $slg->coro_by_tag(

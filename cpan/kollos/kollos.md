@@ -1270,6 +1270,29 @@ the AST-to-serializable phase.
 
 TODO before the end of development, convert to local
 
+This information is serializable, I think,
+and so this function should really be run in
+the AST-to-serializable phase.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slg.precompute_character_classes(slg, source_hash)
+        local character_class_hash = source_hash.character_classes
+        local isys = slg.l0.isys
+        for symbol_name, components in pairs(character_class_hash) do
+            local char_class, flags = table.unpack(components)
+            local isyid = slg:l0_symbol_by_name(symbol_name)
+            local isy = isys[isyid]
+            isy.character_class = char_class
+            if flags then
+                isy.character_flags = flags
+            end
+        end
+    end
+```
+
+TODO before the end of development, convert to local
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.l0_rule_add(slg, options)
