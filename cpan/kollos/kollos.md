@@ -1297,8 +1297,8 @@ and creates the "runtime" version, as a side effect.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.seriable_to_runtime(slg, source_hash)
-        slg:xsys_populate( source_hash)
-        slg:xrls_populate(source_hash)
+        xsys_populate(slg, source_hash)
+        xrls_populate(slg, source_hash)
         slg:xprs_populate(source_hash)
 
         local if_inaccessible = slg.if_inaccessible
@@ -2284,8 +2284,10 @@ hash to its runtime equivalent.
 Populate the `xsys` table.
 
 ```
+    -- miranda: section+ forward declarations
+    local xsys_populate
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xsys_populate(slg, source_hash)
+    function xsys_populate(slg, source_hash)
         local xsys = {}
         slg.xsys = xsys
 
@@ -2325,8 +2327,10 @@ but Jeffrey thinks they might be used someday,
 for example in error messages.
 
 ```
+    -- miranda: section+ forward declarations
+    local xrls_populate
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.xrls_populate(slg, source_hash)
+    function xrls_populate(slg, source_hash)
         local xrls = {}
         slg.xrls = xrls
 
