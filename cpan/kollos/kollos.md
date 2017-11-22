@@ -5640,10 +5640,13 @@ the valuator's Lua-level settings.
 
 ```
 
+```
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.ambiguity_level(slv)
          return slv._ambiguity_level
     end
+```
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.trace_valuer_step ( slv )
