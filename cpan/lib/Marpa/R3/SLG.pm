@@ -349,22 +349,50 @@ END_OF_LUA
         end)
 END_OF_LUA
 
-    my $character_class_hash = $hashed_source->{character_classes};
+    my ($character_pairs) = $slg->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => '',
+            args      => [],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slg = ...
+        _M.wrap(function ()
+            local isys = slg.l0.isys
+            local character_pairs = {}
+            for isyid = 0, #isys do
+                local isy = isys[isyid]
+                local perl_re = isy.character_class
+                if perl_re then
+                    local perl_re = isy.character_class
+                    local flags = isy.character_flags
+                    if flags then
+                        perl_re = '(?' .. flags .. ')' .. perl_re
+                    end
+                    character_pairs[#character_pairs+1] = isyid
+                    character_pairs[#character_pairs+1] = perl_re
+                end
+            end
+            return 'ok', character_pairs
+        end)
+END_OF_LUA
 
-    my @class_table = ();
+  my @class_table;
   CLASS_SYMBOL:
-    for my $class_symbol ( sort keys %{$character_class_hash} ) {
-        my $symbol_id = $slg->l0_symbol_by_name($class_symbol);
-        next CLASS_SYMBOL if not defined $symbol_id;
-        my $cc_components = $character_class_hash->{$class_symbol};
-
-        my ( $char_class, $flags ) = @{$cc_components};
-        $flags = $flags ? '(' . q{?} . $flags . ')' : q{};
+    while (scalar @{$character_pairs}) {
+        my $perl_re = pop @{$character_pairs};
+        my $symbol_id = pop @{$character_pairs};
         my $compiled_re;
         my $error;
-        if ( not defined eval { $compiled_re = qr/$flags$char_class/xms; 1; } ) {
-            $error = qq{Problem in evaluating character class: "$char_class"\n};
-            $error .= qq{  Flags were "$flags"\n} if $flags;
+        if ( not defined eval { $compiled_re = qr/$perl_re/xms; 1; } ) {
+            $error = qq{Problem in evaluating character class: "$perl_re"\n};
             $error .= $EVAL_ERROR;
         }
         if ( not $compiled_re ) {
