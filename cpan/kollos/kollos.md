@@ -1039,11 +1039,11 @@ in `lmw_g`.
     end
 ```
 
-TODO before the end of development, convert to local
-
 ```
+    -- miranda: section+ forward declarations
+    local precompute_discard_events
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_discard_events(slg, source_hash)
+    function precompute_discard_events(slg, source_hash)
         local l0g = slg.l0
         for irlid = 0, l0g:highest_rule_id() do
             local irl = l0g.irls[irlid]
@@ -1101,11 +1101,11 @@ TODO before the end of development, convert to local
     end
 ```
 
-TODO before the end of development, convert to local
-
 ```
+    -- miranda: section+ forward declarations
+    local precompute_lexeme_adverbs
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_lexeme_adverbs(slg, source_hash)
+    function precompute_lexeme_adverbs(slg, source_hash)
         local lexeme_declarations = source_hash.lexeme_declarations or {}
         local g1g = slg.g1
         local l0g = slg.l0
@@ -1218,15 +1218,15 @@ TODO before the end of development, convert to local
     end
 ```
 
-TODO before the end of development, convert to local
-
 This information is serializable, I think,
 and so this function should really be run in
 the AST-to-serializable phase.
 
 ```
+    -- miranda: section+ forward declarations
+    local precompute_xsy_blessings
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_xsy_blessings(slg, source_hash)
+    function precompute_xsy_blessings(slg, source_hash)
         local lexeme_default_adverbs = source_hash.lexeme_default_adverbs or {}
         local default_blessing = lexeme_default_adverbs.bless or '::undef'
         local xsys = slg.xsys
@@ -1266,15 +1266,15 @@ the AST-to-serializable phase.
     end
 ```
 
-TODO before the end of development, convert to local
-
 This information is serializable, I think,
 and so this function should really be run in
 the AST-to-serializable phase.
 
 ```
+    -- miranda: section+ forward declarations
+    local precompute_character_classes
     -- miranda: section+ most Lua function definitions
-    function _M.class_slg.precompute_character_classes(slg, source_hash)
+    function precompute_character_classes(slg, source_hash)
         local character_class_hash = source_hash.character_classes
         local isys = slg.l0.isys
         for symbol_name, components in pairs(character_class_hash) do
@@ -1310,10 +1310,10 @@ and creates the "runtime" version, as a side effect.
 
         precompute_g1(slg, source_hash);
         precompute_l0(slg, source_hash);
-        slg:precompute_discard_events(source_hash)
-        slg:precompute_lexeme_adverbs(source_hash)
-        slg:precompute_xsy_blessings(source_hash)
-        slg:precompute_character_classes(source_hash)
+        precompute_discard_events(slg, source_hash)
+        precompute_lexeme_adverbs(slg, source_hash)
+        precompute_xsy_blessings(slg, source_hash)
+        precompute_character_classes(slg, source_hash)
     end
 ```
 
