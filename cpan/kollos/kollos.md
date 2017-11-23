@@ -5952,6 +5952,7 @@ This is a registry object.
     class_asf_fields.slr = true
     class_asf_fields.regix = true
     class_asf_fields.lmw_b = true
+    class_asf_fields.lmw_o = true
     class_asf_fields.end_of_parse = true
     -- underscore ("_") to prevent override of function of same name
     class_asf_fields._ambiguity_level = true
@@ -5993,6 +5994,7 @@ which is not kept in the registry.
             -- not necessary, but may ease the burden on
             -- memory
             asf.lmw_b = nil
+            asf.lmw_o = nil
             return asf_register(asf)
         end
 
@@ -6016,7 +6018,19 @@ which is not kept in the registry.
         asf.lmw_b = bocage
         if not bocage then return no_parse(asf) end
 
-        local ambiguity_level = lmw_b:ambiguity_metric()
+        local lmw_o = _M.order_new(bocage)
+        asf.lmw_o = lmw_o
+
+        local ranking_method = slg.ranking_method
+        if ranking_method == 'high_rule_only' then
+            lmw_o:high_rank_only_set(1)
+            lmw_o:rank()
+        end
+        if ranking_method == 'rule' then
+            lmw_o:high_rank_only_set(0)
+            lmw_o:rank()
+        end
+        local ambiguity_level = lmw_o:ambiguity_metric()
         if ambiguity_level > 2 then ambiguity_level = 2 end
         asf._ambiguity_level = ambiguity_level
 

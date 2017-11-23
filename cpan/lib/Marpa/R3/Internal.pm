@@ -47,10 +47,10 @@ use constant CAUSE_IS_EXPANDED => 6;
 use constant PREDECESSOR_IS_EXPANDED => 7;
 
 package Marpa::R3::Internal_ASF;
-use constant L => 0;
-use constant REGIX => 1;
-use constant SLR => 2;
-use constant SLV => 3;
+use constant TRACE_FILE_HANDLE => 0;
+use constant L => 1;
+use constant REGIX => 2;
+use constant SLR => 3;
 use constant END_OF_PARSE => 4;
 use constant FACTORING_MAX => 5;
 use constant OR_NODES => 6;

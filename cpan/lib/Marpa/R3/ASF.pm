@@ -30,6 +30,12 @@ $VERSION = eval $VERSION;
 
 package Marpa::R3::Internal_ASF;
 
+use Scalar::Util qw(blessed tainted);
+use English qw( -no_match_vars );
+
+our $PACKAGE = 'Marpa::R3::ASF';
+
+# Set those common args which are at the Perl level.
 # This is more complicated that it needs to be for the current implementation.
 # It allows for LHS terminals (implemented in Libmarpa but not allowed by the SLIF).
 # It also assumes that every or-node which can be constructed from preceding or-nodes
@@ -174,15 +180,14 @@ sub set_last_choice {
     my $choice     = $nook->[Marpa::R3::Internal::Nook::FIRST_CHOICE];
     return if $choice > $#{$and_nodes};
     if ( nook_has_semantic_cause( $asf, $nook ) ) {
-        my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
         my $slr       = $asf->[Marpa::R3::Internal_ASF::SLR];
         my $slg = $slr->[Marpa::R3::Internal_R::SLG];
         my $and_node_id = $and_nodes->[$choice];
-        my ($current_predecessor) = $slv->call_by_tag(
+        my ($current_predecessor) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            local slv, id = ...
-            local current = slv.lmw_b:_and_node_predecessor(id)
+            local asf, id = ...
+            local current = asf.lmw_b:_and_node_predecessor(id)
             return current and current or -1
 END_OF_LUA
             'i', $and_node_id);
@@ -190,11 +195,11 @@ END_OF_LUA
             $choice++;
             $and_node_id = $and_nodes->[$choice];
             last AND_NODE if not defined $and_node_id;
-            my ($next_predecessor) = $slv->call_by_tag(
+            my ($next_predecessor) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
             <<'END_OF_LUA',
-                local slv, id = ...
-                local next = slv.lmw_b:_and_node_predecessor(id)
+                local asf, id = ...
+                local next = asf.lmw_b:_and_node_predecessor(id)
                 return next and next or -1
 END_OF_LUA
                 'i', ($and_node_id // -1));
@@ -228,15 +233,14 @@ sub nook_increment {
 sub nook_has_semantic_cause {
     my ( $asf, $nook ) = @_;
     my $or_node   = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
-    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
-    my ($result) = $slv->call_by_tag(
+    my ($result) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $or_node);
-    local slv, or_node = ...
-    local slr = slv.slr
-    local irl_id = slv.lmw_b:_or_node_nrl(or_node)
-    local predot_position = slv.lmw_b:_or_node_position(or_node) - 1
+    local asf, or_node = ...
+    local slr = asf.slr
+    local irl_id = asf.lmw_b:_or_node_nrl(or_node)
+    local predot_position = asf.lmw_b:_or_node_position(or_node) - 1
     local predot_isyid = slr.slg.g1:_nrl_rhs(irl_id, predot_position)
     return slr.slg.g1:_nsy_is_semantic(predot_isyid)
 END_OF_LUA
@@ -248,13 +252,12 @@ END_OF_LUA
 sub Marpa::R3::ASF::peak {
     my ($asf)    = @_;
     my $or_nodes = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
-    my $slv      = $asf->[Marpa::R3::Internal_ASF::SLV];
 
-    my ($augment_or_node_id) = $slv->call_by_tag(
+    my ($augment_or_node_id) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
-        local slv = ...
-        local bocage = slv.lmw_b
+        local asf = ...
+        local bocage = asf.lmw_b
         if not bocage then error('No Bocage') end
         return bocage:_top_or_node()
 END_OF_LUA
@@ -262,9 +265,9 @@ END_OF_LUA
     # TODO: Why does Lua think this was a string?
     my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
     my ($start_or_node_id)
-        = $slv->call_by_tag(
+        = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            'local slv, id = ...; return slv.lmw_b:_and_node_cause(id)',
+            'local asf, id = ...; return asf.lmw_b:_and_node_cause(id)',
             'i',
             $augment_and_node_id
             );
@@ -285,84 +288,118 @@ our $NID_LEAF_BASE = -43;
 sub and_node_to_nid { return -$_[0] + $NID_LEAF_BASE; }
 sub nid_to_and_node { return -$_[0] + $NID_LEAF_BASE; }
 
+# Set those common args which are at the Perl level.
+sub asf_common_set {
+    my ( $asf, $flat_args ) = @_;
+    if ( my $value = $flat_args->{'trace_file_handle'} ) {
+        $asf->[Marpa::R3::Internal_ASF::TRACE_FILE_HANDLE] = $value;
+    }
+    my $trace_file_handle =
+      $asf->[Marpa::R3::Internal_ASF::TRACE_FILE_HANDLE];
+    delete $flat_args->{'trace_file_handle'};
+    return $flat_args;
+}
+
 # Returns undef if no parse
 sub Marpa::R3::ASF::new {
-    my ( $class, @arg_hashes ) = @_;
+    my ( $class, @args ) = @_;
     my $asf = bless [], $class;
 
-    my $slr;
     my $end_of_parse;
 
-    for my $arg_hash (@arg_hashes) {
-        ARG: for my $arg ( keys %{$arg_hash} ) {
-            if ( $arg eq 'recognizer' ) {
-                $asf->[Marpa::R3::Internal_ASF::SLR] = $slr =
-                    $arg_hash->{$arg};
-                next ARG;
-            }
+    my ( $flat_args, $error_message ) = Marpa::R3::flatten_hash_args( \@args );
+    Marpa::R3::exception( sprintf $error_message, '$asf->new' )
+      if not $flat_args;
+    $flat_args = asf_common_set( $asf, $flat_args );
+
+    my $slr = $flat_args->{recognizer};
+    Marpa::R3::exception(
+        qq{Marpa::R3::ASF::new() called without a "recognizer" argument} )
+      if not defined $slr;
+    $asf->[Marpa::R3::Internal_ASF::SLR] = $slr;
+    delete $flat_args->{recognizer};
+
+    my $slr_class = 'Marpa::R3::Recognizer';
+    if ( not blessed $slr or not $slr->isa($slr_class) ) {
+        my $ref_type = ref $slr;
+        my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
+        Marpa::R3::exception(
+            qq{'recognizer' named argument to new() is $desc\n},
+            "  It should be a ref to $slr_class\n"
+        );
+    }
+
+    $asf->[Marpa::R3::Internal_ASF::TRACE_FILE_HANDLE] //=
+      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
+
+    my $trace_file_handle =
+      $asf->[Marpa::R3::Internal_ASF::TRACE_FILE_HANDLE];
+
+    my $lua = $slr->[Marpa::R3::Internal_R::L];
+    $asf->[Marpa::R3::Internal_ASF::L] = $lua;
+
+        ARG: for my $arg ( keys %{$flat_args} ) {
             if ( $arg eq 'factoring_max' ) {
                 $asf->[Marpa::R3::Internal_ASF::FACTORING_MAX] =
-                    $arg_hash->{$arg};
+                    $flat_args->{$arg};
+                delete $flat_args->{$arg};
                 next ARG;
             }
-            if ( $arg eq 'end' ) {
-                $end_of_parse = $arg_hash->{$arg};
-                next ARG;
-            }
-            Marpa::R3::exception(
-                qq{Unknown named arg to $asf->new(): "$arg"});
-        } ## end ARG: for my $arg ( keys %{$arg_hash} )
-    } ## end for my $arg_hash (@arg_hashes)
+        }
 
-    Marpa::R3::exception(
-        q{The "recognizer" named argument must be specified with the Marpa::R3::ASF::new method}
-    ) if not defined $slr;
-    $asf->[Marpa::R3::Internal_ASF::SLR] = $slr;
+    my ( $regix ) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+            signature => 's',
+            args      => [$flat_args],
+            handlers  => {
+                trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+                },
+            }
+        },
+        <<'END_OF_LUA');
+        local slr, flat_args = ...
+        _M.wrap(function ()
+            local asf = slr:asf_new(flat_args)
+            if not asf then return 'ok', -1 end
+            local order = asf.lmw_o
+            if not order then
+                error( 'Parse failed' )
+            end
+            if order:is_null() == 1 then
+                error([[
+        An attempt was make to create an ASF for a null parse\n\a
+        \u{20}  A null parse is a successful parse of a zero-length string\n\z
+        \u{20}  ASF's are not defined for null parses\n\z
+        ]])
+            end
+            return 'ok', asf.regix
+        end)
+END_OF_LUA
+
+    return if $regix < 0;
+    $asf->[Marpa::R3::Internal_ASF::REGIX]  = $regix;
+
     $asf->[Marpa::R3::Internal_ASF::FACTORING_MAX] //= 42;
-
-    my $slg       = $slr->[Marpa::R3::Internal_R::SLG];
-
-    my %v_args = (recognizer => $slr);
-    $v_args{end} = $end_of_parse if $end_of_parse;
-    my $slv = Marpa::R3::Valuer->new(\%v_args);
-    Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
-    $asf->[Marpa::R3::Internal_ASF::SLV] = $slv;
-
     $asf->[Marpa::R3::Internal_ASF::NEXT_INTSET_ID] = 0;
     $asf->[Marpa::R3::Internal_ASF::INTSET_BY_KEY]  = {};
-
     $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID]   = [];
     $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID] = [];
-
     $asf->[Marpa::R3::Internal_ASF::GLADES] = [];
-
-    my ($is_null) = $slv->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END_OF_LUA', '>*' ) ;
-    local slv = ...
-    local order = slv.lmw_o
-    if not order then
-        error( 'Parse failed' )
-    end
-    if order:is_null() == 1 then
-        error([[
-An attempt was make to create an ASF for a null parse
-  A null parse is a successful parse of a zero-length string
-  ASF's are not defined for null parses
-]])
-    end
-END_OF_LUA
 
     my $or_nodes = $asf->[Marpa::R3::Internal_ASF::OR_NODES] = [];
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
 
-        my ($and_node_ids) = $slv->call_by_tag(
+        my ($and_node_ids) = $asf->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i>*', $or_node_id );
         -- assumes throw mode
-        local slv, or_node_id = ...
+        local asf, or_node_id = ...
         local and_node_ids = {}
-        local order = slv.lmw_o
+        local order = asf.lmw_o
         local count = order:_or_node_and_node_count(or_node_id)
         if not count then return and_node_ids end
         for ix = 1, count do
@@ -389,6 +426,31 @@ END_OF_LUA
 
 } ## end sub Marpa::R3::ASF::new
 
+sub Marpa::R3::ASF::DESTROY {
+    # say STDERR "In Marpa::R3::ASF::DESTROY before test";
+    my $asf = shift;
+    my $lua = $asf->[Marpa::R3::Internal_ASF::L];
+
+    # If we are destroying the Perl interpreter, then all the Marpa
+    # objects will be destroyed, including Marpa's Lua interpreter.
+    # We do not need to worry about cleaning up the
+    # recognizer is an orderly manner, because the Lua interpreter
+    # containing the recognizer will be destroyed.
+    # In fact, the Lua interpreter may already have been destroyed,
+    # so this test is necessary to avoid a warning message.
+    return if not $lua;
+    # say STDERR "In Marpa::R3::ASF::DESTROY after test";
+
+    my $regix = $asf->[Marpa::R3::Internal_ASF::REGIX];
+    $asf->call_by_tag(
+        ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', '');
+    local asf = ...
+    local regix = asf.regix
+    _M.unregister(_M.registry, regix)
+END_OF_LUA
+}
+
 sub Marpa::R3::ASF::glade_is_visited {
     my ( $asf, $glade_id ) = @_;
     my $glade = $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id];
@@ -409,16 +471,15 @@ sub Marpa::R3::ASF::glade_visited_clear {
 
 sub nid_sort_ix {
     my ( $asf, $nid ) = @_;
-    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
     my $slr       = $asf->[Marpa::R3::Internal_ASF::SLR];
 
     if ( $nid >= 0 ) {
-        my ($result) = $slv->call_by_tag(
+        my ($result) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $nid);
-        local slv, nid = ...
-        local slr = slv.slr
-        local irl_id = slv.lmw_b:_or_node_nrl(nid)
+        local asf, nid = ...
+        local slr = asf.slr
+        local irl_id = asf.lmw_b:_or_node_nrl(nid)
         return slr.slg.g1:_source_xrl(irl_id)
 END_OF_LUA
         return $result;
@@ -426,12 +487,12 @@ END_OF_LUA
 
     my $and_node_id  = nid_to_and_node($nid);
 
-    my ($result) = $slv->call_by_tag(
+    my ($result) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $and_node_id);
-    local slv, and_node_id = ...
-    local slr = slv.slr
-    local token_nsy_id = slv.lmw_b:_and_node_symbol(and_node_id)
+    local asf, and_node_id = ...
+    local slr = asf.slr
+    local token_nsy_id = asf.lmw_b:_and_node_symbol(and_node_id)
     local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
     -- -2 is reserved for 'end of data'
     return -token_id - 3
@@ -456,14 +517,13 @@ sub Marpa::R3::ASF::recognizer {
 sub nid_rule_id {
     my ( $asf, $nid ) = @_;
     return if $nid < 0;
-    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
-    my ($xrl_id) = $slv->call_by_tag(
+    my ($xrl_id) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $nid);
-    local slv, nid = ...
-    local slr = slv.slr
-    local irl_id = slv.lmw_b:_or_node_nrl(nid)
+    local asf, nid = ...
+    local slr = asf.slr
+    local irl_id = asf.lmw_b:_or_node_nrl(nid)
     local xrl_id = slr.slg.g1:_source_xrl(irl_id)
     return xrl_id
 END_OF_LUA
@@ -472,15 +532,14 @@ END_OF_LUA
 
 sub or_node_es_span {
     my ( $asf, $choicepoint ) = @_;
-    my $slv        = $asf->[Marpa::R3::Internal_ASF::SLV];
 
-    my ($origin_es, $current_es) = $slv->call_by_tag(
+    my ($origin_es, $current_es) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $choicepoint);
-    local slv, choicepoint = ...
-    local slr = slv.slr
-    local origin_es = slv.lmw_b:_or_node_origin(choicepoint)
-    local current_es = slv.lmw_b:_or_node_set(choicepoint)
+    local asf, choicepoint = ...
+    local slr = asf.slr
+    local origin_es = asf.lmw_b:_or_node_origin(choicepoint)
+    local current_es = asf.lmw_b:_or_node_set(choicepoint)
     return origin_es, current_es
 END_OF_LUA
 
@@ -489,14 +548,13 @@ END_OF_LUA
 
 sub token_es_span {
     my ( $asf, $and_node_id ) = @_;
-    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
-    my ($predecessor_id, $parent_or_node_id) = $slv->call_by_tag(
+    my ($predecessor_id, $parent_or_node_id) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        local slv, and_node_id = ...
-        local slr = slv.slr
-        local b = slv.lmw_b
+        local asf, and_node_id = ...
+        local slr = asf.slr
+        local b = asf.lmw_b
         return
             b:_and_node_predecessor(and_node_id),
             b:_and_node_parent(and_node_id)
@@ -505,12 +563,12 @@ END_OF_LUA
 
     if ( defined $predecessor_id ) {
 
-        my ($origin_es, $current_es) = $slv->call_by_tag(
+        my ($origin_es, $current_es) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA',
-            local slv, predecessor_id, parent_or_node_id = ...
-            local slr = slv.slr
-            local b = slv.lmw_b
+            local asf, predecessor_id, parent_or_node_id = ...
+            local slr = asf.slr
+            local b = asf.lmw_b
             return
                 b:_or_node_set(predecessor_id),
                 b:_or_node_set(parent_or_node_id)
@@ -557,14 +615,13 @@ sub nid_token_id {
     my ( $asf, $nid ) = @_;
     return if $nid > $NID_LEAF_BASE;
     my $and_node_id  = nid_to_and_node($nid);
-    my $slv          = $asf->[Marpa::R3::Internal_ASF::SLV];
 
-    my ($token_id) = $slv->call_by_tag(
+    my ($token_id) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        local slv, and_node_id = ...
-        local slr = slv.slr
-        local token_nsy_id = slv.lmw_b:_and_node_symbol(and_node_id)
+        local asf, and_node_id = ...
+        local slr = asf.slr
+        local token_nsy_id = asf.lmw_b:_and_node_symbol(and_node_id)
         local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
         return token_id
 END_OF_LUA
@@ -580,13 +637,12 @@ sub nid_symbol_id {
     Marpa::R3::exception("No symbol ID for node ID: $nid") if $nid < 0;
 
     # Not a token, so return the LHS of the rule
-    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
-    my ($lhs_id) = $slv->call_by_tag(
+    my ($lhs_id) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
-        local slv, nid = ...
-        local slr = slv.slr
-        local irl_id = slv.lmw_b:_or_node_nrl(nid)
+        local asf, nid = ...
+        local slr = asf.slr
+        local irl_id = asf.lmw_b:_or_node_nrl(nid)
         local g1g = slr.slg.g1
         local xrl_id = g1g:_source_xrl(irl_id)
         local lhs_id = g1g:rule_lhs(xrl_id)
@@ -724,8 +780,6 @@ sub factoring_finish {
     my $nidset_by_id   = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     my $powerset_by_id = $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID];
 
-    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
-
     my @worklist = ( 0 .. $#{$factoring_stack} );
 
     DO_WORKLIST: while ( scalar @worklist ) {
@@ -743,9 +797,9 @@ sub factoring_finish {
             if ( !$work_nook->[Marpa::R3::Internal::Nook::CAUSE_IS_EXPANDED] )
             {
                 if ( not nook_has_semantic_cause( $asf, $work_nook ) ) {
-                    ($child_or_node) = $slv->call_by_tag(
+                    ($child_or_node) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                        'local slv, work_and_node_id = ...; return slv.lmw_b:_and_node_cause(work_and_node_id)',
+                        'local asf, work_and_node_id = ...; return asf.lmw_b:_and_node_cause(work_and_node_id)',
                         'i',
                         $work_and_node_id);
                     $child_is_cause = 1;
@@ -756,9 +810,9 @@ sub factoring_finish {
             if ( !$work_nook
                 ->[Marpa::R3::Internal::Nook::PREDECESSOR_IS_EXPANDED] )
             {
-                ($child_or_node) = $slv->call_by_tag(
+                ($child_or_node) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-                    'local slv, work_and_node_id = ...; return slv.lmw_b:_and_node_predecessor(work_and_node_id)',
+                    'local asf, work_and_node_id = ...; return asf.lmw_b:_and_node_predecessor(work_and_node_id)',
                     'i',
                     $work_and_node_id);
                 if ( defined $child_or_node ) {
@@ -802,12 +856,11 @@ sub factoring_finish {
 
 sub and_nodes_to_cause_nids {
     my ( $asf, @and_node_ids ) = @_;
-    my $slv    = $asf->[Marpa::R3::Internal_ASF::SLV];
     my %causes = ();
     for my $and_node_id (@and_node_ids) {
-        my ($cause_nid) = $slv->call_by_tag(
+        my ($cause_nid) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
-            'local slv, and_node_id = ...; return slv.lmw_b:_and_node_cause(and_node_id)',
+            'local asf, and_node_id = ...; return asf.lmw_b:_and_node_cause(and_node_id)',
             'i',
             $and_node_id);
         $cause_nid //= and_node_to_nid($and_node_id);
@@ -1744,7 +1797,6 @@ sub Marpa::R3::ASF::show_powersets {
 
 sub dump_nook {
     my ( $asf, $nook ) = @_;
-    my $slv        = $asf->[Marpa::R3::Internal_ASF::SLV];
     my $or_nodes   = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
     my $or_node_id = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
     my $and_node_count = scalar @{ $or_nodes->[$or_node_id] };
@@ -1765,7 +1817,7 @@ sub dump_nook {
         . $nook->[Marpa::R3::Internal::Nook::FIRST_CHOICE] . q{-}
         . $nook->[Marpa::R3::Internal::Nook::LAST_CHOICE]
         . qq{ of $and_node_count: };
-    $text .= $slv->verbose_or_node($or_node_id);
+    $text .= $asf->verbose_or_node($or_node_id);
     return $text;
 } ## end sub dump_nook
 
