@@ -1781,6 +1781,212 @@ sub dump_factoring_stack {
     return $text . "\n";
 } ## end sub dump_factoring_stack
 
+# not to be documented
+sub Marpa::R3::ASF::call_by_tag {
+    my ( $asf, $tag, $codestr, $signature, @args ) = @_;
+    my $lua   = $asf->[Marpa::R3::Internal_ASF::L];
+    my $regix = $asf->[Marpa::R3::Internal_ASF::REGIX];
+
+    my @results;
+    my $eval_error;
+    my $eval_ok;
+    {
+        local $@;
+        $eval_ok = eval {
+            @results =
+              $lua->call_by_tag( $regix, $tag, $codestr, $signature, @args );
+            return 1;
+        };
+        $eval_error = $@;
+    }
+    if ( not $eval_ok ) {
+        Marpa::R3::exception($eval_error);
+    }
+    return @results;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::coro_by_tag {
+    my ( $asf, $tag, $args, $codestr ) = @_;
+    my $lua        = $asf->[Marpa::R3::Internal_ASF::L];
+    my $regix      = $asf->[Marpa::R3::Internal_ASF::REGIX];
+    my $handler    = $args->{handlers} // {};
+    my $resume_tag = $tag . '[R]';
+    my $signature  = $args->{signature} // '';
+    my $p_args     = $args->{args} // [];
+
+    my @results;
+    my $eval_error;
+    my $eval_ok;
+    {
+        local $@;
+        $eval_ok = eval {
+            $lua->call_by_tag( $regix, $tag, $codestr, $signature, @{$p_args} );
+            my @resume_args = ('');
+            my $signature = 's';
+          CORO_CALL: while (1) {
+                my ( $cmd, $yield_data ) =
+                  $lua->call_by_tag( $regix, $resume_tag,
+                    'local asf, resume_arg = ...; return _M.resume(resume_arg)',
+                    $signature, @resume_args ) ;
+                if (not $cmd) {
+                   @results = @{$yield_data};
+                   return 1;
+                }
+                my $handler = $handler->{$cmd};
+                Marpa::R3::exception(qq{No coro handler for "$cmd"})
+                  if not $handler;
+                $yield_data //= [];
+                my ($handler_cmd, $new_resume_args) = $handler->(@{$yield_data});
+                Marpa::R3::exception(qq{Undefined return command from handler for "$cmd"})
+                   if not defined $handler_cmd;
+                if ($handler_cmd eq 'ok') {
+                   $signature = 's';
+                   @resume_args = ($new_resume_args);
+                   if (scalar @resume_args < 1) {
+                       @resume_args = ('');
+                   }
+                   next CORO_CALL;
+                }
+                if ($handler_cmd eq 'sig') {
+                   @resume_args = @{$new_resume_args};
+                   $signature = shift @resume_args;
+                   next CORO_CALL;
+                }
+                Marpa::R3::exception(qq{Bad return command ("$handler_cmd") from handler for "$cmd"})
+            }
+            return 1;
+        };
+        $eval_error = $@;
+    }
+    if ( not $eval_ok ) {
+        # if it's an object, just die
+        die $eval_error if ref $eval_error;
+        Marpa::R3::exception($eval_error);
+    }
+    return @results;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::and_node_tag {
+    my ( $asf, $and_node_id ) = @_;
+
+    my ($tag) = $asf->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        << 'END_OF_LUA', 'i', $and_node_id );
+    local asf, and_node_id=...
+    return asf:and_node_tag(and_node_id)
+END_OF_LUA
+
+    return $tag;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::verbose_or_node {
+    my ( $asf, $or_node_id ) = @_;
+    my $slr = $asf->[Marpa::R3::Internal_ASF::SLR];
+    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
+
+    my ($text, $nrl_id, $position)
+        = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', 'i', $or_node_id);
+        local asf, or_node_id = ...
+        local slr = asf.slr
+        local bocage = asf.lmw_b
+        local origin = bocage:_or_node_origin(or_node_id)
+        if not origin then return end
+        local set = bocage:_or_node_set(or_node_id)
+        local position = bocage:_or_node_position(or_node_id)
+        local g1r = slr.g1
+        local origin_earleme = g1r:earleme(origin)
+        local current_earleme = g1r:earleme(set)
+        local text = string.format(
+            'OR-node #%d: R%d:@%d-%d\n',
+            or_node_id,
+            position,
+            origin_earleme,
+            current_earleme,
+            )
+
+END_OF_LUA
+    return if not $text;
+
+    $text .= ( q{ } x 4 )
+        . $slg->dotted_nrl_show( $nrl_id, $position ) . "\n";
+    return $text;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::bocage_show {
+    my ($asf)     = @_;
+
+    my ($result) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', '');
+        local asf = ...
+        return asf:bocage_show()
+END_OF_LUA
+
+    return $result;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::or_nodes_show {
+    my ( $asf ) = @_;
+
+    my ($result) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local asf = ...
+    return asf:or_nodes_show()
+END_OF_LUA
+
+    return $result;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::and_nodes_show {
+    my ( $asf ) = @_;
+    my ($result) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END_OF_LUA', '');
+    local asf = ...
+    return asf:and_nodes_show()
+END_OF_LUA
+
+    return $result;
+}
+
+sub Marpa::R3::ASF::ambiguity_level {
+    my ($asf) = @_;
+
+    my ($metric) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local asf = ...
+    return asf:ambiguity_level()
+END__OF_LUA
+    return $metric;
+}
+
+sub Marpa::R3::ASF::g1_pos {
+    my ( $asf ) = @_;
+    my ($g1_pos) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local asf = ...
+    return asf:g1_pos()
+END__OF_LUA
+    return $g1_pos;
+}
+
+# not to be documented
+sub Marpa::R3::ASF::regix {
+    my ( $asf ) = @_;
+    my $regix = $asf->[Marpa::R3::Internal_ASF::REGIX];
+    return $regix;
+}
+
 1;
 
 # vim: expandtab shiftwidth=4:

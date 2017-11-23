@@ -47,16 +47,18 @@ use constant CAUSE_IS_EXPANDED => 6;
 use constant PREDECESSOR_IS_EXPANDED => 7;
 
 package Marpa::R3::Internal_ASF;
-use constant SLR => 0;
-use constant SLV => 1;
-use constant END_OF_PARSE => 2;
-use constant FACTORING_MAX => 3;
-use constant OR_NODES => 4;
-use constant GLADES => 5;
-use constant INTSET_BY_KEY => 6;
-use constant NEXT_INTSET_ID => 7;
-use constant NIDSET_BY_ID => 8;
-use constant POWERSET_BY_ID => 9;
+use constant L => 0;
+use constant REGIX => 1;
+use constant SLR => 2;
+use constant SLV => 3;
+use constant END_OF_PARSE => 4;
+use constant FACTORING_MAX => 5;
+use constant OR_NODES => 6;
+use constant GLADES => 7;
+use constant INTSET_BY_KEY => 8;
+use constant NEXT_INTSET_ID => 9;
+use constant NIDSET_BY_ID => 10;
+use constant POWERSET_BY_ID => 11;
 
 package Marpa::R3::Internal_ASF::Traverse;
 use constant ASF => 0;

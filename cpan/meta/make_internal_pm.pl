@@ -130,6 +130,10 @@ __DATA__
       indirect in this structure.  The resulting circular reference would prevent
       both structures from being freed, and create a memory leak. }
 
+    L { Lua Interpreter }
+    REGIX { Registry index in Lua interpreter --
+        a valid Lua index but not a pseudo-index. }
+
     SLR { The underlying SLR }
     SLV { The underlying SLV }
     END_OF_PARSE
