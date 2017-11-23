@@ -124,7 +124,7 @@ __DATA__
     CAUSE_IS_EXPANDED
     PREDECESSOR_IS_EXPANDED
 
-    :package=Marpa::R3::Internal::ASF
+    :package=Marpa::R3::Internal_ASF
 
     { It is important not to keep any references to choicepoints, direct or
       indirect in this structure.  The resulting circular reference would prevent
@@ -151,7 +151,7 @@ __DATA__
     NIDSET_BY_ID
     POWERSET_BY_ID
 
-    :package=Marpa::R3::Internal::ASF::Traverse
+    :package=Marpa::R3::Internal_ASF::Traverse
 
     ASF
     VALUES { Memoized values, by glade ID }

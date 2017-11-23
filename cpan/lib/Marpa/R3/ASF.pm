@@ -28,7 +28,7 @@ $VERSION = eval $VERSION;
 # It is intended to create documented Libmarpa methods to underlie
 # this interface, and rewrite it to use them
 
-package Marpa::R3::Internal::ASF;
+package Marpa::R3::Internal_ASF;
 
 # This is more complicated that it needs to be for the current implementation.
 # It allows for LHS terminals (implemented in Libmarpa but not allowed by the SLIF).
@@ -65,10 +65,10 @@ package Marpa::R3::Internal::ASF;
 sub intset_id {
     my ( $asf, @ids ) = @_;
     my $key           = join q{ }, sort { $a <=> $b } @ids;
-    my $intset_by_key = $asf->[Marpa::R3::Internal::ASF::INTSET_BY_KEY];
+    my $intset_by_key = $asf->[Marpa::R3::Internal_ASF::INTSET_BY_KEY];
     my $intset_id     = $intset_by_key->{$key};
     return $intset_id if defined $intset_id;
-    $intset_id = $asf->[Marpa::R3::Internal::ASF::NEXT_INTSET_ID]++;
+    $intset_id = $asf->[Marpa::R3::Internal_ASF::NEXT_INTSET_ID]++;
     $intset_by_key->{$key} = $intset_id;
     return $intset_id;
 } ## end sub intset_id
@@ -76,7 +76,7 @@ sub intset_id {
 sub Marpa::R3::Nidset::obtain {
     my ( $class, $asf, @nids ) = @_;
     my $id           = intset_id( $asf, @nids );
-    my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
+    my $nidset_by_id = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     my $nidset       = $nidset_by_id->[$id];
     return $nidset if defined $nidset;
     $nidset = bless [], $class;
@@ -117,7 +117,7 @@ sub Marpa::R3::Nidset::show {
 sub Marpa::R3::Powerset::obtain {
     my ( $class, $asf, @nidset_ids ) = @_;
     my $id             = intset_id( $asf, @nidset_ids );
-    my $powerset_by_id = $asf->[Marpa::R3::Internal::ASF::POWERSET_BY_ID];
+    my $powerset_by_id = $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID];
     my $powerset       = $powerset_by_id->[$id];
     return $powerset if defined $powerset;
     $powerset = bless [], $class;
@@ -150,7 +150,7 @@ sub Marpa::R3::Powerset::nidset {
     my $nidset_ids = $powerset->[Marpa::R3::Internal::Powerset::NIDSET_IDS];
     return if $ix > $#{$nidset_ids};
     my $nidset_id = $powerset->[Marpa::R3::Internal::Powerset::NIDSET_IDS]->[$ix];
-    my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
+    my $nidset_by_id = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     return $nidset_by_id->[$nidset_id];
 } ## end sub Marpa::R3::Powerset::nidset_id
 
@@ -168,14 +168,14 @@ sub Marpa::R3::Powerset::show {
 
 sub set_last_choice {
     my ( $asf, $nook ) = @_;
-    my $or_nodes   = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
+    my $or_nodes   = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
     my $or_node_id = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
     my $and_nodes  = $or_nodes->[$or_node_id];
     my $choice     = $nook->[Marpa::R3::Internal::Nook::FIRST_CHOICE];
     return if $choice > $#{$and_nodes};
     if ( nook_has_semantic_cause( $asf, $nook ) ) {
-        my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
-        my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
+        my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
+        my $slr       = $asf->[Marpa::R3::Internal_ASF::SLR];
         my $slg = $slr->[Marpa::R3::Internal_R::SLG];
         my $and_node_id = $and_nodes->[$choice];
         my ($current_predecessor) = $slv->call_by_tag(
@@ -228,7 +228,7 @@ sub nook_increment {
 sub nook_has_semantic_cause {
     my ( $asf, $nook ) = @_;
     my $or_node   = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
-    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my ($result) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -247,8 +247,8 @@ END_OF_LUA
 # at this point
 sub Marpa::R3::ASF::peak {
     my ($asf)    = @_;
-    my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
-    my $slv      = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $or_nodes = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
+    my $slv      = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my ($augment_or_node_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -273,7 +273,7 @@ END_OF_LUA
     my $glade_id = $base_nidset->id();
 
     # Cannot "obtain" the glade if it is not registered
-    $asf->[Marpa::R3::Internal::ASF::GLADES]->[$glade_id]
+    $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id]
         ->[Marpa::R3::Internal::Glade::REGISTERED] = 1;
     glade_obtain( $asf, $glade_id );
     return $glade_id;
@@ -296,12 +296,12 @@ sub Marpa::R3::ASF::new {
     for my $arg_hash (@arg_hashes) {
         ARG: for my $arg ( keys %{$arg_hash} ) {
             if ( $arg eq 'recognizer' ) {
-                $asf->[Marpa::R3::Internal::ASF::SLR] = $slr =
+                $asf->[Marpa::R3::Internal_ASF::SLR] = $slr =
                     $arg_hash->{$arg};
                 next ARG;
             }
             if ( $arg eq 'factoring_max' ) {
-                $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] =
+                $asf->[Marpa::R3::Internal_ASF::FACTORING_MAX] =
                     $arg_hash->{$arg};
                 next ARG;
             }
@@ -317,8 +317,8 @@ sub Marpa::R3::ASF::new {
     Marpa::R3::exception(
         q{The "recognizer" named argument must be specified with the Marpa::R3::ASF::new method}
     ) if not defined $slr;
-    $asf->[Marpa::R3::Internal::ASF::SLR] = $slr;
-    $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX] //= 42;
+    $asf->[Marpa::R3::Internal_ASF::SLR] = $slr;
+    $asf->[Marpa::R3::Internal_ASF::FACTORING_MAX] //= 42;
 
     my $slg       = $slr->[Marpa::R3::Internal_R::SLG];
 
@@ -326,15 +326,15 @@ sub Marpa::R3::ASF::new {
     $v_args{end} = $end_of_parse if $end_of_parse;
     my $slv = Marpa::R3::Valuer->new(\%v_args);
     Marpa::R3::exception( q{No parse in $asf->new()}) if not $slv;
-    $asf->[Marpa::R3::Internal::ASF::SLV] = $slv;
+    $asf->[Marpa::R3::Internal_ASF::SLV] = $slv;
 
-    $asf->[Marpa::R3::Internal::ASF::NEXT_INTSET_ID] = 0;
-    $asf->[Marpa::R3::Internal::ASF::INTSET_BY_KEY]  = {};
+    $asf->[Marpa::R3::Internal_ASF::NEXT_INTSET_ID] = 0;
+    $asf->[Marpa::R3::Internal_ASF::INTSET_BY_KEY]  = {};
 
-    $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID]   = [];
-    $asf->[Marpa::R3::Internal::ASF::POWERSET_BY_ID] = [];
+    $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID]   = [];
+    $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID] = [];
 
-    $asf->[Marpa::R3::Internal::ASF::GLADES] = [];
+    $asf->[Marpa::R3::Internal_ASF::GLADES] = [];
 
     my ($is_null) = $slv->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -353,7 +353,7 @@ An attempt was make to create an ASF for a null parse
     end
 END_OF_LUA
 
-    my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES] = [];
+    my $or_nodes = $asf->[Marpa::R3::Internal_ASF::OR_NODES] = [];
     OR_NODE: for ( my $or_node_id = 0;; $or_node_id++ ) {
 
         my ($and_node_ids) = $slv->call_by_tag(
@@ -391,7 +391,7 @@ END_OF_LUA
 
 sub Marpa::R3::ASF::glade_is_visited {
     my ( $asf, $glade_id ) = @_;
-    my $glade = $asf->[Marpa::R3::Internal::ASF::GLADES]->[$glade_id];
+    my $glade = $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id];
     return if not $glade;
     return $glade->[Marpa::R3::Internal::Glade::VISITED];
 } ## end sub Marpa::R3::ASF::glade_is_visited
@@ -400,8 +400,8 @@ sub Marpa::R3::ASF::glade_visited_clear {
     my ( $asf, $glade_id ) = @_;
     my $glade_list =
         defined $glade_id
-        ? [ $asf->[Marpa::R3::Internal::ASF::GLADES]->[$glade_id] ]
-        : $asf->[Marpa::R3::Internal::ASF::GLADES];
+        ? [ $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id] ]
+        : $asf->[Marpa::R3::Internal_ASF::GLADES];
     $_->[Marpa::R3::Internal::Glade::VISITED] = undef
         for grep {defined} @{$glade_list};
     return;
@@ -409,8 +409,8 @@ sub Marpa::R3::ASF::glade_visited_clear {
 
 sub nid_sort_ix {
     my ( $asf, $nid ) = @_;
-    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
+    my $slr       = $asf->[Marpa::R3::Internal_ASF::SLR];
 
     if ( $nid >= 0 ) {
         my ($result) = $slv->call_by_tag(
@@ -441,7 +441,7 @@ END_OF_LUA
 
 sub Marpa::R3::ASF::grammar {
     my ($asf)   = @_;
-    my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr     = $asf->[Marpa::R3::Internal_ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     return $slg;
 } ## end sub Marpa::R3::ASF::grammar
@@ -449,14 +449,14 @@ sub Marpa::R3::ASF::grammar {
 # TODO -- Document this method
 sub Marpa::R3::ASF::recognizer {
     my ($asf)   = @_;
-    my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr     = $asf->[Marpa::R3::Internal_ASF::SLR];
     return $slr;
 }
 
 sub nid_rule_id {
     my ( $asf, $nid ) = @_;
     return if $nid < 0;
-    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my ($xrl_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -472,7 +472,7 @@ END_OF_LUA
 
 sub or_node_es_span {
     my ( $asf, $choicepoint ) = @_;
-    my $slv        = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv        = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my ($origin_es, $current_es) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -489,7 +489,7 @@ END_OF_LUA
 
 sub token_es_span {
     my ( $asf, $and_node_id ) = @_;
-    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my ($predecessor_id, $parent_or_node_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -525,7 +525,7 @@ END_OF_LUA
 
 sub nid_literal {
     my ( $asf, $nid ) = @_;
-    my $slr = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr = $asf->[Marpa::R3::Internal_ASF::SLR];
     if ( $nid <= $NID_LEAF_BASE ) {
         my $and_node_id = nid_to_and_node($nid);
         my ( $start, $length ) = token_es_span( $asf, $and_node_id );
@@ -540,7 +540,7 @@ sub nid_literal {
 
 sub nid_span {
     my ( $asf, $nid ) = @_;
-    my $slr = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr = $asf->[Marpa::R3::Internal_ASF::SLR];
     if ( $nid <= $NID_LEAF_BASE ) {
         my $and_node_id = nid_to_and_node($nid);
         my ( $start, $length ) = token_es_span( $asf, $and_node_id );
@@ -557,7 +557,7 @@ sub nid_token_id {
     my ( $asf, $nid ) = @_;
     return if $nid > $NID_LEAF_BASE;
     my $and_node_id  = nid_to_and_node($nid);
-    my $slv          = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv          = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my ($token_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
@@ -580,7 +580,7 @@ sub nid_symbol_id {
     Marpa::R3::exception("No symbol ID for node ID: $nid") if $nid < 0;
 
     # Not a token, so return the LHS of the rule
-    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
     my ($lhs_id) = $slv->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA',
@@ -599,7 +599,7 @@ END_OF_LUA
 
 sub nid_symbol_name {
     my ( $asf, $nid ) = @_;
-    my $slr       = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr       = $asf->[Marpa::R3::Internal_ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     my $symbol_id = nid_symbol_id($asf, $nid);
     return $slg->g1_symbol_name($symbol_id);
@@ -607,7 +607,7 @@ sub nid_symbol_name {
 
 sub nid_token_name {
     my ( $asf, $nid ) = @_;
-    my $slr      = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr      = $asf->[Marpa::R3::Internal_ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
     my $token_id = nid_token_id($asf, $nid);
     return if not defined $token_id;
@@ -640,7 +640,7 @@ sub first_factoring {
 
     # Due to skipping, even the top or-node can have no valid choices
     my $asf      = $choicepoint->[Marpa::R3::Internal::Choicepoint::ASF];
-    my $or_nodes = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
+    my $or_nodes = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
     if ( not scalar @{ $or_nodes->[$nid_of_choicepoint] } ) {
         $choicepoint->[Marpa::R3::Internal::Choicepoint::FACTORING_STACK] =
             undef;
@@ -717,14 +717,14 @@ sub factoring_iterate {
 sub factoring_finish {
     my ($choicepoint, $nid_of_choicepoint) = @_;
     my $asf           = $choicepoint->[Marpa::R3::Internal::Choicepoint::ASF];
-    my $or_nodes      = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
+    my $or_nodes      = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
     my $factoring_stack =
         $choicepoint->[Marpa::R3::Internal::Choicepoint::FACTORING_STACK];
 
-    my $nidset_by_id   = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
-    my $powerset_by_id = $asf->[Marpa::R3::Internal::ASF::POWERSET_BY_ID];
+    my $nidset_by_id   = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
+    my $powerset_by_id = $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID];
 
-    my $slv       = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv       = $asf->[Marpa::R3::Internal_ASF::SLV];
 
     my @worklist = ( 0 .. $#{$factoring_stack} );
 
@@ -802,7 +802,7 @@ sub factoring_finish {
 
 sub and_nodes_to_cause_nids {
     my ( $asf, @and_node_ids ) = @_;
-    my $slv    = $asf->[Marpa::R3::Internal::ASF::SLV];
+    my $slv    = $asf->[Marpa::R3::Internal_ASF::SLV];
     my %causes = ();
     for my $and_node_id (@and_node_ids) {
         my ($cause_nid) = $slv->call_by_tag(
@@ -819,9 +819,9 @@ sub and_nodes_to_cause_nids {
 sub glade_id_factors {
     my ($choicepoint) = @_;
     my $asf           = $choicepoint->[Marpa::R3::Internal::Choicepoint::ASF];
-    my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr           = $asf->[Marpa::R3::Internal_ASF::SLR];
     my $slg = $slr->[Marpa::R3::Internal_R::SLG];
-    my $or_nodes      = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
+    my $or_nodes      = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
 
     my @result;
     my $factoring_stack =
@@ -848,7 +848,7 @@ sub glade_id_factors {
         my $base_nidset = Marpa::R3::Nidset->obtain( $asf, @{$cause_nids} );
         my $glade_id = $base_nidset->id();
 
-        $asf->[Marpa::R3::Internal::ASF::GLADES]->[$glade_id]
+        $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id]
             ->[Marpa::R3::Internal::Glade::REGISTERED] = 1;
         push @result, $glade_id;
     } ## end FACTOR: for ( my $factor_ix = 0; $factor_ix <= $#{...})
@@ -858,9 +858,9 @@ sub glade_id_factors {
 sub glade_obtain {
     my ( $asf, $glade_id ) = @_;
 
-    my $factoring_max = $asf->[Marpa::R3::Internal::ASF::FACTORING_MAX];
+    my $factoring_max = $asf->[Marpa::R3::Internal_ASF::FACTORING_MAX];
 
-    my $glades = $asf->[Marpa::R3::Internal::ASF::GLADES];
+    my $glades = $asf->[Marpa::R3::Internal_ASF::GLADES];
     my $glade  = $glades->[$glade_id];
     if (   not defined $glade
         or not $glade->[Marpa::R3::Internal::Glade::REGISTERED] )
@@ -874,7 +874,7 @@ sub glade_obtain {
     return $glade if $glade->[Marpa::R3::Internal::Glade::SYMCHES];
 
     my $base_nidset =
-        $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID]->[$glade_id];
+        $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID]->[$glade_id];
     my $choicepoint;
     my $choicepoint_powerset;
     {
@@ -937,7 +937,7 @@ sub glade_obtain {
             my $base_nidset = Marpa::R3::Nidset->obtain( $asf, $choicepoint_nid );
             my $glade_id    = $base_nidset->id();
 
-            $asf->[Marpa::R3::Internal::ASF::GLADES]->[$glade_id]
+            $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id]
                 ->[Marpa::R3::Internal::Glade::REGISTERED] = 1;
             push @factorings, [$glade_id];
             push @symches, \@factorings;
@@ -979,7 +979,7 @@ sub glade_obtain {
     $glade->[Marpa::R3::Internal::Glade::SYMCHES] = \@symches;
 
     $glade->[Marpa::R3::Internal::Glade::ID] = $glade_id;
-    $asf->[Marpa::R3::Internal::ASF::GLADES]->[$glade_id] = $glade;
+    $asf->[Marpa::R3::Internal_ASF::GLADES]->[$glade_id] = $glade;
     return $glade;
 } ## end sub glade_obtain
 
@@ -992,7 +992,7 @@ sub Marpa::R3::ASF::glade_symch_count {
 
 sub Marpa::R3::ASF::glade_literal {
     my ( $asf, $glade_id ) = @_;
-    my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
+    my $nidset_by_id = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     my $nidset       = $nidset_by_id->[$glade_id];
     Marpa::R3::exception("No glade found for glade ID $glade_id)") if not defined $nidset;
     my $nid0         = $nidset->nid(0);
@@ -1001,7 +1001,7 @@ sub Marpa::R3::ASF::glade_literal {
 
 sub Marpa::R3::ASF::glade_g1_span {
     my ( $asf, $glade_id ) = @_;
-    my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
+    my $nidset_by_id = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     my $nidset       = $nidset_by_id->[$glade_id];
     Marpa::R3::exception("No glade found for glade ID $glade_id)") if not defined $nidset;
     my $nid0         = $nidset->nid(0);
@@ -1012,7 +1012,7 @@ sub Marpa::R3::ASF::glade_g1_span {
 sub Marpa::R3::ASF::glade_L0_length {
     my ( $asf, $glade_id ) = @_;
     my ($g1_start, $g1_length) = $asf->glade_g1_span( $glade_id );
-    my $slr           = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr           = $asf->[Marpa::R3::Internal_ASF::SLR];
 
     my ($l0_length) = $slr->call_by_tag(
     ('@' . __FILE__ . ':' . __LINE__),
@@ -1025,7 +1025,7 @@ END_OF_LUA
 
 sub Marpa::R3::ASF::g1_glade_symbol_id {
     my ( $asf, $glade_id ) = @_;
-    my $nidset_by_id = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
+    my $nidset_by_id = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     my $nidset       = $nidset_by_id->[$glade_id];
     Marpa::R3::exception("No glade found for glade ID $glade_id)") if not defined $nidset;
     my $nid0         = $nidset->nid(0);
@@ -1080,13 +1080,13 @@ sub Marpa::R3::ASF::factor_downglade {
     return $factoring->[$symbol_ix];
 } ## end sub Marpa::R3::ASF::factor_downglade
 
-sub Marpa::R3::Internal::ASF::ambiguities {
+sub Marpa::R3::Internal_ASF::ambiguities {
     my ($asf) = @_;
     my $peak = $asf->peak();
-    return Marpa::R3::Internal::ASF::glade_ambiguities( $asf, $peak, [] );
+    return Marpa::R3::Internal_ASF::glade_ambiguities( $asf, $peak, [] );
 }
 
-sub Marpa::R3::Internal::ASF::glade_ambiguities {
+sub Marpa::R3::Internal_ASF::glade_ambiguities {
     my ( $asf, $glade, $seen ) = @_;
     return [] if $seen->[$glade];    # empty on revisit
     $seen->[$glade] = 1;
@@ -1229,14 +1229,14 @@ sub Marpa::R3::Internal::ASF::glade_ambiguities {
 
     return \@results;
 
-} ## end sub Marpa::R3::Internal::ASF::glade_ambiguities
+} ## end sub Marpa::R3::Internal_ASF::glade_ambiguities
 
 # A generic display routine for ambiguities -- complex application will
 # want to replace this, using it perhaps as a fallback.
-sub Marpa::R3::Internal::ASF::ambiguities_show {
+sub Marpa::R3::Internal_ASF::ambiguities_show {
     my ( $asf, $ambiguities ) = @_;
     my $grammar = $asf->grammar();
-    my $slr     = $asf->[Marpa::R3::Internal::ASF::SLR];
+    my $slr     = $asf->[Marpa::R3::Internal_ASF::SLR];
     my $result  = q{};
     AMBIGUITY: for my $ambiguity ( @{$ambiguities} ) {
         my $type = $ambiguity->[0];
@@ -1397,7 +1397,7 @@ END_OF_LUA
 
     } ## end AMBIGUITY: for my $ambiguity ( @{$ambiguities} )
     return $result;
-} ## end sub Marpa::R3::Internal::ASF::ambiguities_show
+} ## end sub Marpa::R3::Internal_ASF::ambiguities_show
 
 # The higher level calls
 
@@ -1413,21 +1413,21 @@ sub Marpa::R3::ASF::traverse {
     }
     my $peak       = $asf->peak();
     my $peak_glade = glade_obtain( $asf, $peak );
-    my $traverser  = bless [], "Marpa::R3::Internal::ASF::Traverse";
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF]      = $asf;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::CODE]     = $method;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::PER_TRAVERSE_OBJECT] = $per_traverse_object;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::VALUES]   = [];
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE]    = $peak_glade;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX] = 0;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX] = 0;
+    my $traverser  = bless [], "Marpa::R3::Internal_ASF::Traverse";
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF]      = $asf;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::CODE]     = $method;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::PER_TRAVERSE_OBJECT] = $per_traverse_object;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::VALUES]   = [];
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE]    = $peak_glade;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX] = 0;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX] = 0;
     return $method->( $traverser, $per_traverse_object );
 } ## end sub Marpa::R3::ASF::traverse
 
-sub Marpa::R3::Internal::ASF::Traverse::all_choices {
+sub Marpa::R3::Internal_ASF::Traverse::all_choices {
     my ( $traverser ) = @_;
 
-    my @values = Marpa::R3::Internal::ASF::Traverse::rh_values( $traverser );
+    my @values = Marpa::R3::Internal_ASF::Traverse::rh_values( $traverser );
     my @results = ( [] );
     for my $rh_ix ( 0 .. @values - 1 ) {
         my @new_results = ();
@@ -1445,141 +1445,141 @@ sub Marpa::R3::Internal::ASF::Traverse::all_choices {
 }
 
 # TODO -- Document this method
-sub Marpa::R3::Internal::ASF::Traverse::asf {
+sub Marpa::R3::Internal_ASF::Traverse::asf {
     my ( $traverser ) = @_;
-    return $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
+    return $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
 }
 
-sub Marpa::R3::Internal::ASF::Traverse::literal {
+sub Marpa::R3::Internal_ASF::Traverse::literal {
     my ( $traverser ) = @_;
-    my $asf = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
-    my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $asf = $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
+    my $glade = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
     return $asf->glade_literal($glade_id);
 }
 
 # TODO document span() -> g1_span()
-sub Marpa::R3::Internal::ASF::Traverse::g1_span {
+sub Marpa::R3::Internal_ASF::Traverse::g1_span {
     my ( $traverser ) = @_;
-    my $asf = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
-    my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $asf = $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
+    my $glade = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
     return $asf->glade_g1_span($glade_id);
 }
 
-sub Marpa::R3::Internal::ASF::Traverse::symbol_id {
+sub Marpa::R3::Internal_ASF::Traverse::symbol_id {
     my ( $traverser ) = @_;
-    my $asf = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
-    my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $asf = $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
+    my $glade = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
     return $asf->g1_glade_symbol_id($glade_id);
 }
 
-sub Marpa::R3::Internal::ASF::Traverse::rule_id {
+sub Marpa::R3::Internal_ASF::Traverse::rule_id {
     my ( $traverser ) = @_;
-    my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $glade = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $symch_ix =
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX];
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX];
     my $symch = $glade->[Marpa::R3::Internal::Glade::SYMCHES]->[$symch_ix];
     my ( $rule_id ) = @{$symch};
     return if $rule_id < 0;
     return $rule_id;
-} ## end sub Marpa::R3::Internal::ASF::Traverse::rule_id
+} ## end sub Marpa::R3::Internal_ASF::Traverse::rule_id
 
-sub Marpa::R3::Internal::ASF::Traverse::rh_length {
+sub Marpa::R3::Internal_ASF::Traverse::rh_length {
     my ( $traverser ) = @_;
-    my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $glade = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $symch_ix =
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX];
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX];
     my $symch = $glade->[Marpa::R3::Internal::Glade::SYMCHES]->[$symch_ix];
     my ( $rule_id, undef, @factorings ) = @{$symch};
     Marpa::R3::exception(
         '$glade->rh_length($rh_ix) called for a token -- that is not allowed')
         if $rule_id < 0;
     my $factoring_ix =
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX];
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX];
     my $factoring = $factorings[$factoring_ix];
     return scalar @{$factoring};
-} ## end sub Marpa::R3::Internal::ASF::Traverse::rh_length
+} ## end sub Marpa::R3::Internal_ASF::Traverse::rh_length
 
-sub Marpa::R3::Internal::ASF::Traverse::rh_value {
+sub Marpa::R3::Internal_ASF::Traverse::rh_value {
     my ( $traverser, $rh_ix ) = @_;
-    my $glade = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $glade = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $symch_ix =
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX];
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX];
     my $symch = $glade->[Marpa::R3::Internal::Glade::SYMCHES]->[$symch_ix];
     my ( $rule_id, undef, @factorings ) = @{$symch};
     Marpa::R3::exception(
         '$glade->rh_value($rh_ix) called for a token -- that is not allowed')
         if $rule_id < 0;
     my $factoring_ix =
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX];
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX];
     my $factoring = $factorings[$factoring_ix];
     return if $rh_ix > $#{$factoring};
     my $downglade_id = $factoring->[$rh_ix];
-    my $memoized_value = $traverser->[Marpa::R3::Internal::ASF::Traverse::VALUES]->[$downglade_id];
+    my $memoized_value = $traverser->[Marpa::R3::Internal_ASF::Traverse::VALUES]->[$downglade_id];
     return $memoized_value if defined $memoized_value;
-    my $asf = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
+    my $asf = $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
     my $downglade    = glade_obtain( $asf, $downglade_id );
     my $blessing     = ref $traverser;
 
     # A shallow clone
     my $child_traverser = bless [ @{$traverser} ], $blessing;
-    $child_traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE] =
+    $child_traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE] =
         $downglade;
-    $child_traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX]     = 0;
-    $child_traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX] = 0;
-    my $code  = $traverser->[Marpa::R3::Internal::ASF::Traverse::CODE];
+    $child_traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX]     = 0;
+    $child_traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX] = 0;
+    my $code  = $traverser->[Marpa::R3::Internal_ASF::Traverse::CODE];
     my $value = $code->(
         $child_traverser,
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::PER_TRAVERSE_OBJECT]
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::PER_TRAVERSE_OBJECT]
     );
     Marpa::R3::exception(
         'The ASF traversing method returned undef -- that is not allowed')
         if not defined $value;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::VALUES]->[$downglade_id]
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::VALUES]->[$downglade_id]
         = $value;
     return $value;
-} ## end sub Marpa::R3::Internal::ASF::Traverse::rh_value
+} ## end sub Marpa::R3::Internal_ASF::Traverse::rh_value
 
-sub Marpa::R3::Internal::ASF::Traverse::rh_values {
+sub Marpa::R3::Internal_ASF::Traverse::rh_values {
     my ( $traverser ) = @_;
-    return map { Marpa::R3::Internal::ASF::Traverse::rh_value( $traverser, $_ ) }
-        0 .. Marpa::R3::Internal::ASF::Traverse::rh_length( $traverser ) - 1;
+    return map { Marpa::R3::Internal_ASF::Traverse::rh_value( $traverser, $_ ) }
+        0 .. Marpa::R3::Internal_ASF::Traverse::rh_length( $traverser ) - 1;
 }
 
-sub Marpa::R3::Internal::ASF::Traverse::next_factoring {
+sub Marpa::R3::Internal_ASF::Traverse::next_factoring {
     my ($traverser) = @_;
-    my $glade       = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $glade       = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
-    my $asf         = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
-    my $symch_ix = $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX];
+    my $asf         = $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
+    my $symch_ix = $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX];
     my $last_factoring =
         $asf->symch_factoring_count( $glade_id, $symch_ix ) - 1;
     my $factoring_ix =
-        $traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX];
+        $traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX];
     return if $factoring_ix >= $last_factoring;
     $factoring_ix++;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX] =
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX] =
         $factoring_ix;
     return $factoring_ix;
-} ## end sub Marpa::R3::Internal::ASF::Traverse::next_factoring
+} ## end sub Marpa::R3::Internal_ASF::Traverse::next_factoring
 
-sub Marpa::R3::Internal::ASF::Traverse::next_symch {
+sub Marpa::R3::Internal_ASF::Traverse::next_symch {
     my ($traverser) = @_;
-    my $glade       = $traverser->[Marpa::R3::Internal::ASF::Traverse::GLADE];
+    my $glade       = $traverser->[Marpa::R3::Internal_ASF::Traverse::GLADE];
     my $glade_id = $glade->[Marpa::R3::Internal::Glade::ID];
-    my $asf         = $traverser->[Marpa::R3::Internal::ASF::Traverse::ASF];
-    my $symch_ix = $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX];
+    my $asf         = $traverser->[Marpa::R3::Internal_ASF::Traverse::ASF];
+    my $symch_ix = $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX];
     my $last_symch = $asf->glade_symch_count( $glade_id ) - 1;
     return if $symch_ix >= $last_symch;
     $symch_ix++;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::SYMCH_IX] = $symch_ix;
-    $traverser->[Marpa::R3::Internal::ASF::Traverse::FACTORING_IX] = 0;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::SYMCH_IX] = $symch_ix;
+    $traverser->[Marpa::R3::Internal_ASF::Traverse::FACTORING_IX] = 0;
     return $symch_ix;
-} ## end sub Marpa::R3::Internal::ASF::Traverse::next_symch
+} ## end sub Marpa::R3::Internal_ASF::Traverse::next_symch
 
-sub Marpa::R3::Internal::ASF::Traverse::next {
+sub Marpa::R3::Internal_ASF::Traverse::next {
     my ($traverser) = @_;
     return $traverser->next_factoring() // $traverser->next_symch();
 }
@@ -1725,7 +1725,7 @@ sub Marpa::R3::ASF::dump {
 sub Marpa::R3::ASF::show_nidsets {
     my ($asf)   = @_;
     my $text    = q{};
-    my $nidsets = $asf->[Marpa::R3::Internal::ASF::NIDSET_BY_ID];
+    my $nidsets = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
     for my $nidset ( grep {defined} @{$nidsets} ) {
         $text .= $nidset->show() . "\n";
     }
@@ -1735,7 +1735,7 @@ sub Marpa::R3::ASF::show_nidsets {
 sub Marpa::R3::ASF::show_powersets {
     my ($asf)     = @_;
     my $text      = q{};
-    my $powersets = $asf->[Marpa::R3::Internal::ASF::POWERSET_BY_ID];
+    my $powersets = $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID];
     for my $powerset ( grep {defined} @{$powersets} ) {
         $text .= $powerset->show() . "\n";
     }
@@ -1744,8 +1744,8 @@ sub Marpa::R3::ASF::show_powersets {
 
 sub dump_nook {
     my ( $asf, $nook ) = @_;
-    my $slv        = $asf->[Marpa::R3::Internal::ASF::SLV];
-    my $or_nodes   = $asf->[Marpa::R3::Internal::ASF::OR_NODES];
+    my $slv        = $asf->[Marpa::R3::Internal_ASF::SLV];
+    my $or_nodes   = $asf->[Marpa::R3::Internal_ASF::OR_NODES];
     my $or_node_id = $nook->[Marpa::R3::Internal::Nook::OR_NODE];
     my $and_node_count = scalar @{ $or_nodes->[$or_node_id] };
     my $text           = 'Nook ';

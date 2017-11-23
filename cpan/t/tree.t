@@ -341,13 +341,13 @@ END_OF_TEXT
 
         my $asf = Marpa::R3::ASF->new( { recognizer => $recce, end => $i } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal_ASF::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep { defined } @{$ambiguities}[ 0 .. 1 ];
 
         $ambiguity_desc =
-          Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+          Marpa::R3::Internal_ASF::ambiguities_show( $asf, \@ambiguities );
     }
 
     Marpa::R3::Test::is( $ambiguity_desc, $ambiguity_expected[$i],

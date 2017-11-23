@@ -46,7 +46,7 @@ use constant IS_PREDECESSOR => 5;
 use constant CAUSE_IS_EXPANDED => 6;
 use constant PREDECESSOR_IS_EXPANDED => 7;
 
-package Marpa::R3::Internal::ASF;
+package Marpa::R3::Internal_ASF;
 use constant SLR => 0;
 use constant SLV => 1;
 use constant END_OF_PARSE => 2;
@@ -58,7 +58,7 @@ use constant NEXT_INTSET_ID => 7;
 use constant NIDSET_BY_ID => 8;
 use constant POWERSET_BY_ID => 9;
 
-package Marpa::R3::Internal::ASF::Traverse;
+package Marpa::R3::Internal_ASF::Traverse;
 use constant ASF => 0;
 use constant VALUES => 1;
 use constant CODE => 2;
