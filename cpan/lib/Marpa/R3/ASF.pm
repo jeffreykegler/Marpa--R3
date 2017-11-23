@@ -778,7 +778,6 @@ sub factoring_finish {
         $choicepoint->[Marpa::R3::Internal::Choicepoint::FACTORING_STACK];
 
     my $nidset_by_id   = $asf->[Marpa::R3::Internal_ASF::NIDSET_BY_ID];
-    my $powerset_by_id = $asf->[Marpa::R3::Internal_ASF::POWERSET_BY_ID];
 
     my @worklist = ( 0 .. $#{$factoring_stack} );
 
