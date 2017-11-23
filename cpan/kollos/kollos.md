@@ -5941,6 +5941,384 @@ the valuator's Lua-level settings.
 
 ```
 
+## Abstract Syntax Forest (ASF) class
+
+This is a registry object.
+
+### ASF fields
+
+```
+    -- miranda: section+ class_asf field declarations
+    class_asf_fields.slr = true
+    class_asf_fields.regix = true
+    class_asf_fields.lmw_b = true
+    class_asf_fields.end_of_parse = true
+    -- underscore ("_") to prevent override of function of same name
+    class_asf_fields._ambiguity_level = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_asf_fields = {}
+    -- miranda: insert class_asf field declarations
+    declarations(_M.class_asf, class_asf_fields, 'asf')
+```
+
+```
+    -- miranda: section+ luaL_Reg definitions
+    static const struct luaL_Reg asf_methods[] = {
+      { NULL, NULL },
+    };
+
+```
+### ASF constructor
+
+Temporary constructor for development.
+Creates an "slr-internal" version of asf,
+which is not kept in the registry.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.asf_new(slr, flat_args)
+
+        local function asf_register(asf)
+            local regix = _M.register(_M.registry, asf)
+            asf.regix = regix
+            return asf
+        end
+
+        local function no_parse(asf)
+            asf._ambiguity_level = 0
+            -- clearing the libmarpa objects is
+            -- not necessary, but may ease the burden on
+            -- memory
+            asf.lmw_b = nil
+            return asf_register(asf)
+        end
+
+        local asf = {}
+        setmetatable(asf, _M.class_asf)
+        asf.slr = slr
+        local slg = slr.slg
+        local g1r = slr.g1
+
+        asf:common_set(flat_args, {'end'})
+
+        local end_of_parse = asf.end_of_parse
+        if not end_of_parse or end_of_parse < 0 then
+            end_of_parse = g1r:latest_earley_set()
+        end
+        asf.end_of_parse = end_of_parse
+
+        _M.throw = false
+        local bocage = _M.bocage_new(g1r, end_of_parse)
+        _M.throw = true
+        asf.lmw_b = bocage
+        if not bocage then return no_parse(asf) end
+
+        local ambiguity_level = lmw_b:ambiguity_metric()
+        if ambiguity_level > 2 then ambiguity_level = 2 end
+        asf._ambiguity_level = ambiguity_level
+
+        return asf_register(asf)
+
+    end
+```
+
+A common processor for
+the valuator's Lua-level settings.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_asf.common_set(asf, flat_args, extra_args)
+        local ok_args = {
+            ['end'] = true,
+        }
+        if extra_args then
+            for ix = 1, #extra_args do
+                ok_args[extra_args[ix]] = true
+            end
+        end
+
+        for name, value in pairs(flat_args) do
+           if not ok_args[name] then
+               error(string.format(
+                   'Bad asf named argument: %s => %s',
+                   inspect(name),
+                   inspect(value)
+               ))
+           end
+        end
+
+        local raw_value
+
+        -- 'end' named argument --
+        raw_value = flat_args["end"]
+        if raw_value then
+            local value = math.tointeger(raw_value)
+            if not value then
+               error(string.format(
+                   'Bad value for "end" named argument: %s',
+                   inspect(raw_value)))
+            end
+            asf.end_of_parse = value
+        end
+
+    end
+```
+
+### ASF mutators
+
+### ASF accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_asf.g1_pos(asf)
+        return asf.end_of_parse
+    end
+
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_asf.ambiguity_level(asf)
+         return asf._ambiguity_level
+    end
+```
+
+### ASF diagnostics
+
+```
+    -- miranda: section+ diagnostics
+    function _M.class_asf.and_node_tag(asf, and_node_id)
+        local slr = asf.slr
+        local bocage = asf.lmw_b
+        local parent_or_node_id = bocage:_and_node_parent(and_node_id)
+        local origin = bocage:_or_node_origin(parent_or_node_id)
+        local origin_earleme = slr.g1:earleme(origin)
+
+        local current_earley_set = bocage:_or_node_set(parent_or_node_id)
+        local current_earleme = slr.g1:earleme(current_earley_set)
+
+        local cause_id = bocage:_and_node_cause(and_node_id)
+        local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+
+        local middle_earley_set = bocage:_and_node_middle(and_node_id)
+        local middle_earleme = slr.g1:earleme(middle_earley_set)
+
+        local position = bocage:_or_node_position(parent_or_node_id)
+        local nrl_id = bocage:_or_node_nrl(parent_or_node_id)
+
+        local tag = { string.format("R%d:%d@%d-%d",
+            nrl_id,
+            position,
+            origin_earleme,
+            current_earleme)
+        }
+
+        if cause_id then
+            tag[#tag+1] = string.format("C%d", bocage:_or_node_nrl(cause_id))
+        else
+            tag[#tag+1] = string.format("S%d", bocage:_and_node_symbol(and_node_id))
+        end
+        tag[#tag+1] = string.format("@%d", middle_earleme)
+        return table.concat(tag)
+    end
+
+    function _M.class_asf.and_nodes_show(asf)
+        local slr = asf.slr
+        local bocage = asf.lmw_b
+        local g1r = slr.g1
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local parent = bocage:_and_node_parent(id)
+            -- print('parent:', parent)
+            if not parent then break end
+            local predecessor = bocage:_and_node_predecessor(id)
+            local cause = bocage:_and_node_cause(id)
+            local symbol = bocage:_and_node_symbol(id)
+            local origin = bocage:_or_node_origin(parent)
+            local set = bocage:_or_node_set(parent)
+            local nrl_id = bocage:_or_node_nrl(parent)
+            local position = bocage:_or_node_position(parent)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+            local middle_earley_set = bocage:_and_node_middle(id)
+            local middle_earleme = g1r:earleme(middle_earley_set)
+            local desc = {string.format(
+                "And-node #%d: R%d:%d@%d-%d",
+                id,
+                nrl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            -- Marpa::R2's show_and_nodes() had a minor bug:
+            -- cause_nrl_id was not set properly and therefore
+            -- not used in the sort.  That problem is fixed
+            -- here.
+            local cause_nrl_id = -1
+            if cause then
+                cause_nrl_id = bocage:_or_node_nrl(cause)
+                desc[#desc+1] = 'C' .. cause_nrl_id
+            else
+                desc[#desc+1] = 'S' .. symbol
+            end
+            desc[#desc+1] = '@' .. middle_earleme
+            if not symbol then symbol = -1 end
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                nrl_id,
+                position,
+                middle_earleme,
+                symbol,
+                cause_nrl_id,
+                table.concat(desc)
+            }
+        end
+
+        table.sort(data, _M.cmp_seq)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+    function _M.class_asf.or_node_tag(asf, or_node_id)
+        local slr = asf.slr
+        local bocage = asf.lmw_b
+        local set = bocage:_or_node_set(or_node_id)
+        local nrl_id = bocage:_or_node_nrl(or_node_id)
+        local origin = bocage:_or_node_origin(or_node_id)
+        local position = bocage:_or_node_position(or_node_id)
+        return string.format("R%d:%d@%d-%d",
+            nrl_id,
+            position,
+            origin,
+            set)
+    end
+
+    function _M.class_asf.or_nodes_show(asf)
+        local slr = asf.slr
+        local bocage = asf.lmw_b
+        local g1r = slr.g1
+        local data = {}
+        local id = -1
+        while true do
+            id = id + 1
+            local origin = bocage:_or_node_origin(id)
+            if not origin then break end
+            local set = bocage:_or_node_set(id)
+            local nrl_id = bocage:_or_node_nrl(id)
+            local position = bocage:_or_node_position(id)
+            local origin_earleme = g1r:earleme(origin)
+            local current_earleme = g1r:earleme(set)
+
+            local desc = {string.format(
+                "R%d:%d@%d-%d",
+                nrl_id,
+                position,
+                origin_earleme,
+                current_earleme)}
+            data[#data+1] = {
+                origin_earleme,
+                current_earleme,
+                nrl_id,
+                table.concat(desc)
+            }
+        end
+
+        local function cmp_data(i, j)
+            for ix = 1, #i do
+                if i[ix] < j[ix] then return true end
+                if i[ix] > j[ix] then return false end
+            end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+    end
+
+```
+
+`bocage_show` returns a string which describes the bocage.
+
+```
+    -- miranda: section+ diagnostics
+    function _M.class_asf.bocage_show(asf)
+        local slr = asf.slr
+        local bocage = asf.lmw_b
+        local data = {}
+        local or_node_id = -1
+        while true do
+            or_node_id = or_node_id + 1
+            local irl_id = bocage:_or_node_nrl(or_node_id)
+            if not irl_id then goto LAST_OR_NODE end
+            local position = bocage:_or_node_position(or_node_id)
+            local or_origin = bocage:_or_node_origin(or_node_id)
+            local origin_earleme = slr.g1:earleme(or_origin)
+            local or_set = bocage:_or_node_set(or_node_id)
+            local current_earleme = slr.g1:earleme(or_set)
+            local and_node_ids = {}
+            local first_and_id = bocage:_or_node_first_and(or_node_id)
+            local last_and_id = bocage:_or_node_last_and(or_node_id)
+            for and_node_id = first_and_id, last_and_id do
+                local symbol = bocage:_and_node_symbol(and_node_id)
+                local cause_tag
+                if symbol then cause_tag = 'S' .. symbol end
+                local cause_id = bocage:_and_node_cause(and_node_id)
+                local cause_irl_id
+                if cause_id then
+                    cause_irl_id = bocage:_or_node_nrl(cause_id)
+                    cause_tag = asf:or_node_tag(cause_id)
+                end
+                local parent_tag = asf:or_node_tag(or_node_id)
+                local predecessor_id = bocage:_and_node_predecessor(and_node_id)
+                local predecessor_tag = "-"
+                if predecessor_id then
+                    predecessor_tag = asf:or_node_tag(predecessor_id)
+                end
+                local tag = string.format(
+                    "%d: %d=%s %s %s",
+                    and_node_id,
+                    or_node_id,
+                    parent_tag,
+                    predecessor_tag,
+                    cause_tag
+                )
+                data[#data+1] = { and_node_id, tag }
+            end
+            ::LAST_AND_NODE::
+        end
+        ::LAST_OR_NODE::
+
+        local function cmp_data(i, j)
+            if i[1] < j[1] then return true end
+            return false
+        end
+
+        table.sort(data, cmp_data)
+        local result = {}
+        for _,datum in pairs(data) do
+            result[#result+1] = datum[#datum]
+        end
+        result[#result+1] = '' -- so concat adds a final '\n'
+        return table.concat(result, '\n')
+
+    end
+
+```
+
 ## Kollos semantics
 
 Initially, Marpa's semantics were performed using a VM (virtual machine)
@@ -10226,6 +10604,17 @@ Marpa::R3.
           marpa_lua_setfield(L, -2, "__index");
           marpa_lua_pushvalue(L, -1);
           marpa_lua_setfield(L, kollos_table_stack_ix, "class_slv");
+          marpa_lua_pushvalue(L, kollos_table_stack_ix);
+          marpa_lua_setfield(L, -2, "kollos");
+
+          /* Create the ASF metatable */
+          marpa_luaL_newlibtable(L, asf_methods);
+          marpa_lua_pushvalue(L, upvalue_stack_ix);
+          marpa_luaL_setfuncs(L, asf_methods, 1);
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, -2, "__index");
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, kollos_table_stack_ix, "class_asf");
           marpa_lua_pushvalue(L, kollos_table_stack_ix);
           marpa_lua_setfield(L, -2, "kollos");
 
