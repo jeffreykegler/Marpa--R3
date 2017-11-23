@@ -5710,6 +5710,12 @@ the valuator's Lua-level settings.
 
 ### SLV diagnostics
 
+These diagnostics duplicate those
+in the ASF code.
+It is expected that the SLV object will be deleted in
+favor of an ASF-based valuer,
+at which point these diagnostics should be deleted.
+
 ```
     -- miranda: section+ diagnostics
     function _M.class_slv.and_node_tag(slv, and_node_id)
