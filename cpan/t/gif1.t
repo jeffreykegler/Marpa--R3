@@ -454,7 +454,7 @@ sub my_parser {
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $recce->read( \$string ); 1 } )
-    my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+    my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
     if ( not defined $asf ) {
         return 'No ASF', 'Input read to end but no ASF';
     }

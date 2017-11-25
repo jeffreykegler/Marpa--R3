@@ -779,11 +779,11 @@ sub Marpa::R3::Valuer::ambiguous {
     return q{No parse} if $ambiguity_level <= 0;
     return q{} if $ambiguity_level == 1;
     # ASF must be created for end location of SLV (not SLR!)
-    my $asf = Marpa::R3::ASF->new( { recognizer => $slr, end => $slv->g1_pos() } );
+    my $asf = Marpa::R3::ASF2->new( { recognizer => $slr, end => $slv->g1_pos() } );
     die 'Could not create ASF' if not defined $asf;
-    my $ambiguities = Marpa::R3::Internal_ASF::ambiguities($asf);
+    my $ambiguities = Marpa::R3::Internal_ASF2::ambiguities($asf);
     my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
-    return Marpa::R3::Internal_ASF::ambiguities_show( $asf, \@ambiguities );
+    return Marpa::R3::Internal_ASF2::ambiguities_show( $asf, \@ambiguities );
 } ## end sub Marpa::R3::Recognizer::ambiguous
 
 sub Marpa::R3::Valuer::ambiguity_level {

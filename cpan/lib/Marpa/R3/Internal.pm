@@ -53,6 +53,14 @@ use constant REGIX => 2;
 use constant SLR => 3;
 use constant END_OF_PARSE => 4;
 use constant FACTORING_MAX => 5;
+
+package Marpa::R3::Internal_ASF2;
+use constant TRACE_FILE_HANDLE => 0;
+use constant L => 1;
+use constant REGIX => 2;
+use constant SLR => 3;
+use constant END_OF_PARSE => 4;
+use constant FACTORING_MAX => 5;
 use constant OR_NODES => 6;
 use constant GLADES => 7;
 use constant INTSET_BY_KEY => 8;
@@ -60,7 +68,7 @@ use constant NEXT_INTSET_ID => 9;
 use constant NIDSET_BY_ID => 10;
 use constant POWERSET_BY_ID => 11;
 
-package Marpa::R3::Internal_ASF::Traverse;
+package Marpa::R3::Internal_ASF2::Traverse;
 use constant ASF => 0;
 use constant VALUES => 1;
 use constant CODE => 2;

@@ -339,15 +339,15 @@ END_OF_TEXT
     my $ambiguity_desc = 'No ambiguity';
     if ( $ambiguity_level > 1 ) {
 
-        my $asf = Marpa::R3::ASF->new( { recognizer => $recce, end => $i } );
+        my $asf = Marpa::R3::ASF2->new( { recognizer => $recce, end => $i } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R3::Internal_ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal_ASF2::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep { defined } @{$ambiguities}[ 0 .. 1 ];
 
         $ambiguity_desc =
-          Marpa::R3::Internal_ASF::ambiguities_show( $asf, \@ambiguities );
+          Marpa::R3::Internal_ASF2::ambiguities_show( $asf, \@ambiguities );
     }
 
     Marpa::R3::Test::is( $ambiguity_desc, $ambiguity_expected[$i],

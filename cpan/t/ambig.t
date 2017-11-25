@@ -75,16 +75,16 @@ PROCESSING: {
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     if ( $valuer->ambiguity_level() > 1 ) {
-        my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+        my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R3::Internal_ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal_ASF2::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
 
         $actual_value = 'Application grammar is ambiguous';
         $actual_result =
-            Marpa::R3::Internal_ASF::ambiguities_show( $asf, \@ambiguities );
+            Marpa::R3::Internal_ASF2::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
     }
 
@@ -116,7 +116,7 @@ if ( !$is_ambiguous_parse ) {
     Test::More::fail(qq{glade_g1_span() length});
 }
 else {
-    my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+    my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
     my $glade_id = $asf->peak;
 
 # Marpa::R3::Display

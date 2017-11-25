@@ -50,7 +50,7 @@ END_OF_SOURCE
 
 my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 $recce->read( \'aa' );
-my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
 die 'No ASF' if not defined $asf;
 my $output_as_array = asf_to_basic_tree($asf);
 my $actual_output   = array_display($output_as_array);

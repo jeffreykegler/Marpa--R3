@@ -141,6 +141,23 @@ __DATA__
 
     FACTORING_MAX
 
+    :package=Marpa::R3::Internal_ASF2
+
+    { It is important not to keep any references to choicepoints, direct or
+      indirect in this structure.  The resulting circular reference would prevent
+      both structures from being freed, and create a memory leak. }
+
+    TRACE_FILE_HANDLE
+
+    L { Lua Interpreter }
+    REGIX { Registry index in Lua interpreter --
+        a valid Lua index but not a pseudo-index. }
+
+    SLR { The underlying SLR }
+    END_OF_PARSE
+
+    FACTORING_MAX
+
     OR_NODES {
         per or-node data, 
         current arrays of sorted and-nodes
@@ -156,7 +173,7 @@ __DATA__
     NIDSET_BY_ID
     POWERSET_BY_ID
 
-    :package=Marpa::R3::Internal_ASF::Traverse
+    :package=Marpa::R3::Internal_ASF2::Traverse
 
     ASF
     VALUES { Memoized values, by glade ID }

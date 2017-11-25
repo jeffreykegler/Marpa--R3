@@ -92,6 +92,10 @@ require Marpa::R3::ASF;
 ( $version_result = version_ok($Marpa::R3::ASF::VERSION) )
     and die 'Marpa::R3::ASF::VERSION ', $version_result;
 
+require Marpa::R3::ASF2;
+( $version_result = version_ok($Marpa::R3::ASF2::VERSION) )
+    and die 'Marpa::R3::ASF2::VERSION ', $version_result;
+
 require Marpa::R3::X;
 ( $version_result = version_ok($Marpa::R3::X::VERSION) )
     and die 'Marpa::R3::X::VERSION ', $version_result;

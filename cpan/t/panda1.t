@@ -100,7 +100,7 @@ my $panda_grammar = Marpa::R3::Grammar->new(
     { bless_package => 'PennTags', source => \$dsl, } );
 my $panda_recce = Marpa::R3::Recognizer->new( { grammar => $panda_grammar } );
 $panda_recce->read( \$sentence );
-my $asf = Marpa::R3::ASF->new( { recognizer => $panda_recce } );
+my $asf = Marpa::R3::ASF2->new( { recognizer => $panda_recce } );
 my $full_result = $asf->traverse( {}, \&full_traverser );
 my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 
