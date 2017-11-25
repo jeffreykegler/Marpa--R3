@@ -363,7 +363,7 @@ sub Marpa::R3::ASF::new {
         <<'END_OF_LUA');
         local slr, flat_args = ...
         _M.wrap(function ()
-            local asf = slr:asf_new(flat_args)
+            local asf = slr:asf2_new(flat_args)
             if not asf then return 'ok', -1 end
             local order = asf.lmw_o
             if not order then

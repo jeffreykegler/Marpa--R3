@@ -5954,21 +5954,21 @@ This is a registry object.
 ### ASF fields
 
 ```
-    -- miranda: section+ class_asf field declarations
-    class_asf_fields.slr = true
-    class_asf_fields.regix = true
-    class_asf_fields.lmw_b = true
-    class_asf_fields.lmw_o = true
-    class_asf_fields.end_of_parse = true
+    -- miranda: section+ class_asf2 field declarations
+    class_asf2_fields.slr = true
+    class_asf2_fields.regix = true
+    class_asf2_fields.lmw_b = true
+    class_asf2_fields.lmw_o = true
+    class_asf2_fields.end_of_parse = true
     -- underscore ("_") to prevent override of function of same name
-    class_asf_fields._ambiguity_level = true
+    class_asf2_fields._ambiguity_level = true
 ```
 
 ```
     -- miranda: section+ populate metatables
-    local class_asf_fields = {}
-    -- miranda: insert class_asf field declarations
-    declarations(_M.class_asf, class_asf_fields, 'asf')
+    local class_asf2_fields = {}
+    -- miranda: insert class_asf2 field declarations
+    declarations(_M.class_asf2, class_asf2_fields, 'asf')
 ```
 
 ```
@@ -5986,7 +5986,7 @@ which is not kept in the registry.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.asf_new(slr, flat_args)
+    function _M.class_slr.asf2_new(slr, flat_args)
 
         local function asf_register(asf)
             local regix = _M.register(_M.registry, asf)
@@ -6005,7 +6005,7 @@ which is not kept in the registry.
         end
 
         local asf = {}
-        setmetatable(asf, _M.class_asf)
+        setmetatable(asf, _M.class_asf2)
         asf.slr = slr
         local slg = slr.slg
         local g1r = slr.g1
@@ -6050,7 +6050,7 @@ the valuator's Lua-level settings.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_asf.common_set(asf, flat_args, extra_args)
+    function _M.class_asf2.common_set(asf, flat_args, extra_args)
         local ok_args = {
             ['end'] = true,
         }
@@ -6093,7 +6093,7 @@ the valuator's Lua-level settings.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_asf.g1_pos(asf)
+    function _M.class_asf2.g1_pos(asf)
         return asf.end_of_parse
     end
 
@@ -6101,7 +6101,7 @@ the valuator's Lua-level settings.
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_asf.ambiguity_level(asf)
+    function _M.class_asf2.ambiguity_level(asf)
          return asf._ambiguity_level
     end
 ```
@@ -6110,7 +6110,7 @@ the valuator's Lua-level settings.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_asf.and_node_tag(asf, and_node_id)
+    function _M.class_asf2.and_node_tag(asf, and_node_id)
         local slr = asf.slr
         local bocage = asf.lmw_b
         local parent_or_node_id = bocage:_and_node_parent(and_node_id)
@@ -6145,7 +6145,7 @@ the valuator's Lua-level settings.
         return table.concat(tag)
     end
 
-    function _M.class_asf.and_nodes_show(asf)
+    function _M.class_asf2.and_nodes_show(asf)
         local slr = asf.slr
         local bocage = asf.lmw_b
         local g1r = slr.g1
@@ -6208,7 +6208,7 @@ the valuator's Lua-level settings.
         return table.concat(result, '\n')
     end
 
-    function _M.class_asf.or_node_tag(asf, or_node_id)
+    function _M.class_asf2.or_node_tag(asf, or_node_id)
         local slr = asf.slr
         local bocage = asf.lmw_b
         local set = bocage:_or_node_set(or_node_id)
@@ -6222,7 +6222,7 @@ the valuator's Lua-level settings.
             set)
     end
 
-    function _M.class_asf.or_nodes_show(asf)
+    function _M.class_asf2.or_nodes_show(asf)
         local slr = asf.slr
         local bocage = asf.lmw_b
         local g1r = slr.g1
@@ -6275,7 +6275,7 @@ the valuator's Lua-level settings.
 
 ```
     -- miranda: section+ diagnostics
-    function _M.class_asf.bocage_show(asf)
+    function _M.class_asf2.bocage_show(asf)
         local slr = asf.slr
         local bocage = asf.lmw_b
         local data = {}
@@ -10635,6 +10635,17 @@ Marpa::R3.
           marpa_lua_setfield(L, -2, "__index");
           marpa_lua_pushvalue(L, -1);
           marpa_lua_setfield(L, kollos_table_stack_ix, "class_asf");
+          marpa_lua_pushvalue(L, kollos_table_stack_ix);
+          marpa_lua_setfield(L, -2, "kollos");
+
+          /* Create the ASF metatable */
+          marpa_luaL_newlibtable(L, asf_methods);
+          marpa_lua_pushvalue(L, upvalue_stack_ix);
+          marpa_luaL_setfuncs(L, asf_methods, 1);
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, -2, "__index");
+          marpa_lua_pushvalue(L, -1);
+          marpa_lua_setfield(L, kollos_table_stack_ix, "class_asf2");
           marpa_lua_pushvalue(L, kollos_table_stack_ix);
           marpa_lua_setfield(L, -2, "kollos");
 
