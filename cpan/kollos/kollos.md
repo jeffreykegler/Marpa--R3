@@ -5971,10 +5971,10 @@ This is a registry object.
     class_asf_fields.slr = true
     class_asf_fields.regix = true
     class_asf_fields.lmw_b = true
-    class_asf_fields.lmw_o = true
     class_asf_fields.end_of_parse = true
     -- underscore ("_") to prevent override of function of same name
     class_asf_fields._ambiguity_level = true
+    class_asf_fields.glades = true
 ```
 
 ```
@@ -6013,7 +6013,6 @@ which is not kept in the registry.
             -- not necessary, but may ease the burden on
             -- memory
             asf.lmw_b = nil
-            asf.lmw_o = nil
             return asf_register(asf)
         end
 
@@ -6037,19 +6036,8 @@ which is not kept in the registry.
         asf.lmw_b = bocage
         if not bocage then return no_parse(asf) end
 
-        local lmw_o = _M.order_new(bocage)
-        asf.lmw_o = lmw_o
-
         local ranking_method = slg.ranking_method
-        if ranking_method == 'high_rule_only' then
-            lmw_o:high_rank_only_set(1)
-            lmw_o:rank()
-        end
-        if ranking_method == 'rule' then
-            lmw_o:high_rank_only_set(0)
-            lmw_o:rank()
-        end
-        local ambiguity_level = lmw_o:ambiguity_metric()
+        local ambiguity_level = lmw_b:ambiguity_metric()
         if ambiguity_level > 2 then ambiguity_level = 2 end
         asf._ambiguity_level = ambiguity_level
 
@@ -6742,6 +6730,80 @@ the valuator's Lua-level settings.
 
     end
 
+```
+
+## Glade class
+
+For the moment, not a registry object,
+meaning that it cannot be a Perl object.
+
+### Glade fields
+
+```
+    -- miranda: section+ class_glade field declarations
+    -- TODO Do I need the `asf` field?
+    class_glade_fields.asf = true
+    class_glade_fields.token_symches = true
+    class_glade_fields.rule_symches = true
+```
+
+```
+    -- miranda: section+ create nonmetallic metatables
+    _M.class_glade = {}
+    -- miranda: section+ populate metatables
+    local class_glade_fields = {}
+
+    -- miranda: insert class_glade field declarations
+    declarations(_M.class_glade, class_glade_fields, 'glade')
+```
+
+### Glade constructors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_glade.token_glade_obtain(asf, and_ids_arg)
+        local and_ids = {table.unpack(and_ids_arg)}
+        table.sort(and_ids)
+        local key = table.concat(and_ids, ',')
+        local glade = asf.glades[key]
+        if glade then return glade end
+        -- Glade does not exist, so we create it
+
+        local slr = asf.slr
+        for ix = 1, #and_ids do
+            local and_id = and_ids[ix]
+            local token_nsy_id = asf.lmw_b:_and_node_symbol(and_id)
+            local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
+            and_ids[ix] = { token_id, and_id }
+        end
+        table.sort(and_ids, _M.cmp_seq)
+
+        local token_symches = {}
+        local this_and_id = and_ids[1]
+        local last_token_id = this_and_id[1]
+        local this_symch = {this_and_id[2]}
+        for ix = 2, #and_ids do
+            this_and_id = and_ids[ix]
+            local this_token_id = this_and_id[1]
+            if this_token_id ~= last_token_id then
+                token_symches[#token_symches+1] = this_symch
+                this_symch = {}
+            end
+            this_symch[#this_symch+1] = this_and_id[2]
+            last_token_id = this_token_id
+        end
+        token_symches[#token_symches+1] = this_symch
+
+        glade = setmetatable({}, _M.class_glade)
+        glade.token_symches = token_symches
+
+        glade.asf = asf
+        local glades = asf.glades
+        local glade_ix = #glades+1
+        glades[key] = glade
+        glades[glade_ix] = glade
+        return glade
+    end
 ```
 
 ## Kollos semantics
