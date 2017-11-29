@@ -5974,6 +5974,33 @@ This is a registry object.
     class_asf_fields.end_of_parse = true
     -- underscore ("_") to prevent override of function of same name
     class_asf_fields._ambiguity_level = true
+```
+
+`glades` is a sequence containing all glades.
+The sequence maps glade indexes to glades.
+
+There are also non-sequence elements.
+The non-sequence elements are keys.
+The keys are used when to find a glade using
+its components and-ids or or-ids,
+and to prevent the creation
+of duplicate glades.
+Every key is a comma-separated list of integers.
+
+If the glade is a rule glade,
+and therefore contains or-ids,
+the first integer is the count of or-ids.
+Subsequent integers are the or-ids.
+
+If the glade is a token glade,
+and therefore contains and-ids,
+the first integer is negative --
+the additive inverse of the
+count of and-ids.
+Subsequent integers are the and-ids.
+
+```
+    -- miranda: section+ class_asf field declarations
     class_asf_fields.glades = true
 ```
 
@@ -6759,19 +6786,26 @@ meaning that it cannot be a Perl object.
 
 ### Glade constructors
 
+In fact, I expect there will never be more than one
+token symch in any glade.
+Relying on this fact would simplify `token_glade_obtain()`
+considerably.
+
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_glade.token_glade_obtain(asf, and_ids_arg)
-        local and_ids = {table.unpack(and_ids_arg)}
-        table.sort(and_ids)
-        local key = table.concat(and_ids, ',')
+        local key_elements = {0, table.unpack(and_ids_arg)}
+        table.sort(key_elements)
+        key_elements[1] = -#and_ids_arg
+        local key = table.concat(key_elements, ',')
         local glade = asf.glades[key]
         if glade then return glade end
         -- Glade does not exist, so we create it
 
         local slr = asf.slr
-        for ix = 1, #and_ids do
-            local and_id = and_ids[ix]
+        local and_ids = {}
+        for ix = 1, #and_ids_arg do
+            local and_id = and_ids_arg[ix]
             local token_nsy_id = asf.lmw_b:_and_node_symbol(and_id)
             local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
             and_ids[ix] = { token_id, and_id }
@@ -6790,6 +6824,55 @@ meaning that it cannot be a Perl object.
                 this_symch = {}
             end
             this_symch[#this_symch+1] = this_and_id[2]
+            last_token_id = this_token_id
+        end
+        token_symches[#token_symches+1] = this_symch
+
+        glade = setmetatable({}, _M.class_glade)
+        glade.token_symches = token_symches
+
+        glade.asf = asf
+        local glades = asf.glades
+        local glade_ix = #glades+1
+        glades[key] = glade
+        glades[glade_ix] = glade
+        return glade
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_glade.rule_glade_obtain(asf, or_ids_arg)
+        local key_elements = {0, table.unpack(or_ids_arg)}
+        table.sort(key_elements)
+        key_elements[1] = #or_ids_arg
+        local key = table.concat(key_elements, ',')
+        local glade = asf.glades[key]
+        if glade then return glade end
+        -- Glade does not exist, so we create it
+
+        local slr = asf.slr
+        local or_ids = {}
+        for ix = 1, #or_ids_arg do
+            local or_id = or_ids_arg[ix]
+            local nrl_id = asf.lmw_b:_or_node_nrl(nid)
+            local irl_id slr.slg.g1:_source_xrl(nrl_id)
+            or_ids[ix] = { irl_id, or_id }
+        end
+        table.sort(or_ids, _M.cmp_seq)
+
+        local token_symches = {}
+        local this_or_id = or_ids[1]
+        local last_token_id = this_or_id[1]
+        local this_symch = {this_or_id[2]}
+        for ix = 2, #or_ids do
+            this_or_id = or_ids[ix]
+            local this_token_id = this_or_id[1]
+            if this_token_id ~= last_token_id then
+                token_symches[#token_symches+1] = this_symch
+                this_symch = {}
+            end
+            this_symch[#this_symch+1] = this_or_id[2]
             last_token_id = this_token_id
         end
         token_symches[#token_symches+1] = this_symch
