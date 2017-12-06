@@ -6761,8 +6761,10 @@ the valuator's Lua-level settings.
 
 ## Glade class
 
-For the moment, not a registry object,
-meaning that it cannot be a Perl object.
+Not a registry object.
+As of this writing,
+I don't think I want to
+make this a Perl object.
 
 ### Glade fields
 
@@ -6770,6 +6772,9 @@ meaning that it cannot be a Perl object.
     -- miranda: section+ class_glade field declarations
     -- TODO Do I need the `asf` field?
     class_glade_fields.asf = true
+    class_glade_fields.xsyid = true
+    class_glade_fields.g1_start = true
+    class_glade_fields.g1_end = true
     class_glade_fields.token_symches = true
     class_glade_fields.rule_symches = true
 ```
@@ -6786,10 +6791,46 @@ meaning that it cannot be a Perl object.
 
 ### Glade constructors
 
+TODO: Under construction.
+
+Returns a new asf.
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.new(slr, xsyid, g1_start_arg, g1_end_arg)
+        local slg = slr.slg
+        local g1g = slg.g1
+        local g1r = slr.g1
+        local g1_end = g1r:latest_earley_set()
+        local g1_start = math.tointeger(g1_start_arg) or g1_end
+        if g1_start < 0 then g1_start = g1_end + 1 + g1_start end
+        if g1_start > g1_end or g1_start < 0 then
+             _M._internal_error(
+                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
+                 must be in range 0-%d",
+                 inspect(g1_start_arg, {depth=1}),
+                 g1_end
+             )
+        end
+        local g1_end = math.tointeger(g1_end_arg) or g1_start
+        if g1_end < 0 then g1_end = g1_end + 1 + g1_end end
+        if g1_end > g1_end or g1_end < 0 then
+             _M._internal_error(
+                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
+                 must be in range 0-%d",
+                 inspect(g1_end_arg, {depth=1}),
+                 g1_end
+             )
+        end
+    end
+```
+
 In fact, I expect there will never be more than one
 token symch in any glade.
 Relying on this fact would simplify `token_glade_obtain()`
 considerably.
+
+TODO: Delete this?
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -6839,6 +6880,8 @@ considerably.
         return glade
     end
 ```
+
+TODO: Delete this?
 
 ```
     -- miranda: section+ most Lua function definitions
