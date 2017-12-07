@@ -580,6 +580,15 @@ perhaps because it is buggy.
     class_slg_fields.xrls = true
     class_slg_fields.xprs = true
     class_slg_fields.xsys = true
+
+```
+
+Maps `(irlid, irl_dot)` pairs to external rule/symbol
+information: `(xrlid, xrl_dot, predot_xsy)`.
+
+```
+    -- miranda: section+ class_slg field declarations
+    class_slg_fields.i_to_xpr_dotted = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -1054,6 +1063,37 @@ in `lmw_g`.
 
 ```
     -- miranda: section+ forward declarations
+    local precompute_i_to_xpr_dotted
+    -- miranda: section+ most Lua function definitions
+    function precompute_i_to_xpr_dotted(slg)
+        local g1g = slg.g1
+        local xprs = slg.xprs
+        local i_to_xpr_dotted = {}
+        slg.i_to_xpr_dotted = i_to_xpr_dotted
+        for irlid = 0, g1g:highest_rule_id() do
+            local irl = g1g.irls[irlid]
+            local this_i_to_xpr_dotted = {}
+            i_to_xpr_dotted[irlid] = this_i_to_xpr_dotted
+            local xpr_id = slg:g1_rule_to_xprid(irlid)
+            local xpr = xprs[xpr_id]
+            local xpr_rhs = xpr.rhs
+            local xpr_dots = slg:g1_rule_to_xpr_dots(irlid)
+            for irl_dot = 1, g1g:rule_length(irlid) do
+                 local xpr_dot
+                 if irl_dot == -1 then
+                     xpr_dot = xpr_dots[#xpr_dots]
+                 else
+                     xpr_dot = xpr_dots[irl_dot]
+                 end
+                 this_i_to_xpr_dotted[irl_dot] =
+                     {xpr_id, xpr_dot, xpr_rhs[xpr_dot]}
+            end
+        end
+    end
+```
+
+```
+    -- miranda: section+ forward declarations
     local precompute_discard_events
     -- miranda: section+ most Lua function definitions
     function precompute_discard_events(slg, source_hash)
@@ -1323,6 +1363,7 @@ and creates the "runtime" version, as a side effect.
 
         precompute_g1(slg, source_hash);
         precompute_l0(slg, source_hash);
+        precompute_i_to_xpr_dotted(slg);
         precompute_discard_events(slg, source_hash)
         precompute_lexeme_adverbs(slg, source_hash)
         precompute_xsy_blessings(slg, source_hash)
@@ -1696,6 +1737,8 @@ Display any XPR
         return slg:lmg_rule_to_xpr_dots('l0', irlid)
     end
 ```
+
+TODO: Do I need, or even use, xpr_top?
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -6111,6 +6154,8 @@ which is not kept in the registry.
         while true do
             local rule_id, dot_position, origin = g1r:progress_item()
             if not rule_id then goto LAST_ITEM end
+            if dot_position ~= -1 then goto NEXT_ITEM end
+            ::NEXT_ITEM::
         end
         ::LAST_ITEM::
         g1r:progress_report_finish()
