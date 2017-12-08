@@ -1089,6 +1089,11 @@ in `lmw_g`.
                      {xpr_id, xpr_dot, xpr_rhs[xpr_dot]}
             end
         end
+        local ahm_count = g1g:_ahm_count()
+        for ahm_id = 0, ahm_count -1 do
+            local nrl_id = g1g:_ahm_nrl(ahm_id)
+            local nrl_dot = g1g:_ahm_position(ahm_id)
+        end
     end
 ```
 

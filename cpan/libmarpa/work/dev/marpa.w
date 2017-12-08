@@ -3205,6 +3205,8 @@ int marpa_g_precompute(Marpa_Grammar g)
     @t}\comment{@>
     /* After this point, errors are not recoverable */
 
+    MARPA_OFF_DEBUG3("At %s, ahm count is %ld", STRLOC, (long)(g->t_ahm_count));
+
     @<Clear rule duplication tree@>@;
 
     @t}\comment{@>
@@ -4874,15 +4876,17 @@ involved exist.
 @d Next_AHM_of_AHM(ahm) ((ahm)+1)
 @d Prev_AHM_of_AHM(ahm) ((ahm)-1)
 
-@<Widely aligned grammar elements@> =
-   AHM t_ahms;
-@
 @d AHM_Count_of_G(g) ((g)->t_ahm_count)
-@<Int aligned grammar elements@> =
+@ @<Int aligned grammar elements@> =
    int t_ahm_count;
+@ @<Initialize grammar elements@> =
+g->t_ahm_count = 0;
+
 @ The space is allocated during precomputation.
 Because the grammar may be destroyed before precomputation,
 I test that |g->t_ahms| is non-zero.
+@<Widely aligned grammar elements@> =
+   AHM t_ahms;
 @ @<Initialize grammar elements@> =
 g->t_ahms = NULL;
 @ @<Destroy grammar elements@> =
@@ -5075,6 +5079,7 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     SYMI_Count_of_G(g) = symbol_instance_of_next_rule;
     MARPA_ASSERT(ahm_count == current_item - base_item);
     AHM_Count_of_G(g) = ahm_count;
+    MARPA_DEBUG3("At %s, Setting debug count to %ld", STRLOC, (long)ahm_count);
     g->t_ahms = marpa_renew(struct s_ahm, base_item, ahm_count);
     @<Populate the first |AHM|'s of the |RULE|'s@>@;
 }
@@ -12040,11 +12045,13 @@ int marpa_ptrv_is_trivial(Marpa_PTraverser ptrv)
   @<Fail if fatal error@>@;
   return PTRV_is_Trivial(ptrv);
 }
-@ @<Fail if PIM traverser grammar is trivial@> =
-  if (PTRV_is_Trivial(ptrv)) {
-    MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL);
-    return failure_indicator;
-  }
+
+@q This is not used now, and may never be. @>
+@q @@<Fail if PIM traverser grammar is trivial@@> = @>
+@q  if (PTRV_is_Trivial(ptrv)) { @>
+@q    MARPA_ERROR (MARPA_ERR_GRAMMAR_IS_TRIVIAL); @>
+@q    return failure_indicator; @>
+@q  } @>
 
 @** Parse bocage code (B, BOCAGE).
 @ Pre-initialization is making the elements safe for the deallocation logic
