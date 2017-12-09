@@ -134,57 +134,57 @@ END_RULES
 my $ahms_show_output = $grammar->ahms_show();
 
 Marpa::R3::Test::is( $ahms_show_output, <<'END_AHMS', 'Leo Example AHMs' );
-AHM 0: postdot = "Expression"
+AHM 0: dot=0; nulls=0
     Statement ::= . Expression
-AHM 1: completion
+AHM 1: completion; dot=1; nulls=0
     Statement ::= Expression .
-AHM 2: postdot = "Lvalue"
+AHM 2: dot=0; nulls=0
     Expression ::= . Lvalue AssignOp Expression
-AHM 3: postdot = "AssignOp"
+AHM 3: dot=1; nulls=0
     Expression ::= Lvalue . AssignOp Expression
-AHM 4: postdot = "Expression"
+AHM 4: dot=2; nulls=0
     Expression ::= Lvalue AssignOp . Expression
-AHM 5: completion
+AHM 5: completion; dot=3; nulls=0
     Expression ::= Lvalue AssignOp Expression .
-AHM 6: postdot = "Lvalue"
+AHM 6: dot=0; nulls=0
     Expression ::= . Lvalue AddAssignOp Expression
-AHM 7: postdot = "AddAssignOp"
+AHM 7: dot=1; nulls=0
     Expression ::= Lvalue . AddAssignOp Expression
-AHM 8: postdot = "Expression"
+AHM 8: dot=2; nulls=0
     Expression ::= Lvalue AddAssignOp . Expression
-AHM 9: completion
+AHM 9: completion; dot=3; nulls=0
     Expression ::= Lvalue AddAssignOp Expression .
-AHM 10: postdot = "Lvalue"
+AHM 10: dot=0; nulls=0
     Expression ::= . Lvalue MinusAssignOp Expression
-AHM 11: postdot = "MinusAssignOp"
+AHM 11: dot=1; nulls=0
     Expression ::= Lvalue . MinusAssignOp Expression
-AHM 12: postdot = "Expression"
+AHM 12: dot=2; nulls=0
     Expression ::= Lvalue MinusAssignOp . Expression
-AHM 13: completion
+AHM 13: completion; dot=3; nulls=0
     Expression ::= Lvalue MinusAssignOp Expression .
-AHM 14: postdot = "Lvalue"
+AHM 14: dot=0; nulls=0
     Expression ::= . Lvalue MultiplyAssignOp Expression
-AHM 15: postdot = "MultiplyAssignOp"
+AHM 15: dot=1; nulls=0
     Expression ::= Lvalue . MultiplyAssignOp Expression
-AHM 16: postdot = "Expression"
+AHM 16: dot=2; nulls=0
     Expression ::= Lvalue MultiplyAssignOp . Expression
-AHM 17: completion
+AHM 17: completion; dot=3; nulls=0
     Expression ::= Lvalue MultiplyAssignOp Expression .
-AHM 18: postdot = "Variable"
+AHM 18: dot=0; nulls=0
     Expression ::= . Variable
-AHM 19: completion
+AHM 19: completion; dot=1; nulls=0
     Expression ::= Variable .
-AHM 20: postdot = "Variable"
+AHM 20: dot=0; nulls=0
     Lvalue ::= . Variable
-AHM 21: completion
+AHM 21: completion; dot=1; nulls=0
     Lvalue ::= Variable .
-AHM 22: postdot = "Statement"
+AHM 22: dot=0; nulls=0
     [:start:] ::= . Statement
-AHM 23: completion
+AHM 23: completion; dot=1; nulls=0
     [:start:] ::= Statement .
-AHM 24: postdot = "[:start:]"
+AHM 24: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 25: completion
+AHM 25: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_AHMS
 

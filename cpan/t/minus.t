@@ -121,49 +121,49 @@ END_RULES
 
 Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'END_AHMS', 'Minuses Equation AHMs' );
-AHM 0: postdot = "E"
+AHM 0: dot=0; nulls=0
     E ::= . E Minus E
-AHM 1: postdot = "Minus"
+AHM 1: dot=1; nulls=0
     E ::= E . Minus E
-AHM 2: postdot = "E"
+AHM 2: dot=2; nulls=0
     E ::= E Minus . E
-AHM 3: completion
+AHM 3: completion; dot=3; nulls=0
     E ::= E Minus E .
-AHM 4: postdot = "E"
+AHM 4: dot=0; nulls=0
     E ::= . E MinusMinus
-AHM 5: postdot = "MinusMinus"
+AHM 5: dot=1; nulls=0
     E ::= E . MinusMinus
-AHM 6: completion
+AHM 6: completion; dot=2; nulls=0
     E ::= E MinusMinus .
-AHM 7: postdot = "MinusMinus"
+AHM 7: dot=0; nulls=0
     E ::= . MinusMinus E
-AHM 8: postdot = "E"
+AHM 8: dot=1; nulls=0
     E ::= MinusMinus . E
-AHM 9: completion
+AHM 9: completion; dot=2; nulls=0
     E ::= MinusMinus E .
-AHM 10: postdot = "Minus"
+AHM 10: dot=0; nulls=0
     E ::= . Minus E
-AHM 11: postdot = "E"
+AHM 11: dot=1; nulls=0
     E ::= Minus . E
-AHM 12: completion
+AHM 12: completion; dot=2; nulls=0
     E ::= Minus E .
-AHM 13: postdot = "Number"
+AHM 13: dot=0; nulls=0
     E ::= . Number
-AHM 14: completion
+AHM 14: completion; dot=1; nulls=0
     E ::= Number .
-AHM 15: postdot = "Minus"
+AHM 15: dot=0; nulls=0
     MinusMinus ::= . Minus Minus
-AHM 16: postdot = "Minus"
+AHM 16: dot=1; nulls=0
     MinusMinus ::= Minus . Minus
-AHM 17: completion
+AHM 17: completion; dot=2; nulls=0
     MinusMinus ::= Minus Minus .
-AHM 18: postdot = "E"
+AHM 18: dot=0; nulls=0
     [:start:] ::= . E
-AHM 19: completion
+AHM 19: completion; dot=1; nulls=0
     [:start:] ::= E .
-AHM 20: postdot = "[:start:]"
+AHM 20: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 21: completion
+AHM 21: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_AHMS
 

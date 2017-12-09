@@ -80,35 +80,35 @@ R8 a ~ [a]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->ahms_show(), <<'END_OF_STRING', 'Leo166 AHMs' );
-AHM 0: postdot = "a"
+AHM 0: dot=0; nulls=0
     S ::= . a A
-AHM 1: postdot = "A"
+AHM 1: dot=1; nulls=0
     S ::= a . A
-AHM 2: completion
+AHM 2: completion; dot=2; nulls=0
     S ::= a A .
-AHM 3: postdot = "a"
+AHM 3: dot=0; nulls=0
     S ::= . a A[]
-AHM 4: completion
+AHM 4: completion; dot=2; nulls=1
     S ::= a A[] .
-AHM 5: postdot = "B"
+AHM 5: dot=0; nulls=0
     A ::= . B
-AHM 6: completion
+AHM 6: completion; dot=1; nulls=0
     A ::= B .
-AHM 7: postdot = "C"
+AHM 7: dot=0; nulls=0
     B ::= . C
-AHM 8: completion
+AHM 8: completion; dot=1; nulls=0
     B ::= C .
-AHM 9: postdot = "S"
+AHM 9: dot=0; nulls=0
     C ::= . S
-AHM 10: completion
+AHM 10: completion; dot=1; nulls=0
     C ::= S .
-AHM 11: postdot = "S"
+AHM 11: dot=0; nulls=0
     [:start:] ::= . S
-AHM 12: completion
+AHM 12: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 13: postdot = "[:start:]"
+AHM 13: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 14: completion
+AHM 14: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_OF_STRING
 

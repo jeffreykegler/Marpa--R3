@@ -141,25 +141,25 @@ restore_stdout();
 
 Marpa::R3::Test::is( ${$actual_ref},
     <<'EOS', 'Ambiguous Equation AHMs' );
-AHM 0: postdot = "E"
+AHM 0: dot=0; nulls=0
     E ::= . E Op E
-AHM 1: postdot = "Op"
+AHM 1: dot=1; nulls=0
     E ::= E . Op E
-AHM 2: postdot = "E"
+AHM 2: dot=2; nulls=0
     E ::= E Op . E
-AHM 3: completion
+AHM 3: completion; dot=3; nulls=0
     E ::= E Op E .
-AHM 4: postdot = "Number"
+AHM 4: dot=0; nulls=0
     E ::= . Number
-AHM 5: completion
+AHM 5: completion; dot=1; nulls=0
     E ::= Number .
-AHM 6: postdot = "E"
+AHM 6: dot=0; nulls=0
     [:start:] ::= . E
-AHM 7: completion
+AHM 7: completion; dot=1; nulls=0
     [:start:] ::= E .
-AHM 8: postdot = "[:start:]"
+AHM 8: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 9: completion
+AHM 9: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 EOS
 

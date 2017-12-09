@@ -132,45 +132,45 @@ my $ahms_show_output = $grammar->ahms_show();
 
 Marpa::R3::Test::is( $ahms_show_output,
     <<'END_AHM', 'Implementation Example AHMs' );
-AHM 0: postdot = "Expression"
+AHM 0: dot=0; nulls=0
     Calculator ::= . Expression
-AHM 1: completion
+AHM 1: completion; dot=1; nulls=0
     Calculator ::= Expression .
-AHM 2: postdot = "Number"
+AHM 2: dot=0; nulls=0
     Factor ::= . Number
-AHM 3: completion
+AHM 3: completion; dot=1; nulls=0
     Factor ::= Number .
-AHM 4: postdot = "Term"
+AHM 4: dot=0; nulls=0
     Term ::= . Term [Lex-0] Factor
-AHM 5: postdot = "[Lex-0]"
+AHM 5: dot=1; nulls=0
     Term ::= Term . [Lex-0] Factor
-AHM 6: postdot = "Factor"
+AHM 6: dot=2; nulls=0
     Term ::= Term [Lex-0] . Factor
-AHM 7: completion
+AHM 7: completion; dot=3; nulls=0
     Term ::= Term [Lex-0] Factor .
-AHM 8: postdot = "Factor"
+AHM 8: dot=0; nulls=0
     Term ::= . Factor
-AHM 9: completion
+AHM 9: completion; dot=1; nulls=0
     Term ::= Factor .
-AHM 10: postdot = "Expression"
+AHM 10: dot=0; nulls=0
     Expression ::= . Expression [Lex-1] Term
-AHM 11: postdot = "[Lex-1]"
+AHM 11: dot=1; nulls=0
     Expression ::= Expression . [Lex-1] Term
-AHM 12: postdot = "Term"
+AHM 12: dot=2; nulls=0
     Expression ::= Expression [Lex-1] . Term
-AHM 13: completion
+AHM 13: completion; dot=3; nulls=0
     Expression ::= Expression [Lex-1] Term .
-AHM 14: postdot = "Term"
+AHM 14: dot=0; nulls=0
     Expression ::= . Term
-AHM 15: completion
+AHM 15: completion; dot=1; nulls=0
     Expression ::= Term .
-AHM 16: postdot = "Calculator"
+AHM 16: dot=0; nulls=0
     [:start:] ::= . Calculator
-AHM 17: completion
+AHM 17: completion; dot=1; nulls=0
     [:start:] ::= Calculator .
-AHM 18: postdot = "[:start:]"
+AHM 18: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 19: completion
+AHM 19: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_AHM
 

@@ -88,41 +88,41 @@ R9 b ~ [b]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->ahms_show(), <<'END_OF_STRING', 'Leo168 AHMs' );
-AHM 0: postdot = "a"
+AHM 0: dot=0; nulls=0
     S ::= . a S
-AHM 1: postdot = "S"
+AHM 1: dot=1; nulls=0
     S ::= a . S
-AHM 2: completion
+AHM 2: completion; dot=2; nulls=0
     S ::= a S .
-AHM 3: postdot = "a"
+AHM 3: dot=0; nulls=0
     S ::= . a S[]
-AHM 4: completion
+AHM 4: completion; dot=2; nulls=1
     S ::= a S[] .
-AHM 5: postdot = "C"
+AHM 5: dot=0; nulls=0
     S ::= . C
-AHM 6: completion
+AHM 6: completion; dot=1; nulls=0
     S ::= C .
-AHM 7: postdot = "a"
+AHM 7: dot=0; nulls=0
     C ::= . a C b
-AHM 8: postdot = "C"
+AHM 8: dot=1; nulls=0
     C ::= a . C b
-AHM 9: postdot = "b"
+AHM 9: dot=2; nulls=0
     C ::= a C . b
-AHM 10: completion
+AHM 10: completion; dot=3; nulls=0
     C ::= a C b .
-AHM 11: postdot = "a"
+AHM 11: dot=0; nulls=0
     C ::= . a C[] b
-AHM 12: postdot = "b"
+AHM 12: dot=2; nulls=1
     C ::= a C[] . b
-AHM 13: completion
+AHM 13: completion; dot=3; nulls=0
     C ::= a C[] b .
-AHM 14: postdot = "S"
+AHM 14: dot=0; nulls=0
     [:start:] ::= . S
-AHM 15: completion
+AHM 15: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 16: postdot = "[:start:]"
+AHM 16: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 17: completion
+AHM 17: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_OF_STRING
 
