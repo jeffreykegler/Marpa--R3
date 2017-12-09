@@ -271,6 +271,9 @@ Marpa's internals, as described in
 @deftypefun int _marpa_g_ahm_position (Marpa_Grammar @var{g}, @
     Marpa_AHM_ID @var{item_id})
 @end deftypefun
+@deftypefun int _marpa_g_ahm_null_count (Marpa_Grammar @var{g}, @
+    Marpa_AHM_ID @var{item_id})
+@end deftypefun
 @deftypefun Marpa_Symbol_ID _marpa_g_ahm_postdot (Marpa_Grammar @var{g}, @
     Marpa_AHM_ID @var{item_id})
 @end deftypefun

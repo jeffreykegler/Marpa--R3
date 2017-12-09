@@ -8659,6 +8659,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_ahm_count"},
     {"_marpa_g_ahm_irl", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_postdot", "Marpa_AHM_ID", "item_id"},
+    {"_marpa_g_ahm_null_count", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_irl_count"},
     {"_marpa_g_irl_is_virtual_lhs", "Marpa_IRL_ID", "irl_id"},
     {"_marpa_g_irl_is_virtual_rhs", "Marpa_IRL_ID", "irl_id"},
