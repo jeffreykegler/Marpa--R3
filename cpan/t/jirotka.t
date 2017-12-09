@@ -196,143 +196,143 @@ END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'END_OF_AHMS', 'AHMs' );
-AHM 0: postdot = "Input[Seq]"
+AHM 0: dot=0; nulls=0
     Input ::= . Input[Seq]
-AHM 1: completion
+AHM 1: completion; dot=1; nulls=0
     Input ::= Input[Seq] .
-AHM 2: postdot = "Input[Seq]"
+AHM 2: dot=0; nulls=0
     Input ::= . Input[Seq] SEPARATOR
-AHM 3: postdot = "SEPARATOR"
+AHM 3: dot=1; nulls=0
     Input ::= Input[Seq] . SEPARATOR
-AHM 4: completion
+AHM 4: completion; dot=2; nulls=0
     Input ::= Input[Seq] SEPARATOR .
-AHM 5: postdot = "Statement"
+AHM 5: dot=0; nulls=0
     Input[Seq] ::= . Statement
-AHM 6: completion
+AHM 6: completion; dot=1; nulls=0
     Input[Seq] ::= Statement .
-AHM 7: postdot = "Input[Seq]"
+AHM 7: dot=0; nulls=0
     Input[Seq] ::= . Input[Seq] SEPARATOR Statement
-AHM 8: postdot = "SEPARATOR"
+AHM 8: dot=1; nulls=0
     Input[Seq] ::= Input[Seq] . SEPARATOR Statement
-AHM 9: postdot = "Statement"
+AHM 9: dot=2; nulls=0
     Input[Seq] ::= Input[Seq] SEPARATOR . Statement
-AHM 10: completion
+AHM 10: completion; dot=3; nulls=0
     Input[Seq] ::= Input[Seq] SEPARATOR Statement .
-AHM 11: postdot = "CREATE"
+AHM 11: dot=0; nulls=0
     Statement ::= . CREATE TypeDef
-AHM 12: postdot = "TypeDef"
+AHM 12: dot=1; nulls=0
     Statement ::= CREATE . TypeDef
-AHM 13: completion
+AHM 13: completion; dot=2; nulls=0
     Statement ::= CREATE TypeDef .
-AHM 14: postdot = "METRIC"
+AHM 14: dot=0; nulls=0
     TypeDef ::= . METRIC ID_METRIC AS MetricSelect
-AHM 15: postdot = "ID_METRIC"
+AHM 15: dot=1; nulls=0
     TypeDef ::= METRIC . ID_METRIC AS MetricSelect
-AHM 16: postdot = "AS"
+AHM 16: dot=2; nulls=0
     TypeDef ::= METRIC ID_METRIC . AS MetricSelect
-AHM 17: postdot = "MetricSelect"
+AHM 17: dot=3; nulls=0
     TypeDef ::= METRIC ID_METRIC AS . MetricSelect
-AHM 18: completion
+AHM 18: completion; dot=4; nulls=0
     TypeDef ::= METRIC ID_METRIC AS MetricSelect .
-AHM 19: postdot = "SELECT"
+AHM 19: dot=0; nulls=0
     MetricSelect ::= . SELECT MetricExpr ByClause MetricSelect[R3:3]
-AHM 20: postdot = "MetricExpr"
+AHM 20: dot=1; nulls=0
     MetricSelect ::= SELECT . MetricExpr ByClause MetricSelect[R3:3]
-AHM 21: postdot = "ByClause"
+AHM 21: dot=2; nulls=0
     MetricSelect ::= SELECT MetricExpr . ByClause MetricSelect[R3:3]
-AHM 22: postdot = "MetricSelect[R3:3]"
+AHM 22: dot=3; nulls=0
     MetricSelect ::= SELECT MetricExpr ByClause . MetricSelect[R3:3]
-AHM 23: completion
+AHM 23: completion; dot=4; nulls=0
     MetricSelect ::= SELECT MetricExpr ByClause MetricSelect[R3:3] .
-AHM 24: postdot = "SELECT"
+AHM 24: dot=0; nulls=0
     MetricSelect ::= . SELECT MetricExpr ByClause Match[] Filter[] WithPf[]
-AHM 25: postdot = "MetricExpr"
+AHM 25: dot=1; nulls=0
     MetricSelect ::= SELECT . MetricExpr ByClause Match[] Filter[] WithPf[]
-AHM 26: postdot = "ByClause"
+AHM 26: dot=2; nulls=0
     MetricSelect ::= SELECT MetricExpr . ByClause Match[] Filter[] WithPf[]
-AHM 27: completion
+AHM 27: completion; dot=6; nulls=3
     MetricSelect ::= SELECT MetricExpr ByClause Match[] Filter[] WithPf[] .
-AHM 28: postdot = "SELECT"
+AHM 28: dot=0; nulls=0
     MetricSelect ::= . SELECT MetricExpr ByClause[] MetricSelect[R3:3]
-AHM 29: postdot = "MetricExpr"
+AHM 29: dot=1; nulls=0
     MetricSelect ::= SELECT . MetricExpr ByClause[] MetricSelect[R3:3]
-AHM 30: postdot = "MetricSelect[R3:3]"
+AHM 30: dot=3; nulls=1
     MetricSelect ::= SELECT MetricExpr ByClause[] . MetricSelect[R3:3]
-AHM 31: completion
+AHM 31: completion; dot=4; nulls=0
     MetricSelect ::= SELECT MetricExpr ByClause[] MetricSelect[R3:3] .
-AHM 32: postdot = "SELECT"
+AHM 32: dot=0; nulls=0
     MetricSelect ::= . SELECT MetricExpr ByClause[] Match[] Filter[] WithPf[]
-AHM 33: postdot = "MetricExpr"
+AHM 33: dot=1; nulls=0
     MetricSelect ::= SELECT . MetricExpr ByClause[] Match[] Filter[] WithPf[]
-AHM 34: completion
+AHM 34: completion; dot=6; nulls=4
     MetricSelect ::= SELECT MetricExpr ByClause[] Match[] Filter[] WithPf[] .
-AHM 35: postdot = "Match"
+AHM 35: dot=0; nulls=0
     MetricSelect[R3:3] ::= . Match MetricSelect[R3:4]
-AHM 36: postdot = "MetricSelect[R3:4]"
+AHM 36: dot=1; nulls=0
     MetricSelect[R3:3] ::= Match . MetricSelect[R3:4]
-AHM 37: completion
+AHM 37: completion; dot=2; nulls=0
     MetricSelect[R3:3] ::= Match MetricSelect[R3:4] .
-AHM 38: postdot = "Match"
+AHM 38: dot=0; nulls=0
     MetricSelect[R3:3] ::= . Match Filter[] WithPf[]
-AHM 39: completion
+AHM 39: completion; dot=3; nulls=2
     MetricSelect[R3:3] ::= Match Filter[] WithPf[] .
-AHM 40: postdot = "MetricSelect[R3:4]"
+AHM 40: dot=1; nulls=1
     MetricSelect[R3:3] ::= Match[] . MetricSelect[R3:4]
-AHM 41: completion
+AHM 41: completion; dot=2; nulls=0
     MetricSelect[R3:3] ::= Match[] MetricSelect[R3:4] .
-AHM 42: postdot = "Filter"
+AHM 42: dot=0; nulls=0
     MetricSelect[R3:4] ::= . Filter WithPf
-AHM 43: postdot = "WithPf"
+AHM 43: dot=1; nulls=0
     MetricSelect[R3:4] ::= Filter . WithPf
-AHM 44: completion
+AHM 44: completion; dot=2; nulls=0
     MetricSelect[R3:4] ::= Filter WithPf .
-AHM 45: postdot = "Filter"
+AHM 45: dot=0; nulls=0
     MetricSelect[R3:4] ::= . Filter WithPf[]
-AHM 46: completion
+AHM 46: completion; dot=2; nulls=1
     MetricSelect[R3:4] ::= Filter WithPf[] .
-AHM 47: postdot = "WithPf"
+AHM 47: dot=1; nulls=1
     MetricSelect[R3:4] ::= Filter[] . WithPf
-AHM 48: completion
+AHM 48: completion; dot=2; nulls=0
     MetricSelect[R3:4] ::= Filter[] WithPf .
-AHM 49: postdot = "NUMBER"
+AHM 49: dot=0; nulls=0
     MetricExpr ::= . NUMBER
-AHM 50: completion
+AHM 50: completion; dot=1; nulls=0
     MetricExpr ::= NUMBER .
-AHM 51: postdot = "BY"
+AHM 51: dot=0; nulls=0
     ByClause ::= . BY
-AHM 52: completion
+AHM 52: completion; dot=1; nulls=0
     ByClause ::= BY .
-AHM 53: postdot = "FOR"
+AHM 53: dot=0; nulls=0
     Match ::= . FOR
-AHM 54: completion
+AHM 54: completion; dot=1; nulls=0
     Match ::= FOR .
-AHM 55: postdot = "WHERE"
+AHM 55: dot=0; nulls=0
     Filter ::= . WHERE FilterExpr
-AHM 56: postdot = "FilterExpr"
+AHM 56: dot=1; nulls=0
     Filter ::= WHERE . FilterExpr
-AHM 57: completion
+AHM 57: completion; dot=2; nulls=0
     Filter ::= WHERE FilterExpr .
-AHM 58: postdot = "TRUE"
+AHM 58: dot=0; nulls=0
     FilterExpr ::= . TRUE
-AHM 59: completion
+AHM 59: completion; dot=1; nulls=0
     FilterExpr ::= TRUE .
-AHM 60: postdot = "FALSE"
+AHM 60: dot=0; nulls=0
     FilterExpr ::= . FALSE
-AHM 61: completion
+AHM 61: completion; dot=1; nulls=0
     FilterExpr ::= FALSE .
-AHM 62: postdot = "WITH"
+AHM 62: dot=0; nulls=0
     WithPf ::= . WITH PF
-AHM 63: postdot = "PF"
+AHM 63: dot=1; nulls=0
     WithPf ::= WITH . PF
-AHM 64: completion
+AHM 64: completion; dot=2; nulls=0
     WithPf ::= WITH PF .
-AHM 65: postdot = "Input"
+AHM 65: dot=0; nulls=0
     [:start:] ::= . Input
-AHM 66: completion
+AHM 66: completion; dot=1; nulls=0
     [:start:] ::= Input .
-AHM 67: postdot = "[:start:]"
+AHM 67: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 68: completion
+AHM 68: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_OF_AHMS
 

@@ -70,55 +70,55 @@ END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'END_OF_STRING', 'final nonnulling AHFA' );
-AHM 0: postdot = "p"
+AHM 0: dot=0; nulls=0
     S ::= . p p S[R0:2]
-AHM 1: postdot = "p"
+AHM 1: dot=1; nulls=0
     S ::= p . p S[R0:2]
-AHM 2: postdot = "S[R0:2]"
+AHM 2: dot=2; nulls=0
     S ::= p p . S[R0:2]
-AHM 3: completion
+AHM 3: completion; dot=3; nulls=0
     S ::= p p S[R0:2] .
-AHM 4: postdot = "p"
+AHM 4: dot=0; nulls=0
     S ::= . p p[] S[R0:2]
-AHM 5: postdot = "S[R0:2]"
+AHM 5: dot=2; nulls=1
     S ::= p p[] . S[R0:2]
-AHM 6: completion
+AHM 6: completion; dot=3; nulls=0
     S ::= p p[] S[R0:2] .
-AHM 7: postdot = "p"
+AHM 7: dot=1; nulls=1
     S ::= p[] . p S[R0:2]
-AHM 8: postdot = "S[R0:2]"
+AHM 8: dot=2; nulls=0
     S ::= p[] p . S[R0:2]
-AHM 9: completion
+AHM 9: completion; dot=3; nulls=0
     S ::= p[] p S[R0:2] .
-AHM 10: postdot = "S[R0:2]"
+AHM 10: dot=2; nulls=2
     S ::= p[] p[] . S[R0:2]
-AHM 11: completion
+AHM 11: completion; dot=3; nulls=0
     S ::= p[] p[] S[R0:2] .
-AHM 12: postdot = "p"
+AHM 12: dot=0; nulls=0
     S[R0:2] ::= . p n
-AHM 13: postdot = "n"
+AHM 13: dot=1; nulls=0
     S[R0:2] ::= p . n
-AHM 14: completion
+AHM 14: completion; dot=2; nulls=0
     S[R0:2] ::= p n .
-AHM 15: postdot = "n"
+AHM 15: dot=1; nulls=1
     S[R0:2] ::= p[] . n
-AHM 16: completion
+AHM 16: completion; dot=2; nulls=0
     S[R0:2] ::= p[] n .
-AHM 17: postdot = "a"
+AHM 17: dot=0; nulls=0
     p ::= . a
-AHM 18: completion
+AHM 18: completion; dot=1; nulls=0
     p ::= a .
-AHM 19: postdot = "a"
+AHM 19: dot=0; nulls=0
     n ::= . a
-AHM 20: completion
+AHM 20: completion; dot=1; nulls=0
     n ::= a .
-AHM 21: postdot = "S"
+AHM 21: dot=0; nulls=0
     [:start:] ::= . S
-AHM 22: completion
+AHM 22: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 23: postdot = "[:start:]"
+AHM 23: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 24: completion
+AHM 24: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 END_OF_STRING
 
