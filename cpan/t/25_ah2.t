@@ -147,59 +147,59 @@ Marpa::R3::Test::is( $accessible_symbols, q{A S [:start:] [Lex-0]},
 
 Marpa::R3::Test::is( $grammar->ahms_show(),
     <<'EOS', 'Aycock/Horspool AHMs' );
-AHM 0: postdot = "A"
+AHM 0: dot=0; nulls=0
     S ::= . A S[R0:1]
-AHM 1: postdot = "S[R0:1]"
+AHM 1: dot=1; nulls=0
     S ::= A . S[R0:1]
-AHM 2: completion
+AHM 2: completion; dot=2; nulls=0
     S ::= A S[R0:1] .
-AHM 3: postdot = "A"
+AHM 3: dot=0; nulls=0
     S ::= . A A[] A[] A[]
-AHM 4: completion
+AHM 4: completion; dot=4; nulls=3
     S ::= A A[] A[] A[] .
-AHM 5: postdot = "S[R0:1]"
+AHM 5: dot=1; nulls=1
     S ::= A[] . S[R0:1]
-AHM 6: completion
+AHM 6: completion; dot=2; nulls=0
     S ::= A[] S[R0:1] .
-AHM 7: postdot = "A"
+AHM 7: dot=0; nulls=0
     S[R0:1] ::= . A S[R0:2]
-AHM 8: postdot = "S[R0:2]"
+AHM 8: dot=1; nulls=0
     S[R0:1] ::= A . S[R0:2]
-AHM 9: completion
+AHM 9: completion; dot=2; nulls=0
     S[R0:1] ::= A S[R0:2] .
-AHM 10: postdot = "A"
+AHM 10: dot=0; nulls=0
     S[R0:1] ::= . A A[] A[]
-AHM 11: completion
+AHM 11: completion; dot=3; nulls=2
     S[R0:1] ::= A A[] A[] .
-AHM 12: postdot = "S[R0:2]"
+AHM 12: dot=1; nulls=1
     S[R0:1] ::= A[] . S[R0:2]
-AHM 13: completion
+AHM 13: completion; dot=2; nulls=0
     S[R0:1] ::= A[] S[R0:2] .
-AHM 14: postdot = "A"
+AHM 14: dot=0; nulls=0
     S[R0:2] ::= . A A
-AHM 15: postdot = "A"
+AHM 15: dot=1; nulls=0
     S[R0:2] ::= A . A
-AHM 16: completion
+AHM 16: completion; dot=2; nulls=0
     S[R0:2] ::= A A .
-AHM 17: postdot = "A"
+AHM 17: dot=0; nulls=0
     S[R0:2] ::= . A A[]
-AHM 18: completion
+AHM 18: completion; dot=2; nulls=1
     S[R0:2] ::= A A[] .
-AHM 19: postdot = "A"
+AHM 19: dot=1; nulls=1
     S[R0:2] ::= A[] . A
-AHM 20: completion
+AHM 20: completion; dot=2; nulls=0
     S[R0:2] ::= A[] A .
-AHM 21: postdot = "[Lex-0]"
+AHM 21: dot=0; nulls=0
     A ::= . [Lex-0]
-AHM 22: completion
+AHM 22: completion; dot=1; nulls=0
     A ::= [Lex-0] .
-AHM 23: postdot = "S"
+AHM 23: dot=0; nulls=0
     [:start:] ::= . S
-AHM 24: completion
+AHM 24: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 25: postdot = "[:start:]"
+AHM 25: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
-AHM 26: completion
+AHM 26: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
 EOS
 

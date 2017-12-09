@@ -5045,7 +5045,15 @@ int _marpa_g_ahm_position(Marpa_Grammar g,
     return Position_of_AHM(AHM_by_ID(item_id));
 }
 
-@ |-1| is the value for completions, so |-2| is the failure indicator.
+@ @<Function definitions@> =
+int _marpa_g_ahm_raw_position(Marpa_Grammar g,
+        Marpa_AHM_ID item_id) {
+    @<Return |-2| on failure@>@/
+    @<Fail if not precomputed@>@/
+    @<Fail if |item_id| is invalid@>@/
+    return Raw_Position_of_AHM(AHM_by_ID(item_id));
+}
+
 @ @<Function definitions@> =
 int _marpa_g_ahm_null_count(Marpa_Grammar g,
         Marpa_AHM_ID item_id) {

@@ -8171,14 +8171,14 @@ indexed by isyid.
         local properties = {}
         if not postdot_id then
             properties[#properties+1] = 'completion'
-        else
-            properties[#properties+1] =
-               'postdot = "' ..  lmw_g:nsy_name(postdot_id) .. '"'
         end
+        local dot_position = lmw_g:_ahm_raw_position(item_id)
+        properties[#properties+1] = 'dot=' .. dot_position
+        local null_count = lmw_g:_ahm_null_count(item_id)
+        properties[#properties+1] = 'nulls=' .. null_count
         pieces[#pieces+1] = table.concat(properties, '; ')
         pieces[#pieces+1] = "\n    "
         local irl_id = lmw_g:_ahm_nrl(item_id)
-        local dot_position = lmw_g:_ahm_position(item_id)
         pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
         pieces[#pieces+1] = '\n'
         return table.concat(pieces)
@@ -8660,6 +8660,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_ahm_irl", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_postdot", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_null_count", "Marpa_AHM_ID", "item_id"},
+    {"_marpa_g_ahm_raw_position", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_irl_count"},
     {"_marpa_g_irl_is_virtual_lhs", "Marpa_IRL_ID", "irl_id"},
     {"_marpa_g_irl_is_virtual_rhs", "Marpa_IRL_ID", "irl_id"},

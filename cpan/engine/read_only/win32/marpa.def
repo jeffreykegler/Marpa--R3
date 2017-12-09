@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Fri Dec  8 17:16:19 2017
+; Fri Dec  8 19:04:46 2017
 EXPORTS
    marpa_check_version
    marpa_version
@@ -183,6 +183,7 @@ EXPORTS
    _marpa_g_ahm_count
    _marpa_g_ahm_irl
    _marpa_g_ahm_position
+   _marpa_g_ahm_raw_position
    _marpa_g_ahm_null_count
    _marpa_g_ahm_postdot
    _marpa_r_is_use_leo
