@@ -588,7 +588,7 @@ information: `(xrlid, xrl_dot, predot_xsy)`.
 
 ```
     -- miranda: section+ class_slg field declarations
-    class_slg_fields.i_to_xpr_dotted = true
+    class_slg_fields.ahmdots = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -1063,37 +1063,40 @@ in `lmw_g`.
 
 ```
     -- miranda: section+ forward declarations
-    local precompute_i_to_xpr_dotted
+    local precompute_ahmdots
     -- miranda: section+ most Lua function definitions
-    function precompute_i_to_xpr_dotted(slg)
+    function precompute_ahmdots(slg)
         local g1g = slg.g1
-        local xprs = slg.xprs
-        local i_to_xpr_dotted = {}
-        slg.i_to_xpr_dotted = i_to_xpr_dotted
-        for irlid = 0, g1g:highest_rule_id() do
-            local irl = g1g.irls[irlid]
-            local this_i_to_xpr_dotted = {}
-            i_to_xpr_dotted[irlid] = this_i_to_xpr_dotted
-            local xpr_id = slg:g1_rule_to_xprid(irlid)
-            local xpr = xprs[xpr_id]
-            local xpr_rhs = xpr.rhs
-            local xpr_dots = slg:g1_rule_to_xpr_dots(irlid)
-            for irl_dot = 1, g1g:rule_length(irlid) do
-                 local xpr_dot
-                 if irl_dot == -1 then
-                     xpr_dot = xpr_dots[#xpr_dots]
-                 else
-                     xpr_dot = xpr_dots[irl_dot]
-                 end
-                 this_i_to_xpr_dotted[irl_dot] =
-                     {xpr_id, xpr_dot, xpr_rhs[xpr_dot]}
-            end
-        end
+        local ahmdots = {}
         local ahm_count = g1g:_ahm_count()
         for ahm_id = 0, ahm_count -1 do
+            local ahmdot = {}
             local nrl_id = g1g:_ahm_nrl(ahm_id)
-            local nrl_dot = g1g:_ahm_position(ahm_id)
+            local xrl_id = g1g:_source_xrl(nrl_id)
+            if xrl_id then
+                local nrl_dot = g1g:_ahm_position(ahm_id)
+                local null_count = g1g:_ahm_null_count(ahm_id)
+                local rhs_ix1 = nrl_dot - 1 - null_count
+                if rhs_ix1 < 0 then
+                    rhs_ix1 = 0
+                else
+                    local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1)
+                    local xsy_id = g1g:_source_xsy(nsy_id)
+                    if xsy_id then
+                        ahmdot[#ahmdot+1] = { xrl_id, xsy_id, false }
+                    end
+                end
+                for null_ix = 1, null_count do
+                    local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1 + null_ix)
+                    local xsy_id = g1g:_source_xsy(nsy_id)
+                    if xsy_id then
+                        ahmdot[#ahmdot+1] = { xrl_id, xsy_id, true }
+                    end
+                end
+            end
+            ahmdots[ahm_id] = ahmdot
         end
+        slg.ahmdots = ahmdots
     end
 ```
 
@@ -1368,7 +1371,7 @@ and creates the "runtime" version, as a side effect.
 
         precompute_g1(slg, source_hash);
         precompute_l0(slg, source_hash);
-        precompute_i_to_xpr_dotted(slg);
+        precompute_ahmdots(slg);
         precompute_discard_events(slg, source_hash)
         precompute_lexeme_adverbs(slg, source_hash)
         precompute_xsy_blessings(slg, source_hash)
