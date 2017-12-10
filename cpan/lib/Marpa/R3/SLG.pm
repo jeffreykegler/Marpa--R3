@@ -850,14 +850,16 @@ END_OF_LUA
 
 # not to be documented
 sub Marpa::R3::Grammar::ahms_show {
-    my ( $slg ) = @_;
+    my ( $slg, $options ) = @_;
+    $options //= {};
+    my $verbose = $options->{verbose} or 0;
 
     my ($text) = $slg->call_by_tag(
         ('@' . __FILE__ . ':' .  __LINE__),
-        <<'END_OF_LUA', '' );
-    local grammar = ...
+        <<'END_OF_LUA', 'i', $verbose );
+    local grammar, verbose = ...
     local g1g = grammar.g1
-    return g1g:ahms_show()
+    return g1g:ahms_show({verbose = verbose})
 END_OF_LUA
 
     return $text;

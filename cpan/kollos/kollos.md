@@ -1075,16 +1075,23 @@ in `lmw_g`.
             local nrl_id = g1g:_ahm_nrl(ahm_id)
             local xrl_id = g1g:_source_xrl(nrl_id)
             if xrl_id then
-                local nrl_dot = g1g:_ahm_position(ahm_id)
+                local nrl_dot = g1g:_ahm_raw_position(ahm_id)
                 local null_count = g1g:_ahm_null_count(ahm_id)
                 local rhs_ix1 = nrl_dot - 1 - null_count
                 if rhs_ix1 < 0 then
-                    rhs_ix1 = 0
+                    -- urglade[#urglade+1] = { 'TODO', string.format("nrl_dot=%d null_count=%d rhs_ix1=%d",
+                       -- nrl_dot, null_count, rhs_ix1) }
                 else
                     local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1)
+                    if not g1g:_nsy_is_semantic(nsy_id) then
+                        goto DO_NULLS
+                    end
+                    -- urglade[#urglade+1] = { 'TODO', inspect(g1g:_nsy_is_semantic(nsy_id)) }
                     local xsy_id = g1g:_source_xsy(nsy_id)
+                    -- urglade[#urglade+1] = { 'TODO 2', xrl_id, xsy_id, nsy_id }
                     if xsy_id then
-                        -- TODO: Must test xsy because of xsy_id.
+                        -- TODO: Must test xsy because does not exist for every xsy_id
+                        --   Example: xsy_id == 0
                         --   Is this OK?  Or a misfeature?
                         local xsy = xsys[xsy_id]
                         local is_terminal = xsy and xsy.lexeme
@@ -1092,11 +1099,17 @@ in `lmw_g`.
                         urglade[#urglade+1] = { xrl_id, xsy_id, xsy_type }
                     end
                 end
+                ::DO_NULLS::
                 for null_ix = 1, null_count do
+                    -- urglade[#urglade+1] = { 'TODO rhs_ix1, null_ix', inspect(rhs_ix1), inspect(null_ix) }
                     local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1 + null_ix)
-                    local xsy_id = g1g:_source_xsy(nsy_id)
-                    if xsy_id then
-                        urglade[#urglade+1] = { xrl_id, xsy_id, 'n' }
+                    -- urglade[#urglade+1] = { 'TODO nsy_id', inspect(nsy_id) }
+                    if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
+                        -- urglade[#urglade+1] = { 'TODO semantic null_ix', inspect(null_ix) }
+                        local xsy_id = g1g:_source_xsy(nsy_id)
+                        if xsy_id then
+                            urglade[#urglade+1] = { xrl_id, xsy_id, 'n' }
+                        end
                     end
                 end
             end
@@ -2385,6 +2398,7 @@ Populate the `xsys` table.
             runtime_xsy.dsl_form = xsy_source.dsl_form
             runtime_xsy.if_inaccessible = xsy_source.if_inaccessible
             runtime_xsy.name_source = xsy_source.name_source
+            runtime_xsy.is_start = xsy_name == '[:start:]'
 
             xsys[xsy_name] = runtime_xsy
             xsys[xsy_id] = runtime_xsy
@@ -7886,6 +7900,7 @@ the "no lexeme" and "discard" situations.
     class_xsy_fields.if_inaccessible = true
     class_xsy_fields.name_source = true
     class_xsy_fields.lexeme = true
+    class_xsy_fields.is_start = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -8140,7 +8155,7 @@ indexed by isyid.
          -- start symbol
          local nsy_id = math.tointeger(nsy_id_arg)
          if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
-         local nsy_is_start = 0 ~= lmw_g:_nsy_is_start(nsy_id)
+         local nsy_is_start = lmw_g:_nsy_is_start(nsy_id)
          if nsy_is_start then
              local xsy_id = lmw_g:_source_xsy(nsy_id)
              local xsy_name = lmw_g:symbol_name(xsy_id)
@@ -8193,6 +8208,7 @@ indexed by isyid.
         pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
         pieces[#pieces+1] = '\n'
         if verbose > 0 then
+            local slg = lmw_g.slg
             pieces[#pieces+1] = '    '
             pieces[#pieces+1] = inspect(slg.urglades[ahm_id])
             pieces[#pieces+1] = '\n'
@@ -8619,7 +8635,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_g_symbol_is_prediction_event", "Marpa_Symbol_ID", "sym_id"},
     {"marpa_g_symbol_is_prediction_event_set", "Marpa_Symbol_ID", "sym_id", "int", "value"},
     {"marpa_g_symbol_is_productive", "Marpa_Symbol_ID", "symbol_id"},
-    {"marpa_g_symbol_is_start", "Marpa_Symbol_ID", "symbol_id"},
+    {"marpa_g_symbol_is_start", "Marpa_Symbol_ID", "symbol_id", return_type = 'boolean'},
     {"marpa_g_symbol_is_terminal", "Marpa_Symbol_ID", "symbol_id"},
     {"marpa_g_symbol_is_terminal_set", "Marpa_Symbol_ID", "symbol_id", "int", "boolean"},
     {"marpa_g_symbol_is_valued", "Marpa_Symbol_ID", "symbol_id"},
@@ -8689,7 +8705,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_nsy_is_lhs", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_is_semantic", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
-    {"_marpa_g_nsy_is_start", "Marpa_NSY_ID", "nsy_id"},
+    {"_marpa_g_nsy_is_start", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_lhs_xrl", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_rank", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_xrl_offset", "Marpa_NSY_ID", "nsy_id"},
