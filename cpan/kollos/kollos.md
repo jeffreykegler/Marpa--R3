@@ -588,7 +588,7 @@ information: `(xrlid, xrl_dot, predot_xsy)`.
 
 ```
     -- miranda: section+ class_slg field declarations
-    class_slg_fields.ahmdots = true
+    class_slg_fields.urglades = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -1063,14 +1063,15 @@ in `lmw_g`.
 
 ```
     -- miranda: section+ forward declarations
-    local precompute_ahmdots
+    local precompute_urglades
     -- miranda: section+ most Lua function definitions
-    function precompute_ahmdots(slg)
+    function precompute_urglades(slg)
         local g1g = slg.g1
-        local ahmdots = {}
+        local xsys = slg.xsys
+        local urglades = {}
         local ahm_count = g1g:_ahm_count()
         for ahm_id = 0, ahm_count -1 do
-            local ahmdot = {}
+            local urglade = {}
             local nrl_id = g1g:_ahm_nrl(ahm_id)
             local xrl_id = g1g:_source_xrl(nrl_id)
             if xrl_id then
@@ -1083,20 +1084,25 @@ in `lmw_g`.
                     local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1)
                     local xsy_id = g1g:_source_xsy(nsy_id)
                     if xsy_id then
-                        ahmdot[#ahmdot+1] = { xrl_id, xsy_id, false }
+                        -- TODO: Must test xsy because of xsy_id.
+                        --   Is this OK?  Or a misfeature?
+                        local xsy = xsys[xsy_id]
+                        local is_terminal = xsy and xsy.lexeme
+                        local xsy_type = is_terminal and 't' or 'b'
+                        urglade[#urglade+1] = { xrl_id, xsy_id, xsy_type }
                     end
                 end
                 for null_ix = 1, null_count do
                     local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1 + null_ix)
                     local xsy_id = g1g:_source_xsy(nsy_id)
                     if xsy_id then
-                        ahmdot[#ahmdot+1] = { xrl_id, xsy_id, true }
+                        urglade[#urglade+1] = { xrl_id, xsy_id, 'n' }
                     end
                 end
             end
-            ahmdots[ahm_id] = ahmdot
+            urglades[ahm_id] = urglade
         end
-        slg.ahmdots = ahmdots
+        slg.urglades = urglades
     end
 ```
 
@@ -1371,7 +1377,7 @@ and creates the "runtime" version, as a side effect.
 
         precompute_g1(slg, source_hash);
         precompute_l0(slg, source_hash);
-        precompute_ahmdots(slg);
+        precompute_urglades(slg);
         precompute_discard_events(slg, source_hash)
         precompute_lexeme_adverbs(slg, source_hash)
         precompute_xsy_blessings(slg, source_hash)
@@ -2248,7 +2254,7 @@ Lowest ISYID is 0.
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
-                gig:symbol_is_terminal_set(isyid, value)
+                g1g:symbol_is_terminal_set(isyid, value)
                 goto NEXT_PROPERTY
             end
             if property == 'rank' then
@@ -2301,7 +2307,7 @@ Lowest ISYID is 0.
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
-                gig:symbol_is_terminal_set(isyid, value)
+                g1g:symbol_is_terminal_set(isyid, value)
                 goto NEXT_PROPERTY
             end
             if property == 'rank' then
@@ -8168,30 +8174,37 @@ indexed by isyid.
          return xsy_name
     end
 
-    function _M.class_grammar.ahm_show(lmw_g, item_id)
-        local postdot_id = lmw_g:_ahm_postdot(item_id)
-        local pieces = { "AHM " .. item_id .. ': ' }
+    function _M.class_grammar.ahm_show(lmw_g, ahm_id, options)
+        local options = options or {}
+        local verbose = options.verbose or 0
+        local postdot_id = lmw_g:_ahm_postdot(ahm_id)
+        local pieces = { "AHM " .. ahm_id .. ': ' }
         local properties = {}
         if not postdot_id then
             properties[#properties+1] = 'completion'
         end
-        local dot_position = lmw_g:_ahm_raw_position(item_id)
+        local dot_position = lmw_g:_ahm_raw_position(ahm_id)
         properties[#properties+1] = 'dot=' .. dot_position
-        local null_count = lmw_g:_ahm_null_count(item_id)
+        local null_count = lmw_g:_ahm_null_count(ahm_id)
         properties[#properties+1] = 'nulls=' .. null_count
         pieces[#pieces+1] = table.concat(properties, '; ')
         pieces[#pieces+1] = "\n    "
-        local irl_id = lmw_g:_ahm_nrl(item_id)
+        local irl_id = lmw_g:_ahm_nrl(ahm_id)
         pieces[#pieces+1] = lmw_g:_dotted_nrl_show(irl_id, dot_position)
         pieces[#pieces+1] = '\n'
+        if verbose > 0 then
+            pieces[#pieces+1] = '    '
+            pieces[#pieces+1] = inspect(slg.urglades[ahm_id])
+            pieces[#pieces+1] = '\n'
+        end
         return table.concat(pieces)
     end
 
-    function _M.class_grammar.ahms_show(lmw_g)
+    function _M.class_grammar.ahms_show(lmw_g, options)
         local pieces = {}
         local count = lmw_g:_ahm_count()
         for i = 0, count -1 do
-            pieces[#pieces+1] = lmw_g:ahm_show(i)
+            pieces[#pieces+1] = lmw_g:ahm_show(i, options)
         end
         return table.concat(pieces)
     end
