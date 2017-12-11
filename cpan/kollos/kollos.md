@@ -1084,7 +1084,7 @@ in `lmw_g`.
                         goto DO_NULLS
                     end
                     -- urglade[#urglade+1] = { 'TODO', inspect(g1g:_nsy_is_semantic(nsy_id)) }
-                    local xsy_id = g1g:_source_xsy(nsy_id)
+                    local xsy_id = g1g:xsyid_by_nsy(nsy_id)
                     -- urglade[#urglade+1] = { 'TODO 2', xrl_id, xsy_id, nsy_id }
                     if xsy_id then
                         -- TODO: Must test xsy because does not exist for every xsy_id
@@ -1103,7 +1103,7 @@ in `lmw_g`.
                     -- urglade[#urglade+1] = { 'TODO nsy_id', inspect(nsy_id) }
                     if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
                         -- urglade[#urglade+1] = { 'TODO semantic null_ix', inspect(null_ix) }
-                        local xsy_id = g1g:_source_xsy(nsy_id)
+                        local xsy_id = g1g:xsyid_by_nsy(nsy_id)
                         if xsy_id then
                             urglade[#urglade+1] = { xrl_id, xsy_id, 'n' }
                         end
@@ -6664,62 +6664,6 @@ Returns a new asf.
     end
 ```
 
-In fact, I expect there will never be more than one
-token symch in any glade.
-Relying on this fact would simplify `token_glade_obtain()`
-considerably.
-
-TODO: Delete this?
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_glade.token_glade_obtain(asf, and_ids_arg)
-        local key_elements = {0, table.unpack(and_ids_arg)}
-        table.sort(key_elements)
-        key_elements[1] = -#and_ids_arg
-        local key = table.concat(key_elements, ',')
-        local glade = asf.glades[key]
-        if glade then return glade end
-        -- Glade does not exist, so we create it
-
-        local slr = asf.slr
-        local and_ids = {}
-        for ix = 1, #and_ids_arg do
-            local and_id = and_ids_arg[ix]
-            local token_nsy_id = asf.lmw_b:_and_node_symbol(and_id)
-            local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
-            and_ids[ix] = { token_id, and_id }
-        end
-        table.sort(and_ids, _M.cmp_seq)
-
-        local token_symches = {}
-        local this_and_id = and_ids[1]
-        local last_token_id = this_and_id[1]
-        local this_symch = {this_and_id[2]}
-        for ix = 2, #and_ids do
-            this_and_id = and_ids[ix]
-            local this_token_id = this_and_id[1]
-            if this_token_id ~= last_token_id then
-                token_symches[#token_symches+1] = this_symch
-                this_symch = {}
-            end
-            this_symch[#this_symch+1] = this_and_id[2]
-            last_token_id = this_token_id
-        end
-        token_symches[#token_symches+1] = this_symch
-
-        glade = setmetatable({}, _M.class_glade)
-        glade.token_symches = token_symches
-
-        glade.asf = asf
-        local glades = asf.glades
-        local glade_ix = #glades+1
-        glades[key] = glade
-        glades[glade_ix] = glade
-        return glade
-    end
-```
-
 TODO: Delete this?
 
 ```
@@ -8179,28 +8123,31 @@ indexed by isyid.
                 lhs_name, lhs_xrl, xrl_offset)
         end
 
+        local suffix = ''
+        local is_start = grammar:_nsy_is_start(nsy_id)
+        if is_start then suffix = suffix .. "[']" end
         local is_nulling = grammar:_nsy_is_nulling(nsy_id)
-        local nulling_suffix = is_nulling and '[]' or ''
+        if is_nulling then suffix = suffix .. "[]" end
 
         local isy_id = grammar:_source_xsy(nsy_id)
         if not isy_id then
-            return string.format("[NO_ISYID:nsy=%d]%s", nsy_id, nulling_suffix)
+            return string.format("[NO_ISYID:nsy=%d]%s", nsy_id, suffix)
         end
 
         local xsy_id = grammar:xsyid(isy_id)
         if not xsy_id then
-            return string.format("[NO_XSYID:nsy=%d:isyid=%d]%s", nsy_id, isy_id, nulling_suffix)
+            return string.format("[NO_XSYID:nsy=%d:isyid=%d]%s", nsy_id, isy_id, suffix)
         end
 
-        local slg = lmw_g.slg
+        local slg = grammar.slg
 
         local xsy_name = slg:symbol_name(xsy_id)
         -- print('xsy_id =', inspect(xsy_id), inspect(xsy_name))
         if xsy_name then
-            return xsy_name .. nulling_suffix
+            return xsy_name .. suffix
         end
 
-        return string.format("[nsy=%d:xsy=%d]%s", nsy_id, xsy_id, nulling_suffix)
+        return string.format("[nsy=%d:xsy=%d]%s", nsy_id, xsy_id, suffix)
     end
 
     function _M.class_grammar.ahm_show(lmw_g, ahm_id, options)
@@ -8296,7 +8243,7 @@ TODO: Perhaps `isy_key` should also allow isy tables.
         -- TODO: `source_xsy()` name is relic -- will be fixed
         -- when nsy's are eliminated.
         local isy_id = grammar:_source_xsy(nsy_id)
-        print(string.format("isy_id=%d nsy_id=%d", isy_id, nsy_id))
+        -- print(string.format("isy_id=%d nsy_id=%d", isy_id, nsy_id))
         if not isy_id then return end
         return grammar:xsyid(isy_id)
     end
