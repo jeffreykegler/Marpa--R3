@@ -1078,10 +1078,7 @@ in `lmw_g`.
                 local nrl_dot = g1g:_ahm_raw_position(ahm_id)
                 local null_count = g1g:_ahm_null_count(ahm_id)
                 local rhs_ix1 = nrl_dot - 1 - null_count
-                if rhs_ix1 < 0 then
-                    -- urglade[#urglade+1] = { 'TODO', string.format("nrl_dot=%d null_count=%d rhs_ix1=%d",
-                       -- nrl_dot, null_count, rhs_ix1) }
-                else
+                if rhs_ix1 >= 0 then
                     local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1)
                     if not g1g:_nsy_is_semantic(nsy_id) then
                         goto DO_NULLS
@@ -8151,42 +8148,59 @@ indexed by isyid.
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
-    function _M.class_grammar.nsy_name(lmw_g, nsy_id_arg)
-         -- start symbol
-         local nsy_id = math.tointeger(nsy_id_arg)
-         if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
-         local nsy_is_start = lmw_g:_nsy_is_start(nsy_id)
-         if nsy_is_start then
-             local xsy_id = lmw_g:_source_xsy(nsy_id)
-             local xsy_name = lmw_g:symbol_name(xsy_id)
-             return xsy_name .. "[']"
-         end
+    function _M.class_grammar.nsy_name(grammar, nsy_id_arg)
+        -- start symbol
+        local nsy_id = math.tointeger(nsy_id_arg)
+        -- print('nsy_id_arg =', inspect(nsy_id_arg))
+        if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
 
-         -- sequence LHS
-         local lhs_xrl = lmw_g:_nsy_lhs_xrl(nsy_id)
-         if lhs_xrl and lmw_g:sequence_min(lhs_xrl) then
-             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
-             local lhs_name = lmw_g:symbol_name(original_lhs_id)
-             return lhs_name .. "[Seq]"
-         end
 
-         -- virtual symbol
-         local xrl_offset = lmw_g:_nsy_xrl_offset(nsy_id)
-         if xrl_offset and xrl_offset > 0 then
-             local original_lhs_id = lmw_g:rule_lhs(lhs_xrl)
-             local lhs_name = lmw_g:symbol_name(original_lhs_id)
-             return string.format("%s[R%d:%d]",
-                 lhs_name, lhs_xrl, xrl_offset)
-         end
+        -- local nsy_is_start = grammar:_nsy_is_start(nsy_id)
+        -- if nsy_is_start then
+            -- local xsy_id = grammar:xsyid_by_nsy(nsy_id)
+            -- local xsy_name = grammar:symbol_name(xsy_id)
+            -- return xsy_name .. "[']"
+        -- end
 
-         -- real, named symbol or its nulling equivalent
-         local xsy_id = lmw_g:_source_xsy(nsy_id)
-         local xsy_name = lmw_g:symbol_name(xsy_id)
-         local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
-         if is_nulling then
-             xsy_name = xsy_name .. "[]"
-         end
-         return xsy_name
+        -- sequence LHS
+        local lhs_xrl = grammar:_nsy_lhs_xrl(nsy_id)
+        if lhs_xrl and grammar:sequence_min(lhs_xrl) then
+            local original_lhs_id = grammar:rule_lhs(lhs_xrl)
+            local lhs_name = grammar:symbol_name(original_lhs_id)
+            return lhs_name .. "[Seq]"
+        end
+
+        -- virtual symbol
+        local xrl_offset = grammar:_nsy_xrl_offset(nsy_id)
+        if xrl_offset and xrl_offset > 0 then
+            local original_lhs_id = grammar:rule_lhs(lhs_xrl)
+            local lhs_name = grammar:symbol_name(original_lhs_id)
+            return string.format("%s[R%d:%d]",
+                lhs_name, lhs_xrl, xrl_offset)
+        end
+
+        local is_nulling = grammar:_nsy_is_nulling(nsy_id)
+        local nulling_suffix = is_nulling and '[]' or ''
+
+        local isy_id = grammar:_source_xsy(nsy_id)
+        if not isy_id then
+            return string.format("[NO_ISYID:nsy=%d]%s", nsy_id, nulling_suffix)
+        end
+
+        local xsy_id = grammar:xsyid(isy_id)
+        if not xsy_id then
+            return string.format("[NO_XSYID:nsy=%d:isyid=%d]%s", nsy_id, isy_id, nulling_suffix)
+        end
+
+        local slg = lmw_g.slg
+
+        local xsy_name = slg:symbol_name(xsy_id)
+        -- print('xsy_id =', inspect(xsy_id), inspect(xsy_name))
+        if xsy_name then
+            return xsy_name .. nulling_suffix
+        end
+
+        return string.format("[nsy=%d:xsy=%d]%s", nsy_id, xsy_id, nulling_suffix)
     end
 
     function _M.class_grammar.ahm_show(lmw_g, ahm_id, options)
@@ -8229,7 +8243,7 @@ indexed by isyid.
         local name = lmw_g:nsy_name(nsy_id)
         local pieces = { string.format("%d: %s", nsy_id, name) }
         local tags = {}
-        local is_nulling = 0 ~= lmw_g:_nsy_is_nulling(nsy_id)
+        local is_nulling = lmw_g:_nsy_is_nulling(nsy_id)
         if is_nulling then
         tags[#tags+1] = 'nulling'
         end
@@ -8277,6 +8291,14 @@ TODO: Perhaps `isy_key` should also allow isy tables.
                inspect(isy_key))
         end
         return xsy.id
+    end
+    function _M.class_grammar.xsyid_by_nsy(grammar, nsy_id)
+        -- TODO: `source_xsy()` name is relic -- will be fixed
+        -- when nsy's are eliminated.
+        local isy_id = grammar:_source_xsy(nsy_id)
+        print(string.format("isy_id=%d nsy_id=%d", isy_id, nsy_id))
+        if not isy_id then return end
+        return grammar:xsyid(isy_id)
     end
 ```
 
@@ -8703,7 +8725,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_irl_semantic_equivalent", "Marpa_IRL_ID", "irl_id"},
     {"_marpa_g_nsy_count"},
     {"_marpa_g_nsy_is_lhs", "Marpa_NSY_ID", "nsy_id"},
-    {"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id"},
+    {"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_is_semantic", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_is_start", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_lhs_xrl", "Marpa_NSY_ID", "nsy_id"},
