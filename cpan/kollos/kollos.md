@@ -6165,9 +6165,10 @@ which is not kept in the registry.
         end
         g1r:progress_report_start(g1_end)
         while true do
-            local rule_id, dot_position, origin = g1r:progress_item()
-            if not rule_id then goto LAST_ITEM end
+            local irlid, dot_position, origin = g1r:progress_item()
+            if not irlid then goto LAST_ITEM end
             if dot_position ~= -1 then goto NEXT_ITEM end
+            if origin ~= g1_start then goto NEXT_ITEM end
             ::NEXT_ITEM::
         end
         ::LAST_ITEM::
@@ -6638,69 +6639,6 @@ make this a Perl object.
 
     -- miranda: insert class_glade field declarations
     declarations(_M.class_glade, class_glade_fields, 'glade')
-```
-
-### Glade constructors
-
-TODO: Under construction.
-
-Returns a new asf.
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.asf_new(slr, xsyid, g1_start_arg, g1_end_arg)
-    end
-```
-
-TODO: Delete this?
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_glade.rule_glade_obtain(asf, or_ids_arg)
-        local key_elements = {0, table.unpack(or_ids_arg)}
-        table.sort(key_elements)
-        key_elements[1] = #or_ids_arg
-        local key = table.concat(key_elements, ',')
-        local glade = asf.glades[key]
-        if glade then return glade end
-        -- Glade does not exist, so we create it
-
-        local slr = asf.slr
-        local or_ids = {}
-        for ix = 1, #or_ids_arg do
-            local or_id = or_ids_arg[ix]
-            local nrl_id = asf.lmw_b:_or_node_nrl(nid)
-            local irl_id slr.slg.g1:_source_xrl(nrl_id)
-            or_ids[ix] = { irl_id, or_id }
-        end
-        table.sort(or_ids, _M.cmp_seq)
-
-        local token_symches = {}
-        local this_or_id = or_ids[1]
-        local last_token_id = this_or_id[1]
-        local this_symch = {this_or_id[2]}
-        for ix = 2, #or_ids do
-            this_or_id = or_ids[ix]
-            local this_token_id = this_or_id[1]
-            if this_token_id ~= last_token_id then
-                token_symches[#token_symches+1] = this_symch
-                this_symch = {}
-            end
-            this_symch[#this_symch+1] = this_or_id[2]
-            last_token_id = this_token_id
-        end
-        token_symches[#token_symches+1] = this_symch
-
-        glade = setmetatable({}, _M.class_glade)
-        glade.token_symches = token_symches
-
-        glade.asf = asf
-        local glades = asf.glades
-        local glade_ix = #glades+1
-        glades[key] = glade
-        glades[glade_ix] = glade
-        return glade
-    end
 ```
 
 ## Kollos semantics
