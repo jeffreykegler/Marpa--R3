@@ -1073,40 +1073,28 @@ in `lmw_g`.
         for ahm_id = 0, ahm_count -1 do
             local urglade = {}
             local nrl_id = g1g:_ahm_nrl(ahm_id)
-            local xrl_id = g1g:_source_xrl(nrl_id)
-            if xrl_id then
-                local nrl_dot = g1g:_ahm_raw_position(ahm_id)
-                local null_count = g1g:_ahm_null_count(ahm_id)
-                local rhs_ix1 = nrl_dot - 1 - null_count
-                if rhs_ix1 >= 0 then
-                    local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1)
-                    if not g1g:_nsy_is_semantic(nsy_id) then
-                        goto DO_NULLS
-                    end
-                    -- urglade[#urglade+1] = { 'TODO', inspect(g1g:_nsy_is_semantic(nsy_id)) }
+            local nrl_dot = g1g:_ahm_raw_position(ahm_id)
+            local null_count = g1g:_ahm_null_count(ahm_id)
+            local rhs_ix1 = nrl_dot - 1 - null_count
+            if rhs_ix1 >= 0 then
+                local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1)
+                if g1g:_nsy_is_semantic(nsy_id) then
                     local xsy_id = g1g:xsyid_by_nsy(nsy_id)
-                    -- urglade[#urglade+1] = { 'TODO 2', xrl_id, xsy_id, nsy_id }
                     if xsy_id then
-                        -- TODO: Must test xsy because does not exist for every xsy_id
-                        --   Example: xsy_id == 0
-                        --   Is this OK?  Or a misfeature?
                         local xsy = xsys[xsy_id]
-                        local is_terminal = xsy and xsy.lexeme
+                        local is_terminal = xsy.lexeme
                         local xsy_type = is_terminal and 't' or 'b'
-                        urglade[#urglade+1] = { xrl_id, xsy_id, xsy_type }
+                        urglade[#urglade+1] = { xsy_id, xsy_type }
                     end
                 end
-                ::DO_NULLS::
-                for null_ix = 1, null_count do
-                    -- urglade[#urglade+1] = { 'TODO rhs_ix1, null_ix', inspect(rhs_ix1), inspect(null_ix) }
-                    local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1 + null_ix)
-                    -- urglade[#urglade+1] = { 'TODO nsy_id', inspect(nsy_id) }
-                    if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
-                        -- urglade[#urglade+1] = { 'TODO semantic null_ix', inspect(null_ix) }
-                        local xsy_id = g1g:xsyid_by_nsy(nsy_id)
-                        if xsy_id then
-                            urglade[#urglade+1] = { xrl_id, xsy_id, 'n' }
-                        end
+            end
+            -- Add the null ur-glades
+            for null_ix = 1, null_count do
+                local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1 + null_ix)
+                if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
+                    local xsy_id = g1g:xsyid_by_nsy(nsy_id)
+                    if xsy_id then
+                        urglade[#urglade+1] = { xsy_id, 'n' }
                     end
                 end
             end
