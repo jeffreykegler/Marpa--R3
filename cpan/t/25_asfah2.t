@@ -149,58 +149,85 @@ Marpa::R3::Test::is( $grammar->ahms_show({verbose=>2}),
     <<'EOS', 'Aycock/Horspool AHMs' );
 AHM 0: dot=0; nulls=0
     S ::= . A S[R0:1]
+    {}
 AHM 1: dot=1; nulls=0
     S ::= A . S[R0:1]
+    { { 1, "b" } }
 AHM 2: completion; dot=2; nulls=0
     S ::= A S[R0:1] .
+    {}
 AHM 3: dot=0; nulls=0
     S ::= . A A[] A[] A[]
+    {}
 AHM 4: completion; dot=4; nulls=3
     S ::= A A[] A[] A[] .
+    { { 1, "b" }, { 1, "n" }, { 1, "n" }, { 1, "n" } }
 AHM 5: dot=1; nulls=1
     S ::= A[] . S[R0:1]
+    { { 1, "n" } }
 AHM 6: completion; dot=2; nulls=0
     S ::= A[] S[R0:1] .
+    {}
 AHM 7: dot=0; nulls=0
     S[R0:1] ::= . A S[R0:2]
+    {}
 AHM 8: dot=1; nulls=0
     S[R0:1] ::= A . S[R0:2]
+    { { 1, "b" } }
 AHM 9: completion; dot=2; nulls=0
     S[R0:1] ::= A S[R0:2] .
+    {}
 AHM 10: dot=0; nulls=0
     S[R0:1] ::= . A A[] A[]
+    {}
 AHM 11: completion; dot=3; nulls=2
     S[R0:1] ::= A A[] A[] .
+    { { 1, "b" }, { 1, "n" }, { 1, "n" } }
 AHM 12: dot=1; nulls=1
     S[R0:1] ::= A[] . S[R0:2]
+    { { 1, "n" } }
 AHM 13: completion; dot=2; nulls=0
     S[R0:1] ::= A[] S[R0:2] .
+    {}
 AHM 14: dot=0; nulls=0
     S[R0:2] ::= . A A
+    {}
 AHM 15: dot=1; nulls=0
     S[R0:2] ::= A . A
+    { { 1, "b" } }
 AHM 16: completion; dot=2; nulls=0
     S[R0:2] ::= A A .
+    { { 1, "b" } }
 AHM 17: dot=0; nulls=0
     S[R0:2] ::= . A A[]
+    {}
 AHM 18: completion; dot=2; nulls=1
     S[R0:2] ::= A A[] .
+    { { 1, "b" }, { 1, "n" } }
 AHM 19: dot=1; nulls=1
     S[R0:2] ::= A[] . A
+    { { 1, "n" } }
 AHM 20: completion; dot=2; nulls=0
     S[R0:2] ::= A[] A .
+    { { 1, "b" } }
 AHM 21: dot=0; nulls=0
     A ::= . [Lex-0]
+    {}
 AHM 22: completion; dot=1; nulls=0
     A ::= [Lex-0] .
+    { { 5, "t" } }
 AHM 23: dot=0; nulls=0
     [:start:] ::= . S
+    {}
 AHM 24: completion; dot=1; nulls=0
     [:start:] ::= S .
+    { { 2, "b" } }
 AHM 25: dot=0; nulls=0
     [:start:]['] ::= . [:start:]
+    {}
 AHM 26: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
+    { { 4, "b" } }
 EOS
 
 }
