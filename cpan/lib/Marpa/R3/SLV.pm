@@ -445,7 +445,7 @@ qq{   It contained non-word characters and that is not allowed\n},
                         warnings    => \@warnings,
                         where       => 'computing value',
                         long_where  => 'Computing value for null symbol: '
-                          . $slg->g1_symbol_display($token_id),
+                          . $slg->g1_symbol_display_form($token_id),
                     }
                 );
             } ## end if ( not $eval_ok or @warnings )
