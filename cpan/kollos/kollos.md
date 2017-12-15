@@ -8513,7 +8513,6 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_g_rule_null_high", "Marpa_Rule_ID", "rule_id"},
     {"marpa_g_rule_null_high_set", "Marpa_Rule_ID", "rule_id", "int", "flag"},
     {"marpa_g_rule_rank", "Marpa_Rule_ID", "rule_id" },
-    {"marpa_g_rule_rank_set", "Marpa_Rule_ID", "rule_id", "Marpa_Rank", "rank" },
     {"marpa_g_rule_rhs", "Marpa_Rule_ID", "rule_id", "int", "ix"},
     {"marpa_g_sequence_min", "Marpa_Rule_ID", "rule_id"},
     {"marpa_g_sequence_separator", "Marpa_Rule_ID", "rule_id"},
@@ -10140,6 +10139,52 @@ All such objects define the `lmw_g` field.
       /* [ grammar_object, grammar_ud, event_type, event_value ] */
       return 2;
     }
+```
+
+-2 is a valid result, so `rule_rank_set()` is a special case.
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int lca_grammar_rule_rank_set(lua_State *L)
+    {
+        Marpa_Grammar grammar;
+        const int grammar_stack_ix = 1;
+        Marpa_Rule_ID rule_id;
+        Marpa_Rank rank;
+        int result;
+
+        if (1) {
+            marpa_luaL_checktype (L, grammar_stack_ix, LUA_TTABLE);
+            marpa_luaL_checkinteger (L, 2);
+            marpa_luaL_checkinteger (L, 3);
+        }
+        {
+            const lua_Integer this_arg = marpa_lua_tointeger (L, 2);
+            marpa_luaL_argcheck (L, (-(1 << 30) <= this_arg
+                    && this_arg <= (1 << 30)), -1, "argument out of range");
+            rule_id = (Marpa_Rule_ID) this_arg;
+        }
+        {
+            const lua_Integer this_arg = marpa_lua_tointeger (L, 3);
+            marpa_luaL_argcheck (L, (-(1 << 30) <= this_arg
+                    && this_arg <= (1 << 30)), -1, "argument out of range");
+            rank = (Marpa_Rank) this_arg;
+        }
+        marpa_lua_getfield (L, grammar_stack_ix, "_libmarpa");
+        grammar = *(Marpa_Grammar *) marpa_lua_touserdata (L, -1);
+        marpa_lua_settop (L, grammar_stack_ix);
+        result = (int) marpa_g_rule_rank_set (grammar, rule_id, rank);
+        if (result == -2) {
+            Marpa_Error_Code error_code = marpa_g_error (grammar, NULL);
+            if (error_code != MARPA_ERR_NONE) {
+                return libmarpa_error_handle (L, grammar_stack_ix,
+                    "lca_grammar_rule_rank_set()");
+            }
+        }
+        marpa_lua_pushinteger (L, (lua_Integer) result);
+        return 1;
+    }
+```
 
 `lca_grammar_rule_new` wraps the Libmarpa method `marpa_g_rule_new()`.
 If the rule is 7 symbols or fewer, I put it on the stack.  As an old
@@ -10150,6 +10195,7 @@ close to a modern architecture.
 Perhaps I will eventually limit Libmarpa's
 rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
 
+```
     -- miranda: section+ non-standard wrappers
 
     static int lca_grammar_rule_new(lua_State *L)
@@ -10392,8 +10438,12 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
     }
+```
 
-    /* -1 is a valid result, so ahm_position() is a special case */
+-1 is a valid result, so `ahm_position()` is a special case.
+
+```
+    -- miranda: section+ non-standard wrappers
     static int lca_grammar_ahm_position(lua_State *L)
     {
         Marpa_Grammar self;
@@ -10423,7 +10473,9 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
         marpa_lua_pushinteger (L, (lua_Integer) result);
         return 1;
     }
+```
 
+```
     -- miranda: section+ luaL_Reg definitions
 
     static const struct luaL_Reg grammar_methods[] = {
@@ -10432,6 +10484,7 @@ rule RHS to 7 symbols, 7 because I can encode dot position in 3 bit.
       { "error_description", lca_libmarpa_error_description },
       { "events", lca_grammar_events },
       { "precompute", lca_grammar_precompute },
+      { "rule_rank_set", lca_grammar_rule_rank_set },
       { "rule_new", lca_grammar_rule_new },
       { "sequence_new", lca_grammar_sequence_new },
       { "_ahm_position", lca_grammar_ahm_position },

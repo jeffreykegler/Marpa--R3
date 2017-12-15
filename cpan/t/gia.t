@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 76;
+use Test::More tests => 78;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -313,6 +313,42 @@ external ::= special action => ::first
    | unspecial action => ::first
 unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
 special ::= words (';') rank => -1
+words ::= word* action => [values]
+
+:discard ~ whitespace
+whitespace ~ [\s]+
+word ~ [\w!-]+
+END_OF_SOURCE
+
+    my $input = <<'END_OF_INPUT';
+I am special so very special -- NOT!;
+I am special and nothing is going to change that;
+END_OF_INPUT
+
+    my $expected_output = [
+        [ 'unspecial', [qw(so very special)] ],
+        [   'special',
+            [qw(I am special and nothing is going to change that)],
+        ]
+    ];
+
+    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
+    do_test(
+        $grammar, $input, $expected_output,
+        'Parse OK', 'Test of rank adverb for display'
+        );
+}
+
+# Test of rank adverb
+if (1) {
+
+    my $source = <<'END_OF_SOURCE';
+:start ::= externals
+externals ::= external* action => [values]
+external ::= special action => ::first
+   | unspecial action => ::first
+unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => -2
+special ::= words (';') rank => -3
 words ::= word* action => [values]
 
 :discard ~ whitespace
