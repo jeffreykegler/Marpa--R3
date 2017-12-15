@@ -232,6 +232,7 @@ t/25_asfah2.t
 t/50d-block.t
 t/50d-debug.t
 t/50d-external.t
+t/50d-gia.t
 t/50d-gie.t
 t/50d-lexevent.t
 t/action.t

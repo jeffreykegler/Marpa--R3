@@ -94,7 +94,7 @@ normalize-whitespace: 1
         { source => \$dsl, bless_package => 'PennTags', } );
     my $panda_recce = Marpa::R3::Recognizer->new( { grammar => $panda_grammar } );
     $panda_recce->read( \$sentence );
-    my $asf = Marpa::R3::ASF->new( { recognizer => $panda_recce } );
+    my $asf = Marpa::R3::ASF2->new( { recognizer => $panda_recce } );
     my $full_result = $asf->traverse( {}, \&full_traverser );
     my $pruned_result = $asf->traverse( {}, \&pruning_traverser );
 
@@ -176,7 +176,7 @@ name: ASF low-level calls synopsis, code part 1
 normalize-whitespace: 1
 partial: 1
 
-    my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+    my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
     die 'No ASF' if not defined $asf;
 
 =for Marpa::R3::Display::End

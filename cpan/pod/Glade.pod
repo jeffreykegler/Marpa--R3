@@ -33,7 +33,7 @@ normalize-whitespace: 1
 
   my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
   $recce->read( \'aa' );
-  my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+  my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
   die 'No ASF' if not defined $asf;
   my $output_as_array = asf_to_basic_tree($asf);
   my $actual_output   = array_display($output_as_array);
@@ -601,16 +601,16 @@ normalize-whitespace: 1
 partial: 1
 
     if ( $valuer->ambiguity_level() > 1 ) {
-        my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+        my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
         die 'No ASF' if not defined $asf;
-        my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
+        my $ambiguities = Marpa::R3::Internal_ASF2::ambiguities($asf);
 
         # Only report the first two
         my @ambiguities = grep {defined} @{$ambiguities}[ 0 .. 1 ];
 
         $actual_value = 'Application grammar is ambiguous';
         $actual_result =
-            Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+            Marpa::R3::Internal_ASF2::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
     }
 
@@ -623,7 +623,7 @@ name: ASF ambiguity reporting
 normalize-whitespace: 1
 partial: 1
 
-    my $ambiguities = Marpa::R3::Internal::ASF::ambiguities($asf);
+    my $ambiguities = Marpa::R3::Internal_ASF2::ambiguities($asf);
 
 =for Marpa::R3::Display::End
 
@@ -650,7 +650,7 @@ normalize-whitespace: 1
 partial: 1
 
   $actual_result =
-    Marpa::R3::Internal::ASF::ambiguities_show( $asf, \@ambiguities );
+    Marpa::R3::Internal_ASF2::ambiguities_show( $asf, \@ambiguities );
 
 =for Marpa::R3::Display::End
 

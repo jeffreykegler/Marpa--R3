@@ -63,11 +63,6 @@ END_OF_SOURCE
         );
 } ## end if (0)
 
-# Marpa::R3::Display
-# name: Case-insensitive characters examples
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
 if (1) {
     my $ic_grammar = Marpa::R3::Grammar->new(
         {   source => \(<<'END_OF_SOURCE'),
@@ -85,8 +80,6 @@ if (1) {
 END_OF_SOURCE
         }
     );
-
-# Marpa::R3::Display::End
 
     do_test(
         $ic_grammar,
@@ -313,11 +306,6 @@ END_OF_SOURCE
 # Test of rank adverb
 if (1) {
 
-# Marpa::R3::Display
-# name: rank adverb example
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
     my $source = <<'END_OF_SOURCE';
 :start ::= externals
 externals ::= external* action => [values]
@@ -336,8 +324,6 @@ END_OF_SOURCE
 I am special so very special -- NOT!;
 I am special and nothing is going to change that;
 END_OF_INPUT
-
-# Marpa::R3::Display
 
     my $expected_output = [
         [ 'unspecial', [qw(so very special)] ],
@@ -382,11 +368,6 @@ END_OF_SOURCE
 # Test of 'symbol', 'name' array item descriptors
 if (1) {
 
-# Marpa::R3::Display
-# name: symbol, name array descriptor example
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
     my $source = <<'END_OF_SOURCE';
 
     :default ::= action => [symbol, name, values]
@@ -397,8 +378,6 @@ if (1) {
     <forty two> ~ '42'
     <forty three> ~ '43'
 END_OF_SOURCE
-
-# Marpa::R3::Display::End
 
     my $input           = '4243';
     my $expected_output = [
@@ -418,11 +397,6 @@ END_OF_SOURCE
 ### Test of 'inaccessible is ok'
 if (1) {
 
-# Marpa::R3::Display
-# name: inaccessible is ok statement
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
     my $source = <<'END_OF_SOURCE';
 
     inaccessible is ok by default
@@ -435,8 +409,6 @@ if (1) {
     c ::= x action => ::first
     x ::= 'x'
 END_OF_SOURCE
-
-# Marpa::R3::Display::End
 
     my $input           = 'xx';
     my $expected_output = [
@@ -542,12 +514,7 @@ if (1) {
     start ::= literals action => ::first
     literals ::= literal+ action => [values]
 
-# Marpa::R3::Display
-# name: eager lexeme example
-
     :lexeme ~ literal eager => 1
-
-# Marpa::R3::Display::End
 
     <literal> ~ '[[' <stuff> ']]'
     <stuff> ~ <any char>*
@@ -583,12 +550,7 @@ if (1) {
     :discard ~ whitespace
     whitespace ~ [\s]+
 
-# Marpa::R3::Display
-# name: eager discard example
-
     :discard ~ comment eager => 1
-
-# Marpa::R3::Display::End
 
     comment ~ '//' <stuff> <newline>
     <stuff> ~ <any char>*
@@ -664,12 +626,7 @@ END_OF_SOURCE
 
 my $start_id;
 
-# Marpa::R3::Display
-# name: SLG start_symbol_id() synopsis
-
     $start_id = $grammar->start_symbol_id();
-
-# Marpa::R3::Display::End
 
     Test::More::is( $start_id, 4, q{Test of $grammar->start_symbol_id()} );
 
