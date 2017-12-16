@@ -256,21 +256,13 @@ are called "tokens".)
 Position in terms of lexemes
 is called B<G1 Earley set position> or,
 more often,
-B<G1 position>,
-because lexemes match G1 Earley set positions "one-to-one" --
-for every lexeme there is a unique G1 Earley set
-and therefore a unique G1 position.
-The first lexeme is at G1 position 1,
-and the I<N>'th lexeme is at G1 position I<N>.
+B<G1 position>.
 
-While there is a
-G1 position for every lexeme,
-the opposite is not the case.
-G1 position is 0-based.
-G1 position 0 is a G1 position before the reading
-of the first lexeme,
-and therefore 
-G1 position 0 does not correspond to any lexeme.
+G1 position is 0-based --
+The first lexeme is at G1 position 0.
+Every G1 position corresponds to at least one lexeme.
+But Marpa::R3 allows ambiguous lexemes --
+more than one lexeme can be read at a single G1 position.
 
 G1 location can be ignored most of the time,
 but it

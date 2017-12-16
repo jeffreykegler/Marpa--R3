@@ -3215,7 +3215,6 @@ This is a registry object.
     class_slr_fields.l0_irls = true
     class_slr_fields.irls = true
     class_slr_fields.lexeme_queue = true
-    class_slr_fields.per_es = true
     class_slr_fields.regix = true
     class_slr_fields.slg = true
     class_slr_fields.start_of_lexeme = true
@@ -3229,6 +3228,25 @@ This is a registry object.
     class_slr_fields.trailers = true
     -- TODO delete after development
     class_slr_fields.has_event_handlers = true
+```
+
+*Per earley set* field:
+A 1-based sequence of data for each earley set.
+G1 positions are 0-based, and therefore
+the sequence index of `per_es` is offset by 1.
+That is, the data for G1 position 0 is in
+`per_es[1]`
+
+Each element of the sequence is the triple
+`(block_ix, start, length)`
+in the form of a Lua sequence.
+`block_ix` is the index of the block,
+`start` is the start of the lexeme literal
+and `length` is the length of the lexeme literal.
+
+```
+    -- miranda: section+ class_slr field declarations
+    class_slr_fields.per_es = true
 ```
 
 *At end of input* field:
@@ -4489,6 +4507,8 @@ Factory to create iterator over the sweeps in a G1 range.
 
 TODO: Allow for leading trailer, final trailer.
 
+
+TODO: Assumes that the value is all on one block.
 ```
     -- miranda: section+ forward declarations
     local sweep_range
@@ -5705,6 +5725,14 @@ the valuator's Lua-level settings.
     -- miranda: section+ most Lua function definitions
     function _M.class_slv.g1_pos(slv)
         return slv.end_of_parse
+    end
+
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slv.g1_range(slv)
+        return slv.this_step.start_es_id, slv.this_step.es_id-1
     end
 
 ```
@@ -7046,6 +7074,9 @@ in terms of the input string.
 
 The length of the current step in input location terms --
 that is, in terms of the input string
+
+TODO: Assumes that the value is all on one block.
+Use `g1_span_l0_length()`?
 
 ```
     -- miranda: section+ VM operations
@@ -10142,6 +10173,12 @@ All such objects define the `lmw_g` field.
 ```
 
 -2 is a valid result, so `rule_rank_set()` is a special case.
+
+TODO: Returning the rank from `marpa_g_rule_rank_set()`
+was a bad idea.
+Change the return value in libmarpa, so that
+`marpa_g_rule_rank_set()` becomes a standard
+function and does not require a special wrapper.
 
 ```
     -- miranda: section+ non-standard wrappers

@@ -133,7 +133,7 @@ VALUE_TEST: {
             qq{Parse value ref type is "$ref_type"; it needs to be "HASH"});
         last VALUE_TEST;
     } ## end if ( ref $value ne 'HASH' )
-    my $expected_text = qq{rule 2: S ::= A B C D\nlocations: 0-4\n};
+    my $expected_text = qq{rule 2: S ::= A B C D\nlocations: 0-3\n};
     Test::More::is( $value->{text}, $expected_text, 'Parse ok?' );
 } ## end VALUE_TEST:
 
