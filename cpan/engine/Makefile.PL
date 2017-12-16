@@ -92,6 +92,11 @@ undef &MY::postamble; # suppress warning
       );
 
     push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
+read_only.time-stamp:
+	date > $@
+END_OF_POSTAMBLE_PIECE
+
+    push @postamble_pieces, <<'END_OF_POSTAMBLE_PIECE';
 gnu_ac_build.time-stamp: read_only.time-stamp
 	$(RM_RF) gnu_ac_build
 	$(LIBMARPA_INSTALL) read_only gnu_ac_build
