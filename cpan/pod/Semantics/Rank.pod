@@ -1,0 +1,92 @@
+# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+#
+# This module is free software; you can redistribute it and/or modify it
+# under the same terms as Perl 5.10.1. For more details, see the full text
+# of the licenses in the directory LICENSES.
+#
+# This program is distributed in the hope that it will be
+# useful, but it is provided "as is" and without any express
+# or implied warranties. For details, see the full text of
+# of the licenses in the directory LICENSES.
+
+=head1 NAME
+
+Marpa::R3::Semantics::Rank - How ranks are computed
+
+=head1 Description
+
+[ TODO: A temporary documnent.
+This needs to be merged into
+Marpa::R3::Semantics::Order.
+]
+
+=head1 Choicepoints
+
+[ TODO: Define choicepoints. ]
+
+=head1 Rule Rank
+
+The rank of a rule is *not* that of the rule, but THE RANK OF THE RULE
+OF ITS MOST RECENTLY SCANNED CHILD.  If you're conversant with Earley
+terminology, the rank of a rule instance is the rank of the rule of its
+predot instance.  This may seem counterintuitive, but it allows ranking
+of rules which are different length, and ranking as scanning of a rule
+proceeds (that is, before it is completed).  If I took the naive approach
+and used the rank of the actual rule of the choice itself, neither of
+those would be possible, and Marpa ranking would be far less powerful.
+
+=head1 Motivation
+
+This method of ranking was chosen as a compromise.  Marpa's ASF's allow
+full generality in ranking.  But in full generality, rule ranking can be
+arbitrarily expensive.  I choose Marpa's built-in ranking to be the most
+powerful possible (or at least that was possible for me to think of)
+that had essentially zero cost.  Zero cost meant no callbacks, and no
+recursion.  So taking the rank of the predot instance was that compromise.
+It's a constant and can be accessed in very fast constant time.  I'd be
+surprised is the difference in speed between a ranked and unranked grammar
+is measurable when the grammar is unambiguous -- that is, when ranking
+is trivial.  When it's non-trivial, and possibilities are eliminated by
+ranking, I'd expect the ranked grammar to be faster, if anything, because
+it does not have to process as many possible parses as the unranked one.
+
+=head1 Caveats
+
+In the above example, it is tempting to simplify by adding a rule
+which saves typing all 3 choices in
+two different places:
+For example,
+
+=for Marpa::R3::Display
+ignore: 1
+
+    <Item> ::= <Item1> | <Item2> | <Item3>
+
+=for Marpa::R3::Display::End
+
+But adding a rule like this breaks ranking, because ranks are not
+evaluated recursively, so that adding a layer of indirection (which in
+most cases in Marpa has almost no effect) hides the rule rank --
+it now becomes the rank not of the predot child, but of the child of
+the predot child.
+
+=head1 COPYRIGHT AND LICENSE
+
+=for Marpa::R3::Display
+ignore: 1
+
+  Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl 5.10.1. For more details, see the full text
+  of the licenses in the directory LICENSES.
+
+  This program is distributed in the hope that it will be
+  useful, but without any warranty; without even the implied
+  warranty of merchantability or fitness for a particular purpose.
+
+=for Marpa::R3::Display::End
+
+=cut
+
+# vim: expandtab shiftwidth=4:
