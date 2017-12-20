@@ -222,6 +222,7 @@ pod/Valuer.pod
 pod/Semantics.pod
 pod/Semantics/Null.pod
 pod/Semantics/Order.pod
+pod/Semantics/Rank.pod
 pod/Support.pod
 pod/Tracing.pod
 pod/Tutorial2.pod

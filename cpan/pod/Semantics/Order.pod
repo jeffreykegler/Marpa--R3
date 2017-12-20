@@ -15,6 +15,10 @@ Marpa::R3::Semantics::Order - How the SLIF ranks ambiguous parses
 
 =head1 Description
 
+[ TODO: This needs to be rewritten to incorporate the changes in
+Marpa::R3::Semantics::Rank.
+]
+
 Marpa allows ambiguous parses.
 While an unambiguous parse can produce at most one parse tree
 and one parse result,

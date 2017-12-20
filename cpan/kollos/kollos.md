@@ -217,9 +217,11 @@ in their first readings.
 The following is a checklist of things to do before beta.
 It is not fully settled -- items may be added.
 
-* Document multi-block methods.
+* Remove null-ranking.
 
-* Document new valuator object.
+* `g1_to_block_first(loc)` now returns a value when
+`loc` is one past the last g1 location.
+Fix this.
 
 * Re-read the docs from beginning to end,
 to make sure they're consistent and consistently up to date.

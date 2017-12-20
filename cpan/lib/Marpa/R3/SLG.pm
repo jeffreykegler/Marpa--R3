@@ -249,7 +249,7 @@ END_OF_LUA
     if not _M.ranking_methods[value] then
         local list = {}
         for method,_ in pairs(_M.ranking_methods) do
-            list[#list+1] = string.format('%q', key)
+            list[#list+1] = string.format('%q', method)
         end
         error(string.format(
             'ranking_method value is %q (should be one of %s)',
