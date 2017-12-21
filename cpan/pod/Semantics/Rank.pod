@@ -15,40 +15,246 @@ Marpa::R3::Semantics::Rank - How ranks are computed
 
 =head1 Description
 
-[ TODO: A temporary documnent.
+[ TODO: This is a temporary documnent.
 This needs to be merged into
 Marpa::R3::Semantics::Order.
 ]
 
+=head1 Dotted Productions
+
+To understand this document,
+it is helpful to understand what a dotted rule is.
+Dotted rules are also important in understanding
+Marpa's progress reports,
+and are thoroughly described
+L<in their
+documentation|Marpa::R3::Progress>.
+For convenience,
+this section briefly repeats the main ideas
+used in this document.
+
+Recall that a production is a B<LHS> and a B<RHS>.
+The B<LHS> is always exactly one symbol.
+The B<RHS> is zero or more symbols.
+Consider the following example of a production,
+given in the syntax of Marpa's DSL.
+
+=for Marpa::R3::Display
+ignore: 1
+
+    S ::= A B C
+
+=for Marpa::R3::Display
+
+Dotted productions are used to track the
+progress of a parse through a production.
+They consist of a rule and a B<dot location>,
+which marks the point in the RHS which scanning
+has reached.
+It is called the B<dot location> because,
+traditionally,
+the location is represented by a dot.
+The symbol before the dot is called
+the B<predot symbol>.
+
+The following is an example of a dotted rule
+in the traditional notation.
+
+=for Marpa::R3::Display
+ignore: 1
+
+    S ::= A B . C
+
+=for Marpa::R3::Display
+
+In this rule, B<B> is the B<predot symbol>.
+(Note that the dot is not allowed in the Marpa DSL,
+though it can be seen in some of Marpa's diagnostics.)
+
+When the dot is after the last symbol of the RHS,
+the dotted production is called a B<completion>.
+Here is the completion for the above production:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    S ::= A B C .
+
+=for Marpa::R3::Display
+
+In this completion example, the symbol B<C>
+is the predot symbol.
+
+When the dot is before the first symbol of the RHS,
+the production is called a B<prediction>.
+Here is the prediction of the production we've been
+using for our examples:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    S ::= . A B C
+
+=for Marpa::R3::Display
+
+In predictions, there is no predot symbol.
+
 =head1 Choicepoints
 
-[ TODO: Define choicepoints. ]
+A choicepoint is a triple: C<(dp, origin, dot)>.
+In this triple,
+
+=over 4
+
+=item *
+
+C<dp> is a dotted production.
+In a choicepoint, C<dp> is never a prediction,
+and therefore there is always a predot symbol.
+
+=item *
+
+C<origin> is the G1 location where the dotted
+rule begins.
+C<origin> is sometimes called the B<origin> of the
+choicepoint.
+
+=item *
+
+C<dot> is the G1 location corresponding to the dot
+in C<dp>.
+C<dot> is sometimes 
+call the C<dot position> of the choicepoint.
+
+=back
+
+The choicepoint is a token choicepoint if the
+predot symbol of C<dp> is a token symbol.
+The choicepoint is a rule choicepoint if the
+predot symbol of C<dp> is the LHS of a rule.
+(Token symbols are never the LHS of a rule,
+and vice versa.)
+
+A choicepoint contains one or B<choices>,
+each of which has a distinct B<cause>.
+A token choicepoint always has exactly one choice.
+The cause of a token choicepoint is its token
+symbol.
+
+A rule choicepoint may have many choices.
+The cause of a rule choicepoint is another choicepoint,
+which we may call its cause choicepoint.
+If C<result-cp> is a choicepoint,
+and C<cause-cp> is the cause choicepoint of
+C<result-cp>,
+we call C<result-cp> the
+B<result> of C<cause-cp>.
+
+Since it is a choicepoint, the cause choicepoint
+must also be a triple.
+Let the triple for for C<cause-cp> be C<(cause-dp, cause-origin, dot)>.
+Let the result of C<cause-cp> be
+C<result-cp> and
+let the
+triple for for C<result-cp> be C<(result-dp, result-origin, dot)>.
+
+If C<result-cp> is the result of C<cause-cp>, then
+
+=over 4
+
+=item *
+
+The dot location of C<cause-cp>
+is the same as the dot location of C<result-cp>.
+
+=item *
+
+The origin of C<cause-cp>, C<cause-origin>,
+is before the dot location of C<result-cp>,
+
+
+=item *
+
+The origin of C<cause-cp>, C<cause-origin>
+is at or after the origin of C<result-cp>.
+
+
+=item *
+
+The dotted production of C<cause-cp> will be a completion.
+
+=item *
+
+The LHS of the dotted production of C<cause-cp> will be
+the predot symbol of C<result-cp>.
+
+=back
+
+C<cause-origin> is sometimes called the
+B<middle position> of the choice,
+since it is, in a sense,
+between the positions
+of C<result-cp>.
+Summing up the above, the choices at a rule choicepoint
+can vary by origin and dotted production,
+but the origins must all fall within a range,
+and the dotted productions must all be completions
+with the same LHS.
 
 =head1 Rule Rank
 
-The rank of a rule is *not* that of the rule, but THE RANK OF THE RULE
-OF ITS MOST RECENTLY SCANNED CHILD.  If you're conversant with Earley
-terminology, the rank of a rule instance is the rank of the rule of its
-predot instance.  This may seem counterintuitive, but it allows ranking
-of rules which are different length, and ranking as scanning of a rule
-proceeds (that is, before it is completed).  If I took the naive approach
-and used the rank of the actual rule of the choice itself, neither of
-those would be possible, and Marpa ranking would be far less powerful.
+The way in which the rank of a choice
+is defined
+may seem
+counter-intuitive at first.
+We will first state it directly.
+Below we will motivate the definition.
+
+The rank of a choice is that of its cause.
+If the cause is a token,
+the rank of the choice is the rank of the token symbol.
+
+If the cause is a choicepoint,
+the rank of the choice is the rank of the rule of the cause.
 
 =head1 Motivation
 
-This method of ranking was chosen as a compromise.  Marpa's ASF's allow
-full generality in ranking.  But in full generality, rule ranking can be
-arbitrarily expensive.  I choose Marpa's built-in ranking to be the most
-powerful possible (or at least that was possible for me to think of)
-that had essentially zero cost.  Zero cost meant no callbacks, and no
-recursion.  So taking the rank of the predot instance was that compromise.
-It's a constant and can be accessed in very fast constant time.  I'd be
-surprised is the difference in speed between a ranked and unranked grammar
-is measurable when the grammar is unambiguous -- that is, when ranking
-is trivial.  When it's non-trivial, and possibilities are eliminated by
-ranking, I'd expect the ranked grammar to be faster, if anything, because
-it does not have to process as many possible parses as the unranked one.
+Note that,
+the rank of a result choicepoint did not come from
+the result choicepoint's rule,
+but from the rules of the causes of that result choicepoint.
+This may seem unnatural,
+but we can show that it makes sense.
+
+First, if ranking is by the rule of the choices in a choicepoint,
+there would, in fact, be no ranking,
+because all the rules would be the same.
+
+Second, since the origin and dot position of all the choices in a
+choicepoint are the same,
+all comparisons would have to be between rules of the same length.
+This would be, in practice, a severe restriction.
+
+In fact, experiment has shown that the most intuitive idea of ranking
+must at least allow ranking by causes.
+
+In Marpa, rule ranking is only by causes, and only by direct causes.
+This is restrictive but it was chosen because it is still
+quite powerful and can be implemented
+extremely efficiently.
+The runtime cost of Marpa's built-in rule ranking is probably
+not measureable.
+
+Certain apps
+may require a more powerful and general way of ranking
+parse choices,
+and be willing to incur an overhead to obtain it.
+For these apps,
+Marpa's ASF's allow full generality in ranking.
+
+=head1 Examples
+
+[ TODO: Add examples. ]
 
 =head1 Caveats
 
