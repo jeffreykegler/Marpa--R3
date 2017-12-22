@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 54;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -271,6 +271,163 @@ END_OF_SOURCE
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
             qq{Test of rank by shortest: "$input"},
+        );
+    }
+}
+
+# Tests of rank adverb based on examples from Lukas Atkinson
+# version 2
+# Here longest is highest rank, as in his original
+
+if (1) {
+
+    my $source = <<'END_OF_SOURCE';
+  :discard ~ ws; ws ~ [\s]+
+  
+  List ::= Item rank => 1
+  List ::= List Item rank => 0
+  Item ::= VAR '=' VAR  rank => 3
+  Item ::= VAR '='      rank => 2
+  Item ::= VAR          rank => 1
+  VAR ~ [\w]+
+END_OF_SOURCE
+
+    my @tests = (
+        [ 'a = b', [ List => [ 'Item', 'a', '=', 'b' ] ], ],
+        [
+            'a = b c = d',
+            [ List => [ List => [qw(Item a = b)] ], [qw(Item c = d)] ]
+        ],
+        [
+            'a = b c = d e',
+            [
+                List => [
+                    List => [ List => [qw(Item a = b)] ],
+                    [qw(Item c = d)]
+                ],
+                [qw(Item e)]
+            ]
+        ],
+        [
+            'a = b c = d e =',
+            [
+                List => [
+                    List => [ List => [qw(Item a = b)] ],
+                    [qw(Item c = d)]
+                ],
+                [qw(Item e =)]
+            ]
+        ],
+        [
+            'a = b c = d e = f',
+            [
+                List => [
+                    List => [ List => [qw(Item a = b)] ],
+                    [qw(Item c = d)]
+                ],
+                [qw(Item e = f)]
+            ]
+        ],
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rule_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        do_test( $grammar, $input, $output, 'Parse OK',
+            qq{Test of rank by longest (v2): "$input"} );
+    }
+}
+
+# Tests of rank adverb based on examples from Lukas Atkinson
+# version 2
+# Here *shortest* is highest rank
+
+if (1) {
+
+    my $source = <<'END_OF_SOURCE';
+  :discard ~ ws; ws ~ [\s]+
+
+  List ::= Item          rank => 0
+  List ::= List Item rank => 1
+  Item ::= VAR '=' VAR  rank => 1
+  Item ::= VAR '='      rank => 2
+  Item ::= VAR          rank => 3
+  VAR ~ [\w]+
+END_OF_SOURCE
+
+    my @tests = (
+        [ 'a = b', [ List => [ List => [qw(Item a =)] ], [qw(Item b)] ], ],
+        [
+            'a = b c = d',
+            [
+                List => [
+                    List =>
+                      [ List => [ List => [qw(Item a =)] ], [qw(Item b)] ],
+                    [qw(Item c = )]
+                ],
+                [qw(Item d)]
+            ]
+        ],
+        [
+            'a = b c = d e',
+            [
+                List => [
+                    List => [
+                        List => [
+                            List => [ List => [qw(Item a = )] ],
+                            [qw(Item b )]
+                        ],
+                        [qw(Item c = )]
+                    ],
+                    [qw(Item d)]
+                ],
+                [qw(Item e)]
+            ]
+        ],
+        [
+            'a = b c = d e =',
+            [
+                List => [
+                    List => [
+                        List => [
+                            List => [ List => [qw(Item a = )] ],
+                            [qw(Item b )]
+                        ],
+                        [qw(Item c = )]
+                    ],
+                    [qw(Item d)]
+                ],
+                [qw(Item e =)]
+            ]
+        ],
+        [
+            'a = b c = d e = f',
+            [
+                List => [
+                    List => [
+                        List => [
+                            List => [
+                                List => [ List => [qw(Item a = )] ],
+                                [qw(Item b )]
+                            ],
+                            [qw(Item c = )]
+                        ],
+                        [qw(Item d)]
+                    ],
+                    [qw(Item e =)]
+                ],
+                [qw(Item f)]
+            ]
+        ],
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rule_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        do_test( $grammar, $input, $output, 'Parse OK',
+            qq{Test of rank by shortest (v2): "$input"},
         );
     }
 }
