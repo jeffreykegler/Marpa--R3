@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 54;
+use Test::More tests => 74;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -117,11 +117,6 @@ END_OF_INPUT
 
 if (1) {
 
-# Marpa::R3::Display
-# name: Ranking, longest highest, version 1
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
@@ -139,8 +134,6 @@ if (1) {
   VAR ~ [\w]+
 
 END_OF_SOURCE
-
-# Marpa::R3::Display::End
 
     my @tests = (
         [ 'a = b', '(a=b)', ],
@@ -292,6 +285,97 @@ END_OF_SOURCE
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
             qq{Test of rank by shortest (v2): "$input"},
+        );
+    }
+}
+
+# Tests of rank adverb based on examples from Lukas Atkinson
+# version 3: reimplemented via BNF
+# Here longest is highest rank, as in his original
+
+if (1) {
+
+# Marpa::R3::Display
+# name: Ranking via BNF, longest highest, version 3
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
+    my $source = <<'END_OF_SOURCE';
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+  
+  Top ::= Body Trailer action => main::group
+  Body ::= Item3*
+  Trailer ::= Item0 | Item1 | Item2
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
+  Item0 ::= action => main::concat
+  VAR ~ [\w]+
+
+END_OF_SOURCE
+
+# Marpa::R3::Display::End
+
+    my @tests = (
+        [ 'a = b', '(a=b)', ],
+        [ 'a = b c = d', '(a=b)(c=d)' ],
+        [ 'a = b c = d e', '(a=b)(c=d)(e)' ],
+        [ 'a = b c = d e =', '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rule_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        do_test( $grammar, $input, $output, 'Parse OK',
+            qq{Test of rank by longest (v3): "$input"} );
+    }
+}
+
+# Tests of rank adverb based on examples from Lukas Atkinson
+# version 3: reimplemented via BNF
+# Here *shortest* is highest rank
+
+if (1) {
+
+# Marpa::R3::Display
+# name: Ranking via BNF, shortest highest, version 3
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
+    my $source = <<'END_OF_SOURCE';
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+
+  Top ::= Body Trailer action => main::group
+  Body ::= Pair*
+  Pair ::= Item2 Item1
+  Trailer ::= Item0 | Item1 | Item2
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
+  Item0 ::= action => main::concat
+  VAR ~ [\w]+
+
+END_OF_SOURCE
+
+# Marpa::R3::Display::End
+
+    my @tests = (
+        [ 'a = b', '(a=)(b)', ],
+        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rule_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        do_test( $grammar, $input, $output, 'Parse OK',
+            qq{Test of rank by shortest (v3): "$input"},
         );
     }
 }
@@ -511,7 +595,7 @@ sub my_parser {
 
 sub flatten {
     my ($array) = @_;
-    # say STDERR 'flatten arg: ', Data::Dumper::Dumper($array);
+    return [] if not defined $array;
     my $ref = ref $array;
     return [$array] if $ref ne 'ARRAY';
     my @flat = ();
@@ -532,15 +616,17 @@ sub concat {
     my ($pp, @args) = @_;
     # say STDERR 'concat: ', Data::Dumper::Dumper(\@args);
     my $flat = flatten(\@args);
+    # say STDERR 'flat: ', Data::Dumper::Dumper($flat);
     return join '', @{$flat};
 }
 
 # For use as a parse action
 sub group {
     my ($pp, @args) = @_;
-    # say STDERR 'comma_sep args: ', Data::Dumper::Dumper(\@args);
+    # say STDERR 'group args: ', Data::Dumper::Dumper(\@args);
     my $flat = flatten(\@args);
-    return join '', map { +'(' . $_ . ')'; } @{$flat};
+    # say STDERR 'flat: ', Data::Dumper::Dumper($flat);
+    return join '', map { +'(' . $_ . ')'; } grep { defined } @{$flat};
 }
 
 # vim: expandtab shiftwidth=4:

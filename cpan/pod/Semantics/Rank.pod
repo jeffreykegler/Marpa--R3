@@ -345,7 +345,9 @@ Marpa's ASF's allow full generality in ranking.
 =head1 Examples
 
 =for Marpa::R3::Display
-name: Ranking, longest highest, version 1
+name: Rank document synopsis
+normalize-whitespace: 1
+partial: 1
 
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
@@ -416,6 +418,74 @@ name: Ranking, shortest highest, version 2
 
 =for Marpa::R3::Display::End
 
+=head1 Alternatives to Ranking
+
+=head2 Reimplementation as BNF
+
+It is generally better, when possible,
+to write a language as BNF, instead of using ranking.
+The advantage of using BNF is that you can easily determined
+exactly what language it is that you are parsing.
+Here is the "longest highest" example,
+reimplemented as BNF:
+
+=for Marpa::R3::Display
+name: Ranking via BNF, longest highest, version 3
+normalize-whitespace: 1
+
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+  
+  Top ::= Body Trailer action => main::group
+  Body ::= Item3*
+  Trailer ::= Item0 | Item1 | Item2
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
+  Item0 ::= action => main::concat
+  VAR ~ [\w]+
+
+=for Marpa::R3::Display::End
+
+We can also reimplement the "shortest highest"
+example as BNF.
+In this case note that, in the course of converting
+to BNF, we discover that the rule
+
+=for Marpa::R3::Display
+name: Ranking via BNF, longest highest, version 3
+normalize-whitespace: 1
+partial: 1
+
+  Item3 ::= VAR '=' VAR action => main::concat
+
+=for Marpa::R3::Display::End
+
+is, in fact, never used.
+We therefore omit it:
+
+=for Marpa::R3::Display
+name: Ranking via BNF, shortest highest, version 3
+normalize-whitespace: 1
+
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+
+  Top ::= Body Trailer action => main::group
+  Body ::= Pair*
+  Pair ::= Item2 Item1
+  Trailer ::= Item0 | Item1 | Item2
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
+  Item0 ::= action => main::concat
+  VAR ~ [\w]+
+
+=for Marpa::R3::Display::End
+
+=head2 Abstract Syntax Forests (ASFs)
+
+=head1 Comparison with PEG
+
 =head1 Caveats
 
 In the above example, it is tempting to simplify by adding a rule
@@ -435,6 +505,17 @@ evaluated recursively, so that adding a layer of indirection (which in
 most cases in Marpa has almost no effect) hides the rule rank --
 it now becomes the rank not of the predot child, but of the child of
 the predot child.
+
+=head1 Details
+
+This section contains additional explanations, not essential to understanding
+the rest of this document.
+Often they are formal or mathematical.
+While some people find these helpful, others find them distracting,
+which is why
+they are segregated here.
+
+=head2 Proof of correctness
 
 =head1 COPYRIGHT AND LICENSE
 
