@@ -13,10 +13,100 @@
 
 Marpa::R3::Semantics::Rank - How ranks are computed
 
+=head1 Synopsis
+
+=for Marpa::R3::Display
+name: Rank document synopsis
+normalize-whitespace: 1
+
+    my $source = <<'END_OF_SOURCE';
+      :discard ~ ws; ws ~ [\s]+
+      :default ::= action => ::array
+      
+      Top ::= List action => main::group
+      List ::= Item3 rank => 6
+      List ::= Item2 rank => 5
+      List ::= Item1 rank => 4
+      List ::= List Item3 rank => 3
+      List ::= List Item2 rank => 2
+      List ::= List Item1 rank => 1
+      Item3 ::= VAR '=' VAR rank => 3 action => main::concat
+      Item2 ::= VAR '='     rank => 2 action => main::concat
+      Item1 ::= VAR         rank => 1 action => main::concat
+      VAR ~ [\w]+
+
+    END_OF_SOURCE
+
+    my @tests = (
+        [ 'a = b',             '(a=b)', ],
+        [ 'a = b c = d',       '(a=b)(c=d)' ],
+        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
+        [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rule_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+        $recce->read( \$input );
+        my $value_ref = $recce->value();
+        if ( not defined $value_ref ) {
+            die 'No parse';
+        }
+        push @results, ${$value_ref};
+    }
+
+=for Marpa::R3::Display::End
+
+=for Marpa::R3::Display
+name: rank example semantics
+normalize-whitespace: 1
+
+    sub flatten {
+        my ($array) = @_;
+
+        # say STDERR 'flatten arg: ', Data::Dumper::Dumper($array);
+        my $ref = ref $array;
+        return [$array] if $ref ne 'ARRAY';
+        my @flat = ();
+      ELEMENT: for my $element ( @{$array} ) {
+            my $ref = ref $element;
+            if ( $ref ne 'ARRAY' ) {
+                push @flat, $element;
+                next ELEMENT;
+            }
+            my $flat_piece = flatten($element);
+            push @flat, @{$flat_piece};
+        }
+        return \@flat;
+    }
+
+    sub concat {
+        my ( $pp, @args ) = @_;
+
+        # say STDERR 'concat: ', Data::Dumper::Dumper(\@args);
+        my $flat = flatten( \@args );
+        return join '', @{$flat};
+    }
+
+    sub group {
+        my ( $pp, @args ) = @_;
+
+        # say STDERR 'comma_sep args: ', Data::Dumper::Dumper(\@args);
+        my $flat = flatten( \@args );
+        return join '', map { +'(' . $_ . ')'; } @{$flat};
+    }
+
+=for Marpa::R3::Display::End
+
 =head1 Description
 
-[ TODO: This is a temporary documnent.
-This needs to be merged into
+[ TODO:
+A reference to this document,
+and consistency with it,
+needs to be added into
 Marpa::R3::Semantics::Order.
 ]
 
@@ -254,7 +344,77 @@ Marpa's ASF's allow full generality in ranking.
 
 =head1 Examples
 
-[ TODO: Add examples. ]
+=for Marpa::R3::Display
+name: Ranking, longest highest, version 1
+
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+  
+  Top ::= List action => main::group
+  List ::= Item3 rank => 6
+  List ::= Item2 rank => 5
+  List ::= Item1 rank => 4
+  List ::= List Item3 rank => 3
+  List ::= List Item2 rank => 2
+  List ::= List Item1 rank => 1
+  Item3 ::= VAR '=' VAR rank => 3 action => main::concat
+  Item2 ::= VAR '='     rank => 2 action => main::concat
+  Item1 ::= VAR         rank => 1 action => main::concat
+  VAR ~ [\w]+
+
+=for Marpa::R3::Display::End
+
+=for Marpa::R3::Display
+name: Ranking, shortest highest, version 1
+
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+
+  Top ::= List action => main::group
+  List ::= Item3 rank => 1
+  List ::= Item2 rank => 2
+  List ::= Item1 rank => 3
+  List ::= List Item3 rank => 4
+  List ::= List Item2 rank => 5
+  List ::= List Item1 rank => 6
+  Item3 ::= VAR '=' VAR rank => 1 action => main::concat
+  Item2 ::= VAR '='     rank => 2 action => main::concat
+  Item1 ::= VAR         rank => 3 action => main::concat
+  VAR ~ [\w]+
+
+=for Marpa::R3::Display::End
+
+=for Marpa::R3::Display
+name: Ranking, longest highest, version 2
+
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+  
+  Top ::= List action => main::group
+  List ::= Item rank => 1
+  List ::= List Item rank => 0
+  Item ::= VAR '=' VAR rank => 3 action => main::concat
+  Item ::= VAR '='     rank => 2 action => main::concat
+  Item ::= VAR         rank => 1 action => main::concat
+  VAR ~ [\w]+
+
+=for Marpa::R3::Display::End
+
+=for Marpa::R3::Display
+name: Ranking, shortest highest, version 2
+
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+
+  Top ::= List action => main::group
+  List ::= Item rank => 0
+  List ::= List Item rank => 1
+  Item ::= VAR '=' VAR rank => 1 action => main::concat
+  Item ::= VAR '='     rank => 2 action => main::concat
+  Item ::= VAR         rank => 3 action => main::concat
+  VAR ~ [\w]+
+
+=for Marpa::R3::Display::End
 
 =head1 Caveats
 

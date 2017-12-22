@@ -236,6 +236,7 @@ t/50d-external.t
 t/50d-gia.t
 t/50d-gie.t
 t/50d-lexevent.t
+t/50d-ranksyn.t
 t/action.t
 t/action2.t
 t/advent.t

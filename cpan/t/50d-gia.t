@@ -117,57 +117,37 @@ END_OF_INPUT
 
 if (1) {
 
+# Marpa::R3::Display
+# name: Ranking, longest highest, version 1
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
   
+  Top ::= List action => main::group
   List ::= Item3 rank => 6
-  List ::= Item2      rank => 5
-  List ::= Item1          rank => 4
+  List ::= Item2 rank => 5
+  List ::= Item1 rank => 4
   List ::= List Item3 rank => 3
   List ::= List Item2 rank => 2
   List ::= List Item1 rank => 1
-  Item3 ::= VAR '=' VAR  rank => 3
-  Item2 ::= VAR '='      rank => 2
-  Item1 ::= VAR          rank => 1
+  Item3 ::= VAR '=' VAR rank => 3 action => main::concat
+  Item2 ::= VAR '='     rank => 2 action => main::concat
+  Item1 ::= VAR         rank => 1 action => main::concat
   VAR ~ [\w]+
+
 END_OF_SOURCE
 
+# Marpa::R3::Display::End
+
     my @tests = (
-        [ 'a = b', [ List => [ 'Item3', 'a', '=', 'b' ] ], ],
-        [
-            'a = b c = d',
-            [ List => [ List => [qw(Item3 a = b)] ], [qw(Item3 c = d)] ]
-        ],
-        [
-            'a = b c = d e',
-            [
-                List => [
-                    List => [ List => [qw(Item3 a = b)] ],
-                    [qw(Item3 c = d)]
-                ],
-                [qw(Item1 e)]
-            ]
-        ],
-        [
-            'a = b c = d e =',
-            [
-                List => [
-                    List => [ List => [qw(Item3 a = b)] ],
-                    [qw(Item3 c = d)]
-                ],
-                [qw(Item2 e =)]
-            ]
-        ],
-        [
-            'a = b c = d e = f',
-            [
-                List => [
-                    List => [ List => [qw(Item3 a = b)] ],
-                    [qw(Item3 c = d)]
-                ],
-                [qw(Item3 e = f)]
-            ]
-        ],
+        [ 'a = b', '(a=b)', ],
+        [ 'a = b c = d', '(a=b)(c=d)' ],
+        [ 'a = b c = d e', '(a=b)(c=d)(e)' ],
+        [ 'a = b c = d e =', '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
     );
 
     my $grammar = Marpa::R3::Grammar->new(
@@ -184,85 +164,37 @@ END_OF_SOURCE
 
 if (1) {
 
+# Marpa::R3::Display
+# name: Ranking, shortest highest, version 1
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
 
+  Top ::= List action => main::group
   List ::= Item3 rank => 1
-  List ::= Item2      rank => 2
-  List ::= Item1          rank => 3
+  List ::= Item2 rank => 2
+  List ::= Item1 rank => 3
   List ::= List Item3 rank => 4
   List ::= List Item2 rank => 5
   List ::= List Item1 rank => 6
-  Item3 ::= VAR '=' VAR  rank => 1
-  Item2 ::= VAR '='      rank => 2
-  Item1 ::= VAR          rank => 3
+  Item3 ::= VAR '=' VAR rank => 1 action => main::concat
+  Item2 ::= VAR '='     rank => 2 action => main::concat
+  Item1 ::= VAR         rank => 3 action => main::concat
   VAR ~ [\w]+
+
 END_OF_SOURCE
 
+# Marpa::R3::Display::End
+
     my @tests = (
-        [ 'a = b', [ List => [ List => [qw(Item2 a =)] ], [qw(Item1 b)] ], ],
-        [
-            'a = b c = d',
-            [
-                List => [
-                    List =>
-                      [ List => [ List => [qw(Item2 a =)] ], [qw(Item1 b)] ],
-                    [qw(Item2 c = )]
-                ],
-                [qw(Item1 d)]
-            ]
-        ],
-        [
-            'a = b c = d e',
-            [
-                List => [
-                    List => [
-                        List => [
-                            List => [ List => [qw(Item2 a = )] ],
-                            [qw(Item1 b )]
-                        ],
-                        [qw(Item2 c = )]
-                    ],
-                    [qw(Item1 d)]
-                ],
-                [qw(Item1 e)]
-            ]
-        ],
-        [
-            'a = b c = d e =',
-            [
-                List => [
-                    List => [
-                        List => [
-                            List => [ List => [qw(Item2 a = )] ],
-                            [qw(Item1 b )]
-                        ],
-                        [qw(Item2 c = )]
-                    ],
-                    [qw(Item1 d)]
-                ],
-                [qw(Item2 e =)]
-            ]
-        ],
-        [
-            'a = b c = d e = f',
-            [
-                List => [
-                    List => [
-                        List => [
-                            List => [
-                                List => [ List => [qw(Item2 a = )] ],
-                                [qw(Item1 b )]
-                            ],
-                            [qw(Item2 c = )]
-                        ],
-                        [qw(Item1 d)]
-                    ],
-                    [qw(Item2 e =)]
-                ],
-                [qw(Item1 f)]
-            ]
-        ],
+        [ 'a = b', '(a=)(b)', ],
+        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
     );
 
     my $grammar = Marpa::R3::Grammar->new(
@@ -281,53 +213,33 @@ END_OF_SOURCE
 
 if (1) {
 
+# Marpa::R3::Display
+# name: Ranking, longest highest, version 2
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
   
+  Top ::= List action => main::group
   List ::= Item rank => 1
   List ::= List Item rank => 0
-  Item ::= VAR '=' VAR  rank => 3
-  Item ::= VAR '='      rank => 2
-  Item ::= VAR          rank => 1
+  Item ::= VAR '=' VAR rank => 3 action => main::concat
+  Item ::= VAR '='     rank => 2 action => main::concat
+  Item ::= VAR         rank => 1 action => main::concat
   VAR ~ [\w]+
+
 END_OF_SOURCE
 
+# Marpa::R3::Display::End
+
     my @tests = (
-        [ 'a = b', [ List => [ 'Item', 'a', '=', 'b' ] ], ],
-        [
-            'a = b c = d',
-            [ List => [ List => [qw(Item a = b)] ], [qw(Item c = d)] ]
-        ],
-        [
-            'a = b c = d e',
-            [
-                List => [
-                    List => [ List => [qw(Item a = b)] ],
-                    [qw(Item c = d)]
-                ],
-                [qw(Item e)]
-            ]
-        ],
-        [
-            'a = b c = d e =',
-            [
-                List => [
-                    List => [ List => [qw(Item a = b)] ],
-                    [qw(Item c = d)]
-                ],
-                [qw(Item e =)]
-            ]
-        ],
-        [
-            'a = b c = d e = f',
-            [
-                List => [
-                    List => [ List => [qw(Item a = b)] ],
-                    [qw(Item c = d)]
-                ],
-                [qw(Item e = f)]
-            ]
-        ],
+        [ 'a = b', '(a=b)', ],
+        [ 'a = b c = d', '(a=b)(c=d)' ],
+        [ 'a = b c = d e', '(a=b)(c=d)(e)' ],
+        [ 'a = b c = d e =', '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
     );
 
     my $grammar = Marpa::R3::Grammar->new(
@@ -345,81 +257,33 @@ END_OF_SOURCE
 
 if (1) {
 
+# Marpa::R3::Display
+# name: Ranking, shortest highest, version 2
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
 
-  List ::= Item          rank => 0
+  Top ::= List action => main::group
+  List ::= Item rank => 0
   List ::= List Item rank => 1
-  Item ::= VAR '=' VAR  rank => 1
-  Item ::= VAR '='      rank => 2
-  Item ::= VAR          rank => 3
+  Item ::= VAR '=' VAR rank => 1 action => main::concat
+  Item ::= VAR '='     rank => 2 action => main::concat
+  Item ::= VAR         rank => 3 action => main::concat
   VAR ~ [\w]+
+
 END_OF_SOURCE
 
+# Marpa::R3::Display::End
+
     my @tests = (
-        [ 'a = b', [ List => [ List => [qw(Item a =)] ], [qw(Item b)] ], ],
-        [
-            'a = b c = d',
-            [
-                List => [
-                    List =>
-                      [ List => [ List => [qw(Item a =)] ], [qw(Item b)] ],
-                    [qw(Item c = )]
-                ],
-                [qw(Item d)]
-            ]
-        ],
-        [
-            'a = b c = d e',
-            [
-                List => [
-                    List => [
-                        List => [
-                            List => [ List => [qw(Item a = )] ],
-                            [qw(Item b )]
-                        ],
-                        [qw(Item c = )]
-                    ],
-                    [qw(Item d)]
-                ],
-                [qw(Item e)]
-            ]
-        ],
-        [
-            'a = b c = d e =',
-            [
-                List => [
-                    List => [
-                        List => [
-                            List => [ List => [qw(Item a = )] ],
-                            [qw(Item b )]
-                        ],
-                        [qw(Item c = )]
-                    ],
-                    [qw(Item d)]
-                ],
-                [qw(Item e =)]
-            ]
-        ],
-        [
-            'a = b c = d e = f',
-            [
-                List => [
-                    List => [
-                        List => [
-                            List => [
-                                List => [ List => [qw(Item a = )] ],
-                                [qw(Item b )]
-                            ],
-                            [qw(Item c = )]
-                        ],
-                        [qw(Item d)]
-                    ],
-                    [qw(Item e =)]
-                ],
-                [qw(Item f)]
-            ]
-        ],
+        [ 'a = b', '(a=)(b)', ],
+        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
     );
 
     my $grammar = Marpa::R3::Grammar->new(
@@ -644,5 +508,39 @@ sub my_parser {
     }
     return [ return ${$value_ref}, 'Parse OK' ];
 } ## end sub my_parser
+
+sub flatten {
+    my ($array) = @_;
+    # say STDERR 'flatten arg: ', Data::Dumper::Dumper($array);
+    my $ref = ref $array;
+    return [$array] if $ref ne 'ARRAY';
+    my @flat = ();
+    ELEMENT: for my $element (@{$array}) {
+       my $ref = ref $element;
+       if ($ref ne 'ARRAY') {
+           push @flat, $element;
+           next ELEMENT;
+       }
+       my $flat_piece = flatten($element);
+       push @flat, @{$flat_piece};
+    }
+    return \@flat;
+}
+
+# For use as a parse action
+sub concat {
+    my ($pp, @args) = @_;
+    # say STDERR 'concat: ', Data::Dumper::Dumper(\@args);
+    my $flat = flatten(\@args);
+    return join '', @{$flat};
+}
+
+# For use as a parse action
+sub group {
+    my ($pp, @args) = @_;
+    # say STDERR 'comma_sep args: ', Data::Dumper::Dumper(\@args);
+    my $flat = flatten(\@args);
+    return join '', map { +'(' . $_ . ')'; } @{$flat};
+}
 
 # vim: expandtab shiftwidth=4:
