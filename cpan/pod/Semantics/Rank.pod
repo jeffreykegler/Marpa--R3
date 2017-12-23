@@ -517,6 +517,147 @@ they are segregated here.
 
 =head2 Proof of correctness
 
+Let C<G> be the grammar in the
+Marpa DSL
+synopsis,
+treated as it was pure BNF,
+without ranking taken into consideration.
+Let C<W> be a string,
+and let C<P-BNF> be the set of parses
+allowed by C<G>.
+Let C<P-ranked> be the
+set of parses
+allowed by C<G> after ranking is taken
+into account.
+
+We will say string C<W> is valid
+is C<P-BNF> is non-empty.
+We will say that C<P-ranked> is
+"unambiguous" if and only if
+it contains at most one parse.
+
+It is necessary to clarify what we mean
+by the "longest highest" parse.
+In C<G>, the leaf nodes take the forms:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    VAR
+    VAR =
+    VAR = VAR
+
+=for Marpa::R3::Display::End
+
+The "longest highest" parse is the one which
+contains the fewest leaf nodes.
+
+Theorem:
+If C<W> is a valid string,
+C<P-ranked> contains only one
+parse,
+and that parse is 
+the the "longest highest" parse.
+
+Proof:
+
+The following proof assumes that the reader is comfortable
+with analyzing BNF,
+and that he is familiar with Earley's algorithm.
+
+=over 4
+
+=item 1:
+
+Analyzing the grammar C<G>,
+we note the the only potential ambiguities
+are in choosing between the pairs of the form "C<(a=)(b)>"
+and nodes of the form "C<a=b>".
+Note that this implies that completions of C<Item2> and C<Item3>
+cannot occur at the same G1 location.
+We will refer to this fact later.
+
+=item 2:
+
+Second, we note that, wherever ambiguities of the kind
+just mentioned occur,
+they must occur in choices
+which have one of these 3 symbols as their predot symbol:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    Item1
+    Item2
+    Item3
+
+=for Marpa::R3::Display::End
+
+=item 3:
+
+From (2), and by examination of C<G>, we conclude that all ambiguities
+must occur as causes of choices
+at choicepoints whose dotted rule has the symbol C<< <List> >>
+on its LHS.
+
+=item 4:
+
+From (1), we note that, when there is an ambiguity,
+the choice will always be between the rule
+
+=for Marpa::R3::Display
+name: Rank document synopsis
+normalize-whitespace: 1
+partial: 1
+
+      Item3 ::= VAR '=' VAR rank => 3
+
+=for Marpa::R3::Display::End
+
+and the rule
+
+=for Marpa::R3::Display
+name: Rank document synopsis
+normalize-whitespace: 1
+partial: 1
+
+      Item1 ::= VAR rank => 1
+
+=for Marpa::R3::Display::End
+
+(The rule for C<Item2> never is one of the choices because,
+as implied in (1),
+C<Item2> will never be the predot symbol at a location
+where C<Item3> is a predot symbol,
+and therefore C<Item2> and C<Item3> will never be predot
+symbols of choices in the same choicepoint.)
+
+=item 5:
+
+Using (4),
+and noting rank 3 is higher than rank 1,
+we conclude that only one choice will be picked,
+and that it will resolve the ambiguity in favor
+of "C<(a=b)>", which contains only one leaf.
+The other choice would imply the parse contains the pair "C<(a=)(b)>",
+which contains two leaves.
+
+=item 6:
+
+Generalized from (5), we observe that all choices are resolved
+so that only one choice remains,
+and that that choice is "longest highest".
+
+=item 7:
+
+From (6) we can show, by induction on the choices in a parse,
+that C<P-ranked> will only contain one parse,
+and that that parse will be "longest highest".
+
+=back
+
+QED.
+
 =head1 COPYRIGHT AND LICENSE
 
 =for Marpa::R3::Display
