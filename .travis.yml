@@ -17,3 +17,6 @@ script:
   - (cd cpan/ && perl Makefile.PL && make && make test)
 
 sudo: false  # faster builds using containers
+
+notifications:
+  irc: "irc.freenode.net#marpa"
