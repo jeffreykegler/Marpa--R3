@@ -113,15 +113,14 @@ Marpa::R3::Semantics::Order.
 =head1 Dotted Productions
 
 To understand this document,
-it is helpful to understand what a dotted rule is.
-Dotted rules are also important in understanding
+it is helpful to understand what a dotted production is.
+Dotted productions are also important in understanding
 Marpa's progress reports,
 and are thoroughly described
 L<in their
 documentation|Marpa::R3::Progress>.
-For convenience,
-this section briefly repeats the main ideas
-used in this document.
+This section repeats the main ideas
+from the perspective of this document.
 
 Recall that a production is a B<LHS> and a B<RHS>.
 The B<LHS> is always exactly one symbol.
@@ -138,7 +137,7 @@ ignore: 1
 
 Dotted productions are used to track the
 progress of a parse through a production.
-They consist of a rule and a B<dot location>,
+They consist of a production and a B<dot location>,
 which marks the point in the RHS which scanning
 has reached.
 It is called the B<dot location> because,
@@ -147,7 +146,7 @@ the location is represented by a dot.
 The symbol before the dot is called
 the B<predot symbol>.
 
-The following is an example of a dotted rule
+The following is an example of a dotted production
 in the traditional notation.
 
 =for Marpa::R3::Display
@@ -157,7 +156,7 @@ ignore: 1
 
 =for Marpa::R3::Display
 
-In this rule, B<B> is the B<predot symbol>.
+In this production, B<B> is the B<predot symbol>.
 (Note that the dot is not allowed in the Marpa DSL,
 though it can be seen in some of Marpa's diagnostics.)
 
@@ -191,7 +190,21 @@ In predictions, there is no predot symbol.
 
 =head1 Choicepoints
 
-A choicepoint is a triple: C<(dp, origin, dot)>.
+Informally
+a B<choicepoint> is a place where the parser
+can decide among B<parse choices>.
+For a choicepoint to work, all the choices must
+have enough in common that each of them
+could be replaced with any other.
+
+A choicepoint can be thought of either the set
+of parse choice,
+or as a tuple of the properties which all
+the parse choices must have in common.
+
+Thought of as the properties, all of the its
+parse choices share in common,
+a choicepoint is a triple: C<(dp, origin, current)>.
 In this triple,
 
 =over 4
@@ -201,11 +214,18 @@ In this triple,
 C<dp> is a dotted production.
 In a choicepoint, C<dp> is never a prediction,
 and therefore there is always a predot symbol.
+The predot symbol of C<dp>
+is the B<predot symbol> of the choicepoint;
+the production of C<dp>
+is the B<production> of the choicepoint;
+and the
+dot position of C<dp>
+is the B<dot position> of the choicepoint.
 
 =item *
 
 C<origin> is the G1 location where the dotted
-rule begins.
+production begins.
 C<origin> is sometimes called the B<origin> of the
 choicepoint.
 
@@ -213,132 +233,177 @@ choicepoint.
 
 C<dot> is the G1 location corresponding to the dot
 in C<dp>.
-C<dot> is sometimes 
-call the C<dot position> of the choicepoint.
+C<current> is sometimes 
+call the C<current position> of the choicepoint.
 
 =back
 
 The choicepoint is a token choicepoint if the
 predot symbol of C<dp> is a token symbol.
-The choicepoint is a rule choicepoint if the
-predot symbol of C<dp> is the LHS of a rule.
-(Token symbols are never the LHS of a rule,
+The choicepoint is a production choicepoint if the
+predot symbol of C<dp> is the LHS of a production.
+(Token symbols are never the LHS of a production,
 and vice versa.)
 
-A choicepoint contains one or B<choices>,
-each of which has a distinct B<cause>.
-A token choicepoint always has exactly one choice.
-The cause of a token choicepoint is its token
-symbol.
+=head1 Parse choices
 
-A rule choicepoint may have many choices.
-The cause of a rule choicepoint is another choicepoint,
-which we may call its cause choicepoint.
-If C<result-cp> is a choicepoint,
-and C<cause-cp> is the cause choicepoint of
-C<result-cp>,
-we call C<result-cp> the
-B<result> of C<cause-cp>.
+As mentioned, a choicepoint can be seen as a set
+of one or more B<parse choices>.
+Often, there is only one parse choice.
+When there is only one parse choice,
+the choicepoint is said to be B<trivial>.
+Is all of the choicepoints of a parse
+are trivial,
+the parse is unambiguous.
 
-Since it is a choicepoint, the cause choicepoint
+A parse choice is a duple: C<(predecessor, cause)>.
+The first element of the duple is the B<predecessor>
+of the parse choice.
+The second element of the duple is the B<cause>
+of the parse choice.
+
+Every parse choice has a distinct cause.
+In every parse choice of a token choicepoint, C<cause> is a token symbol.
+A token choicepoint is always trivial --
+this is, it always has exactly one parse choice.
+
+A production choicepoint may have many parse choices.
+In every parse choice of a production choicepoint,
+C<cause> is another choicepoint,
+called the B<cause choicepoint>.
+
+If C<cp-prod> is production choicepoint
+and C<cp-cuz> is the cause of one of the parse choices,
+then we say that C<cp-prod> is the B<result>
+of C<cp-cuz>;
+and we say that C<cp-cuz> is one of the B<causes>
+of C<cp-prod>.
+
+The predecessor of a parse choice represents the portion
+of the parse that "leads up to" the cause.
+Predecessors are choicepoints but,
+since
+the predecessor
+element of a parse choice plays no role in ranking
+decisions,
+this document will mostly ignore predecessors.
+
+=head1 Causes
+
+Since it is a choicepoint, a cause choicepoint
 must also be a triple.
-Let the triple for for C<cause-cp> be C<(cause-dp, cause-origin, dot)>.
-Let the result of C<cause-cp> be
-C<result-cp> and
+Let the triple for for C<cp-cuz> be C<(cuz-dp, cuz-origin, current)>.
+Let the result of C<cp-cuz> be
+C<cp-prod> and
 let the
-triple for for C<result-cp> be C<(result-dp, result-origin, dot)>.
+triple for for C<cp-prod> be C<(prod-dp, prod-origin, current)>.
 
-If C<result-cp> is the result of C<cause-cp>, then
+If C<cp-prod> is the result of C<cp-cuz>, then
 
 =over 4
 
 =item *
 
-The dot location of C<cause-cp>
-is the same as the dot location of C<result-cp>.
+The dot location of C<cp-cuz>
+is the same as the dot location of C<cp-prod>.
 
 =item *
 
-The origin of C<cause-cp>, C<cause-origin>,
-is before the dot location of C<result-cp>,
-
-
-=item *
-
-The origin of C<cause-cp>, C<cause-origin>
-is at or after the origin of C<result-cp>.
+The origin of C<cp-cuz>, C<cuz-origin>,
+is before the dot location of C<cp-prod>,
 
 
 =item *
 
-The dotted production of C<cause-cp> will be a completion.
-
-=item *
-
-The LHS of the dotted production of C<cause-cp> will be
-the predot symbol of C<result-cp>.
-
-=back
-
-C<cause-origin> is sometimes called the
+The origin of C<cp-cuz>, C<cuz-origin>
+is at or after the origin of C<cp-prod>.
+C<cuz-origin> is sometimes called the
 B<middle position> of the choice,
 since it is, in a sense,
 between the positions
-of C<result-cp>.
-Summing up the above, the choices at a rule choicepoint
-can vary by origin and dotted production,
-but the origins must all fall within a range,
-and the dotted productions must all be completions
-with the same LHS.
+of C<cp-prod>.
+
+=item *
+
+The dotted production of C<cp-cuz> will be a completion.
+
+=item *
+
+The LHS of the dotted production of C<cp-cuz> will be
+the predot symbol of C<cp-prod>.
+
+=back
+
+Summing up the above,
+the causes of a production choicepoint
+vary only by
+middle position,
+and by their production RHS.
+The causes of a production choicepoint
+share the same current G1 location
+and their dotted productions
+are all completion which share
+the same LHS.
 
 =head1 Rule Rank
 
-The way in which the rank of a choice
-is defined
-may seem
-counter-intuitive at first.
-We will first state it directly.
-Below we will motivate the definition.
-
-The rank of a choice is that of its cause.
+The rank of a parse choice is that of its cause.
 If the cause is a token,
 the rank of the choice is the rank of the token symbol.
-
 If the cause is a choicepoint,
-the rank of the choice is the rank of the rule of the cause.
+the rank of the parse choice
+is the rank of the production of the cause.
 
 =head1 Motivation
 
-Note that,
-the rank of a result choicepoint did not come from
-the result choicepoint's rule,
-but from the rules of the causes of that result choicepoint.
-This may seem unnatural,
-but we can show that it makes sense.
+Let C<result> be a production choicepoint.
+For the purposes of this section,
+the "result-production" is the production of C<result>;
+and the "cause-productions" are the productions
+of the causes of C<result>.
+By the definition of the previous section,
+the result-production plays no role in ranking
+the parse choices of C<result>.
+Instead,
+the parse choices of C<result> are ranked by
+the cause-productions.
 
-First, if ranking is by the rule of the choices in a choicepoint,
-there would, in fact, be no ranking,
-because all the rules would be the same.
+This makes sense, because all parse choices
+in the C<result> choicepoint
+share the same result-production,
+so that the result-production cannot be
+a useful part of a ranking method.
+On the other hand,
+parse choices often
+differ in their cause-productions,
+and cause-productions are very helpful in
+producing a useful ranking method.
 
-Second, since the origin and dot position of all the choices in a
-choicepoint are the same,
-all comparisons would have to be between rules of the same length.
-This would be, in practice, a severe restriction.
+Note that ranking is only by direct causes.
+That is the cause-productions determine the rank,
+but even if there is a tie in the rank of the cause-productions,
+the rank of any productions derived from the cause choicepoints
+is B<not> considered.
 
-In fact, experiment has shown that the most intuitive idea of ranking
-must at least allow ranking by causes.
-
-In Marpa, rule ranking is only by causes, and only by direct causes.
-This is restrictive but it was chosen because it is still
-quite powerful and can be implemented
-extremely efficiently.
-The runtime cost of Marpa's built-in rule ranking is probably
+It might be useful to have a scheme that
+allows ranking to be inherited.
+But such a scheme would be complex,
+and would require recursion to implement.
+Marpa's built-in production ranking
+was chosen to be the most powerful system
+that could be implemented with effectively
+zero cost.
+Since Marpa's built-in production ranking
+requires only
+directly accessible information,
+its runtime cost is probably
 not measureable.
 
 Certain apps
 may require a more powerful and general way of ranking
 parse choices,
-and be willing to incur an overhead to obtain it.
+and might be willing to incur extra costs
+to achieve it.
 For these apps,
 Marpa's ASF's allow full generality in ranking.
 
@@ -488,23 +553,8 @@ normalize-whitespace: 1
 
 =head1 Caveats
 
-In the above example, it is tempting to simplify by adding a rule
-which saves typing all 3 choices in
-two different places:
-For example,
-
-=for Marpa::R3::Display
-ignore: 1
-
-    <Item> ::= <Item1> | <Item2> | <Item3>
-
-=for Marpa::R3::Display::End
-
-But adding a rule like this breaks ranking, because ranks are not
-evaluated recursively, so that adding a layer of indirection (which in
-most cases in Marpa has almost no effect) hides the rule rank --
-it now becomes the rank not of the predot child, but of the child of
-the predot child.
+[ TODO: Are these all covered elsewhere?
+Do I need this section? ]
 
 =head1 Details
 
@@ -644,7 +694,7 @@ which contains two leaves.
 
 =item 6:
 
-Generalized from (5), we observe that all choices are resolved
+Generalizing from (5), we observe that all choices are resolved
 so that only one choice remains,
 and that that choice is "longest highest".
 
