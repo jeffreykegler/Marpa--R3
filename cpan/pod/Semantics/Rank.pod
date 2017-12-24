@@ -409,6 +409,14 @@ Marpa's ASF's allow full generality in ranking.
 
 =head1 Examples
 
+Our examples in this document will look at minor variations
+of the same toy grammar.
+
+=head2 Longest highest, version 1
+
+The first variation we will consider in the one in the
+synopsis:
+
 =for Marpa::R3::Display
 name: Rank document synopsis
 normalize-whitespace: 1
@@ -431,6 +439,185 @@ partial: 1
 
 =for Marpa::R3::Display::End
 
+=head3 Longest highest ranking
+
+This one ranks its "items"
+(here represented by the sets of symbols,
+C<< <Item1> >>,
+C<< <Item2> >> and
+C<< <Item3> >>)
+"longest highest".
+The idea behind "longest highest" is this:
+
+C<< <Item3> >> is of the form "C<a=b>"
+and
+C<< <Item2> >> is of the form "C<a=>".
+"C<a=b>" is obviously longer and therefore
+ranks higher,
+so that
+C<< <Item3> >> ranks higher than
+C<< <Item2> >>.
+A similarly train of reasoning shows that,
+in "longest highest"
+C<< <Item2> >> ranks higher than
+C<< <Item1> >>.
+
+=head3 The non-trivial choicepoints
+
+Several examples and their results are shown
+in the synopsis.
+If you study the grammar, you will see that
+the non-trivial choicepoints
+will be for the dotted productions:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= List . Item1
+    List ::= List . Item2
+    List ::= List . Item3
+
+=for Marpa::R3::Display::End
+
+The above are all of the potential
+dotted productions for B<result> choicepoints.
+
+=head3 The cause choicepoints
+
+In all of these dotted productions,
+the predot symbol is C<< <List> >>.
+Recall that cause choicepoints are always completions.
+Since the predot symbol is C<< <List> >>,
+the dotted productions of the causes
+of the non-trivial choicepoints
+may be any of 
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= Item1 .
+    List ::= Item2 .
+    List ::= Item3 .
+    List ::= List Item1 .
+    List ::= List Item2 .
+    List ::= List Item3 .
+
+=for Marpa::R3::Display::End
+
+In fact, if we study the grammar more closely,
+we will see that the only possible ambiguity is between
+items and takes the form "C<(a=)(b)>" versus
+"C<(a=b)>", so that the only non-trivial choices are among
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= Item1 .
+    List ::= Item3 .
+    List ::= List Item1 .
+    List ::= List Item3 .
+
+=for Marpa::R3::Display::End
+
+=head3 The first non-trivial choicepoints
+
+Further study of the grammar shows that the first non-trivial
+choice is between these two:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= Item1 .
+    List ::= Item3 .
+
+=for Marpa::R3::Display::End
+
+The production
+C<List ::= Item3>
+has rank 3,
+and it obviously outranks
+the production
+C<List ::= Item1>,
+which has rank 1.
+Our example uses C<high_rule_only>
+ranking,
+and our example therefore will
+leave only this choice:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= Item3 .
+
+=for Marpa::R3::Display::End
+
+With only one choice left, the resulting choicepoint
+becomes trivial,
+and clearly that remaining choice is the longest,
+and therefore the correct one for the "longest highest"
+ranking.
+
+=head3 The second and subsequent non-trivial choicepoints
+
+We've looked at only the first non-trivial choice
+for our example code.
+Again examining the grammar, we see that
+the second and subsequent non-trivial choices will
+all be between causes with the same two dotted
+productions:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= List Item1 .
+    List ::= List Item3 .
+
+=for Marpa::R3::Display::End
+
+The reasoning for this second and subsequent
+non-trivial choice follows the same line as
+the reasoning we just gave for the
+first non-trivial choice:
+The production
+C<List ::= List Item3>
+has rank 3,
+and it obviously outranks
+the production
+C<List ::= List Item1>,
+which has rank 1.
+Our example uses C<high_rule_only>
+ranking,
+and our example therefore will
+leave only this choice:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    List ::= List Item3 .
+
+=for Marpa::R3::Display::End
+
+=head3 Conclusion
+
+We have now shown that our example will render
+all choicepoints trivial, and that the remaining
+choices will be those consistent with
+"longest highest" ranking.
+
+Below, there is
+a L</"Proof of correctness">.
+This could be read as a 2nd, more rigorous,
+version of the explanation in this section,
+but it requires some patience with math-i-ness.
+
+=head2 Shortest highest, version 1
+
+Here we see the grammar of the synopsis,
+reworked for a "shortest highest"
+ranking.
+"Shortest highest" is the reverse of
+"longest highest.
+
 =for Marpa::R3::Display
 name: Ranking, shortest highest, version 1
 
@@ -451,6 +638,31 @@ name: Ranking, shortest highest, version 1
 
 =for Marpa::R3::Display::End
 
+Here are what the results will look like for
+"shortest highest".
+
+=for Marpa::R3::Display
+name: Ranking results, shortest highest, version 1
+
+    my @tests = (
+        [ 'a = b', '(a=)(b)', ],
+        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
+    );
+
+=for Marpa::R3::Display::End
+
+The reader who wants an first example of ranking scheme
+to work out for themselves may find this one suitable.
+The reasoning will be exactly the same as for the
+L<"longest highest"
+example,|"Shortest highest, version 1">
+just above .
+
+=head2 Longest highest, version 2
+
 =for Marpa::R3::Display
 name: Ranking, longest highest, version 2
 
@@ -466,6 +678,8 @@ name: Ranking, longest highest, version 2
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
+
+=head2 Shortest highest, version 2
 
 =for Marpa::R3::Display
 name: Ranking, shortest highest, version 2

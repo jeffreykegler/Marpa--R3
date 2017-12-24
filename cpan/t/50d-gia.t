@@ -180,7 +180,9 @@ if (1) {
 
 END_OF_SOURCE
 
-# Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: Ranking results, shortest highest, version 1
 
     my @tests = (
         [ 'a = b', '(a=)(b)', ],
@@ -189,6 +191,8 @@ END_OF_SOURCE
         [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
         [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
     );
+
+# Marpa::R3::Display::End
 
     my $grammar = Marpa::R3::Grammar->new(
         { ranking_method => 'high_rule_only', source => \$source } );
