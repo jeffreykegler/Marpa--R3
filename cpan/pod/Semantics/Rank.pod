@@ -103,12 +103,13 @@ normalize-whitespace: 1
 
 =head1 Description
 
-[ TODO:
-A reference to this document,
-and consistency with it,
-needs to be added into
-Marpa::R3::Semantics::Order.
-]
+This document describes rule ranking.
+Rule ranking plays a role in parse ordering,
+which is descibed in L<a separate
+document|Marpa::R3::Semantics::Order>.
+Rule ranking is given its own document,
+because it merits careful definition,
+so that multiple examples can be given.
 
 =head1 Dotted Productions
 
@@ -663,6 +664,12 @@ just above .
 
 =head2 Longest highest, version 2
 
+The previous examples have shown the rule involved
+in parse ranking in "spelled out" form.
+In fact, a more compact form of the grammar can be used,
+as shown below for
+"longest highest" ranking.
+
 =for Marpa::R3::Display
 name: Ranking, longest highest, version 2
 
@@ -680,6 +687,9 @@ name: Ranking, longest highest, version 2
 =for Marpa::R3::Display::End
 
 =head2 Shortest highest, version 2
+
+This is the grammar for "shortest highest",
+in compact form:
 
 =for Marpa::R3::Display
 name: Ranking, shortest highest, version 2
@@ -763,12 +773,69 @@ normalize-whitespace: 1
 
 =head2 Abstract Syntax Forests (ASFs)
 
+Ranking can also be implemented using Marpa's
+L<abstract syntax forests|Marpa::R3::ASF>.
+ASFs are likely to be less efficient than the built in ranking,
+but they are a more general and powerful solution.
+
 =head1 Comparison with PEG
 
-=head1 Caveats
+For those familiar with PEG,
+Marpa's ranking may seem comparable.
+In fact, Marpa's ranking can be seen as a "better PEG".
 
-[ TODO: Are these all covered elsewhere?
-Do I need this section? ]
+A PEG specification looks like a BNF grammar,
+and it is a common misconception that the language PEG implements
+is the same as the language implied by its grammar, when interpreted
+as BNF.  This is rarely the case.
+
+In this section, I will call a PEG specification,
+when interpreted as BNF,
+the specification's "BNF grammar".
+Typically, a PEG implementor thinks their problem out in BNF,
+perhaps ordering the PEG rules to resolve a few of the choices,
+and then twiddles the PEG specification until the test suite passes.
+This results in a parser whose behavior is to a large extent unknown.
+
+Put more directly, the typical PEG implementor does not know what
+language they implemented.
+PEG implementations often do not parse strings allowed
+by the BNF grammar.
+This is usually what the PEG implementor tests for,
+but it is not the only problem,
+and may not be the worst problem.
+
+PEG implementations also often parse strings not allowed by
+the BNF grammar.
+This is not a minor issue:
+overliberal parsers can and have cause security issues.
+
+Overliberal parser is sometimes described as a PEG capability:
+PEG can parse non-context-free languages.
+But this is a little like saying that a sedan with bad steering
+and a tricky suspension has off-road capabilities.
+
+PEG's non-context-free parsing would be a feature if it was
+predictable and describable.
+Regular expressions and context-free BNF specifications are
+popular because they allow the programmer to examine them
+and predict the behaviors of the parsers which implement them.
+A "capability" which cannot be controlled or described by the implementor
+is in fact a danger.
+
+With Marpa, no matter how you assign rule ranks,
+and no matter which ranking method you use,
+you will never get a parse which is not compatible with the
+Marpa grammar interpreted as BNF.
+Rule ranking reduces the parses returned to a subset
+of those allowed by the BNF grammar.
+This gives the implementor which decides to use rule ranking
+a vital "safety net".
+
+Additionally, since Marpa parses all context-free
+grammars, it allows your language to be implemented as pure BNF,
+without rule ranking.
+This will often be the best choice.
 
 =head1 Details
 

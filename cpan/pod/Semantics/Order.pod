@@ -91,6 +91,33 @@ For example, the order may
 change each time
 the parse series is traversed.
 
+=head2 Choicepoints
+
+Informally, a B<choicepoint> is a location where
+a parsing decision must be made.
+A decision may have a single choice,
+in which case the B<decision> is called trivial.
+
+For the parse choices to be interchangeable,
+they all must share a single rule.
+Because of this the rule of the choicepoint itself
+is not the source of a choice's rank --
+instead the rank of each choice's B<cause>
+is used.
+(Informally, a choice's cause might be thought
+as the most recent child of the choicepoint,
+when that choice is made.)
+The parse choices of a choicepoint typically
+have different causes.
+
+The terms "choicepoint" and "cause"
+are defined much more carefully
+in L<a separate
+document|Marpa::R3::Semantics::Rank>.
+That document also gives several examples
+of ranking,
+which are explained in detail.
+
 =head2 Ranking methods
 
 SLIF grammar objects have a L<C<ranking_method> named
@@ -113,14 +140,14 @@ If no numeric rank is specified, the numeric rank is 0.
 =head2 The C<high_rule_only> ranking method
 
 The C<high_rule_only> ranking method is similar to the
-C<rule> ranking method, except that, at every choice point,
+C<rule> ranking method, except that, at every choicepoint,
 it discards all of the choices which
 have a rank lower than that of the highest ranked choice.
 
 The C<high_rule_only> ranking method
 can reduce the ambiguity of a parse,
 but it does not necessarily do so.
-This is because, at each choice point among the parse trees,
+This is because, at each choicepoint among the parse trees,
 it is possible that several of the choices,
 or all of them, will have the same rank
 as the highest ranked choice.
@@ -135,17 +162,17 @@ there will be only one parse tree,
 and the parse bocage will be equivalent
 to that parse tree.
 In an ambiguous parse,
-there will be B<choice points> in the parse bocage.
-At the choice points, there will be two or more
-B<alternatives> -- choices which
+there will be B<choicepoints> in the parse bocage.
+At the choicepoints, there will be two or more
+B<parse choices> -- choices which
 result in different parse trees.
 
 When ranking, the logic traverses the parse bocage,
-looking for choice points.
+looking for choicepoints.
 From the point of view of the individual parse trees,
 this traversal will be top-down
 and left-to-right.
-At the choice points,
+At the choicepoints,
 the choices
 are ranked as follows:
 
@@ -153,24 +180,24 @@ are ranked as follows:
 
 =item * B<Different numeric ranks>:
 
-If the two choices have different numeric ranks,
+If the two parse choices have different numeric ranks,
 they must also have different rule alternatives.
-The choice whose rule alternative has the higher numeric rank
+The parse choice whose rule alternative has the higher numeric rank
 will rank high.
 
 =item * B<Same rule alternative>:
 
-If the two choices have the same rule alternative,
+If the two parse choices have the same rule alternative,
 they rank as described
 under L<"Null variant ranking">.
 
 =item * B<Same numeric rank, different rule alternatives>:
 
 Two different rule alternatives can have the same numeric rank.
-If the two choices are for
+If the two parse choices are for
 rule alternatives that are different,
 but that have the same numeric rank,
-the relative order of the two choices is
+the relative order of the two parse choices is
 arbitrary.
 
 =back
