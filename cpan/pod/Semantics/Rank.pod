@@ -250,10 +250,14 @@ and vice versa.)
 
 As mentioned, a choicepoint can be seen as a set
 of one or more B<parse choices>.
+From the point of view of the individual parse trees,
+the traversal is top-down
+and left-to-right.
+
 Often, there is only one parse choice.
 When there is only one parse choice,
 the choicepoint is said to be B<trivial>.
-Is all of the choicepoints of a parse
+If all of the choicepoints of a parse
 are trivial,
 the parse is unambiguous.
 
@@ -801,41 +805,56 @@ Put more directly, the typical PEG implementor does not know what
 language they implemented.
 PEG implementations often do not parse strings allowed
 by the BNF grammar.
-This is usually what the PEG implementor tests for,
-but it is not the only problem,
-and may not be the worst problem.
 
-PEG implementations also often parse strings not allowed by
-the BNF grammar.
-This is not a minor issue:
-overliberal parsers can and have cause security issues.
+Marpa with ranking allows a safer form of PEG-style parsing.
+Both Marpa's DSL and PEG allow the implementor to specify
+any context-free grammar,
+but Marpa will actually parse all of them correctly,
+while PEG only correctly parses a small subset and
+fakes the rest.
+(In math-y terms, the grammars PEG parses accurately
+are the LL(1) grammars.)
 
-Overliberal parser is sometimes described as a PEG capability:
-PEG can parse non-context-free languages.
-But this is a little like saying that a sedan with bad steering
-and a tricky suspension has off-road capabilities.
+This means that in Marpa,
+the implementor can first write an unranked form of
+their grammar in BNF,
+an a "safety net".
+The BNF grammar will specify
+a superset of what will
+be returned after ranking.
+Ranking or no ranking,
+no parse trees will ever be returned unless that BNF
+accurately describes them.
 
-PEG's non-context-free parsing would be a feature if it was
-predictable and describable.
-Regular expressions and context-free BNF specifications are
-popular because they allow the programmer to examine them
-and predict the behaviors of the parsers which implement them.
-A "capability" which cannot be controlled or described by the implementor
-is in fact a danger.
+With the "safety net" grammar established,
+the implementor of a ranked grammar in Marpa then
+uses ranks to prune,
+eliminating parse trees until the only the ones desired
+are returned.
+Whether in Marpa or in PEG,
+ranking can tricky.
+For the grammar in the synopsis,
+L<below we give a
+proof|"Proof of correctness">
+that the parses returned
+are actually, and only, those desired.
 
-With Marpa, no matter how you assign rule ranks,
-and no matter which ranking method you use,
-you will never get a parse which is not compatible with the
-Marpa grammar interpreted as BNF.
-Rule ranking reduces the parses returned to a subset
-of those allowed by the BNF grammar.
-This gives the implementor which decides to use rule ranking
-a vital "safety net".
+Even if the implementor does not resort to a proof,
+the Marpa BNF provides the "safety net".
+This can be important.
+Overliberal parsing can be a security loophole,
+and bugs caused by overliberal parsing have been
+the topic of security advisories.
 
 Additionally, since Marpa parses all context-free
-grammars, it allows your language to be implemented as pure BNF,
+grammars,
+it often parses your language efficiently when it is implemented as pure BNF,
 without rule ranking.
-This will often be the best choice.
+For example, this can be done the ranked grammar in the synopsis
+can be L<reimplemented as pure unranked
+BNF|/"Reimplementation as BNF">.
+Where this is possible,
+it will usually be the best and safest choice.
 
 =head1 Details
 

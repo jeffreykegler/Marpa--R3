@@ -15,10 +15,6 @@ Marpa::R3::Semantics::Order - How the SLIF ranks ambiguous parses
 
 =head1 Description
 
-[ TODO: This needs to be rewritten to incorporate the changes in
-Marpa::R3::Semantics::Rank.
-]
-
 Marpa allows ambiguous parses.
 While an unambiguous parse can produce at most one parse tree
 and one parse result,
@@ -93,25 +89,23 @@ the parse series is traversed.
 
 =head2 Choicepoints
 
-Informally, a B<choicepoint> is a location where
-a parsing decision must be made.
-A decision may have a single choice,
-in which case the B<decision> is called trivial.
+When ranking, the logic traverses each node
+of the parse bocage.
+In this context, the nodes are also called "choicepoints".
+From the point of view of the individual parse trees,
+the traversal will be top-down
+and left-to-right.
 
-For the parse choices to be interchangeable,
-they all must share a single rule.
-Because of this the rule of the choicepoint itself
-is not the source of a choice's rank --
-instead the rank of each choice's B<cause>
-is used.
-(Informally, a choice's cause might be thought
-as the most recent child of the choicepoint,
-when that choice is made.)
-The parse choices of a choicepoint typically
-have different causes.
+Each choicepoint has one or more "choices".
+Often a choicepoint has only a single choice,
+in which case the choicepoint is called "trivial".
+For two rule instances to be choices of the same
+choicepoint,
+they must end at the same location,
+and their rules must have the same LHS.
 
-The terms "choicepoint" and "cause"
-are defined much more carefully
+The terms "choicepoint" and "choice"
+are defined carefully
 in L<a separate
 document|Marpa::R3::Semantics::Rank>.
 That document also gives several examples
@@ -167,12 +161,7 @@ At the choicepoints, there will be two or more
 B<parse choices> -- choices which
 result in different parse trees.
 
-When ranking, the logic traverses the parse bocage,
-looking for choicepoints.
-From the point of view of the individual parse trees,
-this traversal will be top-down
-and left-to-right.
-At the choicepoints,
+At each choicepoint,
 the choices
 are ranked as follows:
 
