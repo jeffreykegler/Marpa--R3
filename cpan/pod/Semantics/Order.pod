@@ -30,36 +30,6 @@ trees of an ambiguous parse.
 It also describes ways to exclude selected parse trees
 from the parse series.
 
-=head2 Duplicate parses are eliminated
-
-When evaluating the parse trees in a parse series,
-Marpa never evaluates the same parse tree twice.
-What this means probably matches the programmer's
-intuition of what it should mean.
-Marpa considers two parse trees to be the same if they are
-B<semantic equivalents>.
-
-Two parse trees are semantic equivalents if
-and only if
-a recursive, top-down evaluation of each
-applies
-the same rules
-in the same order
-at the same G1 locations.
-If the semantics are deterministic,
-and if two parse trees are
-semantic equivalents according to this definition,
-the two parse trees will always produce the same parse result.
-
-The two parse trees are called semantic equivalents,
-because from the point
-of view of a deterministic semantics they are indistinguishable.
-When the Marpa documentation refers to duplicate
-parses,
-unless otherwise stated,
-it means that the two
-are semantic equivalents.
-
 =head2 Default parse order
 
 By calling
@@ -148,19 +118,6 @@ as the highest ranked choice.
 
 =head2 Rule ranking
 
-A parse series is kept in a structure called a B<parse bocage>.
-The parse bocage is a tree-like structure, whose root node
-is the common root of all the parse trees of the parse series.
-In an unambiguous parse,
-there will be only one parse tree,
-and the parse bocage will be equivalent
-to that parse tree.
-In an ambiguous parse,
-there will be B<choicepoints> in the parse bocage.
-At the choicepoints, there will be two or more
-B<parse choices> -- choices which
-result in different parse trees.
-
 At each choicepoint,
 the choices
 are ranked as follows:
@@ -194,7 +151,7 @@ arbitrary.
 Rule alternatives may be part of a single rule in the DSL --
 for example, a
 L<prioritized rule|Marpa::R3::DSL/"Prioritized rule">.
-Placement with a DSL rule
+Lexical order within a DSL rule
 makes no difference when ranking rule alternatives.
 For example, it makes no difference if two rule alternatives
 come from the same prioritized rule;
@@ -261,11 +218,47 @@ In practice, ambiguity tends to get out of hand very easily.
 Producing and sorting all the parses can take a very
 long time.
 
-=head1 A formal definition
+=head1 Details
 
-This section is a restatement of earlier definition in more formal language.
-It is recorded here for those who find it helpful.
-Most readers will want to ignore this.
+This section contains additional explanations, not essential to understanding
+the rest of this document.
+Often they are formal or mathematical.
+While some people find these helpful, others find them distracting,
+which is why
+they are segregated here.
+
+=head2 Duplicate parses
+
+When evaluating the parse trees in a parse series,
+Marpa never evaluates the same parse tree twice.
+What this means probably matches the programmer's
+intuition of what it should mean.
+Marpa considers two parse trees to be the same if they are
+B<semantic equivalents>.
+
+Two parse trees are semantic equivalents if
+and only if
+a recursive, top-down evaluation of each
+applies
+the same rules
+in the same order
+at the same G1 locations.
+If the semantics are deterministic,
+and if two parse trees are
+semantic equivalents according to this definition,
+the two parse trees will always produce the same parse result.
+
+The two parse trees are called semantic equivalents,
+because from the point
+of view of a deterministic semantics they are indistinguishable.
+When the Marpa documentation refers to duplicate
+parses,
+unless otherwise stated,
+it means that the two
+are semantic equivalents.
+
+Formally, 
+B<semantic equivalence> is defined as follows:
 Call the set of parse trees, C<T>.
 B<Semantic equivalence> is an equivalence relation
 on C<T>.

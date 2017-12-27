@@ -107,23 +107,26 @@ This document describes rule ranking.
 Rule ranking plays a role in parse ordering,
 which is descibed in L<a separate
 document|Marpa::R3::Semantics::Order>.
-Rule ranking is given its own document,
+Rule ranking has its own document,
 because it merits careful definition,
-so that multiple examples can be given.
+and so that multiple examples can be given.
 
 =head1 Dotted Productions
 
 To understand this document,
-it is helpful to understand what a dotted production is.
-Dotted productions are also important in understanding
+it is important to understand what a dotted production is.
+An acquaintance with
+dotted productions is also important in understanding
 Marpa's progress reports,
-and are thoroughly described
-L<in their
+and dotted productions
+are thoroughly described
+L<in the progress report
 documentation|Marpa::R3::Progress>.
 This section repeats the main ideas
 from the perspective of this document.
 
-Recall that a production is a B<LHS> and a B<RHS>.
+Recall that a production is a B<LHS> (left hand side)
+and a B<RHS> (right hand side).
 The B<LHS> is always exactly one symbol.
 The B<RHS> is zero or more symbols.
 Consider the following example of a production,
@@ -147,8 +150,10 @@ the location is represented by a dot.
 The symbol before the dot is called
 the B<predot symbol>.
 
-The following is an example of a dotted production
-in the traditional notation.
+The following is an example of a dotted production.
+(The dot of a dotted rule is not part of Marpa DSL's,
+but we will add it in this document for the sake
+of illustration.)
 
 =for Marpa::R3::Display
 ignore: 1
@@ -158,8 +163,6 @@ ignore: 1
 =for Marpa::R3::Display
 
 In this production, B<B> is the B<predot symbol>.
-(Note that the dot is not allowed in the Marpa DSL,
-though it can be seen in some of Marpa's diagnostics.)
 
 When the dot is after the last symbol of the RHS,
 the dotted production is called a B<completion>.
@@ -194,18 +197,17 @@ In predictions, there is no predot symbol.
 Informally
 a B<choicepoint> is a place where the parser
 can decide among B<parse choices>.
+A choicepoint can be thought of either a set
+of parse choices,
+or as the tuple of the properties which all
+the parse choices for the choicepoint
+must have in common.
+
 For a choicepoint to work, all the choices must
 have enough in common that each of them
 could be replaced with any other.
-
-A choicepoint can be thought of either the set
-of parse choice,
-or as a tuple of the properties which all
-the parse choices must have in common.
-
-Thought of as the properties, all of the its
-parse choices share in common,
-a choicepoint is a triple: C<(dp, origin, current)>.
+Thought of as a tuple of properties,
+a choicepoint is a triple: C<(dp, start, current)>.
 In this triple,
 
 =over 4
@@ -225,17 +227,17 @@ is the B<dot position> of the choicepoint.
 
 =item *
 
-C<origin> is the G1 location where the dotted
+C<start> is the G1 location where the dotted
 production begins.
-C<origin> is sometimes called the B<origin> of the
+C<start> is sometimes called the B<origin> of the
 choicepoint.
 
 =item *
 
-C<dot> is the G1 location corresponding to the dot
+C<current> is the G1 location corresponding to the dot
 in C<dp>.
 C<current> is sometimes 
-call the C<current position> of the choicepoint.
+called the C<current position> of the choicepoint.
 
 =back
 
@@ -284,24 +286,24 @@ of C<cp-cuz>;
 and we say that C<cp-cuz> is one of the B<causes>
 of C<cp-prod>.
 
-The predecessor of a parse choice represents the portion
+The predecessor of a parse choice
+is a choicepoint that
+represents a portion
 of the parse that "leads up to" the cause.
-Predecessors are choicepoints but,
-since
-the predecessor
+The predecessor
 element of a parse choice plays no role in ranking
 decisions,
-this document will mostly ignore predecessors.
+and this document will mostly ignore predecessors.
 
 =head1 Causes
 
 Since it is a choicepoint, a cause choicepoint
 must also be a triple.
-Let the triple for for C<cp-cuz> be C<(cuz-dp, cuz-origin, current)>.
+Let the triple for for C<cp-cuz> be C<(cuz-dp, cuz-origin, cuz-current)>.
 Let the result of C<cp-cuz> be
 C<cp-prod> and
 let the
-triple for for C<cp-prod> be C<(prod-dp, prod-origin, current)>.
+triple for for C<cp-prod> be C<(prod-dp, prod-origin, prod-current)>.
 
 If C<cp-prod> is the result of C<cp-cuz>, then
 
@@ -309,24 +311,39 @@ If C<cp-prod> is the result of C<cp-cuz>, then
 
 =item *
 
-The dot location of C<cp-cuz>
-is the same as the dot location of C<cp-prod>.
+C<cuz-current> is always the same as
+C<prod-current>.
+In other words,
+the current location of C<cp-cuz>
+is the same as the current location of C<cp-prod>.
 
 =item *
 
-The origin of C<cp-cuz>, C<cuz-origin>,
-is before the dot location of C<cp-prod>,
-
+C<cuz-origin> is before C<prod-current>.
+In other words,
+the origin of C<cp-cuz>
+is before the current location of C<cp-prod>.
 
 =item *
 
-The origin of C<cp-cuz>, C<cuz-origin>
+C<cuz-origin>
+is at or after C<prod-origin>.
+In other words,
+the origin of C<cp-cuz>
 is at or after the origin of C<cp-prod>.
-C<cuz-origin> is sometimes called the
-B<middle position> of the choice,
-since it is, in a sense,
-between the positions
-of C<cp-prod>.
+While it is not always properly between
+C<prod-origin> and C<prod-current>,
+C<cuz-origin> is always in the range bounded
+by 
+C<prod-origin> on one side,
+and C<prod-current> and C<cuz-current>
+on the other.
+C<cuz-origin>
+can therefore be thought of as "in the middle"
+of the parse choice.
+For this reason,
+C<cuz-origin> is often called the
+B<middle location> of the parse choice.
 
 =item *
 
@@ -342,13 +359,13 @@ the predot symbol of C<cp-prod>.
 Summing up the above,
 the causes of a production choicepoint
 vary only by
-middle position,
-and by their production RHS.
+middle position
+and production RHS.
 The causes of a production choicepoint
-share the same current G1 location
+always share the same current G1 location
+and production LHS,
 and their dotted productions
-are all completion which share
-the same LHS.
+are always completions.
 
 =head1 Rule Rank
 
@@ -358,13 +375,18 @@ the rank of the choice is the rank of the token symbol.
 If the cause is a choicepoint,
 the rank of the parse choice
 is the rank of the production of the cause.
+Since a token choicepoint is always trivial,
+we can say:
+
+B<The rank of a non-trivial parse choice is the rank
+of the production of its cause.>
 
 =head1 Motivation
 
-Let C<result> be a production choicepoint.
 For the purposes of this section,
-the "result-production" is the production of C<result>;
-and the "cause-productions" are the productions
+let C<result> be a production choicepoint:
+let the "result-production" be the production of C<result>;
+and let the "cause-productions" be the productions
 of the causes of C<result>.
 By the definition of the previous section,
 the result-production plays no role in ranking
@@ -372,8 +394,13 @@ the parse choices of C<result>.
 Instead,
 the parse choices of C<result> are ranked by
 the cause-productions.
+At first,
+this may seem unnecessarily roundabout,
+and even counter-intuitive.
 
-This makes sense, because all parse choices
+On reflection,
+the above definition makes sense,
+because all parse choices
 in the C<result> choicepoint
 share the same result-production,
 so that the result-production cannot be
@@ -381,7 +408,7 @@ a useful part of a ranking method.
 On the other hand,
 parse choices often
 differ in their cause-productions,
-and cause-productions are very helpful in
+so that cause-productions can be very helpful in
 producing a useful ranking method.
 
 Note that ranking is only by direct causes.
@@ -415,7 +442,7 @@ Marpa's ASF's allow full generality in ranking.
 =head1 Examples
 
 Our examples in this document will look at minor variations
-of the same toy grammar.
+of the ranked grammar in the synopsis.
 
 =head2 Longest highest, version 1
 
@@ -448,24 +475,17 @@ partial: 1
 
 This one ranks its "items"
 (here represented by the sets of symbols,
-C<< <Item1> >>,
+C<< <Item3> >>,
 C<< <Item2> >> and
-C<< <Item3> >>)
+C<< <Item1> >>)
 "longest highest".
-The idea behind "longest highest" is this:
-
-C<< <Item3> >> is of the form "C<a=b>"
-and
-C<< <Item2> >> is of the form "C<a=>".
-"C<a=b>" is obviously longer and therefore
-ranks higher,
-so that
-C<< <Item3> >> ranks higher than
-C<< <Item2> >>.
-A similarly train of reasoning shows that,
-in "longest highest"
-C<< <Item2> >> ranks higher than
-C<< <Item1> >>.
+Here the "longest" choice is considered to be the one
+with the most tokens.
+Working this idea out for this grammar,
+we get the following,
+we see that the items,
+from highest to lowest,
+should rank in the order given above.
 
 =head3 The non-trivial choicepoints
 
@@ -478,9 +498,9 @@ will be for the dotted productions:
 =for Marpa::R3::Display
 ignore: 1
 
-    List ::= List . Item1
-    List ::= List . Item2
     List ::= List . Item3
+    List ::= List . Item2
+    List ::= List . Item1
 
 =for Marpa::R3::Display::End
 
@@ -492,10 +512,12 @@ dotted productions for B<result> choicepoints.
 In all of these dotted productions,
 the predot symbol is C<< <List> >>.
 Recall that cause choicepoints are always completions.
-Since the predot symbol is C<< <List> >>,
-the dotted productions of the causes
+Since the predot symbol
+of all the non-trivial choicepoints is
+is C<< <List> >>,
+the dotted production of a cause
 of the non-trivial choicepoints
-may be any of 
+may be any of
 
 =for Marpa::R3::Display
 ignore: 1
@@ -517,10 +539,10 @@ items and takes the form "C<(a=)(b)>" versus
 =for Marpa::R3::Display
 ignore: 1
 
-    List ::= Item1 .
     List ::= Item3 .
-    List ::= List Item1 .
+    List ::= Item1 .
     List ::= List Item3 .
+    List ::= List Item1 .
 
 =for Marpa::R3::Display::End
 
@@ -532,8 +554,8 @@ choice is between these two:
 =for Marpa::R3::Display
 ignore: 1
 
-    List ::= Item1 .
     List ::= Item3 .
+    List ::= Item1 .
 
 =for Marpa::R3::Display::End
 
@@ -558,7 +580,7 @@ ignore: 1
 
 With only one choice left, the resulting choicepoint
 becomes trivial,
-and clearly that remaining choice is the longest,
+and, as defined above, that remaining choice is "longest",
 and therefore the correct one for the "longest highest"
 ranking.
 
@@ -574,8 +596,8 @@ productions:
 =for Marpa::R3::Display
 ignore: 1
 
-    List ::= List Item1 .
     List ::= List Item3 .
+    List ::= List Item1 .
 
 =for Marpa::R3::Display::End
 
@@ -604,16 +626,19 @@ ignore: 1
 
 =head3 Conclusion
 
-We have now shown that our example will render
-all choicepoints trivial, and that the remaining
-choices will be those consistent with
+We have now shown that our example will reduce
+all choicepoints to a single choice,
+one which is consistent with
 "longest highest" ranking.
+Since all choicepoints are reduced to a single
+choice,
+the ranked grammar in unambiguous.
 
 Below, there is
 a L</"Proof of correctness">.
 This could be read as a 2nd, more rigorous,
 version of the explanation in this section,
-but it requires some patience with math-i-ness.
+but it requires some patience for math.
 
 =head2 Shortest highest, version 1
 
@@ -711,6 +736,13 @@ name: Ranking, shortest highest, version 2
 
 =for Marpa::R3::Display::End
 
+Again, the reader looking for simple examples to work
+out for themselves may want to convince himself
+that an argument similar to the one given
+L<above for the "spelled out"
+examples|Longest highest ranking>
+can be worked out for the compact examples.
+
 =head1 Alternatives to Ranking
 
 =head2 Reimplementation as BNF
@@ -742,8 +774,11 @@ normalize-whitespace: 1
 
 We can also reimplement the "shortest highest"
 example as BNF.
-In this case note that, in the course of converting
-to BNF, we discover that the rule
+One of the advantages of a BNF (re)implementation,
+is that it often clarifies the grammar.
+For example
+in this case, we note that
+the DSL rule
 
 =for Marpa::R3::Display
 name: Ranking via BNF, longest highest, version 3
@@ -791,60 +826,72 @@ In fact, Marpa's ranking can be seen as a "better PEG".
 A PEG specification looks like a BNF grammar,
 and it is a common misconception that the language PEG implements
 is the same as the language implied by its grammar, when interpreted
-as BNF.  This is rarely the case.
+as BNF.  This is the case only when the grammar is LL(1) --
+in other words, rarely in practical use.
 
 In this section, I will call a PEG specification,
 when interpreted as BNF,
 the specification's "BNF grammar".
-Typically, a PEG implementor thinks their problem out in BNF,
+Typically, a PEG implementer thinks their problem out in BNF,
 perhaps ordering the PEG rules to resolve a few of the choices,
 and then twiddles the PEG specification until the test suite passes.
 This results in a parser whose behavior is to a large extent unknown.
 
-Put more directly, the typical PEG implementor does not know what
+Put more directly, the typical PEG implementer does not know what
 language they implemented.
 PEG implementations often do not parse strings allowed
 by the BNF grammar.
 
 Marpa with ranking allows a safer form of PEG-style parsing.
-Both Marpa's DSL and PEG allow the implementor to specify
+Both Marpa's DSL and PEG allow the implementer to specify
 any context-free grammar,
 but Marpa will actually parse all of them correctly,
 while PEG only correctly parses a small subset and
 fakes the rest.
-(In math-y terms, the grammars PEG parses accurately
-are the LL(1) grammars.)
 
 This means that in Marpa,
-the implementor can first write an unranked form of
-their grammar in BNF,
-an a "safety net".
-The BNF grammar will specify
-a superset of what will
-be returned after ranking.
-Ranking or no ranking,
-no parse trees will ever be returned unless that BNF
-accurately describes them.
+the implementer of a ranked grammar can work systematically.
+He can first write a "superset grammar",
+and then "sculpt" it using ranks until he has exactly
+the language he wants.
+At all points, the superset grammar
+will act as a "safety net".
+That is,
+ranking or no ranking,
+Marpa returns no parse trees that are not specified by
+the BNF grammar.
 
-With the "safety net" grammar established,
-the implementor of a ranked grammar in Marpa then
-uses ranks to prune,
-eliminating parse trees until the only the ones desired
-are returned.
-Whether in Marpa or in PEG,
-ranking can tricky.
-For the grammar in the synopsis,
-L<below we give a
-proof|"Proof of correctness">
-that the parses returned
-are actually, and only, those desired.
+This "sculpted superset" is more likely to result in a
+satisfactory solution than the PEG approach.
+The PEG specification, as BNF, will usually only parse
+a subset of what the implementer needs,
+and the implementer must use ranks to "stretch" the
+grammar to describe what he has in mind.
 
-Even if the implementor does not resort to a proof,
-the Marpa BNF provides the "safety net".
-This can be important.
-Overliberal parsing can be a security loophole,
+Ranking is always the more difficult and less predictable,
+than specifying BNF.
+The "safety net" provided by Marpa's "sculpted superset"
+guards against overliberal parsing.
+This is important:
+overliberal parsing can be a security loophole,
 and bugs caused by overliberal parsing have been
 the topic of security advisories.
+
+Determining what grammar your ranking actually produces
+in PEG is extremely hard --
+a small specialist literature has looked at this subject,
+but most implementers don't bother --
+when the test suite passes, they consider the PEG
+implementation complete.
+
+Ranking's effect is more straightforward in Marpa.
+Above, we showed very informally that the example
+in our synopsis does what it claims to do --
+that the parses returned
+are actually, and only, those desired.
+L<A more formal
+proof|"Proof of correctness">
+is given below.
 
 Additionally, since Marpa parses all context-free
 grammars,
@@ -853,8 +900,8 @@ without rule ranking.
 For example, this can be done the ranked grammar in the synopsis
 can be L<reimplemented as pure unranked
 BNF|/"Reimplementation as BNF">.
-Where this is possible,
-it will usually be the best and safest choice.
+Where it is possible to convert your ranked grammar to a pure BNF grammar,
+that will usually be the best and safest choice.
 
 =head1 Details
 
@@ -881,7 +928,7 @@ allowed by C<G> after ranking is taken
 into account.
 
 We will say string C<W> is valid
-is C<P-BNF> is non-empty.
+if C<P-BNF> is non-empty.
 We will say that C<P-ranked> is
 "unambiguous" if and only if
 it contains at most one parse.
@@ -929,9 +976,9 @@ We will refer to this fact later.
 
 =item 2:
 
-Second, we note that, wherever ambiguities of the kind
-just mentioned occur,
-they must occur in choices
+wherever ambiguities of the kind
+in (1) occur,
+they must occur in parse choices
 which have one of these 3 symbols as their predot symbol:
 
 =for Marpa::R3::Display
@@ -946,7 +993,7 @@ ignore: 1
 =item 3:
 
 From (2), and by examination of C<G>, we conclude that all ambiguities
-must occur as causes of choices
+must occur as causes of parse choices
 at choicepoints whose dotted rule has the symbol C<< <List> >>
 on its LHS.
 
