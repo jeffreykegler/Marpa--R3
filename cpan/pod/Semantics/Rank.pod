@@ -1,4 +1,4 @@
-# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+More formally,
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
@@ -1072,7 +1072,7 @@ but it is not true in general.
 For this section,
 we consider a
 tomonoid C<(M, +, >=)>
-where M is a set,
+where M is a set of metrics,
 C<+> is the monoid operation,
 and C<< <= >
 is an ordering relation over M.
@@ -1084,17 +1084,148 @@ zero, and C<+> and C<< <= > are the operations
 of addition and "less than or equal" as ordinarily
 defined.)
 
+We overload the function C<Met>,
+so that C<x> in C<Met(x)> may be
+a token symbol,
+a parse choice,
+a choicepoint, or
+a parse set.
+We require the following of a metric:
+
+B<Met-parse-set>:
+The metric of a parse set is the metric of its
+top choicepoint.
+
+B<Met-choicepoint>:
+The metric of a choicepoint is the maximum
+over the metrics of the parse choices
+that are the elements of that choicepoint.
+
+B<Met-parse-choice>:
+The metric of a parse choice is
+C<Met(pred)+Met(cause)>.
+Here C<+> is the tomonoid operation,
+which is not necessarily ordinary addition;
+C<pred> is the predessor choicepoint;
+and C<cause> is the cause,
+which may either be a choicepoint or a symbol.
+
+B<Met-token>:
+The metric of a token symbol is a constant.
+
 Where C<m> is an element of C<M>,
 C<R(m)> is the "rank" of C<m>.
 Rank is an integer.
-We assume that C<R> preserves the total order,
+We assume that, within a choicepoint,
+C<R> preserves the total order,
 or more precisely, that
 
-B<(1)>:
 If C<m1> and C<m2> are both elements of the
 tomonoid C<M>,
 and C<m1 <= m2>,
 then C<R(m1) <= R(m2)>.
+
+We say that C<R(pc)> is the "rank" of the parse choice,
+where rank is an integer.
+We assume that
+
+B<(1)>:
+In any non-trivial choicepoint
+where C<pc1> and C<pc2> are two parse choices,
+if C<Met(pc1) <= Met(pc2)>, then
+C<R(pc1) <= R(pc2)>.
+
+We say that a choicepoint is "reduced"
+when all but its highest ranked parse choices
+are removed from it.
+Where C<pset> is a parse set,
+we say that C<Met(parse)> is the metric
+of the parse.
+C<Met(P-ranked)> is the metric of the original
+ranked parse set,
+before any reductions.
+
+We take as our induction hypothesis that
+reduction preserves the metric of the parse
+set.
+More formally,
+
+B<(HYP)>:
+Let C<ps1> be a parse set.
+Let C<cp> be a choicepoint in C<ps1>
+which has at least two parse choices
+with different metrics.
+Let C<ps2> be C<ps1> after C<cp>
+is reduced.
+Then, C<Met(ps2) = Met(ps1)>.
+
+B<Rank Induction Theorem>:
+Let C<P-ranked> be the parse set
+of a ranked grammar,
+and let
+C<reduced> be that parse set after
+all of its choicepoints have been reduced.
+Then, C<Met(reduced) = Met(P-ranked)>.
+
+=head3 Proof
+
+The proof is by induction,
+with C<(HYP)> as the induction hypothesis.
+As the basis of the induction,
+we take
+C<Met(P-ranked) = Met(P-ranked)>.
+We have the basis of the induction directly.
+
+To show the step, we assume that a C<ps1>
+is a parse set,
+and that it contains a C<cp> with
+at two least two parses choices
+with different metrics.
+Using ranking, 
+we eliminate all but the highest ranked
+parse choice,
+and call the new parse set C<ps2>.
+
+By C<(1)>, the parse choices with the
+highest metrics remain in C<cp> in C<ps2>.
+By C<Met-choicepoint>, the metric of the
+choicepoint is already the highest metric
+of any of its parse elements,
+so that the metric of C<cp> in C<ps2>
+remains unchanged.
+All other choicepoints remain exactly as
+they were in C<ps1>,
+so that,
+by C<Met-choicepoint>,
+their metrics also remain unchanged.
+
+By C<Met-token>
+the metrics of the token symbols are constant.
+Of the parse choices which remain in C<ps2>,
+all get their metric from the tomonoid
+operation on token symbols and choicepoints.
+
+Marpa grammars have no cycles, so that a
+induction by depth,
+starting from the deepest leaf node
+and proceeding to the
+parse set's top choicepoint
+will show
+that no choicepoint changes its metric.
+There the top choicepoint of C<ps2>
+does not change its
+metric from the metric
+of top choicepoint of C<ps1>,
+and 
+C<Met(ps2) = Met(ps1)>.
+This shows the step of the induction.
+
+To show the induction terminates,
+we note that the parse set contains a finite
+number of choicepoints,
+and that each induction step reduces one of these.
+
+QED.
 
 =head1 COPYRIGHT AND LICENSE
 
