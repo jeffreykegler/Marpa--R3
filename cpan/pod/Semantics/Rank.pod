@@ -688,7 +688,7 @@ The reader who wants an first example of ranking scheme
 to work out for themselves may find this one suitable.
 The reasoning will be exactly the same as for the
 L<"longest highest"
-example,|"Shortest highest, version 1">
+example,|"Longest highest, version 1">
 just above .
 
 =head2 Longest highest, version 2
@@ -933,8 +933,29 @@ We will say that C<P-ranked> is
 "unambiguous" if and only if
 it contains at most one parse.
 
-It is necessary to clarify what we mean
-by the "longest highest" parse.
+In the
+L<less formal discussion
+above|"Longest highest, version 1">,
+we used some unstated assumptions
+about "longest highest" parses
+based on intuition.
+Here we state them
+and justify them.
+
+We define the "length" of a parse C<p>,
+C<Len(p)>,
+to be
+the number of leaf nodes in it.
+We define the "length" of a parse set,
+C<Len(ps),
+to be the maximum "length"
+of any parse in C<p-set>.
+If C<Len(p-hi) = Len(ps)>,
+where C<p-hi> is a parse in
+C<ps>,
+the C<p-hi> is a
+"longest highest" parse.
+
 In C<G>, the leaf nodes take the forms:
 
 =for Marpa::R3::Display
@@ -945,9 +966,6 @@ ignore: 1
     VAR = VAR
 
 =for Marpa::R3::Display::End
-
-The "longest highest" parse is the one which
-contains the fewest leaf nodes.
 
 Theorem:
 If C<W> is a valid string,
@@ -964,9 +982,7 @@ and that he is familiar with Earley's algorithm.
 
 =over 4
 
-=item 1:
-
-Analyzing the grammar C<G>,
+B<1:> Analyzing the grammar C<G>,
 we note the the only potential ambiguities
 are in choosing between the pairs of the form "C<(a=)(b)>"
 and nodes of the form "C<a=b>".
@@ -974,14 +990,10 @@ Note that this implies that completions of C<Item2> and C<Item3>
 cannot occur at the same G1 location.
 We will refer to this fact later.
 
-=item 2:
-
-wherever ambiguities of the kind
+B<2:> wherever ambiguities of the kind
 in (1) occur,
 they must occur in parse choices
-which have one of these 3 symbols as their predot symbol:
-
-=for Marpa::R3::Display
+which have one of these 3 symbols as their predot symbol:> =for Marpa::R3::Display
 ignore: 1
 
     Item1
@@ -990,16 +1002,12 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
-=item 3:
-
-From (2), and by examination of C<G>, we conclude that all ambiguities
+B<3:> From (2), and by examination of C<G>, we conclude that all ambiguities
 must occur as causes of parse choices
 at choicepoints whose dotted rule has the symbol C<< <List> >>
 on its LHS.
 
-=item 4:
-
-From (1), we note that, when there is an ambiguity,
+B<4:> From (1), we note that, when there is an ambiguity,
 the choice will always be between the rule
 
 =for Marpa::R3::Display
@@ -1029,9 +1037,7 @@ where C<Item3> is a predot symbol,
 and therefore C<Item2> and C<Item3> will never be predot
 symbols of choices in the same choicepoint.)
 
-=item 5:
-
-Using (4),
+B<5:> Using (4),
 and noting rank 3 is higher than rank 1,
 we conclude that only one choice will be picked,
 and that it will resolve the ambiguity in favor
@@ -1039,21 +1045,56 @@ of "C<(a=b)>", which contains only one leaf.
 The other choice would imply the parse contains the pair "C<(a=)(b)>",
 which contains two leaves.
 
-=item 6:
-
-Generalizing from (5), we observe that all choices are resolved
+B<6:> Generalizing from (5), we observe that all choices are resolved
 so that only one choice remains,
 and that that choice is "longest highest".
 
-=item 7:
-
-From (6) we can show, by induction on the choices in a parse,
+B<7:> From (6) we can show, by induction on the choices in a parse,
 that C<P-ranked> will only contain one parse,
 and that that parse will be "longest highest".
 
 =back
 
 QED.
+
+=head2 The Rank Induction Theorem
+
+The L<less formal justification of the grammar
+in the
+synopsis|"Longest highest, version 1">
+relied on an unstated assumption:
+that if we optimized the metric used in ranking
+at each choicepoint,
+this would optimize it for the whole document.
+This is true for the synopsis grammar,
+but it is not true in general.
+
+For this section,
+we consider a
+tomonoid C<(M, +, >=)>
+where M is a set,
+C<+> is the monoid operation,
+and C<< <= >
+is an ordering relation over M.
+A "tomonoid" is also called
+a totally ordered monoid.
+(The best known tomonoid is C<(N0, +, >=)>
+where C<N0> is the set of natural numbers plus
+zero, and C<+> and C<< <= > are the operations
+of addition and "less than or equal" as ordinarily
+defined.)
+
+Where C<m> is an element of C<M>,
+C<R(m)> is the "rank" of C<m>.
+Rank is an integer.
+We assume that C<R> preserves the total order,
+or more precisely, that
+
+B<(1)>:
+If C<m1> and C<m2> are both elements of the
+tomonoid C<M>,
+and C<m1 <= m2>,
+then C<R(m1) <= R(m2)>.
 
 =head1 COPYRIGHT AND LICENSE
 
