@@ -1,4 +1,4 @@
-More formally,
+# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
@@ -947,7 +947,7 @@ C<Len(p)>,
 to be
 the number of leaf nodes in it.
 We define the "length" of a parse set,
-C<Len(ps),
+C<Len(ps)>,
 to be the maximum "length"
 of any parse in C<p-set>.
 If C<Len(p-hi) = Len(ps)>,
@@ -1059,28 +1059,33 @@ QED.
 
 =head2 The Rank Induction Theorem
 
-The L<less formal justification of the grammar
-in the
-synopsis|"Longest highest, version 1">
+The L<less formal
+justification|"Longest highest, version 1">
+of the grammar
+in the synopsis
 relied on an unstated assumption:
 that if we optimized the metric used in ranking
 at each choicepoint,
 this would optimize it for the whole document.
-This is true for the synopsis grammar,
+This happens to be true for the synopsis grammar,
 but it is not true in general.
 
-For this section,
-we consider a
-tomonoid C<(M, +, >=)>
-where M is a set of metrics,
+We define C<Metric> to be a duple of
+a tomonoid and a constant:
+C<< (M, +, >=), tokval >>.
+In the tomonoid
+C<< (M, +, >=) >>,
+M is a set of metrics,
 C<+> is the monoid operation,
-and C<< <= >
-is an ordering relation over M.
+and C<< <= >>
+is a total ordering over M.
+C<tokval> is an element of C<M>.
+
 A "tomonoid" is also called
 a totally ordered monoid.
-(The best known tomonoid is C<(N0, +, >=)>
+(The best known tomonoid is C<< (N0, +, >=) >>
 where C<N0> is the set of natural numbers plus
-zero, and C<+> and C<< <= > are the operations
+zero, and C<+> and C<< <= >> are the operations
 of addition and "less than or equal" as ordinarily
 defined.)
 
@@ -1090,40 +1095,35 @@ a token symbol,
 a parse choice,
 a choicepoint, or
 a parse set.
-We require the following of a metric:
+
+We make the following definitions of C<Met>:
 
 B<Met-parse-set>:
-The metric of a parse set is the metric of its
-top choicepoint.
+The metric of a parse set C<ps>,
+C<Met(ps)>,
+is the metric of its top choicepoint.
 
 B<Met-choicepoint>:
-The metric of a choicepoint is the maximum
+The metric of a choicepoint C<cp>,
+C<Met(cp)>,
+is the maximum
 over the metrics of the parse choices
 that are the elements of that choicepoint.
 
 B<Met-parse-choice>:
-The metric of a parse choice is
-C<Met(pred)+Met(cause)>.
+The metric of a parse choice
+C<pc = (pred, cause)>,
+is C<Met(pc) = Met(pred)+Met(cause)>.
 Here C<+> is the tomonoid operation,
 which is not necessarily ordinary addition;
-C<pred> is the predessor choicepoint;
-and C<cause> is the cause,
+C<pred> is the predessor of C<pc>;
+and C<cause> is the cause of C<pc>,
 which may either be a choicepoint or a symbol.
 
 B<Met-token>:
-The metric of a token symbol is a constant.
-
-Where C<m> is an element of C<M>,
-C<R(m)> is the "rank" of C<m>.
-Rank is an integer.
-We assume that, within a choicepoint,
-C<R> preserves the total order,
-or more precisely, that
-
-If C<m1> and C<m2> are both elements of the
-tomonoid C<M>,
-and C<m1 <= m2>,
-then C<R(m1) <= R(m2)>.
+The metric of a token symbol C<tok>
+is the C<tokval> constant:
+C<Met(tok) = tokval>.
 
 We say that C<R(pc)> is the "rank" of the parse choice,
 where rank is an integer.
@@ -1132,18 +1132,15 @@ We assume that
 B<(1)>:
 In any non-trivial choicepoint
 where C<pc1> and C<pc2> are two parse choices,
-if C<Met(pc1) <= Met(pc2)>, then
-C<R(pc1) <= R(pc2)>.
+if C<< Met(pc1) <= Met(pc2) >>, then
+C<< R(pc1) <= R(pc2) >>.
 
 We say that a choicepoint is "reduced"
 when all but its highest ranked parse choices
 are removed from it.
-Where C<pset> is a parse set,
-we say that C<Met(parse)> is the metric
-of the parse.
-C<Met(P-ranked)> is the metric of the original
-ranked parse set,
-before any reductions.
+We say that a choicepoint is "unreduced"
+when it contains two choicepoints with different
+ranks.
 
 We take as our induction hypothesis that
 reduction preserves the metric of the parse
@@ -1152,9 +1149,7 @@ More formally,
 
 B<(HYP)>:
 Let C<ps1> be a parse set.
-Let C<cp> be a choicepoint in C<ps1>
-which has at least two parse choices
-with different metrics.
+Let C<cp> be an unreduced choicepoint in C<ps1>.
 Let C<ps2> be C<ps1> after C<cp>
 is reduced.
 Then, C<Met(ps2) = Met(ps1)>.
@@ -1176,7 +1171,8 @@ we take
 C<Met(P-ranked) = Met(P-ranked)>.
 We have the basis of the induction directly.
 
-To show the step, we assume that a C<ps1>
+To show the step of the induction,
+we assume that a C<ps1>
 is a parse set,
 and that it contains a C<cp> with
 at two least two parses choices
@@ -1193,12 +1189,6 @@ choicepoint is already the highest metric
 of any of its parse elements,
 so that the metric of C<cp> in C<ps2>
 remains unchanged.
-All other choicepoints remain exactly as
-they were in C<ps1>,
-so that,
-by C<Met-choicepoint>,
-their metrics also remain unchanged.
-
 By C<Met-token>
 the metrics of the token symbols are constant.
 Of the parse choices which remain in C<ps2>,
@@ -1220,10 +1210,14 @@ and
 C<Met(ps2) = Met(ps1)>.
 This shows the step of the induction.
 
-To show the induction terminates,
-we note that the parse set contains a finite
-number of choicepoints,
-and that each induction step reduces one of these.
+Since we made no assumptions about the cardinality of C<M>,
+the tomonoid's set,
+we want to show that the induction terminates.
+We note that C<P-ranked> parse set contains a finite
+number of choicepoints.
+Therefore C<P-ranked> contains a finite number of unreduced choicepoints.
+Each induction step reduces one previously unreduced choicepoint.
+Therefore the induction terminates after a finite number of steps.
 
 QED.
 
