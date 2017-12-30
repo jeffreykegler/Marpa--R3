@@ -942,15 +942,28 @@ based on intuition.
 Here we make them explicit
 and justify them.
 
-We define the "length" of a parse C<p>,
-C<Len(p)>,
+What "longest highest" means locally is reasonably obvious --
+it C<item3> has more tokens than C<item1>,
+then C<item3> is "longer" than C<item1>.
+It is less clear what it means globally.
+The possibilities might overlap,
+and optimizing one decision might make
+the parse as a whole suboptimal.
+
+We will say that the "longest highest" parse is the
+parse with the fewest "items".
+This is based on the intuition that if items are longer,
+fewer of them will fit into a fixed size string.
+
+We define the "size" of a parse C<p>,
+C<Size(p)>,
 to be
 the number of leaf nodes in it.
-We define the "length" of a parse set,
-C<Len(ps)>,
-to be the maximum "length"
+We define the "size" of a parse set,
+C<Size(ps)>,
+to be the minimum "size"
 of any parse in C<p-set>.
-If C<Len(p-hi) = Len(ps)>,
+If C<Size(p-hi) = Size(ps)>,
 where C<p-hi> is a parse in
 C<ps>,
 then C<p-hi> is a
@@ -967,6 +980,11 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
+We say that a choicepoint is "reduced" if all of 
+its choices have the same rank.
+We say that a choicepoint is "unreduced" if it is
+not reduced.
+
 Theorem:
 If C<W> is a valid string,
 C<P-ranked> contains only one
@@ -982,8 +1000,109 @@ and that he is familiar with Earley's algorithm.
 
 =over 4
 
-B<1>: Analyzing the grammar C<G>,
-we note the the only potential ambiguities
+B<(1)>:
+Analyzing the grammar C<G>,
+we see that it is a list of items,
+where "item" means one of
+C<Item1>,
+C<Item2> or
+C<Item3>.
+Therefore C<G> is not ambiguous for a string
+unless that string divides into items
+in more than one way.
+
+B<(2)>:
+Analyzing the grammar C<G>,
+we can see that two C<VAR>s never occur
+together in the same item.
+This means that wherever we do find two
+C<VAR>s in a row, it must mark a boundary
+between items must occur between
+the two successive C<VAR>s.
+
+B<(3)>:
+No item begins with an equal sign ("C<=>").
+
+B<(4)>:
+From (2) and (3), we know that any
+ambiguity between items must occur in a string
+that consists of an initial "C<VAR>"
+followed by zero or more substrings of the form
+"C<< <VAR> >>".
+In regular expression form,
+this is C<< <VAR> (= <VAR>)* >>.
+
+To illustrate, here are some strings, following
+by their possible divisions into items
+according to the pure BNF grammar:
+
+=for Marpa::R3::Display
+ignore: 1
+
+    a                   (a)
+    a=b                 (a=)(b); (a=b)
+    a=b=c               (a=)(b=)(c); (a=)(b=c)
+    a=b=c=d             (a=)(b=)(c=)(d); (a=)(b=)(c=d)
+
+=for Marpa::R3::Display::End
+
+Here item boundaries are indicated by using
+parentheses to surround each item.
+Note that, while all four strings in the display above
+have at least one valid parse according to the pure BNF
+grammar,
+only "C<a>" and
+"C<a=b>" have valid parses after the ranking of the
+synopsis grammar is applied.
+
+B<(5)>:
+In fact, since we know that 
+of the form "C<< <VAR> = <VAR> >>".
+From (4) we can easily see that a token string of
+the form "C<< <VAR> >>" is not ambigious:
+For example, the string "C<a>" can only divide into
+items as "C<(a)>".
+From this and (4) we see that
+any ambiguity between items must occur in a string
+whose regular expression form is
+C<< <VAR> (= <VAR>)+ >>.
+
+B<6>: We will now proceed by induction on the
+ambiguous choicepoints, proceeding from left to right
+in the parse.
+We take as our induction hypothesis the following:
+
+Let C<ps1> be a parse set,
+and C<loc1> the G1 location with the first unreduced
+choicepoint in C<ps1>.
+Let C<cp> be an unreduced choicepoint at C<loc1>.
+Let C<ps2> be the parse set after C<cp> is reduced.
+Then, first, C<cp> is the only unreduced choicepoint
+at C<loc1>; and
+second, C<Size(ps1) = Size(ps2)>.
+
+B<7>:
+From (5) we know
+that any unreduced choicepoint must be
+immediately after a token string of the form "C<< <VAR> = <VAR> >>".
+Using parentheses to enclose items,
+we have two parse choices at this point.
+
+=for Marpa::R3::Display
+ignore: 1
+
+    ( <VAR> = <VAR> )
+    ( <VAR> = ) ( <VAR> )
+
+=for Marpa::R3::Display::End
+
+From the ranking, we know that we will reduce this choicepoint
+to "C<< ( <VAR> = <VAR> ) >>".
+
+[ TODO: Revised to here. ]
+
+[ TODO: Must show only one unreduced choicepoint at each G1 location. ]
+
 are in choosing between the pairs of the form "C<(a=)(b)>"
 and nodes of the form "C<a=b>".
 Note that this implies that completions of C<Item2> and C<Item3>
@@ -993,7 +1112,7 @@ We will refer to this fact later.
 B<2>: Wherever ambiguities of the kind
 in (1) occur,
 they must occur in parse choices
-which have one of these 3 symbols as their predot symbol:> =for Marpa::R3::Display
+which have one of these 3 symbols as their predot symbol:
 
 =for Marpa::R3::Display
 ignore: 1
