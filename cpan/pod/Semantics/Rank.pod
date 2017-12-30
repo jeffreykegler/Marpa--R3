@@ -1002,7 +1002,7 @@ and that he is familiar with Earley's algorithm.
 
 B<(1)>:
 Analyzing the grammar C<G>,
-we see that it is a list of items,
+we see that it is a sequence of items,
 where "item" means one of
 C<Item1>,
 C<Item2> or
@@ -1012,13 +1012,11 @@ unless that string divides into items
 in more than one way.
 
 B<(2)>:
-Analyzing the grammar C<G>,
-we can see that two C<VAR>s never occur
+We can see that two C<VAR>s never occur
 together in the same item.
 This means that wherever we do find two
 C<VAR>s in a row, it must mark a boundary
-between items must occur between
-the two successive C<VAR>s.
+between items.
 
 B<(3)>:
 No item begins with an equal sign ("C<=>").
@@ -1048,7 +1046,8 @@ ignore: 1
 
 Here item boundaries are indicated by using
 parentheses to surround each item.
-Note that, while all four strings in the display above
+Peeking ahead, we will discover that,
+while all four strings in the display above
 have at least one valid parse according to the pure BNF
 grammar,
 only "C<a>" and
@@ -1056,8 +1055,6 @@ only "C<a>" and
 synopsis grammar is applied.
 
 B<(5)>:
-In fact, since we know that 
-of the form "C<< <VAR> = <VAR> >>".
 From (4) we can easily see that a token string of
 the form "C<< <VAR> >>" is not ambigious:
 For example, the string "C<a>" can only divide into
