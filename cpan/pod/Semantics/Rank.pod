@@ -38,10 +38,13 @@ normalize-whitespace: 1
     END_OF_SOURCE
 
     my @tests = (
+        [ 'a',                 '(a)', ],
         [ 'a = b',             '(a=b)', ],
+        [ 'a = b = c',         '(a=)(b=c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=d)', ],
         [ 'a = b c = d',       '(a=b)(c=d)' ],
-        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
         [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
         [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
     );
 
@@ -914,60 +917,68 @@ they are segregated here.
 
 =head2 Proof of correctness
 
+We assume that the reader is comfortable
+reading and analyzing BNF.
 Let C<G> be the grammar in the
 Marpa DSL
 synopsis,
 treated as it was pure BNF,
 without ranking taken into consideration.
 Let C<W> be a string,
-and let C<P-BNF> be the set of parses
+and let C<ps-pure> be the set of parses
 allowed by C<G>.
-Let C<P-ranked> be the
+Let C<ps-ranked> be the
 set of parses
 allowed by C<G> after ranking is taken
 into account.
 
 We will say string C<W> is valid
-if C<P-BNF> is non-empty.
-We will say that C<P-ranked> is
+if C<ps-pure> is non-empty.
+We will say that a parse set is
 "unambiguous" if and only if
 it contains at most one parse.
 
 In the
 L<less formal discussion
 above|"Longest highest, version 1">,
-we used some unstated assumptions
-about "longest highest" parses
-based on intuition.
-Here we make them explicit
-and justify them.
+we took an intuitive approach to
+the idea of "longest highest",
+one which made the unstated assumption
+that optimizing for "longest highest"
+locally would also optimize globally.
+Here we make our idea of "longest highest"
+explicit and justify it.
 
 What "longest highest" means locally is reasonably obvious --
 it C<item3> has more tokens than C<item1>,
 then C<item3> is "longer" than C<item1>.
 It is less clear what it means globally.
-The possibilities might overlap,
-and optimizing one decision might make
+Items might overlap,
+so that optimizing locally might make
 the parse as a whole suboptimal.
 
-We will say that the "longest highest" parse is the
-parse with the fewest "items".
+We will define a "longest highest" parse as
+one of the parses with the fewest "items".
 This is based on the intuition that if items are longer,
 fewer of them will fit into a fixed size string.
 
-We define the "size" of a parse C<p>,
+More formally,
+we define the "size" of a parse C<p>,
 C<Size(p)>,
 to be
-the number of leaf nodes in it.
-We define the "size" of a parse set,
+the number of items in it.
+If C<ps> is a parse set,
+we define the "size" of C<ps>,
 C<Size(ps)>,
 to be the minimum "size"
-of any parse in C<p-set>.
-If C<Size(p-hi) = Size(ps)>,
-where C<p-hi> is a parse in
-C<ps>,
-then C<p-hi> is a
-"longest highest" parse.
+of any parse in C<ps>.
+In other words,
+if C<p-lh> is a parse in C<ps> and if,
+for every parse C<p> in parse set C<ps>,
+C<< Size(p-lh) <= Size(p) >>,
+the C<p-lh> is a "longest highest" parse.
+
+[ TODO: Keep to next TODO? ]
 
 In C<G>, the leaf nodes take the forms:
 
@@ -980,6 +991,8 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
+[ TODO: Keep from previous TODO? ]
+
 We say that a choicepoint is "reduced" if all of 
 its choices have the same rank.
 We say that a choicepoint is "unreduced" if it is
@@ -987,18 +1000,19 @@ not reduced.
 
 Theorem:
 If C<W> is a valid string,
-C<P-ranked> contains only one
+C<ps-ranked> contains only one
 parse,
 and that parse is 
-the the "longest highest" parse.
+the "longest highest" parse.
 
 Proof:
 
-The following proof assumes that the reader is comfortable
-with analyzing BNF,
-and that he is familiar with Earley's algorithm.
-
-=over 4
+Recall that a Marpa C<high_rule_only> parse
+first parses according to the pure BNF,
+and then prunes the parse using ranking.
+We will first examine C<ps-pure>,
+the parse set which results from the pure
+BNF phase.
 
 B<(1)>:
 Analyzing the grammar C<G>,
@@ -1011,12 +1025,59 @@ Therefore C<G> is not ambiguous for a string
 unless that string divides into items
 in more than one way.
 
+We will call a division of C<W> into items
+a "factoring".
+
+B<(2) "Independence">:
+Let C<seq1> and C<seq2> be two factorings
+of C<W> into items.
+Let C<first> and C<last> be two G1 locations
+such that C<< first <= last >>.
+Let C<sub1> be a subsequence of one or more
+items of C<seq1>
+that starts at C<first> and ends at C<last>.
+Similarly,
+let C<sub1> be a subsequence of one or more
+items of C<seq1>
+that starts at C<first> and ends at C<last>.
+
+Let C<seq3> be
+the result of replacing 
+C<sub1> in C<seq1> with
+C<sub2>.
+Then,
+because C<G> is a context free grammar,
+C<seq3> is also a factoring of C<W>.
+
 B<(2)>:
-We can see that two C<VAR>s never occur
+Recall the L<discussion of G1
+fenceposts|Marpa::R3::Recognizer/"G1 Fenceposts">.
+
+We will say that a G1 fencepost C<fp>
+is a "factoring barrier"
+if it is not properly contained in any item.
+More formally,
+let C<First(it1)> be first G1 location of
+an item C<it1>,
+and let C<Last(it1)> be last G1 location of
+an item C<it1>.
+Then if,
+for every item C<it>,
+G1 fencepost C<I> is such that
+C<< I <= First(it)  >> or
+C<< I > Last(it)  >>,
+then G1 fencepost C<I> is a factoring barrier.
+
+B<(3)>:
+We can see from C<G>
+that two C<VAR>s never occur
 together in the same item.
 This means that wherever we do find two
-C<VAR>s in a row, it must mark a boundary
-between items.
+C<VAR>s in a row,
+the G1 fencepost between them is
+a factoring barrier.
+
+[ TODO: to here ]
 
 B<(3)>:
 No item begins with an equal sign ("C<=>").
@@ -1170,8 +1231,6 @@ and that that choice is "longest highest".
 B<7:> From (6) we can show, by induction on the choices in a parse,
 that C<P-ranked> will only contain one parse,
 and that that parse will be "longest highest".
-
-=back
 
 QED.
 

@@ -19,7 +19,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 8;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -55,15 +55,19 @@ my $source = <<'END_OF_SOURCE';
 END_OF_SOURCE
 
 my @tests = (
+    [ 'a',                 '(a)', ],
     [ 'a = b',             '(a=b)', ],
+    [ 'a = b = c',         '(a=)(b=c)', ],
+    [ 'a = b = c = d',     '(a=)(b=)(c=d)', ],
     [ 'a = b c = d',       '(a=b)(c=d)' ],
-    [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
     [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+    [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
     [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
 );
 
 my $grammar = Marpa::R3::Grammar->new(
     { ranking_method => 'high_rule_only', source => \$source } );
+
 for my $test (@tests) {
     my ( $input, $output ) = @{$test};
     my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
@@ -77,7 +81,7 @@ for my $test (@tests) {
 
 # Marpa::R3::Display::End
 
-for my $ix ( 0 .. $#results ) {
+for my $ix ( 0 .. $#tests ) {
     my ( $input, $output ) = @{$tests[$ix]};
     my $result = $results[$ix];
     Test::More::is( $result, $output,

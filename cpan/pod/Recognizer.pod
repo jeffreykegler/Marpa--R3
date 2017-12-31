@@ -246,7 +246,7 @@ the current eoread of that current block.
 
 =back
 
-=head1 G1 position
+=head1 G1 location
 
 In addition to block position,
 Marpa::R3 apps sometimes have to deal with position
@@ -254,20 +254,59 @@ in terms of lexemes.
 (Marpa::R3's lexemes are similar to what in other parsers
 are called "tokens".)
 Position in terms of lexemes
-is called B<G1 Earley set position> or,
+is called B<G1 Earley set location> or,
 more often,
-B<G1 position>.
+B<G1 location>.
 
-G1 position is 0-based --
-The first lexeme is at G1 position 0.
-Every G1 position corresponds to at least one lexeme.
+G1 location is 0-based --
+The first lexeme is at G1 location 0.
+Every G1 location corresponds to at least one lexeme.
 But Marpa::R3 allows ambiguous lexemes --
-more than one lexeme can be read at a single G1 position.
+more than one lexeme can be read at a single G1 location.
 
 G1 location can be ignored most of the time,
 but it
 is useful for tracing the G1 grammar
 and for advanced techniques.
+
+=head1 G1 fenceposts
+
+Restating the definition of G1 location above
+more pedantically,
+the G1 locations are an ordered set
+of sets of tokens.
+G1 locations B<contain> sets of tokens.
+
+It is sometimes useful to use an idea of locations
+between G1 locations --
+This is the classic "fencepost" issue -- sometimes
+you want to count sections of fence,
+and in other cases it is more convenient to count
+fenceposts.
+
+Let the G1 locations be from 0 to C<N>.
+If C<N> is greater than 1 and less than C<N>,
+G1 fencepost C<N> is before G1 location C<N>
+and after G1 location C<N-1>.
+G1 fencepost C<0> is before G1 location 0.
+G1 fencepost C<N> is after G1 location C<N>
+
+The above implies that
+
+=over 4
+
+=item *
+
+If there are C<N> G1 locations,
+there are C<N+1> G1 fenceposts.
+
+=item *
+
+G1 location C<I> is always between
+G1 fencepost C<I> and
+G1 fencepost C<I+1>.
+
+=back
 
 =head1 Universes
 
