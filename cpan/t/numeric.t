@@ -62,7 +62,7 @@ my @minimal = ( q{}, qw[(;;;a) (;;a;a) (;a;a;a) (a;a;a;a)] );
 for my $maximal ( 0, 1 ) {
     my $dsl = $dsl{ $maximal ? 'low' : 'high' };
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => $dsl } );
+        { ranking_method => 'high_rank_only', source => $dsl } );
     my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
     my $input_length = 4;

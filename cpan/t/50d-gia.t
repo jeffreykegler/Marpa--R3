@@ -128,9 +128,9 @@ if (1) {
   List ::= List Item3 rank => 3
   List ::= List Item2 rank => 2
   List ::= List Item1 rank => 1
-  Item3 ::= VAR '=' VAR rank => 3 action => main::concat
-  Item2 ::= VAR '='     rank => 2 action => main::concat
-  Item1 ::= VAR         rank => 1 action => main::concat
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 END_OF_SOURCE
@@ -144,7 +144,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
@@ -173,9 +173,9 @@ if (1) {
   List ::= List Item3 rank => 4
   List ::= List Item2 rank => 5
   List ::= List Item1 rank => 6
-  Item3 ::= VAR '=' VAR rank => 1 action => main::concat
-  Item2 ::= VAR '='     rank => 2 action => main::concat
-  Item1 ::= VAR         rank => 3 action => main::concat
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 END_OF_SOURCE
@@ -195,7 +195,7 @@ END_OF_SOURCE
 # Marpa::R3::Display::End
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
@@ -240,7 +240,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
@@ -284,7 +284,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
@@ -330,7 +330,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
@@ -375,7 +375,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',

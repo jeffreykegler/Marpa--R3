@@ -758,7 +758,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
@@ -853,7 +853,7 @@ END_OF_SOURCE
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',

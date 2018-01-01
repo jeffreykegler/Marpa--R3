@@ -116,13 +116,13 @@ calls of the L<C<new()>|/"Constructor"> method.
 The value must be a string:
 one of "C<none>",
 "C<rule>",
-or "C<high_rule_only>".
+or "C<high_rank_only>".
 When the value is "C<none>", Marpa returns the parse results
 in arbitrary order.
 This is the default.
 
 The "C<rule>"
-and "C<high_rule_only>" ranking methods
+and "C<high_rank_only>" ranking methods
 allow the user
 to control the order
 in which parse results are returned by

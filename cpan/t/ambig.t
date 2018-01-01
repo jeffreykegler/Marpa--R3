@@ -151,7 +151,7 @@ END_OF_SOURCE
 
 $input = q{a b};
 
-for my $ranking_method ( 'none', 'rule', 'high_rule_only' ) {
+for my $ranking_method ( 'none', 'rule', 'high_rank_only' ) {
 
     my $ranking_grammar = Marpa::R3::Grammar->new(
         { ranking_method => $ranking_method, source => $source } );
@@ -162,7 +162,7 @@ for my $ranking_method ( 'none', 'rule', 'high_rule_only' ) {
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
 
-    if ( $ranking_method eq 'high_rule_only' ) {
+    if ( $ranking_method eq 'high_rank_only' ) {
 
         # count parses and test that there is only one
         my $parse_count = 0;

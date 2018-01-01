@@ -5504,7 +5504,7 @@ which is not kept in the registry.
         slv.lmw_o = lmw_o
 
         local ranking_method = slg.ranking_method
-        if ranking_method == 'high_rule_only' then
+        if ranking_method == 'high_rank_only' then
             lmw_o:high_rank_only_set(1)
             lmw_o:rank()
         end
@@ -6330,7 +6330,7 @@ which is not kept in the registry.
         asf.lmw_o = lmw_o
 
         local ranking_method = slg.ranking_method
-        if ranking_method == 'high_rule_only' then
+        if ranking_method == 'high_rank_only' then
             lmw_o:high_rank_only_set(1)
             lmw_o:rank()
         end
@@ -11814,7 +11814,7 @@ but before it is executed.
 
 ```
     -- miranda: section+ constant Lua tables
-    _M.ranking_methods = { none = true, high_rule_only = true, rule = true }
+    _M.ranking_methods = { none = true, high_rank_only = true, rule = true }
 ```
 
 ## Kollos utilities

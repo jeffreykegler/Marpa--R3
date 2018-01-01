@@ -101,14 +101,14 @@ Rule ranks must be integers.
 They may be negative.
 If no numeric rank is specified, the numeric rank is 0.
 
-=head2 The C<high_rule_only> ranking method
+=head2 The C<high_rank_only> ranking method
 
-The C<high_rule_only> ranking method is similar to the
+The C<high_rank_only> ranking method is similar to the
 C<rule> ranking method, except that, at every choicepoint,
 it discards all of the choices which
 have a rank lower than that of the highest ranked choice.
 
-The C<high_rule_only> ranking method
+The C<high_rank_only> ranking method
 can reduce the ambiguity of a parse,
 but it does not necessarily do so.
 This is because, at each choicepoint among the parse trees,

@@ -30,9 +30,9 @@ normalize-whitespace: 1
       List ::= List Item3 rank => 3
       List ::= List Item2 rank => 2
       List ::= List Item1 rank => 1
-      Item3 ::= VAR '=' VAR rank => 3 action => main::concat
-      Item2 ::= VAR '='     rank => 2 action => main::concat
-      Item1 ::= VAR         rank => 1 action => main::concat
+      Item3 ::= VAR '=' VAR action => main::concat
+      Item2 ::= VAR '='     action => main::concat
+      Item1 ::= VAR         action => main::concat
       VAR ~ [\w]+
 
     END_OF_SOURCE
@@ -49,7 +49,7 @@ normalize-whitespace: 1
     );
 
     my $grammar = Marpa::R3::Grammar->new(
-        { ranking_method => 'high_rule_only', source => \$source } );
+        { ranking_method => 'high_rank_only', source => \$source } );
     for my $test (@tests) {
         my ( $input, $output ) = @{$test};
         my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
@@ -467,9 +467,9 @@ partial: 1
   List ::= List Item3 rank => 3
   List ::= List Item2 rank => 2
   List ::= List Item1 rank => 1
-  Item3 ::= VAR '=' VAR rank => 3 action => main::concat
-  Item2 ::= VAR '='     rank => 2 action => main::concat
-  Item1 ::= VAR         rank => 1 action => main::concat
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
@@ -569,7 +569,7 @@ and it obviously outranks
 the production
 C<List ::= Item1>,
 which has rank 1.
-Our example uses C<high_rule_only>
+Our example uses C<high_rank_only>
 ranking,
 and our example therefore will
 leave only this choice:
@@ -615,7 +615,7 @@ and it obviously outranks
 the production
 C<List ::= List Item1>,
 which has rank 1.
-Our example uses C<high_rule_only>
+Our example uses C<high_rank_only>
 ranking,
 and our example therefore will
 leave only this choice:
@@ -664,9 +664,9 @@ name: Ranking, shortest highest, version 1
   List ::= List Item3 rank => 4
   List ::= List Item2 rank => 5
   List ::= List Item1 rank => 6
-  Item3 ::= VAR '=' VAR rank => 1 action => main::concat
-  Item2 ::= VAR '='     rank => 2 action => main::concat
-  Item1 ::= VAR         rank => 3 action => main::concat
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
@@ -1007,7 +1007,7 @@ the "longest highest" parse.
 
 Proof:
 
-Recall that a Marpa C<high_rule_only> parse
+Recall that a Marpa C<high_rank_only> parse
 first parses according to the pure BNF,
 and then prunes the parse using ranking.
 We will first examine C<ps-pure>,
@@ -1287,7 +1287,7 @@ name: Rank document synopsis
 normalize-whitespace: 1
 partial: 1
 
-      Item3 ::= VAR '=' VAR rank => 3
+      Item3 ::= VAR '=' VAR
 
 =for Marpa::R3::Display::End
 
@@ -1298,7 +1298,7 @@ name: Rank document synopsis
 normalize-whitespace: 1
 partial: 1
 
-      Item1 ::= VAR rank => 1
+      Item1 ::= VAR
 
 =for Marpa::R3::Display::End
 

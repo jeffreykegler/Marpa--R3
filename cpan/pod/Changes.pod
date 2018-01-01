@@ -166,6 +166,12 @@ named arguments, in alphabetical order.
 
 Mostly unchanged.
 
+=head2 ranking_method
+
+Formerly recognizer named argument.
+C<high_rule_only> option renamed to
+C<high_rank_only>.
+
 =head2 source
 
 Mostly unchanged.
@@ -298,7 +304,9 @@ the new valuator objects.
 
 =head2 ranking_method
 
-Removed.
+Changed to grammar named argument.
+C<high_rule_only> option renamed to
+C<high_rank_only>.
 
 =head2 rejection
 
