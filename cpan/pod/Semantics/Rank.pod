@@ -1052,7 +1052,6 @@ C<seq3> is also a factoring of C<W>.
 B<(2)>:
 Recall the L<discussion of G1
 fenceposts|Marpa::R3::Recognizer/"G1 Fenceposts">.
-
 We will say that a G1 fencepost C<fp>
 is a "factoring barrier"
 if it is not properly contained in any item.
@@ -1068,7 +1067,41 @@ C<< I <= First(it)  >> or
 C<< I > Last(it)  >>,
 then G1 fencepost C<I> is a factoring barrier.
 
-B<(3)>:
+B<(4)>:
+Where C<|W|> is the length of C<W>,
+we can see from (2)
+that fencepost C<|W|>
+is a factoring barrier.
+
+B<(5)>:
+Also from (2) we see that
+G1 fencepost 0 is a factoring barrier.
+
+B<(6)>:
+Let a "subfactoring" be a sequence of
+items bounded by factoring barriers.
+From (4) and (5) we can see that C<W>
+can be divided into subfactorings.
+
+B<(7)>:
+Let a "minimal subfactoring" be subfactoring
+which does not properly contain any
+factoring barriers.
+From (6)
+and the definition of a G1 fencepost,
+we see that C<W>
+can be divided into
+minimal subfactorings.
+
+B<(6)>:
+We divide the minimal subfactorings
+into four cases:
+no equal signs;
+exactly as many equal signs as C<< <VAR> >> tokens;
+more equal signs than C<< <VAR> >> tokens; and
+fewer equal signs than C<< <VAR> >> tokens.
+
+B<(7)>:
 We can see from C<G>
 that two C<VAR>s never occur
 together in the same item.
@@ -1077,12 +1110,72 @@ C<VAR>s in a row,
 the G1 fencepost between them is
 a factoring barrier.
 
-[ TODO: to here ]
-
-B<(3)>:
+B<(8)>:
 No item begins with an equal sign ("C<=>").
 
-B<(4)>:
+B<(9)>:
+Let C<|W|> be the length of C<W>.
+We note, based on C<G>,
+that C<W> is not valid if it is zero-legnth,
+that is, if C<|W| == 0>.
+
+B<(10) Division into cases>:
+From (4),
+we divide the minimal subfactorings
+into four cases:
+no equal signs;
+exactly as many equal signs as C<< <VAR> >> tokens;
+more equal signs than C<< <VAR> >> tokens; and
+fewer equal signs than C<< <VAR> >> tokens.
+
+B<(11)>:
+A minimal subfactoring cannot contain two equal signs
+in a row.
+We know this such the second equal sign would either
+start a new item,
+or both equal signs would be in the same item.
+But from C<G>,
+we see that no equal sign ever starts an item.
+And also from C<G>,
+we see that no two equal signs occur in a row
+inside an item.
+
+B<(11)>:
+A mimimal subfactoring
+and is a sequence of alternatiing
+C<< <VAR> >> tokens
+and equal signs,
+starting with 
+a C<< <VAR> >> tokens.
+We see this from
+(7), (8) and (11).
+
+B<(12): The case of no equal signs>:
+From (12) it follows that,
+if a minimal subfactoring contains no equal sign,
+it is the token string consisting of a single
+C<< <VAR> >> token;
+and its only subfactoring is into a single
+C<< <Item1> >> item.
+For instance,
+it might be the string "C<a>",
+in which case it factors as
+"C<(a)>".
+(Here and hereafter
+we will enclose single items in parentheses
+to show the itemization within subfactorings.)
+
+B<(12)>: The case of fewer equal signs than C<VAR>s>:
+From C<G>
+we can see that
+every item has more C<< <VAR> >> tokens than equal signs ("C<=>").
+So this case cannot occur.
+Another way to show this is from (11).
+
+B<(13)>: The case of as many equal signs as C<VAR>s>:
+
+[ TODO: to here ]
+
 From (2) and (3), we know that any
 ambiguity between items must occur in a string
 that consists of an initial "C<VAR>"
