@@ -309,10 +309,9 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
 :start ::= externals
 externals ::= external* action => [values]
-external ::= special action => ::first
-   | unspecial action => ::first
-unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
-special ::= words (';') rank => -1
+external ::= sentence action => ::first
+sentence ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
+sentence ::= words (';') rank => -1
 words ::= word* action => [values]
 
 :discard ~ whitespace
@@ -326,13 +325,14 @@ I am special and nothing is going to change that;
 END_OF_INPUT
 
     my $expected_output = [
-        [ 'unspecial', [qw(so very special)] ],
-        [   'special',
+        [ 'sentence', [qw(so very special)] ],
+        [   'sentence',
             [qw(I am special and nothing is going to change that)],
         ]
     ];
 
-    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rank_only', source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rank adverb for display'
@@ -345,10 +345,9 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
 :start ::= externals
 externals ::= external* action => [values]
-external ::= special action => ::first
-   | unspecial action => ::first
-unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => -2
-special ::= words (';') rank => -3
+external ::= sentence action => ::first
+sentence ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => -2
+sentence ::= words (';') rank => -3
 words ::= word* action => [values]
 
 :discard ~ whitespace
@@ -362,13 +361,14 @@ I am special and nothing is going to change that;
 END_OF_INPUT
 
     my $expected_output = [
-        [ 'unspecial', [qw(so very special)] ],
-        [   'special',
+        [ 'sentence', [qw(so very special)] ],
+        [   'sentence',
             [qw(I am special and nothing is going to change that)],
         ]
     ];
 
-    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rank_only', source => \$source } );
     do_test(
         $grammar, $input, $expected_output,
         'Parse OK', 'Test of rank adverb for display'
@@ -440,16 +440,15 @@ if (1) {
     :default ::= action => [values]
     start ::= stuff*
     stuff ::= a | b
-    a ::= x action => ::first
-    b ::= x action => ::first
-    c ::= x action => ::first
-    x ::= 'x'
+    a ::= 'a' action => ::first
+    b ::= 'b' action => ::first
+    c ::= 'c' action => ::first
 END_OF_SOURCE
 
-    my $input           = 'xx';
+    my $input           = 'aa';
     my $expected_output = [
-        [ [ 'x' ] ],
-        [ [ 'x' ] ]
+        [ 'a' ],
+        [ 'a' ]
     ];
 
     my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
@@ -887,8 +886,7 @@ sub my_parser {
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $recce->read( \$string ); 1 ...})
-    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
-    my $value_ref = $valuer->value();
+    my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse';
     }

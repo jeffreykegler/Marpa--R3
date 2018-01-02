@@ -678,11 +678,14 @@ Here are what the results will look like for
 name: Ranking results, shortest highest, version 1
 
     my @tests = (
-        [ 'a = b', '(a=)(b)', ],
-        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
-        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
-        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
-        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=)(b)', ],
+        [ 'a = b = c',         '(a=)(b=)(c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=)(d)', ],
+        [ 'a = b c = d',       '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e =',   '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e',     '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ],
     );
 
 =for Marpa::R3::Display::End
@@ -764,13 +767,18 @@ normalize-whitespace: 1
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
   
-  Top ::= Body Trailer action => main::group
-  Body ::= Item3*
-  Trailer ::= Item0 | Item1 | Item2
-  Item3 ::= VAR '=' VAR action => main::concat
-  Item2 ::= VAR '='     action => main::concat
-  Item1 ::= VAR         action => main::concat
-  Item0 ::= action => main::concat
+  Top            ::= Sub_Factorings action => main::group
+  Sub_Factorings ::= Var_Boundeds
+  Sub_Factorings ::= Var_Boundeds Non_Terminal
+  Sub_Factorings ::= Non_Terminal
+  Var_Boundeds   ::= Var_Bounded+
+  Var_Bounded    ::= Non_Terminals Terminator
+  Var_Bounded    ::= Terminator
+  Var_Bounded    ::= Singleton
+  Non_Terminals  ::= Non_Terminal+
+  Terminator     ::= VAR '=' VAR action => main::concat
+  Non_Terminal   ::= VAR '='     action => main::concat
+  Singleton      ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
@@ -788,7 +796,7 @@ name: Ranking via BNF, longest highest, version 3
 normalize-whitespace: 1
 partial: 1
 
-  Item3 ::= VAR '=' VAR action => main::concat
+  Terminator     ::= VAR '=' VAR action => main::concat
 
 =for Marpa::R3::Display::End
 
@@ -802,13 +810,16 @@ normalize-whitespace: 1
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
 
-  Top ::= Body Trailer action => main::group
-  Body ::= Pair*
-  Pair ::= Item2 Item1
-  Trailer ::= Item0 | Item1 | Item2
-  Item2 ::= VAR '='     action => main::concat
-  Item1 ::= VAR         action => main::concat
-  Item0 ::= action => main::concat
+  Top            ::= Sub_Factorings action => main::group
+  Sub_Factorings ::= Var_Boundeds
+  Sub_Factorings ::= Var_Boundeds Non_Terminal
+  Sub_Factorings ::= Non_Terminal
+  Var_Boundeds   ::= Var_Bounded+
+  Var_Bounded    ::= Non_Terminals Singleton
+  Var_Bounded    ::= Singleton
+  Non_Terminals  ::= Non_Terminal+
+  Non_Terminal   ::= VAR '=' action => main::concat
+  Singleton      ::= VAR     action => main::concat
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End

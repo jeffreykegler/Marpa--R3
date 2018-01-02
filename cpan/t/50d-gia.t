@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 74;
+use Test::More tests => 110;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -80,10 +80,9 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
 :start ::= externals
 externals ::= external* action => [values]
-external ::= special action => ::first
-   | unspecial action => ::first
-unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
-special ::= words (';') rank => -1
+external ::= sentence action => ::first
+sentence ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
+sentence ::= words (';') rank => -1
 words ::= word* action => [values]
 
 :discard ~ whitespace
@@ -99,17 +98,14 @@ END_OF_INPUT
 # Marpa::R3::Display
 
     my $expected_output = [
-        [ 'unspecial', [qw(so very special)] ],
-        [   'special',
-            [qw(I am special and nothing is going to change that)],
-        ]
+        [ 'sentence', [qw(so very special)] ],
+        [ 'sentence',   [qw(I am special and nothing is going to change that)], ]
     ];
 
-    my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
-    do_test(
-        $grammar, $input, $expected_output,
-        'Parse OK', 'Test of rank adverb for display'
-        );
+    my $grammar = Marpa::R3::Grammar->new(
+        { source => \$source, ranking_method => 'high_rank_only' } );
+    do_test( $grammar, $input, $expected_output,
+        'Parse OK', 'Test of rank adverb for display' );
 }
 
 # Tests of rank adverb based on examples from Lukas Atkinson
@@ -136,10 +132,13 @@ if (1) {
 END_OF_SOURCE
 
     my @tests = (
-        [ 'a = b', '(a=b)', ],
-        [ 'a = b c = d', '(a=b)(c=d)' ],
-        [ 'a = b c = d e', '(a=b)(c=d)(e)' ],
-        [ 'a = b c = d e =', '(a=b)(c=d)(e=)' ],
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=b)', ],
+        [ 'a = b = c',         '(a=)(b=c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=d)', ],
+        [ 'a = b c = d',       '(a=b)(c=d)' ],
+        [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
         [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
     );
 
@@ -185,11 +184,14 @@ END_OF_SOURCE
 # name: Ranking results, shortest highest, version 1
 
     my @tests = (
-        [ 'a = b', '(a=)(b)', ],
-        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
-        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
-        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
-        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=)(b)', ],
+        [ 'a = b = c',         '(a=)(b=)(c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=)(d)', ],
+        [ 'a = b c = d',       '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e =',   '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e',     '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ],
     );
 
 # Marpa::R3::Display::End
@@ -232,10 +234,13 @@ END_OF_SOURCE
 # Marpa::R3::Display::End
 
     my @tests = (
-        [ 'a = b', '(a=b)', ],
-        [ 'a = b c = d', '(a=b)(c=d)' ],
-        [ 'a = b c = d e', '(a=b)(c=d)(e)' ],
-        [ 'a = b c = d e =', '(a=b)(c=d)(e=)' ],
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=b)', ],
+        [ 'a = b = c',         '(a=)(b=c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=d)', ],
+        [ 'a = b c = d',       '(a=b)(c=d)' ],
+        [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
         [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
     );
 
@@ -276,11 +281,14 @@ END_OF_SOURCE
 # Marpa::R3::Display::End
 
     my @tests = (
-        [ 'a = b', '(a=)(b)', ],
-        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
-        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
-        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
-        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=)(b)', ],
+        [ 'a = b = c',         '(a=)(b=)(c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=)(d)', ],
+        [ 'a = b c = d',       '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e =',   '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e',     '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ],
     );
 
     my $grammar = Marpa::R3::Grammar->new(
@@ -308,13 +316,18 @@ if (1) {
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
   
-  Top ::= Body Trailer action => main::group
-  Body ::= Item3*
-  Trailer ::= Item0 | Item1 | Item2
-  Item3 ::= VAR '=' VAR action => main::concat
-  Item2 ::= VAR '='     action => main::concat
-  Item1 ::= VAR         action => main::concat
-  Item0 ::= action => main::concat
+  Top            ::= Sub_Factorings action => main::group
+  Sub_Factorings ::= Var_Boundeds
+  Sub_Factorings ::= Var_Boundeds Non_Terminal
+  Sub_Factorings ::= Non_Terminal
+  Var_Boundeds   ::= Var_Bounded+
+  Var_Bounded    ::= Non_Terminals Terminator
+  Var_Bounded    ::= Terminator
+  Var_Bounded    ::= Singleton
+  Non_Terminals  ::= Non_Terminal+
+  Terminator     ::= VAR '=' VAR action => main::concat
+  Non_Terminal   ::= VAR '='     action => main::concat
+  Singleton      ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 END_OF_SOURCE
@@ -322,10 +335,13 @@ END_OF_SOURCE
 # Marpa::R3::Display::End
 
     my @tests = (
-        [ 'a = b', '(a=b)', ],
-        [ 'a = b c = d', '(a=b)(c=d)' ],
-        [ 'a = b c = d e', '(a=b)(c=d)(e)' ],
-        [ 'a = b c = d e =', '(a=b)(c=d)(e=)' ],
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=b)', ],
+        [ 'a = b = c',         '(a=)(b=c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=d)', ],
+        [ 'a = b c = d',       '(a=b)(c=d)' ],
+        [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
         [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
     );
 
@@ -353,13 +369,16 @@ if (1) {
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
 
-  Top ::= Body Trailer action => main::group
-  Body ::= Pair*
-  Pair ::= Item2 Item1
-  Trailer ::= Item0 | Item1 | Item2
-  Item2 ::= VAR '='     action => main::concat
-  Item1 ::= VAR         action => main::concat
-  Item0 ::= action => main::concat
+  Top            ::= Sub_Factorings action => main::group
+  Sub_Factorings ::= Var_Boundeds
+  Sub_Factorings ::= Var_Boundeds Non_Terminal
+  Sub_Factorings ::= Non_Terminal
+  Var_Boundeds   ::= Var_Bounded+
+  Var_Bounded    ::= Non_Terminals Singleton
+  Var_Bounded    ::= Singleton
+  Non_Terminals  ::= Non_Terminal+
+  Non_Terminal   ::= VAR '=' action => main::concat
+  Singleton      ::= VAR     action => main::concat
   VAR ~ [\w]+
 
 END_OF_SOURCE
@@ -367,11 +386,14 @@ END_OF_SOURCE
 # Marpa::R3::Display::End
 
     my @tests = (
-        [ 'a = b', '(a=)(b)', ],
-        [ 'a = b c = d', '(a=)(b)(c=)(d)' ],
-        [ 'a = b c = d e', '(a=)(b)(c=)(d)(e)' ],
-        [ 'a = b c = d e =', '(a=)(b)(c=)(d)(e=)' ],
-        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ]
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=)(b)', ],
+        [ 'a = b = c',         '(a=)(b=)(c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=)(d)', ],
+        [ 'a = b c = d',       '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e =',   '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e',     '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ],
     );
 
     my $grammar = Marpa::R3::Grammar->new(
@@ -435,18 +457,17 @@ if (1) {
     :default ::= action => [values]
     start ::= stuff*
     stuff ::= a | b
-    a ::= x action => ::first
-    b ::= x action => ::first
-    c ::= x action => ::first
-    x ::= 'x'
+    a ::= 'a' action => ::first
+    b ::= 'b' action => ::first
+    c ::= 'c' action => ::first
 END_OF_SOURCE
 
 # Marpa::R3::Display::End
 
-    my $input           = 'xx';
+    my $input           = 'aa';
     my $expected_output = [
-        [ [ 'x' ] ],
-        [ [ 'x' ] ]
+        [ 'a' ],
+        [ 'a' ]
     ];
 
     my $grammar = Marpa::R3::Grammar->new( { source => \$source } );
@@ -589,8 +610,7 @@ sub my_parser {
         chomp $abbreviated_error;
         return 'No parse', $abbreviated_error;
     } ## end if ( not defined eval { $recce->read( \$string ); 1 ...})
-    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
-    my $value_ref = $valuer->value();
+    my $value_ref = $recce->value();
     if ( not defined $value_ref ) {
         return 'No parse', 'Input read to end but no parse';
     }

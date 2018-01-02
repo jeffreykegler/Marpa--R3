@@ -1392,8 +1392,8 @@ name: rank adverb example
 partial: 1
 normalize-whitespace: 1
 
-    unspecial ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
-    special ::= words (';') rank => -1
+    sentence ::= ('I' 'am' 'special') words ('--' 'NOT!' ';') rank => 1
+    sentence ::= words (';') rank => -1
 
 =for Marpa::R3::Display::End
 
