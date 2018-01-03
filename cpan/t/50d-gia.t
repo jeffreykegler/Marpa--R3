@@ -316,18 +316,18 @@ if (1) {
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
   
-  Top            ::= Sub_Factorings action => main::group
-  Sub_Factorings ::= Var_Boundeds
-  Sub_Factorings ::= Var_Boundeds Non_Terminal
-  Sub_Factorings ::= Non_Terminal
-  Var_Boundeds   ::= Var_Bounded+
-  Var_Bounded    ::= Non_Terminals Terminator
-  Var_Bounded    ::= Terminator
-  Var_Bounded    ::= Singleton
-  Non_Terminals  ::= Non_Terminal+
-  Terminator     ::= VAR '=' VAR action => main::concat
-  Non_Terminal   ::= VAR '='     action => main::concat
-  Singleton      ::= VAR         action => main::concat
+  Top            ::= Max_Boundeds action => main::group
+  Top            ::= Max_Boundeds Unbounded action => main::group
+  Top            ::= Unbounded action => main::group
+  Max_Boundeds   ::= Max_Bounded+
+  Max_Bounded    ::= Eq_Finals Var_Final3
+  Max_Bounded    ::= Var_Final
+  Unbounded      ::= Eq_Finals
+  Eq_Finals      ::= Eq_Final+
+  Var_Final      ::= Var_Final3 | Var_Final1
+  Var_Final3     ::= VAR '=' VAR action => main::concat
+  Eq_Final       ::= VAR '='     action => main::concat
+  Var_Final1     ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 END_OF_SOURCE
@@ -369,16 +369,16 @@ if (1) {
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
 
-  Top            ::= Sub_Factorings action => main::group
-  Sub_Factorings ::= Var_Boundeds
-  Sub_Factorings ::= Var_Boundeds Non_Terminal
-  Sub_Factorings ::= Non_Terminal
-  Var_Boundeds   ::= Var_Bounded+
-  Var_Bounded    ::= Non_Terminals Singleton
-  Var_Bounded    ::= Singleton
-  Non_Terminals  ::= Non_Terminal+
-  Non_Terminal   ::= VAR '=' action => main::concat
-  Singleton      ::= VAR     action => main::concat
+  Top            ::= Max_Boundeds action => main::group
+  Top            ::= Max_Boundeds Unbounded action => main::group
+  Top            ::= Unbounded action => main::group
+  Max_Boundeds   ::= Max_Bounded+
+  Max_Bounded    ::= Eq_Finals Var_Final
+  Max_Bounded    ::= Var_Final
+  Unbounded      ::= Eq_Finals
+  Eq_Finals      ::= Eq_Final+
+  Eq_Final       ::= VAR '='     action => main::concat
+  Var_Final      ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 END_OF_SOURCE

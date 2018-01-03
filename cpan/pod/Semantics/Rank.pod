@@ -767,18 +767,18 @@ normalize-whitespace: 1
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
   
-  Top            ::= Sub_Factorings action => main::group
-  Sub_Factorings ::= Var_Boundeds
-  Sub_Factorings ::= Var_Boundeds Non_Terminal
-  Sub_Factorings ::= Non_Terminal
-  Var_Boundeds   ::= Var_Bounded+
-  Var_Bounded    ::= Non_Terminals Terminator
-  Var_Bounded    ::= Terminator
-  Var_Bounded    ::= Singleton
-  Non_Terminals  ::= Non_Terminal+
-  Terminator     ::= VAR '=' VAR action => main::concat
-  Non_Terminal   ::= VAR '='     action => main::concat
-  Singleton      ::= VAR         action => main::concat
+  Top            ::= Max_Boundeds action => main::group
+  Top            ::= Max_Boundeds Unbounded action => main::group
+  Top            ::= Unbounded action => main::group
+  Max_Boundeds   ::= Max_Bounded+
+  Max_Bounded    ::= Eq_Finals Var_Final3
+  Max_Bounded    ::= Var_Final
+  Unbounded      ::= Eq_Finals
+  Eq_Finals      ::= Eq_Final+
+  Var_Final      ::= Var_Final3 | Var_Final1
+  Var_Final3     ::= VAR '=' VAR action => main::concat
+  Eq_Final       ::= VAR '='     action => main::concat
+  Var_Final1     ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
@@ -796,7 +796,7 @@ name: Ranking via BNF, longest highest, version 3
 normalize-whitespace: 1
 partial: 1
 
-  Terminator     ::= VAR '=' VAR action => main::concat
+  Var_Final3     ::= VAR '=' VAR action => main::concat
 
 =for Marpa::R3::Display::End
 
@@ -810,16 +810,16 @@ normalize-whitespace: 1
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
 
-  Top            ::= Sub_Factorings action => main::group
-  Sub_Factorings ::= Var_Boundeds
-  Sub_Factorings ::= Var_Boundeds Non_Terminal
-  Sub_Factorings ::= Non_Terminal
-  Var_Boundeds   ::= Var_Bounded+
-  Var_Bounded    ::= Non_Terminals Singleton
-  Var_Bounded    ::= Singleton
-  Non_Terminals  ::= Non_Terminal+
-  Non_Terminal   ::= VAR '=' action => main::concat
-  Singleton      ::= VAR     action => main::concat
+  Top            ::= Max_Boundeds action => main::group
+  Top            ::= Max_Boundeds Unbounded action => main::group
+  Top            ::= Unbounded action => main::group
+  Max_Boundeds   ::= Max_Bounded+
+  Max_Bounded    ::= Eq_Finals Var_Final
+  Max_Bounded    ::= Var_Final
+  Unbounded      ::= Eq_Finals
+  Eq_Finals      ::= Eq_Final+
+  Eq_Final       ::= VAR '='     action => main::concat
+  Var_Final      ::= VAR         action => main::concat
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
@@ -989,25 +989,35 @@ for every parse C<p> in parse set C<ps>,
 C<< Size(p-lh) <= Size(p) >>,
 the C<p-lh> is a "longest highest" parse.
 
-[ TODO: Keep to next TODO? ]
-
-In C<G>, the leaf nodes take the forms:
-
-=for Marpa::R3::Display
-ignore: 1
-
-    VAR
-    VAR =
-    VAR = VAR
-
-=for Marpa::R3::Display::End
-
-[ TODO: Keep from previous TODO? ]
-
 We say that a choicepoint is "reduced" if all of 
 its choices have the same rank.
 We say that a choicepoint is "unreduced" if it is
 not reduced.
+
+To conveniently represent token strings
+we will represent them as literal strings
+where
+"C<v>" stands for a C<< <VAR> >> tokens
+and equal signs represent themselves.
+For example, we might represent the token
+string 
+
+=for Marpa::R3::Display
+ignore: 1
+
+    <VAR> = <VAR>
+
+=for Marpa::R3::Display::End
+
+as the string
+
+=for Marpa::R3::Display
+ignore: 1
+
+    v=v
+
+=for Marpa::R3::Display::End
+
 
 Theorem:
 If C<W> is a valid string,
@@ -1025,21 +1035,29 @@ We will first examine C<ps-pure>,
 the parse set which results from the pure
 BNF phase.
 
-B<(1)>:
-Analyzing the grammar C<G>,
-we see that it is a sequence of items,
-where "item" means one of
+B<(1) "Item">:
+An "item" will means an instance of
+one of the symbols
 C<Item1>,
 C<Item2> or
 C<Item3>.
-Therefore C<G> is not ambiguous for a string
-unless that string divides into items
-in more than one way.
+When we want to show a token string's division into
+items, we will enclose them in parentheses.
+For example "C<(v=)(v=)(v)>" will indicate that
+the token string is divided into 3 items; and
+"C<(v=)(v=v)>" will represent the same token string
+divided into 2 items.
 
+B<(2) "Factoring">:
+Analyzing the grammar C<G>,
+we see that it is a sequence of items,
+and that C<G> is ambiguous for a string C<W>
+if and only if that string divides into items
+in more than one way.
 We will call a division of C<W> into items
 a "factoring".
 
-B<(2) "Independence">:
+B<(3) "Independence">:
 Let C<seq1> and C<seq2> be two factorings
 of C<W> into items.
 Let C<first> and C<last> be two G1 locations
@@ -1060,7 +1078,7 @@ Then,
 because C<G> is a context free grammar,
 C<seq3> is also a factoring of C<W>.
 
-B<(2)>:
+B<(4)>:
 Recall the L<discussion of G1
 fenceposts|Marpa::R3::Recognizer/"G1 Fenceposts">.
 We will say that a G1 fencepost C<fp>
@@ -1078,41 +1096,28 @@ C<< I <= First(it)  >> or
 C<< I > Last(it)  >>,
 then G1 fencepost C<I> is a factoring barrier.
 
-B<(4)>:
+B<(5)>:
 Where C<|W|> is the length of C<W>,
-we can see from (2)
+we can see from (3)
 that fencepost C<|W|>
 is a factoring barrier.
 
-B<(5)>:
-Also from (2) we see that
+B<(6)>:
+Also from (3) we see that
 G1 fencepost 0 is a factoring barrier.
 
-B<(6)>:
-Let a "subfactoring" be a sequence of
-items bounded by factoring barriers.
-From (4) and (5) we can see that C<W>
-can be divided into subfactorings.
-
 B<(7)>:
-Let a "minimal subfactoring" be subfactoring
+Let a "maximal subfactoring" be subfactoring
 which does not properly contain any
 factoring barriers.
-From (6)
-and the definition of a G1 fencepost,
-we see that C<W>
-can be divided into
-minimal subfactorings.
+From (5) and (6) we can see that C<W>
+can be divided into maximal subfactorings.
 
-B<(6)>:
-We divide the minimal subfactorings
-into four cases:
-no equal signs;
-exactly as many equal signs as C<< <VAR> >> tokens;
-more equal signs than C<< <VAR> >> tokens; and
-fewer equal signs than C<< <VAR> >> tokens.
+B<(8)>:
+Let a "subfactoring" be a sequence of
+items bounded by factoring barriers.
 
-B<(7)>:
+B<(9)>:
 We can see from C<G>
 that two C<VAR>s never occur
 together in the same item.
@@ -1121,174 +1126,140 @@ C<VAR>s in a row,
 the G1 fencepost between them is
 a factoring barrier.
 
-B<(8)>:
+B<(10)>:
 No item begins with an equal sign ("C<=>").
-
-B<(9)>:
-Let C<|W|> be the length of C<W>.
-We note, based on C<G>,
-that C<W> is not valid if it is zero-legnth,
-that is, if C<|W| == 0>.
-
-B<(10) Division into cases>:
-From (4),
-we divide the minimal subfactorings
-into four cases:
-no equal signs;
-exactly as many equal signs as C<< <VAR> >> tokens;
-more equal signs than C<< <VAR> >> tokens; and
-fewer equal signs than C<< <VAR> >> tokens.
+Every item begins with a C<< <VAR> >>
+token.
 
 B<(11)>:
-A minimal subfactoring cannot contain two equal signs
-in a row.
-We know this such the second equal sign would either
-start a new item,
-or both equal signs would be in the same item.
-But from C<G>,
-we see that no equal sign ever starts an item.
-And also from C<G>,
-we see that no two equal signs occur in a row
-inside an item.
+Every maximal subfactoring starts with
+a C<< <VAR> token.
 
-B<(11)>:
-A mimimal subfactoring
-and is a sequence of alternatiing
-C<< <VAR> >> tokens
-and equal signs,
-starting with 
-a C<< <VAR> >> tokens.
-We see this from
-(7), (8) and (11).
+B<(12)>:
+Every maximal subfactoring alternates
+equal signs and C<< <VAR> tokens:
+that is, if it has the pattern
+"C<v=v=v= ...>".
 
-B<(12): The case of no equal signs>:
-From (12) it follows that,
-if a minimal subfactoring contains no equal sign,
-it is the token string consisting of a single
-C<< <VAR> >> token;
-and its only subfactoring is into a single
-C<< <Item1> >> item.
-For instance,
-it might be the string "C<a>",
-in which case it factors as
-"C<(a)>".
-(Here and hereafter
-we will enclose single items in parentheses
-to show the itemization within subfactorings.)
+B<(13)>:
+We will call a maximal subfactoring
+"var-bounded" or simply "bounded"
+if it starts and ends with a
+C<< <VAR> token.
+By (11) and (12), this means that it
+has the pattern
+"C<v=v=v= ... v>".
 
-B<(12)>: The case of fewer equal signs than C<VAR>s>:
-From C<G>
-we can see that
-every item has more C<< <VAR> >> tokens than equal signs ("C<=>").
-So this case cannot occur.
-Another way to show this is from (11).
+B<(14)>:
+We will call a maximal subfactoring
+"var-unbounded" or simply "unbounded"
+if it is not var-bounded.
+C<< <VAR> token.
+By (11) and (12), this means that it
+has the pattern
+"C<v=v= ... v=>".
 
-B<(13)>: The case of as many equal signs as C<VAR>s>:
+B<15>:
+If a C<< <Item1> >> or 
+C<< <Item3> >> occurs in
+a maximal subfactoring,
+it is the last item in that subfactoring.
+To show this, assume for a reduction ad absurdam
+there is a maximal subfactoring with a non-final
+C<< <Item1> >> or 
+C<< <Item3> >>.
+Call that subfactoring C<f>,
+and call that item, C<it>.
+Both of items end in a
+C<< <VAR> token,
+so that C<it> ends in a
+C<< <VAR> token.
+Since C<it>, by assumption for the reductio,
+is non-final, there is a next item.
 
-[ TODO: to here ]
+By (10),
+all items start with 
+C<< <VAR> >> tokens.
+This means there are two 
+C<< <VAR> >> tokens in a row properly
+inside subfactoring C<f>.
+This means there is a factoring barrier
+properly inside C<f>
+But C<f> is assumed for the reductio
+to be maximal and therefore cannot
+properly contain a factoring barrier.
+This shows the reductio,
+and allows us to conclude that,
+if C<f> contains an
+C<< <Item1> >> or 
+an C<< <Item3> >>,
+that item is the final item.
+Which is what we wanted to show for (15).
 
-From (2) and (3), we know that any
-ambiguity between items must occur in a string
-that consists of an initial "C<VAR>"
-followed by zero or more substrings of the form
-"C<< <VAR> >>".
-In regular expression form,
-this is C<< <VAR> (= <VAR>)* >>.
+B<(16)>:
+By (3), every maximal subfactoring is independent --
+in other words, no ambiguity crosses factoring barriers.
+So we narrow our consideration of ambiguities to two cases:
+ambiguities in unbounded maximal subfactorings, and
+ambiguities in bounded maximal subfactorings.
 
-To illustrate, here are some strings, following
-by their possible divisions into items
-according to the pure BNF grammar:
+B<17>:
+Every unbounded maximal subfactoring is unambiguous.
+To show (17), let C<u> be an 
+unbounded maximal subfactoring.
+If follows from the definition of unbounded maximal subfactoring
+(14), that C<u>
+ends in an equal sign.
+Both C<< <Item1> >> and
+C<< <Item3> >> end in C<< <VAR> >> tokens,
+so that no 
+C<< <Item1> >> or
+C<< <Item3> >> can be the last item
+in C<u>.
+Therefore, by (15),
+There is no 
+C<< <Item1> >> or
+C<< <Item3> >> item
+in C<u>.
+This means that every item
+in C<u>
+is an 
+C<< <Item2> >> item.
+This in turn means that C<u>
+is unambiguous,
+which shows (17).
 
-=for Marpa::R3::Display
-ignore: 1
+B<18>:
+Every bounded maximal subfactoring parses either
+as a sequence of C<Item2>'s followed by
+an C<Item1>'s;
+or as
+as a sequence of C<Item2>'s followed by
+an C<Item3>'s.
+This follows from (1) and (15).
 
-    a                   (a)
-    a=b                 (a=)(b); (a=b)
-    a=b=c               (a=)(b=)(c); (a=)(b=c)
-    a=b=c=d             (a=)(b=)(c=)(d); (a=)(b=)(c=d)
-
-=for Marpa::R3::Display::End
-
-Here item boundaries are indicated by using
-parentheses to surround each item.
-Peeking ahead, we will discover that,
-while all four strings in the display above
-have at least one valid parse according to the pure BNF
-grammar,
-only "C<a>" and
-"C<a=b>" have valid parses after the ranking of the
-synopsis grammar is applied.
-
-B<(5)>:
-From (4) we can easily see that a token string of
-the form "C<< <VAR> >>" is not ambigious:
-For example, the string "C<a>" can only divide into
-items as "C<(a)>".
-From this and (4) we see that
-any ambiguity between items must occur in a string
-whose regular expression form is
-C<< <VAR> (= <VAR>)+ >>.
-
-B<6>: We will now proceed by induction on the
-ambiguous choicepoints, proceeding from left to right
-in the parse.
-We take as our induction hypothesis the following:
-
-Let C<ps1> be a parse set,
-and C<loc1> the G1 location with the first unreduced
-choicepoint in C<ps1>.
-Let C<cp> be an unreduced choicepoint at C<loc1>.
-Let C<ps2> be the parse set after C<cp> is reduced.
-Then, first, C<cp> is the only unreduced choicepoint
-at C<loc1>; and
-second, C<Size(ps1) = Size(ps2)>.
-
-B<7>:
-From (5) we know
-that any unreduced choicepoint must be
-immediately after a token string of the form "C<< <VAR> = <VAR> >>".
-Using parentheses to enclose items,
-we have two parse choices at this point.
-
-=for Marpa::R3::Display
-ignore: 1
-
-    ( <VAR> = <VAR> )
-    ( <VAR> = ) ( <VAR> )
-
-=for Marpa::R3::Display::End
-
-From the ranking, we know that we will reduce this choicepoint
-to "C<< ( <VAR> = <VAR> ) >>".
-
-[ TODO: Revised to here. ]
-
-[ TODO: Must show only one unreduced choicepoint at each G1 location. ]
-
-are in choosing between the pairs of the form "C<(a=)(b)>"
-and nodes of the form "C<a=b>".
-Note that this implies that completions of C<Item2> and C<Item3>
-cannot occur at the same G1 location.
-We will refer to this fact later.
-
-B<2>: Wherever ambiguities of the kind
-in (1) occur,
-they must occur in parse choices
-which have one of these 3 symbols as their predot symbol:
+B<19>:
+From (16), (17) and (18) it follows that
+every ambiguous subfactoring is an bounded subfactoring
+whose divisions into items take the two forms
 
 =for Marpa::R3::Display
 ignore: 1
 
-    Item1
-    Item2
-    Item3
+"C<(v=) ... (v=) (v)>"
 
 =for Marpa::R3::Display::End
 
-B<3>: From (2), and by examination of C<G>, we conclude that all ambiguities
-must occur as causes of parse choices
-at choicepoints whose dotted rule has the symbol C<< <List> >>
-on its LHS.
+and
+
+=for Marpa::R3::Display
+ignore: 1
+
+"C<(v=) ... (v=v)>"
+
+=for Marpa::R3::Display::End
+
+[ TODO: to here. ]
 
 B<4>: From (1), we note that, when there is an ambiguity,
 the choice will always be between the rule
@@ -1335,23 +1306,6 @@ and that that choice is "longest highest".
 B<7:> From (6) we can show, by induction on the choices in a parse,
 that C<P-ranked> will only contain one parse,
 and that that parse will be "longest highest".
-
-QED.
-
-=head2 The Rank Induction Theorem
-
-The L<less formal
-justification|"Longest highest, version 1">
-of the grammar
-in the synopsis
-relied on an unstated assumption:
-that if we optimized the metric used in ranking
-at each choicepoint,
-this would optimize it over the entire parse set.
-This happens to be true for the synopsis grammar,
-but it is not true in general.
-
-[ TODO ]
 
 QED.
 
