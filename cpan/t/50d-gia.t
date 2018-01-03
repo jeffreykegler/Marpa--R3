@@ -18,7 +18,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-use Test::More tests => 110;
+use Test::More tests => 142;
 use Data::Dumper;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
@@ -402,6 +402,102 @@ END_OF_SOURCE
         my ( $input, $output ) = @{$test};
         do_test( $grammar, $input, $output, 'Parse OK',
             qq{Test of rank by shortest (v3): "$input"},
+        );
+    }
+}
+
+# Tests of rank adverb based on examples from Lukas Atkinson
+# This one uses a minimized set of ranks
+# Here longest is highest rank, as in his original
+
+if (1) {
+
+# Marpa::R3::Display
+# name: Ranking, longest highest, version 4
+# start-after-line: END_OF_SOURCE
+# end-before-line: '^END_OF_SOURCE$'
+
+    my $source = <<'END_OF_SOURCE';
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+  
+  Top ::= List action => main::group
+  List ::= Item3 rank => 3
+  List ::= Item2
+  List ::= Item1 rank => 1
+  List ::= List Item3 rank => 3
+  List ::= List Item2
+  List ::= List Item1 rank => 1
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
+  VAR ~ [\w]+
+
+END_OF_SOURCE
+
+# Marpa::R3::Display::End
+
+    my @tests = (
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=b)', ],
+        [ 'a = b = c',         '(a=)(b=c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=d)', ],
+        [ 'a = b c = d',       '(a=b)(c=d)' ],
+        [ 'a = b c = d e =',   '(a=b)(c=d)(e=)' ],
+        [ 'a = b c = d e',     '(a=b)(c=d)(e)' ],
+        [ 'a = b c = d e = f', '(a=b)(c=d)(e=f)' ],
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rank_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        do_test( $grammar, $input, $output, 'Parse OK',
+            qq{Test of rank by longest (v4): "$input"} );
+    }
+}
+
+# Tests of rank adverb based on examples from Lukas Atkinson
+# This one uses a minimized set of ranks
+# Here *shortest* is highest rank
+
+if (1) {
+
+    my $source = <<'END_OF_SOURCE';
+  :discard ~ ws; ws ~ [\s]+
+  :default ::= action => ::array
+
+  Top ::= List action => main::group
+  List ::= Item3 rank => 1
+  List ::= Item2
+  List ::= Item1 rank => 3
+  List ::= List Item3 rank => 1
+  List ::= List Item2
+  List ::= List Item1 rank => 3
+  Item3 ::= VAR '=' VAR action => main::concat
+  Item2 ::= VAR '='     action => main::concat
+  Item1 ::= VAR         action => main::concat
+  VAR ~ [\w]+
+
+END_OF_SOURCE
+
+    my @tests = (
+        [ 'a',                 '(a)', ],
+        [ 'a = b',             '(a=)(b)', ],
+        [ 'a = b = c',         '(a=)(b=)(c)', ],
+        [ 'a = b = c = d',     '(a=)(b=)(c=)(d)', ],
+        [ 'a = b c = d',       '(a=)(b)(c=)(d)' ],
+        [ 'a = b c = d e =',   '(a=)(b)(c=)(d)(e=)' ],
+        [ 'a = b c = d e',     '(a=)(b)(c=)(d)(e)' ],
+        [ 'a = b c = d e = f', '(a=)(b)(c=)(d)(e=)(f)' ],
+    );
+
+    my $grammar = Marpa::R3::Grammar->new(
+        { ranking_method => 'high_rank_only', source => \$source } );
+    for my $test (@tests) {
+        my ( $input, $output ) = @{$test};
+        do_test( $grammar, $input, $output, 'Parse OK',
+            qq{Test of rank by shortest (v4): "$input"},
         );
     }
 }
