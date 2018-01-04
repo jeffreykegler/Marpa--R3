@@ -154,7 +154,7 @@ The symbol before the dot is called
 the B<predot symbol>.
 
 The following is an example of a dotted production.
-(The dot of a dotted rule is not part of Marpa DSL's,
+(The dot of a dotted rule is not part of Marpa's DSL,
 but we will add it in this document for the sake
 of illustration.)
 
@@ -218,13 +218,13 @@ In this triple,
 =item *
 
 C<dp> is a dotted production.
-In a choicepoint, C<dp> is never a prediction,
-and therefore there is always a predot symbol.
 The predot symbol of C<dp>
-is the B<predot symbol> of the choicepoint;
-the production of C<dp>
-is the B<production> of the choicepoint;
-and the
+is the B<predot symbol> of the choicepoint --
+if C<dp> is a prediction,
+there is no predot symbol.
+The production of C<dp>
+is the B<production> of the choicepoint.
+The
 dot position of C<dp>
 is the B<dot position> of the choicepoint.
 
@@ -244,10 +244,14 @@ called the C<current position> of the choicepoint.
 
 =back
 
-The choicepoint is a token choicepoint if the
-predot symbol of C<dp> is a token symbol.
-The choicepoint is a production choicepoint if the
-predot symbol of C<dp> is the LHS of a production.
+The choicepoint is a prediction choicepoint if the
+C<dp> is a prediction.
+The choicepoint is a token choicepoint if
+it is not a prediction choicepoint and
+the predot symbol of C<dp> is a token symbol.
+The choicepoint is a production choicepoint if
+it is not a prediction choicepoint and
+the predot symbol of C<dp> is the LHS of a production.
 (Token symbols are never the LHS of a production,
 and vice versa.)
 
@@ -262,6 +266,7 @@ and left-to-right.
 Often, there is only one parse choice.
 When there is only one parse choice,
 the choicepoint is said to be B<trivial>.
+A prediction choicepoint is always trivial.
 If all of the choicepoints of a parse
 are trivial,
 the parse is unambiguous.
@@ -271,6 +276,14 @@ The first element of the duple is the B<predecessor>
 of the parse choice.
 The second element of the duple is the B<cause>
 of the parse choice.
+
+The parse choices of a prediction choicepoint does not have
+a predecessor --
+the C<predecessor> element of its duple is undefined.
+The C<cause> element is defined for
+every choicepoint.
+The C<predecessor> element is defined for
+every non-prediction choicepoint.
 
 Every parse choice has a distinct cause.
 In every parse choice of a token choicepoint, C<cause> is a token symbol.
@@ -289,7 +302,8 @@ of C<cp-cuz>;
 and we say that C<cp-cuz> is one of the B<causes>
 of C<cp-prod>.
 
-The predecessor of a parse choice
+When defined,
+the predecessor of a parse choice
 is a choicepoint that
 represents a portion
 of the parse that "leads up to" the cause.
@@ -306,7 +320,7 @@ Let the triple for for C<cp-cuz> be C<(cuz-dp, cuz-origin, cuz-current)>.
 Let the result of C<cp-cuz> be
 C<cp-prod> and
 let the
-triple for for C<cp-prod> be C<(prod-dp, prod-origin, prod-current)>.
+triple for for C<cp-prod> be C<(res-dp, res-origin, res-current)>.
 
 If C<cp-prod> is the result of C<cp-cuz>, then
 
@@ -315,14 +329,14 @@ If C<cp-prod> is the result of C<cp-cuz>, then
 =item *
 
 C<cuz-current> is always the same as
-C<prod-current>.
+C<res-current>.
 In other words,
 the current location of C<cp-cuz>
 is the same as the current location of C<cp-prod>.
 
 =item *
 
-C<cuz-origin> is before C<prod-current>.
+C<cuz-origin> is before C<res-current>.
 In other words,
 the origin of C<cp-cuz>
 is before the current location of C<cp-prod>.
@@ -330,16 +344,16 @@ is before the current location of C<cp-prod>.
 =item *
 
 C<cuz-origin>
-is at or after C<prod-origin>.
+is at or after C<res-origin>.
 In other words,
 the origin of C<cp-cuz>
 is at or after the origin of C<cp-prod>.
 While it is not always properly between
-C<prod-origin> and C<prod-current>,
+C<res-origin> and C<res-current>,
 C<cuz-origin> is always in the range bounded
 by 
-C<prod-origin> on one side,
-and C<prod-current> and C<cuz-current>
+C<res-origin> on one side,
+and by C<res-current>
 on the other.
 C<cuz-origin>
 can therefore be thought of as "in the middle"
@@ -370,7 +384,7 @@ and production LHS,
 and their dotted productions
 are always completions.
 
-=head1 Rule Rank
+=head1 Rank is by Cause
 
 The rank of a parse choice is that of its cause.
 If the cause is a token,
@@ -379,58 +393,61 @@ If the cause is a choicepoint,
 the rank of the parse choice
 is the rank of the production of the cause.
 Since a token choicepoint is always trivial,
-we can say:
+The rank of a non-trivial parse choice is the rank
+of the production of its cause.
 
-B<The rank of a non-trivial parse choice is the rank
-of the production of its cause.>
+Because this is the most important sentence of this document,
+we will repeat it:
+
+=for Marpa::R3::Display
+ignore: 1
+
+      The rank of a non-trivial parse choice
+    is the rank of the production of its cause.
+
+=for Marpa::R3::Display::End
 
 =head1 Motivation
 
-For the purposes of this section,
-let C<result> be a production choicepoint:
-let the "result-production" be the production of C<result>;
-and let the "cause-productions" be the productions
-of the causes of C<result>.
 By the definition of the previous section,
-the result-production plays no role in ranking
-the parse choices of C<result>.
+the production of a choicepoint plays no
+direct role in ranking.
 Instead,
-the parse choices of C<result> are ranked by
-the cause-productions.
+the ranking is by the productions of some of its
+child nodes.
 At first,
 this may seem unnecessarily roundabout,
 and even counter-intuitive.
 
-On reflection,
-the above definition makes sense,
-because all parse choices
+But on reflection,
+this will make sense.
+All parse choices
 in the C<result> choicepoint
-share the same result-production,
-so that the result-production cannot be
-a useful part of a ranking method.
+share the same the result choicepoint's
+production B<cannot>
+be a useful part of a ranking method.
 On the other hand,
-parse choices often
-differ in their cause-productions,
-so that cause-productions can be very helpful in
+the causes of parse choices often
+differ in their productions.
+Productions of causes can
+can be very helpful in
 producing a useful ranking method.
 
-Note that ranking is only by direct causes.
-That is the cause-productions determine the rank,
+Note that ranking is only by B<direct> causes.
+That is, the cause-productions determine the rank,
 but even if there is a tie in the rank of the cause-productions,
 the rank of any productions derived from the cause choicepoints
 is B<not> considered.
 
 It might be useful to have a scheme that
 allows ranking to be inherited.
-But such a scheme would be complex,
-and would require recursion to implement.
 Marpa's built-in production ranking
 was chosen to be the most powerful system
 that could be implemented with effectively
 zero cost.
 Since Marpa's built-in production ranking
-requires only
-directly accessible information,
+requires only information
+that is quickly and directly available,
 its runtime cost is probably
 not measureable.
 
@@ -933,12 +950,12 @@ assume that the reader is comfortable
 reading and analyzing BNF.
 We will often use the basic theorem
 of Earley parsing.
-As a reminder and
-informally, this is
+As a reminder,
+the theorem states
 that an instance of a dotted production is present
-in the parse
+in a parse,
 if and
-only it is valid for the input so far.
+only if is valid for the input so far.
 More formally:
 
 B<(EARLEY)>:
@@ -947,7 +964,7 @@ Let C<Syms> be the set of symbols in C<G>
 and let exactly one of the symbols
 in C<Syms> be disinguished as the 
 "start symbol".
-Call the "start symbol", C<Start>.
+Call the "start symbol", C<< <Start> >>.
 
 Let C<Terms> be a subset of C<Syms>
 called the "terminals" of C<G>.
@@ -958,9 +975,9 @@ Location is 1-based and C<$> represents the
 last location of C<W>,
 so that C<W = W[1,$]>.
 
-Where C<alpha> and C<beta> are sequence
+Where C<alpha> and C<beta> are sequences
 of symbols in C<Syms>,
-let C<alpha => beta> mean that C<alpha>
+let C<< alpha => beta >> mean that C<alpha>
 derives C<beta> in grammar C<G>
 in zero or more steps.
 
@@ -970,12 +987,12 @@ C<alpha>, C<beta>, C<gammar>,
 C<delta> be sequences
 of zero or more symbols in C<Syms>.
 
-The basic theorem of Earley parsing is that
-these two statement sets
+Theorem:
+These two statement sets
 are equivalent:
 
-Statement set 1.
-We have all of the following:
+Statement set 1 is true if and only if
+we have all of the following:
 
 1a.
 C<eitem> is an instance of a dotted
@@ -989,42 +1006,42 @@ an "Earley item".
 1a.
 C<dp> is the dotted
 production
-C<A ::= beta . gamma>,
-where C<beta> and C<gamma> are sequences
-of zero or more symbols in C<G>.
+C<< <A> ::= beta . gamma> >>.
 
-Statement set2.
-We have all of the following:
+Statement set 2 is true if and only if
+we have all of the following:
 
-2a. C<< alpha => W[1,origin] >>, where
-C<alpha> is a sequence of zero or more
-symbols from C<Syms>
+2a. C<< alpha => W[1,origin] >>
 
 2b. C<< beta => W[origin+1,current] >>
 
-2b. C<< <Start> => alpha <A> delta >>
+2c. C<< <Start> => alpha <A> delta >>
 
+Proof omitted:
 We do not prove the basic theorem
 of Earley parsing
 here.
-The proof is complicated.
-It can be found in Jay Earley's thesis
-and his original paper.
-It has since been repeated in other sources.
+The proof is complicated
+and can be found in Jay Earley's thesis,
+in his original paper,
+and a few other sources.
 
 =head2 Proof of correctness
 
 Let C<G> be the grammar in the
 Marpa DSL
 synopsis,
-treated as it was pure BNF,
-without ranking taken into consideration.
+treated as it was pure BNF --
+that is,
+considered
+without regard to ranking.
 Let C<W> be a string,
 and let C<ps-pure> be the set of parses
 allowed by C<G>.
 Let C<ps-ranked> be the
 set of parses
-allowed by C<G> after ranking is taken
+allowed by the DSL synopsis grammar
+after ranking is taken
 into account.
 
 We will say string C<W> is valid
@@ -1045,7 +1062,7 @@ Here we make our idea of "longest highest"
 explicit and justify it.
 
 What "longest highest" means locally is reasonably obvious --
-it C<item3> has more tokens than C<item1>,
+if C<item3> has more tokens than C<item1>,
 then C<item3> is "longer" than C<item1>.
 It is less clear what it means globally.
 Items might overlap,
@@ -1071,7 +1088,7 @@ In other words,
 if C<p-lh> is a parse in C<ps> and if,
 for every parse C<p> in parse set C<ps>,
 C<< Size(p-lh) <= Size(p) >>,
-the C<p-lh> is a "longest highest" parse.
+then C<p-lh> is a "longest highest" parse.
 
 We say that a choicepoint is "reduced" if all of 
 its choices have the same rank.
@@ -1103,14 +1120,14 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 
-Theorem:
+B<Theorem>:
 If C<W> is a valid string,
 C<ps-ranked> contains only one
 parse,
 and that parse is 
 the "longest highest" parse.
 
-Proof:
+B<Proof>:
 
 Recall that a Marpa C<high_rank_only> parse
 first parses according to the pure BNF,
@@ -1148,14 +1165,14 @@ Let C<seq1> and C<seq2> be two factorings
 of C<W> into items.
 Let C<first> and C<last> be two G1 locations
 such that C<< first <= last >>.
+
 Let C<sub1> be a subsequence of one or more
 items of C<seq1>
 that starts at C<first> and ends at C<last>.
 Similarly,
-let C<sub1> be a subsequence of one or more
-items of C<seq1>
+let C<sub2> be a subsequence of one or more
+items of C<seq2>
 that starts at C<first> and ends at C<last>.
-
 Let C<seq3> be
 the result of replacing 
 C<sub1> in C<seq1> with
@@ -1163,6 +1180,17 @@ C<sub2>.
 Then,
 because C<G> is a context free grammar,
 C<seq3> is also a factoring of C<W>.
+
+As an example,
+Let C<W> be C<v=vv=v>,
+let C<seq1> be C<(v=v)(v=v)> and
+let C<seq2> be C<(v=)(v)(v=)(v)>.
+Let C<first> be 3 and C<last> be 5,
+so that C<sub1> is C<(v=v)>
+and C<sub2> is C<(v=)(v)>.
+Then C<seq3> is C<(v=v)(v=)(v)>,
+which is, as claimed,
+also a factoring of C<W>.
 
 B<(4)>:
 Recall the L<discussion of G1
@@ -1240,12 +1268,11 @@ B<(14)>:
 We will call a maximal subfactoring
 "var-unbounded" or simply "unbounded"
 if it is not var-bounded.
-C<< <VAR> >> token.
 By (11) and (12), this means that it
 has the pattern
 "C<v=v= ... v=>".
 
-B<15>:
+B<(15)>:
 If a C<< <Item1> >> or 
 C<< <Item3> >> occurs in
 a maximal subfactoring,
@@ -1289,7 +1316,7 @@ So we narrow our consideration of ambiguities to two cases:
 ambiguities in unbounded maximal subfactorings, and
 ambiguities in bounded maximal subfactorings.
 
-B<17>:
+B<(17)>:
 Every unbounded maximal subfactoring is unambiguous.
 To show (17), let C<u> be an 
 unbounded maximal subfactoring.
@@ -1315,7 +1342,7 @@ This in turn means that C<u>
 is unambiguous,
 which shows (17).
 
-B<18>:
+B<(18)>:
 Every bounded maximal subfactoring parses either
 as a sequence of C<Item2>'s followed by
 an C<Item1>'s;
@@ -1324,7 +1351,7 @@ as a sequence of C<Item2>'s followed by
 an C<Item3>'s.
 This follows from (1) and (15).
 
-B<19>:
+B<(19)>:
 From (16), (17) and (18) it follows that
 every ambiguous subfactoring is an bounded subfactoring
 whose divisions into items take the two forms
@@ -1348,41 +1375,41 @@ We have now shown how pure parsing works for the
 grammar in the synopsis.
 We next show the consequences of ranking.
 
-B<20>:
+B<(20)>:
 A completed instance of C<List ::= Item1>
 can only be found at G1 location 1.
-We know this form C<G> and (EARLEY).
+We know this from C<G> and (EARLEY).
 
-B<21>:
+B<(21)>:
 A completed instance of C<List ::= List Item1>
 can only be found at G1 location 2 or after.
-We know this form C<G> and (EARLEY).
+We know this from C<G> and (EARLEY).
 
-B<22>
+B<(22)>
 At most one choice with C<Item1> as its last item
 appears in any choicepoint.
 We know this because all choices of a choicepoint
 must be completions with the same current location,
 and from (20) and (21).
 
-B<23>:
+B<(23)>:
 A completed instance of C<List ::= Item3>
 can only be found at G1 location 3.
-We know this form C<G> and (EARLEY).
+We know this from C<G> and (EARLEY).
 
-B<24>:
+B<(24)>:
 A completed instance of C<List ::= List Item3>
 can only be found at G1 location 4 or after.
-We know this form C<G> and (EARLEY).
+We know this from C<G> and (EARLEY).
 
-B<25>
+B<(25)>
 At most one choice with C<Item3> as its last item
 appears in any choicepoint.
 We know this because all choices of a choicepoint
 must be completions with the same current location,
 and from (23) and (24).
 
-B<26>:
+B<(26)>:
 Consider the ambiguity shown in
 (19) and let C<current> be the G1 fencepost at its end.
 An item also ends at G1 so from C<G> and (EARLEY),
@@ -1415,7 +1442,7 @@ all that matters is the dot position and the predot
 symbol,
 and that is the same in all of them.
 
-B<27>:
+B<(27)>:
 At this point,
 it will be useful to examine the possible
 "middle locations" of the choices of C<result>.
@@ -1432,7 +1459,7 @@ Therefore the origin of one of the causes of C<result>
 must be location 0.
 RHS of their dotted rule.
 
-B<28>:
+B<(28)>:
 From (26) and (27) we know that, if C<cuz> is a cause
 of C<result>, 
 it has an origin at location 0;
@@ -1455,11 +1482,11 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
-B<29>:
+B<(29)>:
 From (19) and (EARLEY) we know that dotted productions
 ending in C<Item2> are not valid choices at location C<current>.
 
-B<30>:
+B<(30)>:
 From (19) and (EARLEY) we know 
 that at least one of the following two dotted rules
 must be a valid choice:
@@ -1472,7 +1499,7 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
-B<31>:
+B<(31)>:
 From (22) we know that instances of both 
 dotted productions in (30) cannot have the same
 current location,
@@ -1480,7 +1507,7 @@ and therefore cannot be choices in the same choicepoint.
 Therefore at most one of the causes in (30) is a possible
 cause of C<result>.
 
-B<32>:
+B<(32)>:
 We now repeat the reasoning we just followed for C<Item1>
 for C<Item3>.
 From (19) and (EARLEY) we know 
@@ -1495,7 +1522,7 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
-B<33>:
+B<(33)>:
 From (25) we know that instances of both 
 dotted productions in (32) cannot have the same
 current location,
@@ -1503,7 +1530,7 @@ and therefore cannot be choices in the same choicepoint.
 Therefore at most one of the causes in (32) is a possible
 cause of C<result>.
 
-B<34>:
+B<(34)>:
 From (28), (29), (31) and (33) we know that we will
 have exactly two choices for C<result>;
 that the final symbol of the cause in one will be
@@ -1520,7 +1547,7 @@ is C<Item3> will be the only one kept in C<P-ranked>.
 We further see from (19) that this choice will have
 fewer items than the alternative.
 
-B<35>:
+B<(35)>:
 From (19) we know that there is at
 most one ambiguity per maximal subfactoring.
 From (16) we know that ambiguity resolutions
@@ -1531,7 +1558,7 @@ and that that is the factoring with the fewest items.
 Therefore, C<P-ranked> will only contain one parse,
 and that that parse will be "longest highest".
 
-QED.
+B<QED>.
 
 =head1 COPYRIGHT AND LICENSE
 
