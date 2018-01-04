@@ -24,9 +24,9 @@ normalize-whitespace: 1
       :default ::= action => ::array
       
       Top ::= List action => main::group
-      List ::= Item3 rank => 6
-      List ::= Item2 rank => 5
-      List ::= Item1 rank => 4
+      List ::= Item3 rank => 3
+      List ::= Item2 rank => 2
+      List ::= Item1 rank => 1
       List ::= List Item3 rank => 3
       List ::= List Item2 rank => 2
       List ::= List Item1 rank => 1
@@ -461,9 +461,9 @@ partial: 1
   :default ::= action => ::array
   
   Top ::= List action => main::group
-  List ::= Item3 rank => 6
-  List ::= Item2 rank => 5
-  List ::= Item1 rank => 4
+  List ::= Item3 rank => 3
+  List ::= Item2 rank => 2
+  List ::= Item1 rank => 1
   List ::= List Item3 rank => 3
   List ::= List Item2 rank => 2
   List ::= List Item1 rank => 1
@@ -661,9 +661,9 @@ name: Ranking, shortest highest, version 1
   List ::= Item3 rank => 1
   List ::= Item2 rank => 2
   List ::= Item1 rank => 3
-  List ::= List Item3 rank => 4
-  List ::= List Item2 rank => 5
-  List ::= List Item1 rank => 6
+  List ::= List Item3 rank => 1
+  List ::= List Item2 rank => 2
+  List ::= List Item1 rank => 3
   Item3 ::= VAR '=' VAR action => main::concat
   Item2 ::= VAR '='     action => main::concat
   Item1 ::= VAR         action => main::concat
@@ -926,10 +926,94 @@ While some people find these helpful, others find them distracting,
 which is why
 they are segregated here.
 
+=head2 Earley parsing
+
+In this section we
+assume that the reader is comfortable
+reading and analyzing BNF.
+We will often use the basic theorem
+of Earley parsing.
+As a reminder and
+informally, this is
+that an instance of a dotted production is present
+in the parse
+if and
+only it is valid for the input so far.
+More formally:
+
+B<(EARLEY)>:
+Let C<G> be a grammar.
+Let C<Syms> be the set of symbols in C<G>
+and let exactly one of the symbols
+in C<Syms> be disinguished as the 
+"start symbol".
+Call the "start symbol", C<Start>.
+
+Let C<Terms> be a subset of C<Syms>
+called the "terminals" of C<G>.
+Let C<W> be a string of symbols from C<Terms>.
+Let C<W[a,b]> be the substring of C<W>
+from locations C<a> to C<b> inclusive.
+Location is 1-based and C<$> represents the
+last location of C<W>,
+so that C<W = W[1,$]>.
+
+Where C<alpha> and C<beta> are sequence
+of symbols in C<Syms>,
+let C<alpha => beta> mean that C<alpha>
+derives C<beta> in grammar C<G>
+in zero or more steps.
+
+In this theorem,
+let
+C<alpha>, C<beta>, C<gammar>,
+C<delta> be sequences
+of zero or more symbols in C<Syms>.
+
+The basic theorem of Earley parsing is that
+these two statement sets
+are equivalent:
+
+Statement set 1.
+We have all of the following:
+
+1a.
+C<eitem> is an instance of a dotted
+production, which we will treat
+as a triple:
+C<dp, origin, current>.
+In the literature,
+a triple of this form is also called
+an "Earley item".
+
+1a.
+C<dp> is the dotted
+production
+C<A ::= beta . gamma>,
+where C<beta> and C<gamma> are sequences
+of zero or more symbols in C<G>.
+
+Statement set2.
+We have all of the following:
+
+2a. C<< alpha => W[1,origin] >>, where
+C<alpha> is a sequence of zero or more
+symbols from C<Syms>
+
+2b. C<< beta => W[origin+1,current] >>
+
+2b. C<< <Start> => alpha <A> delta >>
+
+We do not prove the basic theorem
+of Earley parsing
+here.
+The proof is complicated.
+It can be found in Jay Earley's thesis
+and his original paper.
+It has since been repeated in other sources.
+
 =head2 Proof of correctness
 
-We assume that the reader is comfortable
-reading and analyzing BNF.
 Let C<G> be the grammar in the
 Marpa DSL
 synopsis,
@@ -1256,6 +1340,45 @@ and
 ignore: 1
 
 "C<(v=) ... (v=v)>"
+
+B<Part 2>:
+We have now shown how pure parsing works for the
+grammar in the synopsis.
+We next show the consequences of ranking.
+
+B<20>:
+A completed instance of C<List ::= Item1>
+can only be found at G1 location 1.
+We know this form C<G> and (EARLEY).
+
+B<21>:
+A completed instance of C<List ::= List Item1>
+can only be found at G1 location 2 or after.
+We know this form C<G> and (EARLEY).
+
+B<22>
+At most one choice with C<Item1> as its last item
+appears in any choicepoint.
+We know this because all choices of a choicepoint
+must be completions with the same current location,
+and from (20) and (21).
+
+B<23>:
+A completed instance of C<List ::= Item3>
+can only be found at G1 location 3.
+We know this form C<G> and (EARLEY).
+
+B<24>:
+A completed instance of C<List ::= List Item3>
+can only be found at G1 location 4 or after.
+We know this form C<G> and (EARLEY).
+
+B<25>
+At most one choice with C<Item3> as its last item
+appears in any choicepoint.
+We know this because all choices of a choicepoint
+must be completions with the same current location,
+and from (23) and (24).
 
 =for Marpa::R3::Display::End
 

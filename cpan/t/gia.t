@@ -706,15 +706,15 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
   
-  List ::= Item3 rank => 6
-  List ::= Item2      rank => 5
-  List ::= Item1          rank => 4
+  List ::= Item3 rank => 3
+  List ::= Item2 rank => 2
+  List ::= Item1 rank => 1
   List ::= List Item3 rank => 3
   List ::= List Item2 rank => 2
   List ::= List Item1 rank => 1
-  Item3 ::= VAR '=' VAR  rank => 3
-  Item2 ::= VAR '='      rank => 2
-  Item1 ::= VAR          rank => 1
+  Item3 ::= VAR '=' VAR
+  Item2 ::= VAR '='
+  Item1 ::= VAR
   VAR ~ [\w]+
 END_OF_SOURCE
 
@@ -774,14 +774,14 @@ if (1) {
   :discard ~ ws; ws ~ [\s]+
 
   List ::= Item3 rank => 1
-  List ::= Item2      rank => 2
-  List ::= Item1          rank => 3
-  List ::= List Item3 rank => 4
-  List ::= List Item2 rank => 5
-  List ::= List Item1 rank => 6
-  Item3 ::= VAR '=' VAR  rank => 1
-  Item2 ::= VAR '='      rank => 2
-  Item1 ::= VAR          rank => 3
+  List ::= Item2 rank => 2
+  List ::= Item1 rank => 3
+  List ::= List Item3 rank => 1
+  List ::= List Item2 rank => 2
+  List ::= List Item1 rank => 3
+  Item3 ::= VAR '=' VAR
+  Item2 ::= VAR '='
+  Item1 ::= VAR
   VAR ~ [\w]+
 END_OF_SOURCE
 

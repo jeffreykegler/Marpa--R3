@@ -41,9 +41,9 @@ my $source = <<'END_OF_SOURCE';
   :default ::= action => ::array
   
   Top ::= List action => main::group
-  List ::= Item3 rank => 6
-  List ::= Item2 rank => 5
-  List ::= Item1 rank => 4
+  List ::= Item3 rank => 3
+  List ::= Item2 rank => 2
+  List ::= Item1 rank => 1
   List ::= List Item3 rank => 3
   List ::= List Item2 rank => 2
   List ::= List Item1 rank => 1
