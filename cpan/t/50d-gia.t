@@ -116,7 +116,7 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
-  
+
   Top ::= List action => main::group
   List ::= Item3 rank => 3
   List ::= Item2 rank => 2
@@ -220,7 +220,7 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
-  
+
   Top ::= List action => main::group
   List ::= Item rank => 1
   List ::= List Item rank => 0
@@ -315,7 +315,7 @@ if (1) {
     my $source = <<'END_OF_SOURCE';
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
-  
+
   Top            ::= Max_Boundeds action => main::group
   Top            ::= Max_Boundeds Unbounded action => main::group
   Top            ::= Unbounded action => main::group

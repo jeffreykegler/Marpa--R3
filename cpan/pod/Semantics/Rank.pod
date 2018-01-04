@@ -22,7 +22,7 @@ normalize-whitespace: 1
     my $source = <<'END_OF_SOURCE';
       :discard ~ ws; ws ~ [\s]+
       :default ::= action => ::array
-      
+
       Top ::= List action => main::group
       List ::= Item3 rank => 3
       List ::= Item2 rank => 2
@@ -239,7 +239,7 @@ choicepoint.
 
 C<current> is the G1 location corresponding to the dot
 in C<dp>.
-C<current> is sometimes 
+C<current> is sometimes
 called the C<current position> of the choicepoint.
 
 =back
@@ -351,7 +351,7 @@ is at or after the origin of C<cp-prod>.
 While it is not always properly between
 C<res-origin> and C<res-current>,
 C<cuz-origin> is always in the range bounded
-by 
+by
 C<res-origin> on one side,
 and by C<res-current>
 on the other.
@@ -476,7 +476,7 @@ partial: 1
 
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
-  
+
   Top ::= List action => main::group
   List ::= Item3 rank => 3
   List ::= Item2 rank => 2
@@ -727,7 +727,7 @@ name: Ranking, longest highest, version 2
 
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
-  
+
   Top ::= List action => main::group
   List ::= Item rank => 1
   List ::= List Item rank => 0
@@ -783,7 +783,7 @@ normalize-whitespace: 1
 
   :discard ~ ws; ws ~ [\s]+
   :default ::= action => ::array
-  
+
   Top            ::= Max_Boundeds action => main::group
   Top            ::= Max_Boundeds Unbounded action => main::group
   Top            ::= Unbounded action => main::group
@@ -962,7 +962,7 @@ B<(EARLEY)>:
 Let C<G> be a grammar.
 Let C<Syms> be the set of symbols in C<G>
 and let exactly one of the symbols
-in C<Syms> be disinguished as the 
+in C<Syms> be disinguished as the
 "start symbol".
 Call the "start symbol", C<< <Start> >>.
 
@@ -1090,7 +1090,7 @@ for every parse C<p> in parse set C<ps>,
 C<< Size(p-lh) <= Size(p) >>,
 then C<p-lh> is a "longest highest" parse.
 
-We say that a choicepoint is "reduced" if all of 
+We say that a choicepoint is "reduced" if all of
 its choices have the same rank.
 We say that a choicepoint is "unreduced" if it is
 not reduced.
@@ -1101,7 +1101,7 @@ where
 "C<v>" stands for a C<< <VAR> >> tokens
 and equal signs represent themselves.
 For example, we might represent the token
-string 
+string
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1124,7 +1124,7 @@ B<Theorem>:
 If C<W> is a valid string,
 C<ps-ranked> contains only one
 parse,
-and that parse is 
+and that parse is
 the "longest highest" parse.
 
 B<Proof>:
@@ -1174,7 +1174,7 @@ let C<sub2> be a subsequence of one or more
 items of C<seq2>
 that starts at C<first> and ends at C<last>.
 Let C<seq3> be
-the result of replacing 
+the result of replacing
 C<sub1> in C<seq1> with
 C<sub2>.
 Then,
@@ -1221,15 +1221,15 @@ Also from (3) we see that
 G1 fencepost 0 is a factoring barrier.
 
 B<(7)>:
+Let a "subfactoring" be a sequence of
+items bounded by factoring barriers.
+
+B<(8)>:
 Let a "maximal subfactoring" be subfactoring
 which does not properly contain any
 factoring barriers.
 From (5) and (6) we can see that C<W>
 can be divided into maximal subfactorings.
-
-B<(8)>:
-Let a "subfactoring" be a sequence of
-items bounded by factoring barriers.
 
 B<(9)>:
 We can see from C<G>
@@ -1273,41 +1273,61 @@ has the pattern
 "C<v=v= ... v=>".
 
 B<(15)>:
-If a C<< <Item1> >> or 
+If a C<< <Item1> >> or
 C<< <Item3> >> occurs in
 a maximal subfactoring,
 it is the last item in that subfactoring.
 To show this, assume for a reduction ad absurdam
 there is a maximal subfactoring with a non-final
-C<< <Item1> >> or 
+C<< <Item1> >> or
 C<< <Item3> >>.
 Call that subfactoring C<f>,
-and call that item, C<it>.
-Both of items end in a
-C<< <VAR> token,
-so that C<it> ends in a
-C<< <VAR> token.
-Since C<it>, by assumption for the reductio,
+and call that item, C<it1>.
+Both
+C<< <Item1> >> and
+C<< <Item3> >>
+end with a
+C<< <VAR> >> token,
+so that C<it1> ends in a
+C<< <VAR> >> token.
+Since C<it1>, by assumption for the reductio,
 is non-final, there is a next item.
+Call the next item C<it2>.
 
 By (10),
-all items start with 
-C<< <VAR> >> tokens.
-This means there are two 
-C<< <VAR> >> tokens in a row properly
-inside subfactoring C<f>.
-This means there is a factoring barrier
-properly inside C<f>
+all items start with
+C<< <VAR> >> tokens,
+so that C<it2> start with a
+C<< <VAR> >> token.
+C<it1> ends with a
+C<< <VAR> >> token
+and
+C<it2> start with a
+C<< <VAR> >> token,
+so that there are two
+C<< <VAR> >> tokens
+at the fencepost between C<it1>
+and C<it2>.
+Therefore, there is a factoring barrier
+at the fencepost between C<it1>
+and C<it2>.
+
+The fencepost between C<it1>
+and C<it2>
+is properly
+inside subfactoring C<f>,
+which means there is a factoring barrier
+properly inside C<f>.
 But C<f> is assumed for the reductio
 to be maximal and therefore cannot
 properly contain a factoring barrier.
 This shows the reductio,
 and allows us to conclude that,
 if C<f> contains an
-C<< <Item1> >> or 
+C<< <Item1> >> or
 an C<< <Item3> >>,
-that item is the final item.
-Which is what we wanted to show for (15).
+that item must the final item.
+This is what we needed to show for (15).
 
 B<(16)>:
 By (3), every maximal subfactoring is independent --
@@ -1318,25 +1338,25 @@ ambiguities in bounded maximal subfactorings.
 
 B<(17)>:
 Every unbounded maximal subfactoring is unambiguous.
-To show (17), let C<u> be an 
+To show (17), let C<u> be an
 unbounded maximal subfactoring.
 If follows from the definition of unbounded maximal subfactoring
 (14), that C<u>
 ends in an equal sign.
 Both C<< <Item1> >> and
 C<< <Item3> >> end in C<< <VAR> >> tokens,
-so that no 
+so that no
 C<< <Item1> >> or
 C<< <Item3> >> can be the last item
 in C<u>.
 Therefore, by (15),
-There is no 
+There is no
 C<< <Item1> >> or
 C<< <Item3> >> item
 in C<u>.
 This means that every item
 in C<u>
-is an 
+is an
 C<< <Item2> >> item.
 This in turn means that C<u>
 is unambiguous,
@@ -1421,7 +1441,7 @@ have one of these dotted rules
 
 =for Marpa::R3::Display
 ignore: 1
-   
+
      Top ::= List .
      List ::= List . Item3
      List ::= List . Item2
@@ -1461,7 +1481,7 @@ RHS of their dotted rule.
 
 B<(28)>:
 From (26) and (27) we know that, if C<cuz> is a cause
-of C<result>, 
+of C<result>,
 it has an origin at location 0;
 its current location is C<current>;
 and its LHS is C<List>.
@@ -1472,7 +1492,7 @@ C<cuz> may be any one of
 
 =for Marpa::R3::Display
 ignore: 1
-   
+
      List ::= Item3 .
      List ::= Item2 .
      List ::= Item1 .
@@ -1487,7 +1507,7 @@ From (19) and (EARLEY) we know that dotted productions
 ending in C<Item2> are not valid choices at location C<current>.
 
 B<(30)>:
-From (19) and (EARLEY) we know 
+From (19) and (EARLEY) we know
 that at least one of the following two dotted rules
 must be a valid choice:
 
@@ -1500,7 +1520,7 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 B<(31)>:
-From (22) we know that instances of both 
+From (22) we know that instances of both
 dotted productions in (30) cannot have the same
 current location,
 and therefore cannot be choices in the same choicepoint.
@@ -1510,7 +1530,7 @@ cause of C<result>.
 B<(32)>:
 We now repeat the reasoning we just followed for C<Item1>
 for C<Item3>.
-From (19) and (EARLEY) we know 
+From (19) and (EARLEY) we know
 that at least one of the following two dotted rules
 must be a valid choice:
 
@@ -1523,7 +1543,7 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 B<(33)>:
-From (25) we know that instances of both 
+From (25) we know that instances of both
 dotted productions in (32) cannot have the same
 current location,
 and therefore cannot be choices in the same choicepoint.
