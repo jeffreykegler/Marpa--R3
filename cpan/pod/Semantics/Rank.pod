@@ -1115,6 +1115,8 @@ Proof:
 Recall that a Marpa C<high_rank_only> parse
 first parses according to the pure BNF,
 and then prunes the parse using ranking.
+
+B<Part 1>:
 We will first examine C<ps-pure>,
 the parse set which results from the pure
 BNF phase.
@@ -1217,11 +1219,11 @@ token.
 
 B<(11)>:
 Every maximal subfactoring starts with
-a C<< <VAR> token.
+a C<< <VAR> >> token.
 
 B<(12)>:
 Every maximal subfactoring alternates
-equal signs and C<< <VAR> tokens:
+equal signs and C<< <VAR> >> tokens:
 that is, if it has the pattern
 "C<v=v=v= ...>".
 
@@ -1229,7 +1231,7 @@ B<(13)>:
 We will call a maximal subfactoring
 "var-bounded" or simply "bounded"
 if it starts and ends with a
-C<< <VAR> token.
+C<< <VAR> >> token.
 By (11) and (12), this means that it
 has the pattern
 "C<v=v=v= ... v>".
@@ -1238,7 +1240,7 @@ B<(14)>:
 We will call a maximal subfactoring
 "var-unbounded" or simply "unbounded"
 if it is not var-bounded.
-C<< <VAR> token.
+C<< <VAR> >> token.
 By (11) and (12), this means that it
 has the pattern
 "C<v=v= ... v=>".
@@ -1380,54 +1382,153 @@ We know this because all choices of a choicepoint
 must be completions with the same current location,
 and from (23) and (24).
 
-=for Marpa::R3::Display::End
-
-[ TODO: to here. ]
-
-B<4>: From (1), we note that, when there is an ambiguity,
-the choice will always be between the rule
-
-=for Marpa::R3::Display
-name: Rank document synopsis
-normalize-whitespace: 1
-partial: 1
-
-      Item3 ::= VAR '=' VAR
-
-=for Marpa::R3::Display::End
-
-and the rule
+B<26>:
+Consider the ambiguity shown in
+(19) and let C<current> be the G1 fencepost at its end.
+An item also ends at G1 so from C<G> and (EARLEY),
+we know that there is at least one dotted rule instance
+whose predot symbol is C<List> and whose current
+location is C<current>.
+The choicepoint can
+have one of these dotted rules
 
 =for Marpa::R3::Display
-name: Rank document synopsis
-normalize-whitespace: 1
-partial: 1
-
-      Item1 ::= VAR
+ignore: 1
+   
+     Top ::= List .
+     List ::= List . Item3
+     List ::= List . Item2
+     List ::= List . Item1
 
 =for Marpa::R3::Display::End
 
-(The rule for C<Item2> never is one of the choices because,
-as implied in (1),
-C<Item2> will never be the predot symbol at a location
-where C<Item3> is a predot symbol,
-and therefore C<Item2> and C<Item3> will never be predot
-symbols of choices in the same choicepoint.)
+with location 0 as its origin and
+C<current> as its current location.
+There may be more than one choicepoint filling these
+criteria.
+We arbitrarily pick one can call it C<result>.
+We will see as we proceed that,
+while the choicepoints may have different dotted rules,
+our choice of one of them for C<result> makes no difference in
+the ranking logic --
+all that matters is the dot position and the predot
+symbol,
+and that is the same in all of them.
 
-B<5:> Using (4),
-and noting rank 3 is higher than rank 1,
-we conclude that only one choice will be picked,
-and that it will resolve the ambiguity in favor
-of "C<(a=b)>", which contains only one leaf.
-The other choice would imply the parse contains the pair "C<(a=)(b)>",
-which contains two leaves.
+B<27>:
+At this point,
+it will be useful to examine the possible
+"middle locations" of the choices of C<result>.
+(Recall that the "middle location" of a choice
+is always the origin of its cause.)
+From (26) we see that,
+for every possible rule in C<result>,
+the predot symbol is the first symbol.
+This means that the "middle location" of the choices
+must always be the origin of C<result>.
+From (26) we also know that
+the origin of C<result> is always location 0.
+Therefore the origin of one of the causes of C<result>
+must be location 0.
+RHS of their dotted rule.
 
-B<6:> Generalizing from (5), we observe that all choices are resolved
-so that only one choice remains,
-and that that choice is "longest highest".
+B<28>:
+From (26) and (27) we know that, if C<cuz> is a cause
+of C<result>, 
+it has an origin at location 0;
+its current location is C<current>;
+and its LHS is C<List>.
+Again, note that the exact choice of dotted
+rule in C<result> has no effect on these criteria
+for C<cuz>.
+C<cuz> may be any one of
 
-B<7:> From (6) we can show, by induction on the choices in a parse,
-that C<P-ranked> will only contain one parse,
+=for Marpa::R3::Display
+ignore: 1
+   
+     List ::= Item3 .
+     List ::= Item2 .
+     List ::= Item1 .
+     List ::= List Item3 .
+     List ::= List Item2 .
+     List ::= List Item1 .
+
+=for Marpa::R3::Display::End
+
+B<29>:
+From (19) and (EARLEY) we know that dotted productions
+ending in C<Item2> are not valid choices at location C<current>.
+
+B<30>:
+From (19) and (EARLEY) we know 
+that at least one of the following two dotted rules
+must be a valid choice:
+
+=for Marpa::R3::Display
+ignore: 1
+
+     List ::= Item1 .
+     List ::= List Item1 .
+
+=for Marpa::R3::Display::End
+
+B<31>:
+From (22) we know that instances of both 
+dotted productions in (30) cannot have the same
+current location,
+and therefore cannot be choices in the same choicepoint.
+Therefore at most one of the causes in (30) is a possible
+cause of C<result>.
+
+B<32>:
+We now repeat the reasoning we just followed for C<Item1>
+for C<Item3>.
+From (19) and (EARLEY) we know 
+that at least one of the following two dotted rules
+must be a valid choice:
+
+=for Marpa::R3::Display
+ignore: 1
+
+     List ::= Item3 .
+     List ::= List Item3 .
+
+=for Marpa::R3::Display::End
+
+B<33>:
+From (25) we know that instances of both 
+dotted productions in (32) cannot have the same
+current location,
+and therefore cannot be choices in the same choicepoint.
+Therefore at most one of the causes in (32) is a possible
+cause of C<result>.
+
+B<34>:
+From (28), (29), (31) and (33) we know that we will
+have exactly two choices for C<result>;
+that the final symbol of the cause in one will be
+C<Item1>; and
+that the final symbol of the cause in one will be
+C<Item3>.
+From the grammar we know that the cause ending in C<Item1>
+will have rank 1;
+and that the cause ending in C<Item3>
+will have rank 3.
+From this we see, since the ranking method is
+C<high_rank_only>, that the choice whose final symbol
+is C<Item3> will be the only one kept in C<P-ranked>.
+We further see from (19) that this choice will have
+fewer items than the alternative.
+
+B<35>:
+From (19) we know that there is at
+most one ambiguity per maximal subfactoring.
+From (16) we know that ambiguity resolutions
+in maximal subfactoring are independent.
+From (34) we know that every subfactoring
+in C<P-ranked> has exactly one factoring,
+and that that is the factoring with the fewest items.
+Therefore, C<P-ranked> will only contain one parse,
 and that that parse will be "longest highest".
 
 QED.
