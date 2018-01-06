@@ -383,8 +383,8 @@ so we will repeat it:
 =for Marpa::R3::Display
 ignore: 1
 
-    The rank of a parse choice is the rank
-    of the production of its cause.
+    The rank of a parse choice is
+    the rank of the production of its cause.
 
 =for Marpa::R3::Display::End
 
@@ -405,7 +405,7 @@ it will make sense.
 
 Ranking cannot be based
 directly on the rank of the choicepoint's production
-because every choice for that choicepoint shares
+because every parse choice for that choicepoint shares
 the choicepoint's production.
 We have not examined the internal structure of
 predecessors, but ranking is not based on them
@@ -413,7 +413,7 @@ for the same reason:
 the production of a predecessor is always
 the same of the production of its result choicepoint,
 and therefore the production of its predecessor
-is the same for every choice of a choicepoint.
+is the same for every parse choice of a choicepoint.
 
 On the other hand,
 the causes of parse choices can and often do
@@ -423,7 +423,7 @@ the causes of a choicepoint.
 
 Note that ranking is only by B<direct> causes.
 It might reasonably be asked,
-why not look, at least in cases of a tie,
+why not, at least in the case of a tie,
 look at causes of causes.
 Or why not resolve ties by looking at causes of
 predecessors?
@@ -445,8 +445,9 @@ Only causes of causes?
 Or causes of predecessors?
 Depth-first, or breadth-first?
 Only in case of ties, or using a more complex metric?
-To arbitrary depth, or cut off the traversal at
-some point?
+To arbitrary depth, or using a traversal that is
+cut off at some point?
+
 Ranking by direct causes only means the answer
 to all of these questions is as simple as it can be.
 Once we get into analyzing the synopsis grammar in detail,
@@ -463,8 +464,8 @@ allow full generality in ranking.
 =head1 Examples
 
 Our examples in this document will look at
-the ranked grammar in the synopsis and
-minor variations of it.
+the ranked grammar in the synopsis,
+and at minor variations of it.
 
 =head2 Longest highest, version 1
 
@@ -496,13 +497,13 @@ partial: 1
 
 =head3 Longest highest ranking
 
-The DSL in the synopsis ranks its "items"
+The DSL in the synopsis ranks its items
 "longest highest".
-Here items are represented by the symbols,
+Here "items" are represented by the symbols,
 C<< <Item3> >>,
 C<< <Item2> >> and
 C<< <Item1> >>.
-Here the "longest" choice is considered to be the one
+The "longest" choice is considered to be the one
 with the most tokens.
 Working this idea out for this grammar,
 we see that the items
@@ -558,9 +559,12 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 In fact, if we study the grammar more closely,
-we will see that the only possible ambiguity is between
-items and takes the form "C<(a=)(b)>" versus
-"C<(a=b)>", so that the only non-trivial choices are among
+we will see that the only possible ambiguity is
+in the sequence of items,
+and that ambiguities always
+take the form "C<(v=)(v)>" versus
+"C<(v=v)>".
+Therefore the only non-trivial parse choices are
 
 =for Marpa::R3::Display
 ignore: 1
@@ -575,7 +579,9 @@ ignore: 1
 =head3 The first non-trivial choicepoints
 
 Further study of the grammar shows that the first non-trivial
-choice will be between these two:
+choice must be between
+parse choice with
+these two cause choicepoints:
 
 =for Marpa::R3::Display
 ignore: 1
@@ -616,7 +622,8 @@ We've looked at only the first non-trivial choice
 for our example code.
 Again examining the grammar, we see that
 the second and subsequent non-trivial choices will
-all be between causes with the same two dotted
+all be between
+parse choices whose causes have these two dotted
 productions:
 
 =for Marpa::R3::Display
@@ -627,10 +634,6 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
-The reasoning for this second and subsequent
-non-trivial choice follows the same line as
-the reasoning we just gave for the
-first non-trivial choice:
 The production
 C<List ::= List Item3>
 has rank 3,
@@ -672,7 +675,7 @@ Here we see the grammar of the synopsis,
 reworked for a "shortest highest"
 ranking.
 "Shortest highest" is the reverse of
-"longest highest.
+"longest highest".
 
 =for Marpa::R3::Display
 name: Ranking, shortest highest, version 1
@@ -713,9 +716,9 @@ name: Ranking results, shortest highest, version 1
 
 =for Marpa::R3::Display::End
 
-The reader who wants an first example of ranking scheme
+The reader who wants an example of a ranking scheme
 to work out for themselves may find this one suitable.
-The reasoning will be exactly the same as for the
+The reasoning will very similar to that for the
 L<"longest highest"
 example,|"Longest highest, version 1">
 just above.
@@ -766,20 +769,38 @@ name: Ranking, shortest highest, version 2
 =for Marpa::R3::Display::End
 
 Again, the reader looking for simple examples to work
-out for themselves may want to convince himself
-that an argument similar to the one given
+out for themselves may want to rework
+the argument given
 L<above for the "spelled out"
 examples|Longest highest ranking>
-can be worked out for the compact examples.
+for the compact examples.
 
 =head1 Alternatives to Ranking
 
-=head2 Reimplementation as BNF
+=head2 Reimplementation as pure BNF
 
 It is generally better, when possible,
 to write a language as BNF, instead of using ranking.
-The advantage of using BNF is that you can easily determined
+The advantage of using BNF is that you can easily determine
 exactly what language it is that you are parsing.
+Ranked grammars make look easier to analyze at first glance,
+but the more you look at them the more tricky you
+realize they are.
+
+These "pure BNF" reimplementations rely on an observation
+used in L<the detailed proof of the ranked BNF
+example|/"Proof of correctness">:
+The parse string becomes easier to analyze
+when you see as a sequence of "var-bounded"
+substrings,
+where "var-bounded" means the substring is
+delimited by the start of the string,
+the end of the string,
+or the fencepost between
+two C<< <VAR> >> tokens.
+
+=head3 Longest highest as pure BNF
+
 Here is the "longest highest" example,
 reimplemented as BNF:
 
@@ -805,6 +826,8 @@ normalize-whitespace: 1
   VAR ~ [\w]+
 
 =for Marpa::R3::Display::End
+
+=head3 Shortest highest as pure BNF
 
 We can also reimplement the "shortest highest"
 example as BNF.
@@ -867,9 +890,6 @@ BNF.
 This is the case only when the grammar is LL(1) --
 in other words, rarely in practical use.
 
-In this section, I will call a PEG specification
-re-interpreted as pure unranked BNF,
-the specification's "BNF grammar".
 Typically, a PEG implementer thinks their problem out in BNF,
 perhaps ordering the PEG rules to resolve a few of the choices,
 and then twiddles the PEG specification until the test suite passes.
@@ -878,9 +898,9 @@ This results in a parser whose behavior is to a large extent unknown.
 Marpa with ranking allows a safer form of PEG-style parsing.
 Both Marpa's DSL and PEG allow the implementer to specify
 any context-free grammar,
-but Marpa will actually parse all of them correctly,
-while PEG only correctly parses a small subset and
-fakes the rest.
+but Marpa parse all context-free grammars correctly,
+while PEG only correctly parses a small subset of the context-free grammars
+and fakes the rest.
 
 In Marpa,
 the implementer of a ranked grammar can work systematically.
@@ -902,8 +922,7 @@ a subset of what the implementer needs,
 and the implementer must use ranks to "stretch" the
 grammar to describe what he has in mind.
 
-Ranking is always the more difficult and less predictable,
-than specifying BNF.
+Ranking is not as predictable as specifying BNF.
 The "safety net" provided by Marpa's "sculpted superset"
 guards against over-liberal parsing.
 This is important:
@@ -911,11 +930,11 @@ over-liberal parsing can be a security loophole,
 and bugs caused by over-liberal parsing have been
 the topic of security advisories.
 
-Determining what grammar your ranking actually produces
+Determining the exact language parsed
+by a ranked grammar
 in PEG is extremely hard --
 a small specialist literature has looked at this subject.
-Most implementers don't bother trying to determine
-the exact language parsed by their PEG specification --
+Most implementers don't bother trying --
 when the test suite passes, they consider the PEG
 implementation complete.
 
@@ -928,19 +947,20 @@ L<A more formal
 proof|"Proof of correctness">
 is given below.
 
-Additionally, since Marpa parses all context-free
-grammars,
-it often parses your language efficiently when it is implemented as pure BNF,
+Since Marpa parses all context-free grammars,
+and Marpa parses most unambiguous grammars in linear time,
+Marpa often parses your language efficiently when it is implemented as pure BNF,
 without rule ranking.
 As one example, the ranked grammar in the synopsis
 can be L<reimplemented as pure unranked
-BNF|/"Reimplementation as BNF">.
+BNF|/"Reimplementation as pure BNF">.
 Where it is possible to convert your ranked grammar to a pure BNF grammar,
 that will usually be the best and safest choice.
 
 =head1 Details
 
-This section contains additional explanations, not essential to understanding
+This section contains additional explanations,
+not essential to understanding
 the rest of this document.
 Often they are formal or mathematical.
 While some people find these helpful, others find them distracting,
@@ -973,8 +993,8 @@ Call the "start symbol", C<< <Start> >>.
 Let C<Terms> be a subset of C<Syms>
 called the "terminals" of C<G>.
 Let C<W> be a string of symbols from C<Terms>.
-Let C<W[i]> be the C<i>'th of C<W>,
-so that the first character of C<W> is
+Let C<W[i]> be the C<i>'th terminal of C<W>,
+so that the first terminal of C<W> is
 C<W[1]>.
 
 Where C<alpha> and C<beta> are sequences
@@ -1032,15 +1052,15 @@ synopsis,
 Let C<W> be a string,
 and let C<ps-pure> be the set of parses
 allowed by C<G>,
-treated as it was pure unranked BNF.
+treated as if it was pure unranked BNF.
 Let C<ps-ranked> be the
 set of parses
-allowed by the DSL synopsis grammar
+allowed by the C<G>
 after ranking is taken
 into account.
 
 We will say string C<W> is valid
-if C<ps-pure> is non-empty.
+if and only if C<ps-pure> is non-empty.
 We will say that a parse set is
 "unambiguous" if and only if
 it contains at most one parse.
@@ -1064,24 +1084,24 @@ Items might overlap,
 so that optimizing locally might make
 the parse as a whole suboptimal.
 
-We will define a "longest highest" parse as
-one of the parses with the fewest "items".
-This is based on the intuition that if items are longer,
-fewer of them will fit into a fixed size C<W>.
+We will define a "longest highest" parse of C<W> as
+one of the parses of C<W> with the fewest "items".
+This is based on the observations
+that C<W> is fixed in length,
+and that if items are longer,
+fewer of them will fit into C<W>.
 
 More formally,
-Let C<p> be a parse,
+let C<p> be a parse,
 and let C<ps> be a parse set.
-C<Size(p)>,
-the "size" of C<p>,
-is the number of items in C<p>.
-C<Size(ps)>,
-the "size" of C<ps>,
-is the minimum "size" of any parse in C<ps>.
-Then, if C<p-lh> is a parse in C<ps> and if,
+Let C<Items(p)> be
+the number of items in C<p>.
+Let C<Items(ps)>,
+be the minimum "size" of any parse in C<ps>.
+Then, if C<lh> is a parse in C<ps> and if,
 for every parse C<p> in parse set C<ps>,
-C<< Size(p-lh) <= Size(p) >>,
-we say that C<p-lh> is a "longest highest" parse.
+C<< Items(lh) <= Items(p) >>,
+we say that C<lh> is a "longest highest" parse.
 
 To conveniently represent token strings
 we will represent them as literal strings
@@ -1172,12 +1192,12 @@ As an example,
 Let C<W> be C<v=vv=v>,
 let C<seq1> be C<(v=v)(v=v)> and
 let C<seq2> be C<(v=)(v)(v=)(v)>.
-Let C<first> be 3 and C<last> be 5,
+Let C<first> be 4 and C<last> be 6,
 so that C<sub1> is C<(v=v)>
 and C<sub2> is C<(v=)(v)>.
 Then C<seq3> is C<(v=v)(v=)(v)>.
 We claimed that C<seq3> must be a factoring of C<W>,
-and we can see that that is the case.
+and we can see that our claim is correct.
 
 B<(4)>:
 Recall the L<discussion of G1
@@ -1190,12 +1210,12 @@ let C<First(it1)> be first G1 location of
 an item C<it1>,
 and let C<Last(it1)> be last G1 location of
 C<it1>.
-Then if,
+Let C<i>
+be a G1 fencepost C<i> such that,
 for every item C<it>,
-G1 fencepost C<i> is such that
-C<< i <= First(it)  >> or
-C<< i > Last(it)  >>,
-then G1 fencepost C<i> is a factoring barrier.
+either C<< i <= First(it)  >> or
+C<< i > Last(it)  >>.
+Then G1 fencepost C<i> is a factoring barrier.
 
 B<(5)>:
 Where C<|W|> is the length of C<W>,
@@ -1212,12 +1232,12 @@ Let a "subfactoring" be a sequence of
 items bounded by factoring barriers.
 
 B<(8)>:
-Let a "maximal subfactoring" be subfactoring
+Let a "minimal subfactoring" be a subfactoring
 which does not properly contain any
 factoring barriers.
 From (5) and (6) we can see that C<W>
 can be divided into
-one or more maximal subfactorings.
+one or more minimal subfactorings.
 
 B<(9)>:
 We can see from C<G>
@@ -1234,13 +1254,13 @@ Every item begins with a C<< <VAR> >>
 token.
 
 B<(11)>:
-Every maximal subfactoring starts with
+Every minimal subfactoring starts with
 a C<< <VAR> >> token.
-This is because every maximal subfactoring starts
+This is because every subfactoring starts
 with an item, and from (10).
 
 B<(12)>:
-Every maximal subfactoring start with
+Every minimal subfactoring start with
 a C<< <VAR> >> token and
 alternates
 equal signs and C<< <VAR> >> tokens:
@@ -1249,7 +1269,7 @@ that is, it has the pattern
 This follows from (9) and (11).
 
 B<(13)>:
-We will call a maximal subfactoring
+We will call a minimal subfactoring
 "var-bounded" or simply "bounded"
 if it starts and ends with a
 C<< <VAR> >> token.
@@ -1258,7 +1278,7 @@ has the pattern
 "C<v=v=v= ... v>".
 
 B<(14)>:
-We will call a maximal subfactoring
+We will call a minimal subfactoring
 "var-unbounded" or simply "unbounded"
 if it is not var-bounded.
 By (12), this means that it
@@ -1268,14 +1288,17 @@ has the pattern
 B<(15)>:
 If a C<< <Item1> >> or
 C<< <Item3> >> occurs in
-a maximal subfactoring,
+a minimal subfactoring,
 it is the last item in that subfactoring.
-To show this, assume for a reduction ad absurdam
-there is a maximal subfactoring with a non-final
+
+To show this, assume for a reductio ad absurdam
+there is a minimal subfactoring with a non-final
 C<< <Item1> >> or
 C<< <Item3> >>.
 Call that subfactoring C<f>,
 and call that item, C<it1>.
+
+B<(15a)>:
 Both
 C<< <Item1> >> and
 C<< <Item3> >>
@@ -1283,15 +1306,22 @@ end with a
 C<< <VAR> >> token,
 so that C<it1> ends in a
 C<< <VAR> >> token.
+
+B<(15b)>:
 Since C<it1>, by assumption for the reductio,
 is non-final, there is a next item.
 Call the next item C<it2>.
 
+B<(15c)>:
 By (10),
 all items start with
 C<< <VAR> >> tokens,
-so that C<it2> start with a
+so that C<it2> starts with a
 C<< <VAR> >> token.
+
+B<(15d)>:
+From (15a) and (15c),
+we know that
 C<it1> ends with a
 C<< <VAR> >> token
 and
@@ -1301,20 +1331,34 @@ so that there are two
 C<< <VAR> >> tokens
 at the fencepost between C<it1>
 and C<it2>.
-Therefore, there is a factoring barrier
+
+B<(15e)>:
+From (15d),
+there is a factoring barrier
 at the fencepost between C<it1>
 and C<it2>.
 
-The fencepost between C<it1>
+B<(15f)>:
+All items, including C<it1>
+and C<it2>
+and of non-zero length
+so that, from (15e),
+we know that the fencepost between C<it1>
 and C<it2>
 is properly
-inside subfactoring C<f>,
-which means there is a factoring barrier
+inside subfactoring C<f>.
+
+
+B<(15g)>:
+From (15f)
+we see that there is a factoring barrier
 properly inside C<f>.
 But C<f> is assumed for the reductio
-to be maximal and therefore cannot
+to be minimal and therefore cannot
 properly contain a factoring barrier.
-This shows the reductio,
+
+B<(15h)>:
+(15g) shows the reductio,
 and allows us to conclude that,
 if C<f> contains an
 C<< <Item1> >> or
@@ -1323,17 +1367,17 @@ that item must be the final item.
 This is what we needed to show for (15).
 
 B<(16)>:
-By (3), every maximal subfactoring is independent --
+By (3), every minimal subfactoring is independent --
 in other words, no ambiguity crosses factoring barriers.
 So we narrow our consideration of ambiguities to two cases:
-ambiguities in unbounded maximal subfactorings, and
-ambiguities in bounded maximal subfactorings.
+ambiguities in unbounded minimal subfactorings, and
+ambiguities in bounded minimal subfactorings.
 
 B<(17)>:
-Every unbounded maximal subfactoring is unambiguous.
+Every unbounded minimal subfactoring is unambiguous.
 To show (17), let C<u> be an
-unbounded maximal subfactoring.
-It follows from the definition of unbounded maximal subfactoring
+unbounded minimal subfactoring.
+It follows from the definition of unbounded minimal subfactoring
 (14), that C<u>
 ends in an equal sign.
 Both C<< <Item1> >> and
@@ -1356,7 +1400,7 @@ is unambiguous,
 which shows (17).
 
 B<(18)>:
-Every bounded maximal subfactoring parses either
+Every bounded minimal subfactoring parses either
 as a sequence of C<Item2>'s followed by
 an C<Item1>;
 or as
@@ -1566,11 +1610,11 @@ fewer items than the alternative.
 
 B<(35)>:
 From (19) we know that there is at
-most one ambiguity per maximal subfactoring.
+most one ambiguity per minimal subfactoring.
 From (16) we know that ambiguity resolutions
-of a maximal subfactoring are independent
+of a minimal subfactoring are independent
 of the ambiguity resolutions
-in other maximal subfactorings.
+in other minimal subfactorings.
 From (34) we know that every subfactoring
 in C<P-ranked> has exactly one factoring,
 and that that factoring
