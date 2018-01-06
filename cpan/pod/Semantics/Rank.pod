@@ -1292,7 +1292,7 @@ C<< <Item3> >> occurs in
 a minimal subfactoring,
 it is the last item in that subfactoring.
 
-To show this, assume for a reductio ad absurdam
+To show (15), assume for a reductio ad absurdam
 there is a minimal subfactoring with a non-final
 C<< <Item1> >> or
 C<< <Item3> >>.
@@ -1388,7 +1388,7 @@ C<< <Item1> >> or
 C<< <Item3> >> can be the last item
 in C<u>.
 Therefore, by (15),
-There is no
+there is no
 C<< <Item1> >> or
 C<< <Item3> >> item
 in C<u>.
@@ -1407,11 +1407,12 @@ an C<Item1>;
 or as
 as a sequence of C<Item2>'s followed by
 an C<Item3>.
-This follows from (1) and (15).
+This follows from (1), (13) and (15).
 
 B<(19)>:
 From (16), (17) and (18) it follows that
-every ambiguous subfactoring is an bounded subfactoring
+every ambiguity between subfactoring is between
+bounded subfactorings
 whose divisions into items take the two forms
 
 =for Marpa::R3::Display
@@ -1444,8 +1445,8 @@ can only be found at G1 location 2 or after.
 We know this from C<G> and (EARLEY).
 
 B<(22)>
-At most one choice with C<Item1> as its last item
-appears in any choicepoint.
+At most one dotted production with C<Item1> as its last item
+appears in a cause at any choicepoint.
 We know this because all choices of a choicepoint
 must be completions with the same current location,
 and from (20) and (21).
@@ -1461,8 +1462,8 @@ can only be found at G1 location 4 or after.
 We know this from C<G> and (EARLEY).
 
 B<(25)>
-At most one choice with C<Item3> as its last item
-appears in any choicepoint.
+At most one dotted production with C<Item3> as its last item
+appears in a cause at any choicepoint.
 We know this because all choices of a choicepoint
 must be completions with the same current location,
 and from (23) and (24).
@@ -1498,12 +1499,13 @@ We call this choicepoint C<result>.
 We will see as we proceed that,
 while the choicepoints may have different dotted rules,
 our choice of one of them for C<result> makes no difference in
-the ranking logic --
-all of them have the same dot position
-the same predot symbol,
-and the same current location,
-and those will be the only properties of the choicepoint
-that we use.
+the ranking logic.
+The only properties of the C<result>
+that we will use are
+dot position,
+predot symbol,
+and current location.
+These properties are the same for every choice C<result>.
 
 B<(27)>:
 At this point,
@@ -1548,9 +1550,9 @@ From (19) and (EARLEY) we know that dotted productions
 ending in C<Item2> are not valid choices at location C<current>.
 
 B<(30)>:
-From (19) and (EARLEY) we know
-that at least one of the following two dotted rules
-must be a valid choice:
+From (19), (22) and (EARLEY) we know
+that exactly one of the following two dotted rules
+is the cause of a parse choice for C<result>:
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1561,19 +1563,9 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 B<(31)>:
-From (22) we know that instances of both
-dotted productions in (30) cannot have the same
-current location,
-and therefore cannot be choices in the same choicepoint.
-Therefore at most one of the causes in (30) is a possible
-cause of C<result>.
-
-B<(32)>:
-We now repeat the reasoning we just followed for C<Item1>
-for C<Item3>.
-From (19) and (EARLEY) we know
-that at least one of the following two dotted rules
-must be a valid choice:
+From (19), (25) and (EARLEY) we know
+that exactly one of the following two dotted rules
+is the cause of a parse choice for C<result>:
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1583,16 +1575,8 @@ ignore: 1
 
 =for Marpa::R3::Display::End
 
-B<(33)>:
-From (25) we know that instances of both
-dotted productions in (32) cannot have the same
-current location,
-and therefore cannot be choices in the same choicepoint.
-Therefore at most one of the causes in (32) is a possible
-cause of C<result>.
-
-B<(34)>:
-From (28), (29), (31) and (33) we know that we will
+B<(32)>:
+From (28), (29), (30) and (31) we know that we will
 have exactly two choices for C<result>;
 that the final symbol of the cause in one will be
 C<Item1>; and
@@ -1609,14 +1593,14 @@ is C<Item3> will be the only one kept in C<P-ranked>.
 We further see from (19) that this choice will have
 fewer items than the alternative.
 
-B<(35)>:
+B<(33)>:
 From (19) we know that there is at
 most one ambiguity per minimal subfactoring.
 From (16) we know that ambiguity resolutions
 of a minimal subfactoring are independent
 of the ambiguity resolutions
 in other minimal subfactorings.
-From (34) we know that every subfactoring
+From (32) we know that every subfactoring
 in C<P-ranked> has exactly one factoring,
 and that that factoring
 is the one with the fewest items.
