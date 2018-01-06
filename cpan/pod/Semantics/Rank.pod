@@ -1411,7 +1411,7 @@ This follows from (1), (13) and (15).
 
 B<(19)>:
 From (16), (17) and (18) it follows that
-every ambiguity between subfactoring is between
+every ambiguity between subfactorings is between
 bounded subfactorings
 whose divisions into items take the two forms
 
@@ -1472,11 +1472,11 @@ B<(26)>:
 Consider the ambiguity shown in
 (19) and let C<current> be the G1 fencepost at its end.
 An item also ends at G1 so from C<G> and (EARLEY),
-we know that there is at least one dotted rule instance
+we know that there is at least one dotted production instance
 whose predot symbol is C<List> and whose current
 location is C<current>.
 The choicepoint can
-have one of these dotted rules
+have one of these dotted productions
 
 =for Marpa::R3::Display
 ignore: 1
@@ -1497,7 +1497,7 @@ Of the choicepoints fulfilling the criteria,
 we arbitrarily pick one.
 We call this choicepoint C<result>.
 We will see as we proceed that,
-while the choicepoints may have different dotted rules,
+while the choicepoints may have different dotted productions,
 our choice of one of them for C<result> makes no difference in
 the ranking logic.
 The only properties of the C<result>
@@ -1551,7 +1551,7 @@ ending in C<Item2> are not valid choices at location C<current>.
 
 B<(30)>:
 From (19), (22) and (EARLEY) we know
-that exactly one of the following two dotted rules
+that exactly one of the following two dotted productions
 is the cause of a parse choice for C<result>:
 
 =for Marpa::R3::Display
@@ -1564,7 +1564,7 @@ ignore: 1
 
 B<(31)>:
 From (19), (25) and (EARLEY) we know
-that exactly one of the following two dotted rules
+that exactly one of the following two dotted productions
 is the cause of a parse choice for C<result>:
 
 =for Marpa::R3::Display
@@ -1576,7 +1576,7 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 B<(32)>:
-From (28), (29), (30) and (31) we know that we will
+From (29), (30) and (31) we know that we will
 have exactly two choices for C<result>;
 that the final symbol of the cause in one will be
 C<Item1>; and
