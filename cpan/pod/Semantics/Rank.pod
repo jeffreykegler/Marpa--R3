@@ -302,13 +302,13 @@ and this document will mostly ignore predecessors.
 
 Since it is a choicepoint, a cause choicepoint
 must also be a triple.
-Let the result of C<cp-cuz> be
-C<cp-res>.
-Let the triple for for C<cp-cuz> be C<(cuz-dp, cuz-origin, cuz-current)>.
+Let the result of C<cuz> be
+C<res>.
+Let the triple for for C<cuz> be C<(cuz-dp, cuz-origin, cuz-current)>.
 Let the
-triple for for C<cp-res> be C<(res-dp, res-origin, res-current)>.
+triple for for C<res> be C<(res-dp, res-origin, res-current)>.
 
-If C<cp-res> is the result of C<cp-cuz>, then
+If C<res> is the result of C<cuz>, then
 
 =over 4
 
@@ -317,23 +317,23 @@ If C<cp-res> is the result of C<cp-cuz>, then
 C<cuz-current> is always the same as
 C<res-current>.
 In other words,
-the current location of C<cp-cuz>
-is the same as the current location of C<cp-res>.
+the current location of C<cuz>
+is the same as the current location of C<res>.
 
 =item *
 
 C<cuz-origin> is before C<res-current>.
 In other words,
-the origin of C<cp-cuz>
-is before the current location of C<cp-res>.
+the origin of C<cuz>
+is before the current location of C<res>.
 
 =item *
 
 C<cuz-origin>
 is at or after C<res-origin>.
 In other words,
-the origin of C<cp-cuz>
-is at or after the origin of C<cp-res>.
+the origin of C<cuz>
+is at or after the origin of C<res>.
 While it is not always properly between
 C<res-origin> and C<res-current>,
 C<cuz-origin> is always in the range bounded
@@ -350,12 +350,12 @@ B<middle location> of the parse choice.
 
 =item *
 
-The dotted production of C<cp-cuz> will be a completion.
+The dotted production of C<cuz> will be a completion.
 
 =item *
 
-The LHS of the dotted production of C<cp-cuz> will be
-the predot symbol of C<cp-res>.
+The LHS of the dotted production of C<cuz> will be
+the predot symbol of C<res>.
 
 =back
 
