@@ -1430,7 +1430,7 @@ ignore: 1
 "C<(v=) ... (v=v)>"
 
 B<Part 2>:
-We have now shown how pure parsing works for the
+We have now shown how pure BNF parsing works for the
 grammar in the synopsis.
 We next show the consequences of ranking.
 
@@ -1505,18 +1505,18 @@ that we will use are
 dot position,
 predot symbol,
 and current location.
-These properties are the same for every choice C<result>.
+These properties are the same of which choicepoint
+we picked for C<result>.
 
 B<(27)>:
-At this point,
-it will be useful to examine the possible
-"middle locations" of the choices of C<result>.
-(Recall that the "middle location" of a choice
-is always the origin of its cause.)
+Recall that the "middle location" of a choice
+is always the origin of its cause.
 From (26) we see that,
 for every possible rule in C<result>,
-the predot symbol is the first symbol.
-This means that the origin of the of the choices
+the predot symbol is the first symbol of the
+dotted production.
+This means that the origin of the causes of
+C<result>
 must be the same as the origin of C<result>.
 From (26) we also know that
 the origin of C<result> is always location 0.
@@ -1550,7 +1550,7 @@ From (19) and (EARLEY) we know that dotted productions
 ending in C<Item2> are not valid choices at location C<current>.
 
 B<(30)>:
-From (19), (22) and (EARLEY) we know
+From (19), (22), (28) and (EARLEY) we know
 that exactly one of the following two dotted productions
 is the cause of a parse choice for C<result>:
 
@@ -1563,7 +1563,7 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 B<(31)>:
-From (19), (25) and (EARLEY) we know
+From (19), (25), (28) and (EARLEY) we know
 that exactly one of the following two dotted productions
 is the cause of a parse choice for C<result>:
 
@@ -1576,7 +1576,7 @@ ignore: 1
 =for Marpa::R3::Display::End
 
 B<(32)>:
-From (29), (30) and (31) we know that we will
+From (28), (29), (30) and (31) we know that we will
 have exactly two choices for C<result>;
 that the final symbol of the cause in one will be
 C<Item1>; and
