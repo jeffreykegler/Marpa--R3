@@ -1505,7 +1505,8 @@ that we will use are
 dot position,
 predot symbol,
 and current location.
-These properties are the same of which choicepoint
+These properties are the same
+regardless of which choicepoint
 we picked for C<result>.
 
 B<(27)>:
