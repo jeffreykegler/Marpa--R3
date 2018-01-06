@@ -11,10 +11,7 @@
 # of the licenses in the directory LICENSES.
 
 # Temporary
-^grep[.]pl$
-^look1[.]t$
-^look2[.]t$
-^progress1[.]t$
+^dump_ast[.]pl$
 
 # Permanent
 
@@ -23,8 +20,6 @@
 /errs$
 /junk$
 /junk2$
-^doit[.]out$
-^test[.]out$
 [.]DS_Store$
 [.]a$
 [.]gitignore$
@@ -59,6 +54,7 @@
 ^blib/
 ^blib_shared/
 ^doit$
+^doit[.]out$
 ^dovg[.]log$
 ^engine/MYMETA.
 ^engine/Makefile$
@@ -135,6 +131,7 @@
 ^pm_to_blib$
 ^pod2htmd[.]tmp
 ^pod2htmi[.]tmp
+^test[.]out$
 ^xs/MYMETA[.]
 ^xs/Makefile$
 ^xs/Makefile[.]old$

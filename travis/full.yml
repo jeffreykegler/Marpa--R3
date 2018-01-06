@@ -1,0 +1,25 @@
+# the "full" travis file, for pre-release
+language: perl
+perl:
+  - "5.26"
+  - "5.24"
+  - "5.24-shrplib"  # at least one perl with threading support
+  - "5.10"  # minimum supported version
+
+# install prerequisites
+install:
+  # for debugging, output available perls
+  - perlbrew list
+  # install dependencies without testing, for speed
+  - (cd cpan/ && cpanm --installdeps --quiet --notest .)
+
+# build Marpa and execute tests
+script:
+  - make full_test
+  - (cd cpan/ && make distcheck)
+  - (cd cpan/ && make dist)
+
+sudo: false  # faster builds using containers
+
+notifications:
+  irc: "irc.freenode.net#marpa"

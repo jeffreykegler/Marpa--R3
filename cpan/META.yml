@@ -58,21 +58,21 @@ no_index:
     - engine
     - author.t
   namespace:
-    - Marpa::R3::Value
     - Marpa::R3::Perl
     - Marpa::R3::Test
     - Marpa::R3::Display
-    - Marpa::R3::Inner
-    - Marpa::R3::Internal
+    - Marpa::R3::Internal_G
+    - Marpa::R3::Internal_R
+    - Marpa::R3::Internal_V
     - Marpa::R3::MetaAST
     - Marpa::R3::MetaG
   package:
-    - Marpa::R3::Value
     - Marpa::R3::Perl
     - Marpa::R3::Test
     - Marpa::R3::Display
-    - Marpa::R3::Inner
-    - Marpa::R3::Internal
+    - Marpa::R3::Internal_G
+    - Marpa::R3::Internal_R
+    - Marpa::R3::Internal_V
     - Marpa::R3::MetaAST
     - Marpa::R3::MetaG
 requires:
@@ -100,5 +100,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: git://github.com/jeffreykegler/Marpa--R3.git
-version: 4.001_050
+version: 4.001_051
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
