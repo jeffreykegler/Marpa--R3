@@ -411,7 +411,7 @@ We have not examined the internal structure of
 predecessors, but ranking is not based on them
 for the same reason:
 the production of a predecessor is always
-the same of the production of its result choicepoint,
+the same as the production of its result choicepoint,
 and therefore the production of its predecessor
 is the same for every parse choice of a choicepoint.
 
@@ -564,7 +564,7 @@ in the sequence of items,
 and that ambiguities always
 take the form "C<(v=)(v)>" versus
 "C<(v=v)>".
-Therefore the only non-trivial parse choices are
+Therefore the only causes of non-trivial parse choices are
 
 =for Marpa::R3::Display
 ignore: 1
@@ -580,8 +580,8 @@ ignore: 1
 
 Further study of the grammar shows that the first non-trivial
 choice must be between
-parse choice with
-these two cause choicepoints:
+two parse choices with
+these cause choicepoints:
 
 =for Marpa::R3::Display
 ignore: 1
@@ -781,8 +781,8 @@ for the compact examples.
 
 It is generally better, when possible,
 to write a language as BNF, instead of using ranking.
-The advantage of using BNF is that you can easily determine
-exactly what language it is that you are parsing.
+The advantage of using BNF is that you can more readily determine
+exactly what language it is that you are parsing:
 Ranked grammars make look easier to analyze at first glance,
 but the more you look at them the more tricky you
 realize they are.
@@ -791,7 +791,7 @@ These "pure BNF" reimplementations rely on an observation
 used in L<the detailed proof of the ranked BNF
 example|/"Proof of correctness">:
 The parse string becomes easier to analyze
-when you see as a sequence of "var-bounded"
+when you see it as a sequence of "var-bounded"
 substrings,
 where "var-bounded" means the substring is
 delimited by the start of the string,
@@ -898,7 +898,7 @@ This results in a parser whose behavior is to a large extent unknown.
 Marpa with ranking allows a safer form of PEG-style parsing.
 Both Marpa's DSL and PEG allow the implementer to specify
 any context-free grammar,
-but Marpa parse all context-free grammars correctly,
+but Marpa parses all context-free grammars correctly,
 while PEG only correctly parses a small subset of the context-free grammars
 and fakes the rest.
 
@@ -1087,8 +1087,9 @@ the parse as a whole suboptimal.
 We will define a "longest highest" parse of C<W> as
 one of the parses of C<W> with the fewest "items".
 This is based on the observations
-that C<W> is fixed in length,
-and that if items are longer,
+that C<W> is fixed in length;
+and that,
+if items are longer,
 fewer of them will fit into C<W>.
 
 More formally,
@@ -1097,7 +1098,7 @@ and let C<ps> be a parse set.
 Let C<Items(p)> be
 the number of items in C<p>.
 Let C<Items(ps)>,
-be the minimum "size" of any parse in C<ps>.
+be the minimum number of items of any parse in C<ps>.
 Then, if C<lh> is a parse in C<ps> and if,
 for every parse C<p> in parse set C<ps>,
 C<< Items(lh) <= Items(p) >>,
@@ -1333,7 +1334,7 @@ at the fencepost between C<it1>
 and C<it2>.
 
 B<(15e)>:
-From (15d),
+From (9) and (15d),
 there is a factoring barrier
 at the fencepost between C<it1>
 and C<it2>.
