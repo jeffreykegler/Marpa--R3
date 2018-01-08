@@ -1,4 +1,4 @@
-# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+# Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
@@ -20,7 +20,7 @@ use Fatal qw(open close read);
 use File::Spec;
 use Text::Diff ();
 
-my $lgpl_copyright_line = q{Copyright 2017 Jeffrey Kegler};
+my $lgpl_copyright_line = q{Copyright 2018 Jeffrey Kegler};
 ( my $copyright_line_in_tex = $lgpl_copyright_line )
     =~ s/ ^ Copyright \s /Copyright \\copyright\\ /xms;
 
@@ -50,7 +50,7 @@ END_OF_STRING
 
 my $lgpl_license = "$lgpl_copyright_line\n$lgpl_license_body";
 
-my $perl_copyright_line = 'Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.';
+my $perl_copyright_line = 'Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.';
 
 my $perl_license_body = <<'END_OF_STRING';
 This module is free software; you can redistribute it and/or modify it
@@ -99,7 +99,7 @@ my $license_in_tex =
 $license_in_tex =~ s/^$/\\smallskip\\noindent/gxms;
 
 my $texi_copyright = <<'END_OF_TEXI_COPYRIGHT';
-Copyright @copyright{} 2017 Jeffrey Kegler.
+Copyright @copyright{} 2018 Jeffrey Kegler.
 END_OF_TEXI_COPYRIGHT
 
 my $fdl_license = <<'END_OF_FDL_LANGUAGE';
@@ -141,7 +141,7 @@ sub c_comment {
 my $c_license          = c_comment($perl_license);
 my $c_mit_license          = c_comment($mit_license);
 my $c_mit_license_2015          = $c_mit_license;
-    $c_mit_license_2015          =~ s/2017/2015/xms;
+    $c_mit_license_2015          =~ s/2018/2015/xms;
 my $lua_license = hash_comment($mit_license, q{--});
 my $xs_license          = c_comment($perl_license);
 my $r2_hash_license    = hash_comment($lgpl_license);
@@ -325,7 +325,7 @@ my %files_by_type = (
     'etc/OLD_libmarpa_test.sh'              => \&trivial,
     'etc/reserved_check.sh'             => \&trivial,
     'kollos/miranda'             =>
-        gen_license_problems_in_text_file($lua_license, '2017'),
+        gen_license_problems_in_text_file($lua_license, '2018'),
     'engine/LOG_DATA'                 => \&ignored,    # not worth the trouble
     'engine/cf/LIBMARPA_MODE'         => \&trivial,
     'engine/cf/INSTALL.SKIP' => \&trivial,
@@ -507,9 +507,9 @@ sub file_type {
     return \&license_problems_in_fdl_file
         if $filepart eq 'api.texi';
     return \&license_problems_in_pod_file if $filepart =~ /[.]pod \z/xms;
-    return gen_license_problems_in_text_file($lua_license, '2017')
+    return gen_license_problems_in_text_file($lua_license, '2018')
         if $filepart =~ /[.] (lua) \z /xms;
-    return gen_license_problems_in_text_file($md_license, '2017')
+    return gen_license_problems_in_text_file($md_license, '2018')
         if $filepart =~ /[.] (md) \z /xms;
     return gen_license_problems_in_c_file($xs_license)
         if $filepart =~ /[.] (xs) \z /xms;
@@ -591,7 +591,7 @@ sub gen_license_problems_in_hash_file {
     my ($license, $year) = @_;
     $license //= $perl_hash_license;
     if ($year) {
-       $license =~ s/2017/$year/;
+       $license =~ s/2018/$year/;
     }
     return sub {
         my ( $filename, $verbose ) = @_;
@@ -687,7 +687,7 @@ sub gen_license_problems_in_perl_file {
     my ($license, $year) = @_;
     my $perl_license = $license // $r2_hash_license;
     if ($year) {
-        $perl_license =~ s/2017/$year/xms;
+        $perl_license =~ s/2018/$year/xms;
     }
     return sub {
         my ( $filename, $verbose ) = @_;
@@ -944,7 +944,7 @@ sub license_problems_in_pod_file {
 sub gen_license_problems_in_text_file {
     my ($license, $year) = @_;
     if ($year) {
-        $license =~ s/2017/$year/xms;
+        $license =~ s/2018/$year/xms;
     }
     return sub {
         my ( $filename, $verbose ) = @_;
