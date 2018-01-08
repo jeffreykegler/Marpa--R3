@@ -1,4 +1,4 @@
-# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+# Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
@@ -243,9 +243,9 @@ called the C<current location> of the choicepoint.
 
 The choicepoint is a prediction choicepoint if
 C<dp> is a prediction.
-The choicepoint is a token choicepoint if
+The choicepoint is a lexeme choicepoint if
 it is not a prediction choicepoint and
-the predot symbol of C<dp> is a token symbol.
+the predot symbol of C<dp> is a lexeme symbol.
 The choicepoint is a production choicepoint if
 it is not a prediction choicepoint and
 the predot symbol of C<dp> is the LHS of a production.
@@ -263,7 +263,7 @@ and left-to-right.
 Often, there is only one parse choice.
 When there is only one parse choice,
 the choicepoint is said to be B<trivial>.
-Prediction and token choicepoints are always trivial.
+Prediction and lexeme choicepoints are always trivial.
 If all of the choicepoints of a parse
 are trivial,
 the parse is unambiguous.
@@ -504,7 +504,7 @@ C<< <Item3> >>,
 C<< <Item2> >> and
 C<< <Item1> >>.
 The "longest" choice is considered to be the one
-with the most tokens.
+with the most lexemes.
 Working this idea out for this grammar,
 we see that the items
 should rank,
@@ -797,7 +797,7 @@ where "var-bounded" means the substring is
 delimited by the start of the string,
 the end of the string,
 or the fencepost between
-two C<< <VAR> >> tokens.
+two C<< <VAR> >> lexemes.
 
 =head3 Longest highest as pure BNF
 
@@ -1077,7 +1077,7 @@ Here we make our idea of "longest highest"
 explicit and justify it.
 
 What "longest highest" means locally is reasonably obvious --
-if C<item3> has more tokens than C<item1>,
+if C<item3> has more lexemes than C<item1>,
 then C<item3> is "longer" than C<item1>.
 It is less clear what it means globally.
 Items might overlap,
@@ -1104,12 +1104,12 @@ for every parse C<p> in parse set C<ps>,
 C<< Items(lh) <= Items(p) >>,
 we say that C<lh> is a "longest highest" parse.
 
-To conveniently represent token strings
+To conveniently represent lexeme strings
 we will represent them as literal strings
 where
-"C<v>" stands for a C<< <VAR> >> tokens
+"C<v>" stands for a C<< <VAR> >> lexemes
 and equal signs represent themselves.
-For example, we might represent the token
+For example, we might represent the lexeme
 string
 
 =for Marpa::R3::Display
@@ -1152,11 +1152,11 @@ one of the symbols
 C<Item1>,
 C<Item2> or
 C<Item3>.
-When we want to show a token string's division into
+When we want to show a lexeme string's division into
 items, we will enclose them in parentheses.
 For example "C<(v=)(v=)(v)>" will indicate that
-the token string is divided into 3 items; and
-"C<(v=)(v=v)>" will represent the same token string
+the lexeme string is divided into 3 items; and
+"C<(v=)(v=v)>" will represent the same lexeme string
 divided into 2 items.
 
 B<(2) "Factoring">:
@@ -1252,19 +1252,19 @@ a factoring barrier.
 B<(10)>:
 No item begins with an equal sign ("C<=>").
 Every item begins with a C<< <VAR> >>
-token.
+lexeme.
 
 B<(11)>:
 Every minimal subfactoring starts with
-a C<< <VAR> >> token.
+a C<< <VAR> >> lexeme.
 This is because every subfactoring starts
 with an item, and from (10).
 
 B<(12)>:
 Every minimal subfactoring start with
-a C<< <VAR> >> token and
+a C<< <VAR> >> lexeme and
 alternates
-equal signs and C<< <VAR> >> tokens:
+equal signs and C<< <VAR> >> lexemes:
 that is, it has the pattern
 "C<v=v=v= ...>".
 This follows from (9) and (11).
@@ -1273,7 +1273,7 @@ B<(13)>:
 We will call a minimal subfactoring
 "var-bounded" or simply "bounded"
 if it starts and ends with a
-C<< <VAR> >> token.
+C<< <VAR> >> lexeme.
 By (12), this means that it
 has the pattern
 "C<v=v=v= ... v>".
@@ -1304,9 +1304,9 @@ Both
 C<< <Item1> >> and
 C<< <Item3> >>
 end with a
-C<< <VAR> >> token,
+C<< <VAR> >> lexeme,
 so that C<it1> ends in a
-C<< <VAR> >> token.
+C<< <VAR> >> lexeme.
 
 B<(15b)>:
 Since C<it1>, by assumption for the reductio,
@@ -1316,20 +1316,20 @@ Call the next item C<it2>.
 B<(15c)>:
 By (10),
 all items start with
-C<< <VAR> >> tokens,
+C<< <VAR> >> lexemes,
 so that C<it2> starts with a
-C<< <VAR> >> token.
+C<< <VAR> >> lexeme.
 
 B<(15d)>:
 From (15a) and (15c),
 we know that
 C<it1> ends with a
-C<< <VAR> >> token
+C<< <VAR> >> lexeme
 and
 C<it2> starts with a
-C<< <VAR> >> token,
+C<< <VAR> >> lexeme,
 so that there are two
-C<< <VAR> >> tokens
+C<< <VAR> >> lexemes
 at the fencepost between C<it1>
 and C<it2>.
 
@@ -1382,7 +1382,7 @@ It follows from the definition of unbounded minimal subfactoring
 (14), that C<u>
 ends in an equal sign.
 Both C<< <Item1> >> and
-C<< <Item3> >> end in C<< <VAR> >> tokens,
+C<< <Item3> >> end in C<< <VAR> >> lexemes,
 so that no
 C<< <Item1> >> or
 C<< <Item3> >> can be the last item
@@ -1471,7 +1471,7 @@ and from (23) and (24).
 B<(26)>:
 Consider the ambiguity shown in
 (19) and let C<current> be the G1 fencepost at its end.
-An item also ends at G1 so from C<G> and (EARLEY),
+An item also ends at C<current> so from C<G> and (EARLEY),
 we know that there is at least one dotted production instance
 whose predot symbol is C<List> and whose current
 location is C<current>.
@@ -1615,7 +1615,7 @@ B<QED>.
 =for Marpa::R3::Display
 ignore: 1
 
-  Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+  Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.
 
   This module is free software; you can redistribute it and/or modify it
   under the same terms as Perl 5.10.1. For more details, see the full text

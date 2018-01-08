@@ -1,5 +1,5 @@
-# Copyright 2017 Jeffrey Kegler
-# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+# Copyright 2018 Jeffrey Kegler
+# Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
@@ -68,7 +68,7 @@ say "\n1;";
 BEGIN {
 
 $HEADER = <<'END_OF_HEADER';
-# Marpa::R3 is Copyright (C) 2017, Jeffrey Kegler.
+# Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
