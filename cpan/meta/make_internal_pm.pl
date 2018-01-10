@@ -126,10 +126,6 @@ __DATA__
 
     :package=Marpa::R3::Internal_ASF
 
-    { It is important not to keep any references to choicepoints, direct or
-      indirect in this structure.  The resulting circular reference would prevent
-      both structures from being freed, and create a memory leak. }
-
     TRACE_FILE_HANDLE
 
     L { Lua Interpreter }

@@ -43,44 +43,6 @@ our $PACKAGE = 'Marpa::R3::ASF';
 # rules and/or symbols may have extra-syntactic conditions attached making this
 # assumption false.
 
-# Terms:
-
-# NID (Node ID): Encoded ID of either an or-node or an and-node.
-#
-# Extensions:
-# Set "powers":  A set of power 0 is an "atom" -- a single NID.
-# A set of power 1 is a set of NID's -- a nidset.
-# A set of power 2 is a set of sets of NID's, also called a powerset.
-# A set of power 3 is a set of powersets, etc.
-#
-# The whole ID of NID is the external rule id of an or-node, or -1
-# if the NID is for a token and-node.
-#
-# Intensions:
-# A Symch is a nidset, where all the NID's share the same "whole ID"
-# and the same span.  NID's in a symch may differ in their internal rule,
-# or have different causes.  If the symch contains and-node NID's they
-# will all have the same symbol.
-#
-# A choicepoint is a powerset -- a set of symches all of which share
-# the same set of predecessors.  (This set of predecessors is a power 3 set of
-# choicepoints.)  All symches in a choicepoint also share the same span,
-# and the same symch-symbol.  A symch's symbol is the LHS of the rule,
-# or the symbol of the token in the token and-nodes.
-
-# No check for conflicting usage -- value(), asf(), etc.
-# at this point
-sub Marpa::R3::ASF::peak {
-    my ($asf)    = @_;
-    die("Not yet implemented");
-} ## end sub Marpa::R3::ASF::peak
-
-our $NID_LEAF_BASE = -43;
-
-# Range from -1 to -42 reserved for special values
-sub and_node_to_nid { return -$_[0] + $NID_LEAF_BASE; }
-sub nid_to_and_node { return -$_[0] + $NID_LEAF_BASE; }
-
 # Set those common args which are at the Perl level.
 sub asf_common_set {
     my ( $asf, $flat_args ) = @_;
@@ -202,20 +164,6 @@ sub Marpa::R3::ASF::DESTROY {
     local regix = asf.regix
     _M.unregister(_M.registry, regix)
 END_OF_LUA
-}
-
-sub Marpa::R3::ASF::grammar {
-    my ($asf)   = @_;
-    my $slr     = $asf->[Marpa::R3::Internal_ASF::SLR];
-    my $slg = $slr->[Marpa::R3::Internal_R::SLG];
-    return $slg;
-} ## end sub Marpa::R3::ASF::grammar
-
-# TODO -- Document this method
-sub Marpa::R3::ASF::recognizer {
-    my ($asf)   = @_;
-    my $slr     = $asf->[Marpa::R3::Internal_ASF::SLR];
-    return $slr;
 }
 
 # not to be documented
