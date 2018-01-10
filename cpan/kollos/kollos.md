@@ -6134,20 +6134,6 @@ which is not kept in the registry.
         local raw_arg
 
         -- 'end' named argument --
-        local start_of_parse
-        raw_arg = flat_args.start
-        if raw_arg then
-            local value = math.tointeger(raw_arg)
-            if not value then
-               error(string.format(
-                   'Bad value for "start" named argument: %s',
-                   inspect(raw_arg)))
-            end
-            start_of_parse = value
-            flat_args.start = nil
-        end
-
-        -- 'end' named argument --
         local end_of_parse
         raw_arg = flat_args["end"]
         if raw_arg then
@@ -6158,11 +6144,7 @@ which is not kept in the registry.
                    inspect(raw_arg)))
             end
             end_of_parse = value
-            flat_args["end"] = nil
         end
-
-        asf:common_set(flat_args, {'start', 'end'})
-
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = g1r:latest_earley_set()
         end
@@ -6174,37 +6156,41 @@ which is not kept in the registry.
             ]])
         end
 
-        local g1_end = g1r:latest_earley_set()
-        local g1_start = math.tointeger(g1_start_arg) or g1_end
-        if g1_start < 0 then g1_start = g1_end + 1 + g1_start end
-        if g1_start > g1_end or g1_start < 0 then
-             _M._internal_error(
-                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
-                 must be in range 0-%d",
-                 inspect(g1_start_arg, {depth=1}),
-                 g1_end
-             )
+        -- 'start' named argument --
+        local start_of_parse
+        raw_arg = flat_args.start
+        if raw_arg then
+            local value = math.tointeger(raw_arg)
+            if not value then
+              _M.userX('Bad value for "start" named argument: %s',
+                   inspect(raw_arg))
+            end
+            start_of_parse = value
         end
-        local g1_end = math.tointeger(g1_end_arg) or g1_start
-        if g1_end < 0 then g1_end = g1_end + 1 + g1_end end
-        if g1_end > g1_end or g1_end < 0 then
-             _M._internal_error(
-                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
-                 must be in range 0-%d",
-                 inspect(g1_end_arg, {depth=1}),
-                 g1_end
-             )
+        flat_args.start = nil
+        if start_of_parse < 0 then
+            start_of_parse = start_of_parse + end_of_parse
         end
-        g1r:progress_report_start(g1_end)
-        while true do
-            local irlid, dot_position, origin = g1r:progress_item()
-            if not irlid then goto LAST_ITEM end
-            if dot_position ~= -1 then goto NEXT_ITEM end
-            if origin ~= g1_start then goto NEXT_ITEM end
-            ::NEXT_ITEM::
+        if start_of_parse < 0 then
+              _M.userX('"start" named argument is before first G1 location: %s',
+                   inspect(raw_arg))
         end
-        ::LAST_ITEM::
-        g1r:progress_report_finish()
+
+        -- 'top' named argument --
+        local top_xsy_id
+        raw_arg = flat_args["top"]
+        if raw_arg then
+            local value = math.tointeger(raw_arg)
+            if not value or value < 0 then
+               error(string.format(
+                   'Bad value for "top" named argument: %s',
+                   inspect(raw_arg)))
+            end
+            top_xsy_id = value
+        end
+        flat_args["top"] = nil
+
+        asf:common_set(flat_args, {})
 
         return asf_register(asf)
 
