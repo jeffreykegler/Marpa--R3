@@ -3815,7 +3815,7 @@ rule, false otherwise.
         for eim_id = 0, max_eim do
             local trv = _M.traverser_new(l0r, es_id, eim_id)
             local rule_id = trv:rule_id()
-            if not rule_id then goto LAST_EIM end
+            if not rule_id then goto NEXT_EIM end
             local dot = trv:dot()
             if dot >= 0 then goto NEXT_EIM end
             complete_lexemes = true
