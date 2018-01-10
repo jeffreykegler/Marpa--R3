@@ -6161,16 +6161,18 @@ which is not kept in the registry.
             flat_args["end"] = nil
         end
 
-        asf:common_set(flat_args, {'end'})
+        asf:common_set(flat_args, {'start', 'end'})
 
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = g1r:latest_earley_set()
         end
-
-        local ranking_method = slg.ranking_method
-        local ambiguity_level = lmw_b:ambiguity_metric()
-        if ambiguity_level > 2 then ambiguity_level = 2 end
-        asf._ambiguity_level = ambiguity_level
+        if end_of_parse == 0 then
+            _M.userX([[
+                An attempt was make to create an ASF for a null parse\n\z
+                \u{20}  A null parse is a successful parse of a zero-length string\n\z
+                \u{20}  ASF's are not defined for null parses\n\z
+            ]])
+        end
 
         local g1_end = g1r:latest_earley_set()
         local g1_start = math.tointeger(g1_start_arg) or g1_end

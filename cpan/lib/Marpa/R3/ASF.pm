@@ -120,14 +120,6 @@ sub Marpa::R3::ASF::new {
         _M.wrap(function ()
             local asf = slr:asf_new(flat_args)
             if not asf then return 'ok', -1 end
-            local bocage = asf.lmw_b
-            if bocage:is_null() == 1 then
-                error([[
-        An attempt was make to create an ASF for a null parse\n\a
-        \u{20}  A null parse is a successful parse of a zero-length string\n\z
-        \u{20}  ASF's are not defined for null parses\n\z
-        ]])
-            end
             return 'ok', asf.regix
         end)
 END_OF_LUA
