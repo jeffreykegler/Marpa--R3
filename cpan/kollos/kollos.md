@@ -3825,7 +3825,6 @@ rule, false otherwise.
             eager = eager or l0_rules[rule_id].eager
             ::NEXT_EIM::
         end
-        ::LAST_EIM::
         if complete_lexemes then return es_id, eager end
         return
     end
@@ -6197,10 +6196,15 @@ which is not kept in the registry.
             local trv = _M.traverser_new(g1r, es_id, eim_id)
             local dot = trv:dot()
             if dot >= 0 then goto NEXT_EIM end
-            local rule_id = trv:rule_id()
-            if not rule_id then goto LAST_EIM end
             local origin = trv:origin()
             if origin ~= start_of_parse then goto NEXT_EIM end
+            local irl_id = trv:rule_id()
+            if not irl_id then goto NEXT_EIM end
+            if not slg:g1_rule_is_xpr_top(irl_id) then goto NEXT_EIM end
+            local xprid = slg:g1_rule_to_xprid(irlid)
+            local xpr = slg.xprs[xprid]
+            local xsyid = xpr.lhs.id
+            if xsyid ~= top_xsy_id then goto NEXT_EIM end
             ::NEXT_EIM::
         end
         ::LAST_EIM::
