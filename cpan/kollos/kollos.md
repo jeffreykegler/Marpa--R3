@@ -6192,6 +6192,19 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
+        local max_eim = g1r:_earley_set_size(end_of_parse) - 1
+        for eim_id = 0, max_eim do
+            local trv = _M.traverser_new(g1r, es_id, eim_id)
+            local dot = trv:dot()
+            if dot >= 0 then goto NEXT_EIM end
+            local rule_id = trv:rule_id()
+            if not rule_id then goto LAST_EIM end
+            local origin = trv:origin()
+            if origin ~= start_of_parse then goto NEXT_EIM end
+            ::NEXT_EIM::
+        end
+        ::LAST_EIM::
+
         return asf_register(asf)
 
     end
@@ -9193,7 +9206,7 @@ traversers are not a "main sequence" class.
           }
           if (!is_ok) {
               marpa_luaL_error(L,
-                  "problem with traverser_new() arg #2, type was %s",
+                  "problem with ptraverser_new() arg #2, type was %s",
                   marpa_luaL_typename(L, es_ordinal_stack_ix)
               );
           }
