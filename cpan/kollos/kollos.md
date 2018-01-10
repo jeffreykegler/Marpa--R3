@@ -6134,20 +6134,6 @@ which is not kept in the registry.
         local raw_arg
 
         -- 'end' named argument --
-        local start_of_parse
-        raw_arg = flat_args.start
-        if raw_arg then
-            local value = math.tointeger(raw_arg)
-            if not value then
-               error(string.format(
-                   'Bad value for "start" named argument: %s',
-                   inspect(raw_arg)))
-            end
-            start_of_parse = value
-            flat_args.start = nil
-        end
-
-        -- 'end' named argument --
         local end_of_parse
         raw_arg = flat_args["end"]
         if raw_arg then
@@ -6158,51 +6144,66 @@ which is not kept in the registry.
                    inspect(raw_arg)))
             end
             end_of_parse = value
-            flat_args["end"] = nil
         end
-
-        asf:common_set(flat_args, {'end'})
-
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = g1r:latest_earley_set()
         end
+        if end_of_parse == 0 then
+            _M.userX([[
+                An attempt was make to create an ASF for a null parse\n\z
+                \u{20}  A null parse is a successful parse of a zero-length string\n\z
+                \u{20}  ASF's are not defined for null parses\n\z
+            ]])
+        end
 
-        local ranking_method = slg.ranking_method
-        local ambiguity_level = lmw_b:ambiguity_metric()
-        if ambiguity_level > 2 then ambiguity_level = 2 end
-        asf._ambiguity_level = ambiguity_level
+        -- 'start' named argument --
+        local start_of_parse
+        raw_arg = flat_args.start
+        if raw_arg then
+            local value = math.tointeger(raw_arg)
+            if not value then
+              _M.userX('Bad value for "start" named argument: %s',
+                   inspect(raw_arg))
+            end
+            start_of_parse = value
+        end
+        flat_args.start = nil
+        if start_of_parse < 0 then
+            start_of_parse = start_of_parse + end_of_parse
+        end
+        if start_of_parse < 0 then
+              _M.userX('"start" named argument is before first G1 location: %s',
+                   inspect(raw_arg))
+        end
 
-        local g1_end = g1r:latest_earley_set()
-        local g1_start = math.tointeger(g1_start_arg) or g1_end
-        if g1_start < 0 then g1_start = g1_end + 1 + g1_start end
-        if g1_start > g1_end or g1_start < 0 then
-             _M._internal_error(
-                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
-                 must be in range 0-%d",
-                 inspect(g1_start_arg, {depth=1}),
-                 g1_end
-             )
+        -- 'top' named argument --
+        local top_xsy_id
+        raw_arg = flat_args["top"]
+        if raw_arg then
+            local value = math.tointeger(raw_arg)
+            if not value or value < 0 then
+               error(string.format(
+                   'Bad value for "top" named argument: %s',
+                   inspect(raw_arg)))
+            end
+            top_xsy_id = value
         end
-        local g1_end = math.tointeger(g1_end_arg) or g1_start
-        if g1_end < 0 then g1_end = g1_end + 1 + g1_end end
-        if g1_end > g1_end or g1_end < 0 then
-             _M._internal_error(
-                "Marpa::R3::Recognizer::g1_progress_show start index is %d, \z
-                 must be in range 0-%d",
-                 inspect(g1_end_arg, {depth=1}),
-                 g1_end
-             )
+        flat_args["top"] = nil
+
+        asf:common_set(flat_args, {})
+
+        local max_eim = g1r:_earley_set_size(end_of_parse) - 1
+        for eim_id = 0, max_eim do
+            local trv = _M.traverser_new(g1r, es_id, eim_id)
+            local dot = trv:dot()
+            if dot >= 0 then goto NEXT_EIM end
+            local rule_id = trv:rule_id()
+            if not rule_id then goto LAST_EIM end
+            local origin = trv:origin()
+            if origin ~= start_of_parse then goto NEXT_EIM end
+            ::NEXT_EIM::
         end
-        g1r:progress_report_start(g1_end)
-        while true do
-            local irlid, dot_position, origin = g1r:progress_item()
-            if not irlid then goto LAST_ITEM end
-            if dot_position ~= -1 then goto NEXT_ITEM end
-            if origin ~= g1_start then goto NEXT_ITEM end
-            ::NEXT_ITEM::
-        end
-        ::LAST_ITEM::
-        g1r:progress_report_finish()
+        ::LAST_EIM::
 
         return asf_register(asf)
 
@@ -9205,7 +9206,7 @@ traversers are not a "main sequence" class.
           }
           if (!is_ok) {
               marpa_luaL_error(L,
-                  "problem with traverser_new() arg #2, type was %s",
+                  "problem with ptraverser_new() arg #2, type was %s",
                   marpa_luaL_typename(L, es_ordinal_stack_ix)
               );
           }
