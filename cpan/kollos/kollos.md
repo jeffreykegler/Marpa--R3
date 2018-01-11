@@ -6144,6 +6144,7 @@ which is not kept in the registry.
             end
             end_of_parse = value
         end
+        flat_args["end"] = nil
         if not end_of_parse or end_of_parse < 0 then
             end_of_parse = g1r:latest_earley_set()
         end
@@ -6167,6 +6168,7 @@ which is not kept in the registry.
             start_of_parse = value
         end
         flat_args.start = nil
+        start_of_parse = start_of_parse or 0
         if start_of_parse < 0 then
             start_of_parse = start_of_parse + end_of_parse
         end
@@ -6187,27 +6189,32 @@ which is not kept in the registry.
             end
             top_xsy_id = value
         end
+        top_xsy_id = top_xsy_id or slg:start_symbol_id()
         flat_args["top"] = nil
 
         asf:common_set(flat_args, {})
 
         local max_eim = g1r:_earley_set_size(end_of_parse) - 1
         for eim_id = 0, max_eim do
-            local trv = _M.traverser_new(g1r, es_id, eim_id)
-            local dot = trv:dot()
-            if dot >= 0 then goto NEXT_EIM end
-            local origin = trv:origin()
-            if origin ~= start_of_parse then goto NEXT_EIM end
+            -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
+            local trv = _M.traverser_new(g1r, end_of_parse, eim_id)
             local irl_id = trv:rule_id()
             if not irl_id then goto NEXT_EIM end
+            -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
+            local dot = trv:dot()
+            if dot >= 0 then goto NEXT_EIM end
+            -- io.stderr:write('dot is a match: ', dot, "\n")
+            local origin = trv:origin()
+            if origin ~= start_of_parse then goto NEXT_EIM end
             if not slg:g1_rule_is_xpr_top(irl_id) then goto NEXT_EIM end
-            local xprid = slg:g1_rule_to_xprid(irlid)
-            local xpr = slg.xprs[xprid]
-            local xsyid = xpr.lhs.id
-            if xsyid ~= top_xsy_id then goto NEXT_EIM end
+            -- io.stderr:write('is xpr top: ', "\n")
+            local xpr_id = slg:g1_rule_to_xprid(irl_id)
+            local xpr = slg.xprs[xpr_id]
+            local xsy_id = xpr.lhs.id
+            if xsy_id ~= top_xsy_id then goto NEXT_EIM end
+            io.stderr:write('=== xsy_id is a match: ', xsy_id, "\n")
             ::NEXT_EIM::
         end
-        ::LAST_EIM::
 
         return asf_register(asf)
 
