@@ -590,7 +590,7 @@ information: `(xrlid, xrl_dot, predot_xsy)`.
 
 ```
     -- miranda: section+ class_slg field declarations
-    class_slg_fields.urglades = true
+    class_slg_fields.preglade_sets = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -1065,15 +1065,15 @@ in `lmw_g`.
 
 ```
     -- miranda: section+ forward declarations
-    local precompute_urglades
+    local precompute_preglade_sets
     -- miranda: section+ most Lua function definitions
-    function precompute_urglades(slg)
+    function precompute_preglade_sets(slg)
         local g1g = slg.g1
         local xsys = slg.xsys
-        local urglades = {}
+        local preglade_sets = {}
         local ahm_count = g1g:_ahm_count()
         for ahm_id = 0, ahm_count -1 do
-            local urglade = {}
+            local preglades = {}
             local nrl_id = g1g:_ahm_nrl(ahm_id)
             local nrl_dot = g1g:_ahm_raw_position(ahm_id)
             local null_count = g1g:_ahm_null_count(ahm_id)
@@ -1086,7 +1086,7 @@ in `lmw_g`.
                         local xsy = xsys[xsy_id]
                         local is_terminal = xsy.lexeme
                         local xsy_type = is_terminal and 't' or 'b'
-                        urglade[#urglade+1] = { xsy_id, xsy_type }
+                        preglades[#preglades+1] = { xsy_id, xsy_type }
                     end
                 end
             end
@@ -1096,13 +1096,13 @@ in `lmw_g`.
                 if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
                     local xsy_id = g1g:xsyid_by_nsy(nsy_id)
                     if xsy_id then
-                        urglade[#urglade+1] = { xsy_id, 'n' }
+                        preglades[#preglades+1] = { xsy_id, 'n' }
                     end
                 end
             end
-            urglades[ahm_id] = urglade
+            preglade_sets[ahm_id] = preglades
         end
-        slg.urglades = urglades
+        slg.preglade_sets = preglade_sets
     end
 ```
 
@@ -1377,7 +1377,7 @@ and creates the "runtime" version, as a side effect.
 
         precompute_g1(slg, source_hash);
         precompute_l0(slg, source_hash);
-        precompute_urglades(slg);
+        precompute_preglade_sets(slg);
         precompute_discard_events(slg, source_hash)
         precompute_lexeme_adverbs(slg, source_hash)
         precompute_xsy_blessings(slg, source_hash)
@@ -6252,17 +6252,14 @@ illegal named arguments.
 
 ```
     -- miranda: section+ forward declarations
-    local urglade_from_triple
+    local eims_from_triple
     -- miranda: section+ most Lua function definitions
-    function urglade_from_triple(asf, top_arg, start_arg, end_arg )
-        local top_xsyid = top_arg or asf.top_xsyid
-        local g1_start = start_arg or asf.g1_start
-        local g1_end = end_arg or asf.g1_end
+    function eims_from_triple(asf, top_xsyid, g1_start, g1_end )
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
-        local matches = { g1_end }
         local max_eim = g1r:_earley_set_size(g1_end) - 1
+        local matches = {}
         for eim_id = 0, max_eim do
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
@@ -6287,7 +6284,21 @@ illegal named arguments.
             end
             ::NEXT_EIM::
         end
-        if #matches <= 1 then return end
+        if #matches == 0 then return end
+        return matches
+    end
+```
+
+```
+    -- miranda: section+ forward declarations
+    local urglade_from_triple
+    -- miranda: section+ most Lua function definitions
+    function urglade_from_triple(asf, top_arg, start_arg, end_arg )
+        local top_xsyid = top_arg or asf.top_xsyid
+        local g1_start = start_arg or asf.g1_start
+        local g1_end = end_arg or asf.g1_end
+        local matches = eims_from_triple(asf, top_xsyid, g1_start, g1_end)
+        if #matches <= 0 then return end
         return matches
     end
 ```
@@ -8182,7 +8193,7 @@ indexed by isyid.
         if verbose > 0 then
             local slg = lmw_g.slg
             pieces[#pieces+1] = '    '
-            pieces[#pieces+1] = inspect(slg.urglades[ahm_id])
+            pieces[#pieces+1] = inspect(slg.preglade_sets[ahm_id])
             pieces[#pieces+1] = '\n'
         end
         return table.concat(pieces)
