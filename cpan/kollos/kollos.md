@@ -6210,6 +6210,7 @@ which is not kept in the registry.
 
         -- TODO Delete after development
         print(inspect(matches))
+        -- print('preglade_sets: ', inspect(slg.preglade_sets))
 
         return asf_register(asf)
 
