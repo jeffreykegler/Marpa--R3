@@ -590,7 +590,7 @@ information: `(xrlid, xrl_dot, predot_xsy)`.
 
 ```
     -- miranda: section+ class_slg field declarations
-    class_slg_fields.urglades = true
+    class_slg_fields.preglade_sets = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -1065,15 +1065,15 @@ in `lmw_g`.
 
 ```
     -- miranda: section+ forward declarations
-    local precompute_urglades
+    local precompute_preglade_sets
     -- miranda: section+ most Lua function definitions
-    function precompute_urglades(slg)
+    function precompute_preglade_sets(slg)
         local g1g = slg.g1
         local xsys = slg.xsys
-        local urglades = {}
+        local preglade_sets = {}
         local ahm_count = g1g:_ahm_count()
         for ahm_id = 0, ahm_count -1 do
-            local urglade = {}
+            local preglades = {}
             local nrl_id = g1g:_ahm_nrl(ahm_id)
             local nrl_dot = g1g:_ahm_raw_position(ahm_id)
             local null_count = g1g:_ahm_null_count(ahm_id)
@@ -1086,7 +1086,7 @@ in `lmw_g`.
                         local xsy = xsys[xsy_id]
                         local is_terminal = xsy.lexeme
                         local xsy_type = is_terminal and 't' or 'b'
-                        urglade[#urglade+1] = { xsy_id, xsy_type }
+                        preglades[#preglades+1] = { xsy_id, xsy_type }
                     end
                 end
             end
@@ -1096,13 +1096,13 @@ in `lmw_g`.
                 if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
                     local xsy_id = g1g:xsyid_by_nsy(nsy_id)
                     if xsy_id then
-                        urglade[#urglade+1] = { xsy_id, 'n' }
+                        preglades[#preglades+1] = { xsy_id, 'n' }
                     end
                 end
             end
-            urglades[ahm_id] = urglade
+            preglade_sets[ahm_id] = preglades
         end
-        slg.urglades = urglades
+        slg.preglade_sets = preglade_sets
     end
 ```
 
@@ -1377,7 +1377,7 @@ and creates the "runtime" version, as a side effect.
 
         precompute_g1(slg, source_hash);
         precompute_l0(slg, source_hash);
-        precompute_urglades(slg);
+        precompute_preglade_sets(slg);
         precompute_discard_events(slg, source_hash)
         precompute_lexeme_adverbs(slg, source_hash)
         precompute_xsy_blessings(slg, source_hash)
@@ -6053,8 +6053,13 @@ This is a registry object.
 
 ```
     -- miranda: section+ class_asf field declarations
-    class_asf_fields.slg = true
+    class_asf_fields.slr = true
     class_asf_fields.regix = true
+
+    class_asf_fields.top_xsyid = true
+    class_asf_fields.g1_start = true
+    class_asf_fields.g1_end = true
+
     -- underscore ("_") to prevent override of function of same name
     class_asf_fields._ambiguity_level = true
 ```
@@ -6127,6 +6132,7 @@ which is not kept in the registry.
 
         local asf = {}
         setmetatable(asf, _M.class_asf)
+        asf.slr = slr
         local slg = slr.slg
         local g1r = slr.g1
         local g1g = slg.g1
@@ -6155,6 +6161,7 @@ which is not kept in the registry.
                 \u{20}  ASF's are not defined for null parses\n\z
             ]])
         end
+        asf.g1_end = end_of_parse
 
         -- 'start' named argument --
         local start_of_parse
@@ -6176,9 +6183,10 @@ which is not kept in the registry.
               _M.userX('"start" named argument is before first G1 location: %s',
                    inspect(raw_arg))
         end
+        asf.g1_start = start_of_parse
 
         -- 'top' named argument --
-        local top_xsy_id
+        local top_xsyid
         raw_arg = flat_args["top"]
         if raw_arg then
             local value = math.tointeger(raw_arg)
@@ -6187,34 +6195,22 @@ which is not kept in the registry.
                    'Bad value for "top" named argument: %s',
                    inspect(raw_arg)))
             end
-            top_xsy_id = value
+            top_xsyid = value
         end
-        top_xsy_id = top_xsy_id or slg:start_symbol_id()
+        top_xsyid = top_xsyid or slg:start_symbol_id()
         flat_args["top"] = nil
+        asf.top_xsyid = top_xsyid
 
         asf:common_set(flat_args, {})
 
-        local max_eim = g1r:_earley_set_size(end_of_parse) - 1
-        for eim_id = 0, max_eim do
-            -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
-            local trv = _M.traverser_new(g1r, end_of_parse, eim_id)
-            local irl_id = trv:rule_id()
-            if not irl_id then goto NEXT_EIM end
-            -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
-            local dot = trv:dot()
-            if dot >= 0 then goto NEXT_EIM end
-            -- io.stderr:write('dot is a match: ', dot, "\n")
-            local origin = trv:origin()
-            if origin ~= start_of_parse then goto NEXT_EIM end
-            if not slg:g1_rule_is_xpr_top(irl_id) then goto NEXT_EIM end
-            -- io.stderr:write('is xpr top: ', "\n")
-            local xpr_id = slg:g1_rule_to_xprid(irl_id)
-            local xpr = slg.xprs[xpr_id]
-            local xsy_id = xpr.lhs.id
-            if xsy_id ~= top_xsy_id then goto NEXT_EIM end
-            io.stderr:write('=== xsy_id is a match: ', xsy_id, "\n")
-            ::NEXT_EIM::
+        local matches = urglade_from_triple(asf)
+        if not matches then
+            _M.userX("No parse at G1 location %d", start_of_parse)
         end
+
+        -- TODO Delete after development
+        print(inspect(matches))
+        -- print('preglade_sets: ', inspect(slg.preglade_sets))
 
         return asf_register(asf)
 
@@ -6223,6 +6219,9 @@ which is not kept in the registry.
 
 A common processor for
 the valuator's Lua-level settings.
+Right now most args are constructor-only,
+so all this currently does is check for
+illegal named arguments.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -6251,6 +6250,59 @@ the valuator's Lua-level settings.
 ```
 
 ### ASF mutators
+
+```
+    -- miranda: section+ forward declarations
+    local eims_from_triple
+    -- miranda: section+ most Lua function definitions
+    function eims_from_triple(asf, top_xsyid, g1_start, g1_end )
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1r = slr.g1
+        local max_eim = g1r:_earley_set_size(g1_end) - 1
+        local matches = {}
+        for eim_id = 0, max_eim do
+            -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
+            local trv = _M.traverser_new(g1r, g1_end, eim_id)
+            local irl_id = trv:rule_id()
+            if not irl_id then goto NEXT_EIM end
+            -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
+            local dot = trv:dot()
+            if dot >= 0 then goto NEXT_EIM end
+            -- io.stderr:write('dot is a match: ', dot, "\n")
+            local origin = trv:origin()
+            if origin ~= g1_start then goto NEXT_EIM end
+            if not slg:g1_rule_is_xpr_top(irl_id) then
+                goto NEXT_EIM
+            end
+            -- io.stderr:write('is xpr top: ', "\n")
+            local xpr_id = slg:g1_rule_to_xprid(irl_id)
+            local xpr = slg.xprs[xpr_id]
+            local xsy_id = xpr.lhs.id
+            if xsy_id == top_xsyid then
+                io.stderr:write('=== xsy_id is a match: ', xsy_id, "\n")
+                matches[#matches+1] = eim_id
+            end
+            ::NEXT_EIM::
+        end
+        if #matches == 0 then return end
+        return matches
+    end
+```
+
+```
+    -- miranda: section+ forward declarations
+    local urglade_from_triple
+    -- miranda: section+ most Lua function definitions
+    function urglade_from_triple(asf, top_arg, start_arg, end_arg )
+        local top_xsyid = top_arg or asf.top_xsyid
+        local g1_start = start_arg or asf.g1_start
+        local g1_end = end_arg or asf.g1_end
+        local matches = eims_from_triple(asf, top_xsyid, g1_start, g1_end)
+        if #matches <= 0 then return end
+        return matches
+    end
+```
 
 ### ASF accessors
 
@@ -8142,7 +8194,7 @@ indexed by isyid.
         if verbose > 0 then
             local slg = lmw_g.slg
             pieces[#pieces+1] = '    '
-            pieces[#pieces+1] = inspect(slg.urglades[ahm_id])
+            pieces[#pieces+1] = inspect(slg.preglade_sets[ahm_id])
             pieces[#pieces+1] = '\n'
         end
         return table.concat(pieces)
