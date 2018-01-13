@@ -1753,7 +1753,7 @@ Display any XPR
     end
 ```
 
-TODO: Do I need, or even use, xpr_top?
+TODO: Do I need xpr_top?
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1771,6 +1771,30 @@ TODO: Do I need, or even use, xpr_top?
     end
     function _M.class_slg.l0_rule_is_xpr_top(slg, irlid)
         return slg:lmg_rule_is_xpr_top('l0', irlid)
+    end
+```
+
+Retrun the `xpr` is the traverser is at the completion
+of an xpr top.
+Otherwise, return `nil`.
+
+```
+    -- miranda: section+ forward declarations
+    local g1_xpr_top_from_trv
+    -- miranda: section+ most Lua function definitions
+    function g1_xpr_top_from_trv(slg, trv)
+        local irl_id = trv:rule_id()
+        if not irl_id then return end
+        -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
+        local dot = trv:dot()
+        if dot >= 0 then return end
+        -- io.stderr:write('dot is a match: ', dot, "\n")
+        if not slg:g1_rule_is_xpr_top(irl_id) then
+            return
+        end
+        local xpr_id = slg:g1_rule_to_xprid(irl_id)
+        local xpr = slg.xprs[xpr_id]
+        return xpr
     end
 ```
 
@@ -6268,20 +6292,10 @@ illegal named arguments.
         for eim_id = 0, max_eim do
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
-            local irl_id = trv:rule_id()
-            if not irl_id then goto NEXT_EIM end
-            -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
-            local dot = trv:dot()
-            if dot >= 0 then goto NEXT_EIM end
-            -- io.stderr:write('dot is a match: ', dot, "\n")
             local origin = trv:origin()
             if origin ~= g1_start then goto NEXT_EIM end
-            if not slg:g1_rule_is_xpr_top(irl_id) then
-                goto NEXT_EIM
-            end
-            -- io.stderr:write('is xpr top: ', "\n")
-            local xpr_id = slg:g1_rule_to_xprid(irl_id)
-            local xpr = slg.xprs[xpr_id]
+            local xpr = g1_xpr_top_from_trv(slg, trv)
+            if not xpr then goto NEXT_EIM end
             local xsy_id = xpr.lhs.id
             if xsy_id == top_xsyid then
                 io.stderr:write('=== xsy_id is a match: ', xsy_id, "\n")
