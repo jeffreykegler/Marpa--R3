@@ -6059,6 +6059,7 @@ This is a registry object.
     class_asf_fields.top_xsyid = true
     class_asf_fields.g1_start = true
     class_asf_fields.g1_end = true
+    class_asf_fields.peak = true
 
     -- underscore ("_") to prevent override of function of same name
     class_asf_fields._ambiguity_level = true
@@ -6203,13 +6204,15 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local matches = urglade_from_triple(asf)
-        if not matches then
+        local eims = eims_from_triple(asf,
+            asf.top_xsyid, asf.g1_start, asf.g1_end)
+        if not eims then
             _M.userX("No parse at G1 location %d", start_of_parse)
         end
+        asf.peak = glade_from_eims(asf, end_of_parse, eims)
 
         -- TODO Delete after development
-        print(inspect(matches))
+        print(inspect(asf.peak, {depth=1}))
         -- print('preglade_sets: ', inspect(slg.preglade_sets))
 
         return asf_register(asf)
@@ -6255,7 +6258,7 @@ illegal named arguments.
     -- miranda: section+ forward declarations
     local eims_from_triple
     -- miranda: section+ most Lua function definitions
-    function eims_from_triple(asf, top_xsyid, g1_start, g1_end )
+    function eims_from_triple(asf, top_xsyid, g1_start, g1_end)
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
@@ -6292,15 +6295,11 @@ illegal named arguments.
 
 ```
     -- miranda: section+ forward declarations
-    local urglade_from_triple
+    local glade_from_eims
     -- miranda: section+ most Lua function definitions
-    function urglade_from_triple(asf, top_arg, start_arg, end_arg )
-        local top_xsyid = top_arg or asf.top_xsyid
-        local g1_start = start_arg or asf.g1_start
-        local g1_end = end_arg or asf.g1_end
-        local matches = eims_from_triple(asf, top_xsyid, g1_start, g1_end)
-        if #matches <= 0 then return end
-        return matches
+    function glade_from_eims(asf, g1_location, eims)
+        local glade = setmetatable(asf, _M.class_asf)
+        return glade
     end
 ```
 
