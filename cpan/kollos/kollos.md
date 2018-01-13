@@ -8392,6 +8392,22 @@ If the ISYID is valid, the name is unique.
     end
 ```
 
+## Libmarpa traverser wrapper class
+
+
+```
+    -- miranda: section+ class_traverser field declarations
+    class_traverser_fields._libmarpa = true
+    class_traverser_fields.lmw_g = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_traverser_fields = {}
+    -- miranda: insert class_traverser field declarations
+    declarations(_M.class_traverser, class_traverser_fields, 'traverser')
+```
+
 ## Libmarpa valuer wrapper class
 
 The "valuator" portion of Kollos produces the
