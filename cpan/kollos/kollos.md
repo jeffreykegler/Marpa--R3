@@ -6313,7 +6313,39 @@ illegal named arguments.
     local glade_from_eims
     -- miranda: section+ most Lua function definitions
     function glade_from_eims(asf, g1_location, eims)
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1r = slr.g1
         local glade = setmetatable(asf, _M.class_asf)
+        local symch_hash = {}
+        for ix = 1, #eims do
+            local eim_id = eims[ix]
+            local trv = _M.traverser_new(g1r, g1_location, eim_id)
+            local xpr = g1_xpr_top_from_trv(slg, trv)
+            if not xpr then
+                _M._internal_error("Bad eim id %d %d",
+                    g1_location, eim_id)
+            end
+            local xpr_id = xpr.id
+            local symch = symch_hash[xpr_id] or {}
+            if not symch then
+                symch = {}
+                symch_hash[xpr_id] = symch
+            end
+            symch[#symch+1] = eim_id
+        end
+        local xpr_ids = {}
+        for xpr_id, _ in pairs(symch_hash) do
+            xpr_ids[#xpr_ids+1] = xpr_id
+        end
+        table.sort(xpr_ids)
+        local symches = {}
+        for ix = 1, #xpr_ids do
+            local xpr_id = xpr_ids[ix]
+            local symch = symch_hash[xpr_id]
+            table.sort(symch)
+            symches[#symches+1] = symch
+        end
         return glade
     end
 ```
