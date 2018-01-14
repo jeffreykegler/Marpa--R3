@@ -78,13 +78,14 @@ cd kollos && ../lua/lua toc.lua < kollos.md
   * [ASF constructor](#asf-constructor)
   * [ASF mutators](#asf-mutators)
   * [ASF accessors](#asf-accessors)
-  * [ASF diagnostics](#asf-diagnostics)
 * [Abstract Syntax Forest (ASF2) class](#abstract-syntax-forest-asf2-class)
   * [ASF2 fields](#asf2-fields)
   * [ASF2 constructor](#asf2-constructor)
   * [ASF2 mutators](#asf2-mutators)
   * [ASF2 accessors](#asf2-accessors)
   * [ASF2 diagnostics](#asf2-diagnostics)
+* [Glade class](#glade-class)
+  * [Glade fields](#glade-fields)
 * [Kollos semantics](#kollos-semantics)
   * [VM operations](#vm-operations)
     * [VM add op utility](#vm-add-op-utility)
@@ -1752,7 +1753,7 @@ Display any XPR
     end
 ```
 
-TODO: Do I need, or even use, xpr_top?
+TODO: Do I need xpr_top?
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -1770,6 +1771,30 @@ TODO: Do I need, or even use, xpr_top?
     end
     function _M.class_slg.l0_rule_is_xpr_top(slg, irlid)
         return slg:lmg_rule_is_xpr_top('l0', irlid)
+    end
+```
+
+Retrun the `xpr` is the traverser is at the completion
+of an xpr top.
+Otherwise, return `nil`.
+
+```
+    -- miranda: section+ forward declarations
+    local g1_xpr_top_from_trv
+    -- miranda: section+ most Lua function definitions
+    function g1_xpr_top_from_trv(slg, trv)
+        local irl_id = trv:rule_id()
+        if not irl_id then return end
+        -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
+        local dot = trv:dot()
+        if dot >= 0 then return end
+        -- io.stderr:write('dot is a match: ', dot, "\n")
+        if not slg:g1_rule_is_xpr_top(irl_id) then
+            return
+        end
+        local xpr_id = slg:g1_rule_to_xprid(irl_id)
+        local xpr = slg.xprs[xpr_id]
+        return xpr
     end
 ```
 
@@ -6059,6 +6084,7 @@ This is a registry object.
     class_asf_fields.top_xsyid = true
     class_asf_fields.g1_start = true
     class_asf_fields.g1_end = true
+    class_asf_fields.peak = true
 
     -- underscore ("_") to prevent override of function of same name
     class_asf_fields._ambiguity_level = true
@@ -6203,13 +6229,15 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local matches = urglade_from_triple(asf)
-        if not matches then
+        local eims = eims_from_triple(asf,
+            asf.top_xsyid, asf.g1_start, asf.g1_end)
+        if not eims then
             _M.userX("No parse at G1 location %d", start_of_parse)
         end
+        asf.peak = glade_from_eims(asf, end_of_parse, eims)
 
         -- TODO Delete after development
-        print(inspect(matches))
+        print(inspect(asf.peak, {depth=1}))
         -- print('preglade_sets: ', inspect(slg.preglade_sets))
 
         return asf_register(asf)
@@ -6255,7 +6283,7 @@ illegal named arguments.
     -- miranda: section+ forward declarations
     local eims_from_triple
     -- miranda: section+ most Lua function definitions
-    function eims_from_triple(asf, top_xsyid, g1_start, g1_end )
+    function eims_from_triple(asf, top_xsyid, g1_start, g1_end)
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
@@ -6264,20 +6292,10 @@ illegal named arguments.
         for eim_id = 0, max_eim do
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
-            local irl_id = trv:rule_id()
-            if not irl_id then goto NEXT_EIM end
-            -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
-            local dot = trv:dot()
-            if dot >= 0 then goto NEXT_EIM end
-            -- io.stderr:write('dot is a match: ', dot, "\n")
             local origin = trv:origin()
             if origin ~= g1_start then goto NEXT_EIM end
-            if not slg:g1_rule_is_xpr_top(irl_id) then
-                goto NEXT_EIM
-            end
-            -- io.stderr:write('is xpr top: ', "\n")
-            local xpr_id = slg:g1_rule_to_xprid(irl_id)
-            local xpr = slg.xprs[xpr_id]
+            local xpr = g1_xpr_top_from_trv(slg, trv)
+            if not xpr then goto NEXT_EIM end
             local xsy_id = xpr.lhs.id
             if xsy_id == top_xsyid then
                 io.stderr:write('=== xsy_id is a match: ', xsy_id, "\n")
@@ -6292,15 +6310,43 @@ illegal named arguments.
 
 ```
     -- miranda: section+ forward declarations
-    local urglade_from_triple
+    local glade_from_eims
     -- miranda: section+ most Lua function definitions
-    function urglade_from_triple(asf, top_arg, start_arg, end_arg )
-        local top_xsyid = top_arg or asf.top_xsyid
-        local g1_start = start_arg or asf.g1_start
-        local g1_end = end_arg or asf.g1_end
-        local matches = eims_from_triple(asf, top_xsyid, g1_start, g1_end)
-        if #matches <= 0 then return end
-        return matches
+    function glade_from_eims(asf, g1_location, eims)
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1r = slr.g1
+        local glade = setmetatable(asf, _M.class_asf)
+        local symch_hash = {}
+        for ix = 1, #eims do
+            local eim_id = eims[ix]
+            local trv = _M.traverser_new(g1r, g1_location, eim_id)
+            local xpr = g1_xpr_top_from_trv(slg, trv)
+            if not xpr then
+                _M._internal_error("Bad eim id %d %d",
+                    g1_location, eim_id)
+            end
+            local xpr_id = xpr.id
+            local symch = symch_hash[xpr_id] or {}
+            if not symch then
+                symch = {}
+                symch_hash[xpr_id] = symch
+            end
+            symch[#symch+1] = eim_id
+        end
+        local xpr_ids = {}
+        for xpr_id, _ in pairs(symch_hash) do
+            xpr_ids[#xpr_ids+1] = xpr_id
+        end
+        table.sort(xpr_ids)
+        local symches = {}
+        for ix = 1, #xpr_ids do
+            local xpr_id = xpr_ids[ix]
+            local symch = symch_hash[xpr_id]
+            table.sort(symch)
+            symches[#symches+1] = symch
+        end
+        return glade
     end
 ```
 
@@ -8390,6 +8436,22 @@ If the ISYID is valid, the name is unique.
         result.ahm_id = ahm_id
         return result
     end
+```
+
+## Libmarpa traverser wrapper class
+
+
+```
+    -- miranda: section+ class_traverser field declarations
+    class_traverser_fields._libmarpa = true
+    class_traverser_fields.lmw_g = true
+```
+
+```
+    -- miranda: section+ populate metatables
+    local class_traverser_fields = {}
+    -- miranda: insert class_traverser field declarations
+    declarations(_M.class_traverser, class_traverser_fields, 'traverser')
 ```
 
 ## Libmarpa valuer wrapper class
