@@ -10,6 +10,34 @@ unambiguous grammar that is non-linear because of a Leo-ambiguity.
 That further implies that unambiguous grammars are non-linear for Marpa
 only if they have unmarked middle recursions.
 
+Let our notation for an Earley item be [dr, origin, x], where dr is
+a dotted rule, and origin and x are locations in the input.  'origin'
+is the origin location of the Earley item and 'x' is its current location.
+
+Let
+
+sf-a =>* sf-b
+
+mean that sentential form sf-a left-derives sf-b in zero or more steps;
+and in
+
+sf-a =>*[A] sf-b
+
+indicate that sentential form sf-a left-derives sf-b in zero or more
+steps using derivation A.
+
+Also, in derivations, let locations be shown in curly brackets, so that
+
+<A> =>* {a} ... {b} <B> {c}
+
+indicates a derivation whose origin is at location a in the input;
+whose end is at location c; and where derivations from <B> must begin
+at location {b}.
+
+To avoid multiplying symbols pointlessly, I use ellipsis to indicate some
+arbitrary sentential form.  No sentential forms indicated by ellipses
+can be assumed to be equal to another.
+
 Let me define "Leo-ambiguous" to mean that that a grammar allows a
 right-recursive reduction path that contains an arbitrary number of
 pairs of Earley items of the form:
@@ -39,73 +67,34 @@ The proof of the Lemma follows from the definition of context-free.
 
 Theorem:  Every Leo-ambiguous grammar is ambiguous.
 
-Let our notation for an Earley item be [dr, origin, x], where dr is
-a dotted rule, and origin and x are locations in the input.  'origin'
-is the origin location of the Earley item and 'x' is its current location.
-
-Let
-
-sf-a =>* sf-b
-
-mean that sentential form sf-a left-derives sf-b in zero or more steps;
-and in
-
-sf-a =>*[A] sf-b
-
-indicate that sentential form sf-a left-derives sf-b in zero or more
-steps using derivation A.
-
-Also, in derivations, let locations be shown in curly brackets,
-so that
-
-<A> =>* {a} ... {b} <B> {c}
-
-indicates a derivation whose origin is at location a
-in the input;
-whose end is at location c;
-and where derivations from <B> must begin at location
-{b}.
-
-To avoid multiplying symbols pointlessly,
-I use ellipsis to indicate some arbitrary sentential form.
-No sentential forms indicated by ellipses can be assumed
-to be equal to another.
-
 Let G be a context-free grammar.  Assume, for a reductio, that G is
 unambiguous and Leo-ambiguous.
 
 In a Leo-ambiguous right-recursive reduction path of arbitrary length,
-at least one LHS must occur more than twice.
-Call this LHS <dup>.
-There must also be at least two successive occurrences
-of Leo-ambiguous pairs
-where <dup> is the post-dot symbol.
-Call the dot location of the first Leo-ambiguous pair
-in a succession, {a}.
-Call the dot location of the first Leo-ambiguous pair
-in a succession, {b}.
-Call their 
+at least one LHS must occur more than twice.  Call this LHS <dup>.
+There must also be at least two successive occurrences of Leo-ambiguous
+pairs where <dup> is the post-dot symbol.  Call the dot location of the
+first Leo-ambiguous pair in a succession, {a}.  Call the dot location
+of the first Leo-ambiguous pair in a succession, {b}.
 
 Then we have
 
-<dup> =>* {a} w-dup1 {c}
+<dup> =>* {a} w-dup1
 
-<dup> =>*[A] {a} ... <dup> =>* {a} w {b} w-dup-a {c}
+<dup> =>*[A] {a} ... {b} <dup> =>* {a} w {b} w-dup-a
 
-<dup> =>*[B] {a} ... <dup> =>* {a} w {b} w-dup-b {c}
+<dup> =>*[B] {a} ... {b} <dup> =>* {a} w {b} w-dup-b
 
-Because G is context-free, it allows
-us to set w-dup-a = w-dup-b
-so that
+Because G is context-free, it allows us to set w-dup-a = w-dup-b so that
 
 w-dup1 = w . w-dup-a = w . w-dup-b
 
-And since, by the validity of the Earley
-items in the successive Leo-ambiguous pairs,
-the last step of derivations A and B differ, I have A != B.
+And since, by the validity of the Earley items in the successive
+Leo-ambiguous pairs, the last step of derivations A and B differ, I have
+A != B.
 
-But then <dup> =>* w-dup1 in two different ways.  By the Lemma
-therefore, G is ambiguous.
+But then <dup> =>* w-dup1 in two different ways.  By the Lemma therefore,
+G is ambiguous.
 
 QED.
 
