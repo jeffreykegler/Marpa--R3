@@ -62,7 +62,7 @@ its grammars to eliminate proper nullables.)
 Lemma:  If a context-free grammar, G, has a non-terminal which derives
 a string of terminals in more than one way, then G is ambiguous.
 
-The proof of the Lemma follows from the definition of context-free.
+The Lemma follows from the definition of context-free.
 
 Theorem:  Every Leo-ambiguous grammar is ambiguous.
 
@@ -74,7 +74,7 @@ at least one LHS must occur more than twice.  Call this LHS <dup>.
 The reduction path must also contain at least two successive occurrences
 of Leo-ambiguous pairs where <dup> is the post-dot symbol.  Call the dot
 location of the first Leo-ambiguous pair in a succession, {a}.  Call the
-dot location of the first Leo-ambiguous pair in a succession, {b}.
+dot location of the second Leo-ambiguous pair in a succession, {b}.
 
 Then we have
 
