@@ -5,8 +5,8 @@ that is Leo-ambiguous is also ambiguous.
 
 This is of particular interest with Marpa for pragmatic reasons.
 Marpa modified your 1991 algorithm so that it only created Leo items
-for right recursions.  This claimed proof implies that there is no
-unambiguous grammar that is non-linear because of a Leo-ambiguity.
+for right recursions.  My claimed proof implies that there is no
+unambiguous grammar that is non-linear because of right recursions.
 That further implies that unambiguous grammars are non-linear for Marpa
 only if they have unmarked middle recursions.
 
@@ -19,7 +19,7 @@ Let
 sf-a =>* sf-b
 
 mean that sentential form sf-a left-derives sf-b in zero or more steps;
-and in
+and let
 
 sf-a =>*[A] sf-b
 
@@ -30,8 +30,8 @@ Also, in derivations, let locations be shown in curly brackets, so that
 
 <A> =>* {a} ... {b} <B> {c}
 
-indicates a derivation whose origin is at location a in the input;
-whose end is at location c; and where derivations from <B> must begin
+indicates a derivation whose origin is at location {a} in the input;
+whose end is at location {c}; and where derivations from <B> must begin
 at location {b}.
 
 To avoid multiplying symbols pointlessly, I use ellipsis to indicate some
@@ -46,15 +46,14 @@ E1 = [dr1, origin1, x]
 
 E2 = [dr2, origin2, x]
 
-dr1 = <rr1> ::= sf1 . <dup>
+dr1 = <rr1> ::= ... <dup>
 
-dr2 = <rr2> ::= sf2 . <dup>
+dr2 = <rr2> ::= ... <dup>
 
 where E1 and E2 are Earley items; dr1 and dr2 are dotted rules; <rr1>,
 <rr2> and <dup> are right-recursive symbols; origin1, origin2 and x are
-locations; sf1 and sf2 are sentential forms; and either dr1 != dr2 or
-origin1 != origin2.  Let me call a pair of Earley items as specified
-above, a "Leo-ambiguous pairs".
+locations; and either dr1 != dr2 or origin1 != origin2.  Let me call a
+pair of Earley items as specified above, a "Leo-ambiguous pair".
 
 Without loss of generality, I assume the rules of dr1 and dr2 have no
 properly nullable symbols and I ignore nulling symbols.  (Marpa rewrites
@@ -72,29 +71,38 @@ unambiguous and Leo-ambiguous.
 
 In a Leo-ambiguous right-recursive reduction path of arbitrary length,
 at least one LHS must occur more than twice.  Call this LHS <dup>.
-There must also be at least two successive occurrences of Leo-ambiguous
-pairs where <dup> is the post-dot symbol.  Call the dot location of the
-first Leo-ambiguous pair in a succession, {a}.  Call the dot location
-of the first Leo-ambiguous pair in a succession, {b}.
+The reduction path must also contain at least two successive occurrences
+of Leo-ambiguous pairs where <dup> is the post-dot symbol.  Call the dot
+location of the first Leo-ambiguous pair in a succession, {a}.  Call the
+dot location of the first Leo-ambiguous pair in a succession, {b}.
 
 Then we have
 
-<dup> =>* {a} w-dup1
+<dup> =>*[A] {a} ... {b} <dup> =>* {a} w-a {b} w-dup-a
 
-<dup> =>*[A] {a} ... {b} <dup> =>* {a} w {b} w-dup-a
+<dup> =>*[B] {a} ... {b} <dup> =>* {a} w-b {b} w-dup-b
 
-<dup> =>*[B] {a} ... {b} <dup> =>* {a} w {b} w-dup-b
+where w-a, w-b, w-dup-a and w-dup-b are sentences.  Because w-a and w-b
+are sentences between {a} and {b} in a series of Earley tables, we may
+treat them as fixed and equal to each other:
 
-Because G is context-free, it allows us to set w-dup-a = w-dup-b so that
+w-a = w-b
 
-w-dup1 = w . w-dup-a = w . w-dup-b
+G is context-free, <dup> =>* w-dup-a and <dup> =>* w-dup-b.  This allows
+us to set
+
+w-dup-a = w-dup-b
+
+Combining the above, we have
+
+w-a . w-dup-a = w-b . w-dup-b
 
 And since, by the validity of the Earley items in the successive
 Leo-ambiguous pairs, the last step of derivations A and B differ, I have
 A != B.
 
-But then <dup> =>* w-dup1 in two different ways.  By the Lemma therefore,
-G is ambiguous.
+But then <dup> =>* w-a . w-dup-a in at least two different ways.  By the
+Lemma therefore, G is ambiguous.
 
 QED.
 
