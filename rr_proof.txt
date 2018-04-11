@@ -1,14 +1,14 @@
 Let me say that a grammar is Leo-ambiguous if it has right recursions
-that, in the language of your 1991, produce non-deterministic reduction
+that, in the language of Leo 1991, produce non-deterministic reduction
 paths of arbitrary length.  I believe I have a proof that any grammar
 that is Leo-ambiguous is also ambiguous.
 
 This is of particular interest with Marpa for pragmatic reasons.
-Marpa modified your 1991 algorithm so that it only created Leo items
-for right recursions.  My claimed proof implies that there is no
-unambiguous grammar that is non-linear because of right recursions.
-That further implies that unambiguous grammars are non-linear for Marpa
-only if they have unmarked middle recursions.
+Marpa modified Leo 1991 so that it only created Leo items for right
+recursions.  My claimed proof implies that there is no unambiguous
+grammar that is non-linear because of right recursions.  That further
+implies that unambiguous grammars are non-linear for Marpa only if they
+have unmarked middle recursions.
 
 Let our notation for an Earley item be [dr, origin, x], where dr is
 a dotted rule, and origin and x are locations in the input.  'origin'
