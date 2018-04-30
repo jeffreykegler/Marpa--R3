@@ -3916,11 +3916,11 @@ by the user.
 
 * `false` means that either
 
-- the parse is in "pause before" status and special action
-might be required for it to continue; or
+    - the parse is in "pause before" status and special action
+    might be required for it to continue; or
 
-- the parse is exhausted, and cannot continue under any
-circumstance.
+    - the parse is exhausted, and cannot continue under any
+    circumstance.
 
 When `false` is returned, `alternatives()`
 may also return
