@@ -1,4 +1,3 @@
-# the "full" travis file, for pre-release
 language: perl
 perl:
   - "5.26"
@@ -19,9 +18,7 @@ install:
 
 # build Marpa and execute tests
 script:
-  - make full_test
-  - (cd cpan/ && make distcheck)
-  - (cd cpan/ && make dist)
+  - (cd cpan/ && perl Makefile.PL && make && make test)
 
 sudo: false  # faster builds using containers
 
