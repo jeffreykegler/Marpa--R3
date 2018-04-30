@@ -207,10 +207,10 @@ and which is usually assembled using `table.concat()`.
 
 ## Development Notes
 
-This section is first for the convenience of the
+This section is primarily for the convenience of the
 active developers.
 Readers trying to familiarize themselves with Kollos
-may want to skip it or skim it
+may want to skip it
 in their first readings.
 
 ### Preparing for beta release
@@ -276,7 +276,7 @@ in these "Development Notes".
 
 Currently Kollos assumes that the
 core libraries are loaded.
-Going forward, it needs to "require" then,
+Going forward, it needs to "require" them,
 like an ordinary Lua library.
 
 ### New lexer features
@@ -290,11 +290,11 @@ lexeme, and not any lexeme of priority 1 or lower.
 
 ### Discard default statement?
 
-These is a leftover
+[ This is a leftover
 design note from some time ago, for a never-implemented
 feature.
 I'm keeping this note until I decide about this feature,
-one way or the other.
+one way or the other. ]
 
 The `discard default` statement would be modeled on the
 `lexeme default` statement.  An example:
@@ -372,6 +372,8 @@ Marpa::R2's Libmarpa.
 
 Symbols are show several "forms".
 
+#### Name and ID
+
 Name and ID are unique identifiers, available for
 all valid symbols,
 and only for valid symbols.
@@ -380,12 +382,16 @@ Names are strings.
 The symbol name may be an internal creation,
 subject to change in future versions of Kollos.
 
-*DSL form* is the form as it appears in the SLIF DSL.
+#### DSL form
+
+DSL form is the form as it appears in the SLIF DSL.
 It does not vary as long as the DSL does not vary.
 It is not guaranteed unique and many valid symbols
 will not have a DSL form.
 
-*Display form* is a string
+#### Display form
+
+Display form is a string
 available
 for all valid symbols,
 and for invalid symbols IDs as well.
@@ -501,7 +507,7 @@ Internal Lua code should not use them,
 because it cannot know whether the upper layer
 has released it.
 
-Kollos does not does reference counting of its registry
+Kollos does not do reference counting of its registry
 objects.
 If the upper layer wants the equivalent of reference counting,
 it should register the same object multiple times.
@@ -594,10 +600,11 @@ information: `(xrlid, xrl_dot, predot_xsy)`.
     class_slg_fields.preglade_sets = true
 ```
 
-The "blessing" facility exists to provide strings
-for interpretation by the upper layer.
-The Perl upper layer uses these string to bless
-Kollos results into Perl packages,
+The "blessing" facility provide strings
+to the upper layer.
+The upper layer may interpret these as it wishes.
+The Perl upper layer uses the "blessing" strings
+to bless Kollos results into Perl packages,
 whence the name.
 
 ```
@@ -705,8 +712,8 @@ This is a registry object.
 
         -- This logic assumes that Marpa's logic
         -- is correct and that its rewrites are
-        -- not creating inaccessible symbols from
-        -- accessible ones.
+        -- not creating inaccessible ISYs from
+        -- accessible XSYs.
 
         for isyid = 0, lmw_g:highest_symbol_id() do
             local is_accessible = lmw_g:symbol_is_accessible(isyid) ~= 0
@@ -1774,7 +1781,7 @@ TODO: Do I need xpr_top?
     end
 ```
 
-Retrun the `xpr` is the traverser is at the completion
+Return the `xpr` if the traverser is at the completion
 of an xpr top.
 Otherwise, return `nil`.
 
@@ -2468,8 +2475,10 @@ for example in error messages.
 Populate xprs.
 "xprs" are eXternal productions.
 They are actually not fully external,
-but are first translation of the XRLs into
-BNF form.
+but are a first translation of the XRLs into
+BNF form --
+they are as "external" as possible for pure
+BNF.
 One symptom of their less-than-fully external
 nature is that there are two `xprs` tables,
 one for each subgrammar.
@@ -2911,8 +2920,7 @@ contains more than one L0 span.
     end
 ```
 
-# Brief description of block/line/column for
-# an L0 range
+### Brief description of block/line/column
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -2925,8 +2933,7 @@ contains more than one L0 span.
 }
 ```
 
-Brief description of block/line/column for
-an L0 range
+### Brief description of block/line/column for an L0 range
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -3296,7 +3303,7 @@ for parsing C language.
 `nil` otherwise.
 Kollos read method and its block-by-block
 methods are not compatible.
-This boolean keeps them from begin used
+This boolean keeps them from being used
 together.
 
 ```
@@ -3606,8 +3613,7 @@ the recognizer's Lua-level settings.
 ### Internal reading
 
 The top-level read function.
-
-Return `true` if the read is alive (this is,
+Returns `true` if the read is alive (this is,
 if there is some way to continue it),
 `false` otherwise.
 
@@ -3659,10 +3665,11 @@ if there is some way to continue it),
     end
 ```
 
-"Complete" an earleme in L0.
-Return `true` if the parser is "alive",
+`l0_earleme_complete()`
+"completes" an earleme in L0.
+Returns `true` if the parser is "alive",
 that is, not exhausted.
-otherwise `false` and a status string.
+Otherwise returns `false` and a status string.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -3690,7 +3697,8 @@ otherwise `false` and a status string.
 
 ```
 
-Read an alternative.
+`l0_alternative()`
+reads an alternative.
 Returns the number of alternatives accepted,
 which will be 1 or 0.
 
@@ -3737,9 +3745,10 @@ which will be 1 or 0.
 
 ```
 
-Read the current codepoint in L0.
+`l0_read_codepoint()`
+reads the current codepoint in L0.
 Returns `true` if the parser is "alive"
-(not exhausted)/
+(not exhausted).
 Otherwise returns `false` and a status string.
 
 ```
@@ -3777,7 +3786,8 @@ Otherwise returns `false` and a status string.
 
 ```
 
-Read a lexeme from the L0 recognizer.
+`l0_read_lexeme()`
+reads a lexeme from the L0 recognizer.
 Returns `true` on success,
 otherwise `false` and a status string.
 
@@ -3809,11 +3819,16 @@ otherwise `false` and a status string.
 Determine which paths
 and candidates
 are active.
-Right now this is a prototype:
+
+[ Right now this is a prototype:
 Only LATM is implemented;
 a candidate is an earley set ID;
 candidates are moved
 and seconded at once.
+In fact, because we are switching to global lexeme priorities;
+this mechanism may be replaced by multiple lexers.
+There would be two lexers for each
+priority -- eager first, then lazy. ]
 
 The candidate eventually
 chosen is the last one
@@ -3894,12 +3909,24 @@ not find an acceptable lexeme.
     end
 ```
 
-Read find and read the alternatives in the SLIF.
-Returns `true` if the parse is alive,
-`false` if it's exhausted.
-Also returns `false` on "pause before" because
-special action is probably needed before the parse
-should resume.
+`alternatives()`
+finds and reads the alternatives in the SLIF.
+Returns `true`
+if the parse is alive and not in "parse before" status.
+Return `false` otherwise.
+The intuitive idea behind the return codes is that
+
+* `true` means the parse that can continue without special action
+by the user.
+
+* `false` means that either
+
+    - the parse is in "pause before" status and special action
+    might be required for it to continue; or
+
+    - the parse is exhausted, and cannot continue under any
+    circumstance.
+
 When `false` is returned, `alternatives()`
 may also return
 a string indicating the status.
@@ -4982,7 +5009,7 @@ or nil if there was none.
 
 ```
 
-TODO: Make `collected_progress_items a local, after development.
+TODO: Make `collected_progress_items` a local, after development.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -11979,7 +12006,7 @@ but before it is executed.
 ### VLQ (Variable-Length Quantity)
 
 This is an implementation of
-[VLQ (Variable-Length Quantity)|https://en.wikipedia.org/wiki/Variable-length_quantity].
+[VLQ (Variable-Length Quantity)](https://en.wikipedia.org/wiki/Variable-length_quantity).
 
 ```
     -- miranda: section+ kollos table methods
@@ -12168,7 +12195,6 @@ Returns `nil` if `a == b`, and `false` if `a > b`.
 
 ```
 
-vim: expandtab shiftwidth=4:
 <!--
 vim: expandtab shiftwidth=4:
 -->
