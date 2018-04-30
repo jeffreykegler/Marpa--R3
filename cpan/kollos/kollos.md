@@ -3819,11 +3819,16 @@ otherwise `false` and a status string.
 Determine which paths
 and candidates
 are active.
-Right now this is a prototype:
+
+[ Right now this is a prototype:
 Only LATM is implemented;
 a candidate is an earley set ID;
 candidates are moved
 and seconded at once.
+In fact, because we are switching to global lexeme priorities;
+this mechanism may be replaced by multiple lexers.
+There would be two lexers for each
+priority -- eager first, then lazy. ]
 
 The candidate eventually
 chosen is the last one
@@ -5004,7 +5009,7 @@ or nil if there was none.
 
 ```
 
-TODO: Make `collected_progress_items a local, after development.
+TODO: Make `collected_progress_items` a local, after development.
 
 ```
     -- miranda: section+ most Lua function definitions
@@ -12001,7 +12006,7 @@ but before it is executed.
 ### VLQ (Variable-Length Quantity)
 
 This is an implementation of
-[VLQ (Variable-Length Quantity)|https://en.wikipedia.org/wiki/Variable-length_quantity].
+[VLQ (Variable-Length Quantity)](https://en.wikipedia.org/wiki/Variable-length_quantity).
 
 ```
     -- miranda: section+ kollos table methods
@@ -12190,7 +12195,6 @@ Returns `nil` if `a == b`, and `false` if `a > b`.
 
 ```
 
-vim: expandtab shiftwidth=4:
 <!--
 vim: expandtab shiftwidth=4:
 -->
