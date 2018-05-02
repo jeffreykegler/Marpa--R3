@@ -89,40 +89,41 @@ It assumes that you are already familiar with L<the high-level interface|Marpa::
 This low-level interface allows the maximum flexiblity in building the forest,
 but requires the application to do much of the work.
 
-=head1 Ambiguity: factoring versus symches
+=head1 Ambiguity: partitions versus symches
 
 An abstract syntax forest (ASF) is similar to an abstract syntax tree (AST), but it
 has an additional ability -- it can represent an ambiguous parse.
 Ambiguity in a parse can come in two forms, and Marpa's ASF's treat the
 distinction as important.  An ambiguity can be a symbolic choice
-(a symch), or a factoring.  Symbolic choices are the kind of ambiguity
+(a symch), or a partition choice.  Symbolic choices are the kind of ambiguity
 that springs first to mind -- a choice between rules, or a choice
-between a rule and token.  Factorings involve only one rule,
-but the RHS symbols of that rule divide the input up ("factor it") in different ways.
+between a rule and token.  Partition choices involve only one rule,
+but the RHS symbols of that rule divide the input up
+("partition it") in different ways.
 I'll give examples below.
 
-Symches and factorings are treated separately,
+Symches and partitions are treated separately,
 because they behave very differently:
 
 =over 4
 
-=item * Symches are less common than factorings.
+=item * Symches are less common than partitions.
 
 =item * Factorings are frequently not of interest; symches are almost
 always of major interest.
 
 =item * Symches usually have just a few alternatives; the
-possible number of factorings easily grows into the thousands.
+possible number of partitions easily grows into the thousands.
 
 =item * In the worst case, the number of symches is a constant
 that depends on size of the grammar.
 In the worst case,
-the number of factorings
-grows exponentially with the length of the string being factored.
+the number of partitions
+grows exponentially with the length of the string being partitioned.
 
 =item * The constant limiting the number of symches will
 almost always be of manageable size.
-The number of factorings can grow without limit.
+The number of partitions can grow without limit.
 
 =back
 
@@ -176,12 +177,12 @@ depending on whether rule 0 or rule 1 is used.
 The choice, at glade 2, between rules 0 and 1,
 is a symch.
 
-=head2 An example of a factoring
+=head2 An example of a partition
 
 For the grammar,
 
 =for Marpa::R3::Display
-name: ASF factoring dump example grammar
+name: ASF partition dump example grammar
 normalize-whitespace: 1
 partial: 1
 
@@ -207,7 +208,7 @@ two different ways: long string first; or short string first.
 These two different ways of dividing the input stream using the rule
 
 =for Marpa::R3::Display
-name: ASF factoring dump example grammar
+name: ASF partition dump example grammar
 normalize-whitespace: 1
 partial: 1
 
@@ -215,10 +216,10 @@ partial: 1
 
 =for Marpa::R3::Display::End
 
-are called a B<factoring>.  Here's Marpa's dump of the forest:
+are called a B<partition>.  Here's Marpa's dump of the forest:
 
 =for Marpa::R3::Display
-name: ASF factoring dump example output
+name: ASF partition dump example output
 remove-blank-last-line: 1
 remove-display-indent: 1
 
@@ -257,7 +258,10 @@ The peak has no upglades.
 
 =head1 The glade hierarchy
 
-The glade hierarchy is directed graph whose nodes are glades.
+The glade hierarchy is
+a DAG ("directed acyclic graph") whose nodes are glades.
+DAGs are often called "trees", but the term tree is
+confusingly overloaded in this context.
 Internally,
 glade nodes have an 3-level internal structure
 made up of
@@ -266,23 +270,23 @@ made up of
 
 =item * one or more symches, which contain
 
-=item * zero or more factorings, which contain
+=item * zero or more partitions, which contain
 
 =item * one or more downglades.
 
 =back
 
 When discussing symches
-and factorings inside the internal structure of a glade I<G>,
+and partitions inside the internal structure of a glade I<G>,
 I<G> will be called the B<containing glade>.
 
 If I<G> is a glade,
 the downglades in the internal structure will be
-the child nodes of I<G> in the directed graph of
+the child nodes of I<G> in the DAG of
 glades.
 There may not be any downglades, in which
 case I<G> will be a terminal in
-the directed graph of glades.
+the DAG graph of glades.
 
 =head2 Glades
 
@@ -292,6 +296,16 @@ and an "input span".
 An input span is an input start location, and a length in characters.
 Because it has a start location and a length,
 a span also specifies an end location in the input.
+
+Each glade can be seen as a DAG of symches and partitions.
+This is called the B<internal DAG> of the glade.
+
+If each glade in the DAG of glades is expanded, so that each
+internal glade DAG becomes a sub-tree in the glade DAG,
+the result is the B<expanded glade DAG>.
+In this context,
+the expanded glade DAG if often called
+the B<expanded DAG>.
 
 =head2 Symches
 
@@ -306,10 +320,11 @@ For a rule symch, the glade symbol is the LHS of the rule.
 
 At most one of the symches in a glade can be a token symch.
 Token symches have no children.
-In the internal structure of a glade, they are terminals.
-If a glade has a unique symch,
-and that symch is a token symch,
-that glade will be a terminal in the glade hierarchy.
+In the internal DAG of a glade, they are terminals.
+
+Token symches are always unique.
+A token symch is a terminal in the internal DAG of its glade.
+A token symch is also a terminal in the expanded glade DAG.
 
 =head2 Rule symches
 
@@ -322,51 +337,66 @@ the LHS of its rule will always be the same
 as the glade symbol
 of the glade that contains the rule symch.
 
-=head2 Factorings
+=head2 Partitions
 
-Every rule symch has one or more B<factorings>,
-or B<factors>, as children.
+Every rule symch has one or more B<partitions>.
+Each partition is an ordered set of B<cells>,
+one for every symbol on the RHS of the rule.
+Each cell is mapped to a span of G1 locations.
+
 A rule symch is said to B<contain>
-its child factorings.
-Each factoring is the RHS of the parent symch's
-rule, mapped to a unique set of G1 locations.
-The term "factoring" is traditional in the literature
-and is meant to suggest that
-a factoring is a way of
+its child partitions.
+In the parsing literature,
+the traditional term for a partition,
+is a "factoring".
+The term "factoring" is meant to suggest that
+it is a way of
 "dividing up" the input span
 of the containing glade among its RHS symbols.
+We prefer the term "partition" because it is less
+overloaded.
 
-If a rule symch has only one factoring, that factoring is said to be B<unique>.
-Because the number of factorings can get out of hand,
-factorings may be omitted.
-A symch which omits factorings is said to be B<truncated>.
-By default, every symch is truncated down to its first 42 factorings.
+If a rule symch has only one partition, that partition is said to be B<unique>.
+Because the number of partition can get out of hand,
+partitions may be omitted.
+A symch which omits partitions is said to be B<truncated>.
+By default, every symch is truncated down to its first 42 partitions.
 
 =head2 Downglades
 
-Every factoring has one or more downglades as children.
-The number of downglades will be I<L>,
+Every partition has one or more cells.
+Each cell corresponds to a downglade.
+These cell-downglades are the children of
+the partition.
+The number of cells will be I<L>,
 where I<L> is the length of the RHS
 of the parent symch's rule.
-(The parent symch will always be a rule symch.)
-Each of I<L> RHS symbols will be located at
-a specific G1 span,
-and will therefore be a B<symbol instance>.
-This symbol instance will be the symbol instance
-of a glade,
-and that glade will be the downglade.
+(The parent symch of a partition will always be a rule symch.)
+
+Each cell is associated with
+a symbol and a G1 span.
+The symbol of the I<n>th cell is the I<n>th
+RHS symbol of the parent symch's rule.
+Since each cell has a symbol and
+a G1 span,
+each cell is
+a B<symbol instance>.
+The symbol instance of a cell is
+the symbol instance of its associated downglade.
 
 Within a glade,
-symches, factorings and downglades
+symches, partitions and downglades
 are tracked using zero-based indexes.
-Since the internal structure of a glade has
-a 3-level structure,
-within a given containing glade I<G>,
-any downglade can be uniquely
-identified as C<($symch_ix, $factor_ix, $downglade_ix)>,
+The internal DAG of a glade has
+a 3-level structure --
+symches, then partitiions, then downglades.
+Therefore, within
+a given containing glade I<G>,
+every downglade can be uniquely
+identified as C<($symch_ix, $partition_ix, $downglade_ix)>,
 where
 C<$symch_ix> is a zero-based symch index,
-C<$factor_ix> is a zero-based factoring index, and
+C<$partition_ix> is a zero-based partition index, and
 C<$downglade_ix> is a zero-based downglade index.
 
 =head1 The glade ID
@@ -376,6 +406,18 @@ This can be relied on to be a non-negative integer.
 A glade ID may be zero.
 Glade ID's are obtained from the L</"peak()">
 and L</"factoring_downglades()"> methods.
+
+Glade IDs are assigned dynamically as the ASF
+is traversed.
+This means the ID of a glade may be different,
+if the ASF is traversed differently.
+Programmers need to be aware that, while
+glade IDs can be relied on
+as constant unique identifiers
+with an ASF instance,
+they cannot be compared across ASF instances,
+even when those ASF's are
+based on the same parse tree.
 
 =head1 Techniques for traversing ASF's
 
@@ -391,17 +433,17 @@ If so, the memoized result should be used.
 
 This memoization eliminates the need to revisit the downglades
 of an already visited glade.
-It does not eliminate multiple visits to a glade, but it does
-eliminate retraversal of the glades downhill from it.
+Repeated subtraversals
+can happen when two glades share the same downglades,
+something that occurs frequently in ASF's.
+
+Memoization does not eliminate multiple visits to a glade,
+but it does
+eliminate re-traversal of the glades downhill from it.
 In practice, the improvement in speed can be stunning.
 It will often be the difference between
-an program which is unuseably slow even for very small inputs,
+a program which is unuseably slow even for very small inputs,
 and one which is extremely fast even for large inputs.
-
-Repeated subtraversals happen when two glades share the same downglades,
-something that occurs frequently in ASF's.
-Additionally, some day the SLIF may allow cycles.
-Memoization will prevent a cycle from causing an infinite loop.
 
 The example in this POD includes a memoization scheme which is very simple,
 but adequate for most purposes.
@@ -557,7 +599,7 @@ partial: 1
 
 Requires two arguments: a glade ID and a zero-based symch index.
 These specify a symch.
-Returns the count of factorings if the specified symch is a rule symch.
+Returns the count of partitions if the specified symch is a rule symch.
 This count will always be one or greater.
 Returns zero if the specified symch is a token symch.
 
@@ -581,14 +623,15 @@ partial: 1
 
 Requires three arguments: a glade ID,
 the zero-based index of a symch
-and the zero-based index of a factoring.
-These specify a factoring.
+and the zero-based index of a partition.
+These specify a partition.
 On success, returns a reference to an array.
 The array contains the glade IDs of
 the downglades in
-the factoring specified.
+the partition specified.
 
-Returns a Perl undef, if the glade and symch exist, but the factoring index is too high.
+Returns a Perl undef, if the glade and symch exist,
+but the partition index is too high.
 On other failure, throws an exception.
 In particular, exceptions are thrown if the symch is for a token;
 and if the glade exists, but the symch index is too high.
@@ -677,23 +720,19 @@ and is intended for reading by humans only.
 =head1 Ambiguity reports
 
 The ambiguity reports returned by the L<C<ambiguities()> method|/"ambiguities()">
-are of two kinds: symch reports and factoring reports.
+are of two kinds: symch reports and partition reports.
 Only ambiguities uppermost on a path are reported --
 in other words, an ambiguity
-is not reported if it is downhill
-and does not have a higher altitude.
-(Because of cycles,
-it is possible for a downhill glade to be at a higher altitude.)
-Within glade, all of the factorings are
-considered downhill from,
-and of equal altitude to the symches,
+is not reported if it is downhill.
+Within glade, all of the partitions are
+considered downhill from the symches,
 so that if a glade has a symch ambiguity,
-there will be no factoring ambiguity reports for that glade.
+there will be no partition ambiguity reports for that glade.
 
 Typically, when there is more than one kind of ambiguity in an input span, only
 one is of real interest,
 and
-symch ambiguities are usually of more interest than factorings.
+symch ambiguities are usually of more interest than partitions.
 And if one ambiguity is uphill from another, the downhill ambiguity is usually
 a side effect of the uphill one and
 of little interest.
@@ -717,44 +756,44 @@ details of the symch ambiguity.
 
 =head2 Factoring reports
 
-A factoring report identifies
-a sequence of RHS symbols which has more than one factoring.
+A partition report identifies
+a sequence of RHS symbols which has more than one partition.
 Factoring reports identify not just a rule,
 but specific subsequences within the RHS
-which are multiply factored -- B<multifactored stretches>.
+which are multiply partitioned -- B<multipartitioned stretches>.
 Marpa goes down to the symbol level, because a Marpa RHS can be very long.
 Marpa's sequence rules, especially,
 can have long stretches where the symbols are in sync
 with each other, broken by other stretches where they are out of sync.
-(A detailed definition of multifactored stretches is L<below|/"Multifactored stretches">.)
+(A detailed definition of multipartitioned stretches is L<below|/"Multifactored stretches">.)
 
-A factoring report takes the form
+A partition report takes the form
 
 =for Marpa::R3::Display
 ignore: 1
 
-    [ 'factoring', $glade, $symch_ix, $rhs_ix1, $factor_ix2, $rhs_ix2 ];
+    [ 'partition', $glade, $symch_ix, $rhs_ix1, $factor_ix2, $rhs_ix2 ];
 
 =for Marpa::R3::Display::End
 
-where C<$glade> is the ID of the glade with the factoring ambiguity,
+where C<$glade> is the ID of the glade with the partition ambiguity,
 and C<$symch_ix> is the index of the symch involved.
-The multifactored stretch is described by
+The multipartitioned stretch is described by
 two "identifying downglades".
 Both downglades are at the beginning of the stretch,
 and both will have the same input start location.
 The identifying downglades will differ in length.
 
-The first of the two identifying factors has a factoring index of 0,
+The first of the two identifying factors has a partition index of 0,
 and its downglade index is C<$rhs_ix1>.
-The second identifying factor has a factoring index of C<$factor_ix2>,
+The second identifying factor has a partition index of C<$factor_ix2>,
 and its downglade index is C<$rhs_ix2>.
 
 The identifying downglades will usually be enough
 for error reporting, which is the usual application of these reports.
-A multifactored stretch can be extremely large.
+A multipartitioned stretch can be extremely large.
 Full details of it
-can be found by following up on the information in the factoring report
+can be found by following up on the information in the partition report
 using the accessor methods described in this document.
 
 =head1 The code for the synopsis
@@ -791,7 +830,7 @@ normalize-whitespace: 1
               next SYMCH;
           } ## end if ( $g1_rule_id < 0 )
 
-          # ignore any truncation of the factorings
+          # ignore any truncation of the partitions
           my $factoring_count =
               $asf->symch_factoring_count( $glade, $symch_ix );
           my @symch_description = ("Glade $glade");
@@ -816,7 +855,7 @@ normalize-whitespace: 1
           if ( $factoring_count > 1 ) {
               push @symches,
                   bless [
-                  "Glade $glade, symch $symch_ix has $factoring_count factorings",
+                  "Glade $glade, symch $symch_ix has $factoring_count partitions",
                   @factorings
                   ],
                   'My_Factorings';
@@ -906,77 +945,6 @@ if and only if the glade length from A to B is defined.
 
 A B<peak> of an ASF is a node without upglades.
 By construction of the ASF, there is only one peak.
-The B<distance-to-peak> of a glade C<A> is the glade length from the peak to glade C<A>.
-Glade C<A> is said to have a higher B<altitude> than glade C<B> if the distance-to-peak of glade C<A>
-is less than that of glade C<B>.
-Glade C<A> has a lower B<altitude> than glade C<B> if the distance-to-peak of glade C<A>
-is greater than that of glade C<B>.
-Glade C<A> has the same B<altitude> as glade C<B> if the distance-to-peak of glade C<A>
-is equal to that of glade C<B>.
-
-=head2 Cycles
-
-In the current SLIF implementation, a forest is a directed acyclic graph (DAG).
-(In the mathematical literature a DAG is also called a "tree", but that use is confusing
-in the present context.)
-The underlying Marpa algorithm allows parse trees with cycles,
-and someday the SLIF probably will as well.
-When that happens, ASF's will no longer be "acyclic" and therefore will be directed graphs
-(DG's) but not DAG's.
-This document talks about ASF's as if that day had already come --
-it assumes that the ASF's might
-contain cycles.
-
-In an ASF that contains one or more cycles,
-the concepts of uphill and downhill become much less useful
-for describing the relative positions of glades.
-For example, if glade A cycles back to itself through glade B, then
-
-=over 4
-
-=item * Glade A will be uphill from glade B, and
-
-=item * Glade B will be uphill from glade A; so that
-
-=item * Glade B will be downhill from glade A, and
-
-=item * Glade A will be downhill from glade B; and
-
-=item * Glade A will be both downhill and uphill from itself; and
-
-=item * Glade B will be both downhill and uphill from itself.
-
-=back
-
-ASF's will always be constructed so that the peak has no upglades.
-Because of this, the peak can never be part of a cycle.
-This means that altitude will always be well defined in the sense that,
-for any two glades C<A> and C<B>, one and only one of the following statements will be true:
-
-=over 4
-
-=item * Glade C<A> is lower in altitude than glade C<B>.
-
-=item * Glade C<A> is higher in altitude than glade C<B>.
-
-=item * Glade C<A> is equal in altitude to glade C<b>.
-
-=back
-
-=head2 Token symches
-
-In the current SLIF implementation, a symbol is always either a token
-or the LHS of a rule.
-This means that any glade that contains a token symch
-cannot contain any rule symches.
-It also means that any glade that contains a rule symch will not
-contain a token symch.
-
-However, the underlying Marpa algorithm allows LHS terminals,
-and someday the SLIF probably will as well.
-This document is written as if that day has already come,
-and describes
-glades as if they could contain both rule symches and a token symch.
 
 =head2 Maximum symches per glade
 
@@ -985,144 +953,14 @@ even in the worst case, is a very manageable number.
 For a particular case, it is not hard to work out the exact maximum.
 Here are the details.
 
-There can be at most one token symch.
-There can be only rule symch for every rule.
+There can be at most one token symch,
+and if there is a token symch,
+it will be the only symch.
+There can be only one rule symch for every rule.
 In addition, all rules in a glade must have the glade symbol as their LHS.
-Let the number of rules with the glade symbol on their LHS be C<r>.
-The maximum number of symches in a glade is C<r+1>.
-
-=head2 Multifactored stretches
-
-Marpa locates factoring ambiguities, not just by rule,
-but by subsequences of symbols within a RHS.
-It finds B<multifactored stretches>, input spans where the sequence of symbols
-can have multiple factorings.
-Sequence rules can have a very long RHS.
-If ambiguity reporting is to be precise,
-it is necessary
-to narrow down factoring ambiguities to the specific input spans
-where they occur.
-
-Marpa tries to break up each ambiguously factored RHS
-into as many multifactored stretches
-as possible.
-Nonetheless,
-there will be cases in which
-a multifactored stretch encompasses the entire RHS of a rule.
-
-The main body of this document worked with an intuitive "know one when I see one"
-idea of multifactored stretches.
-In this section we will give an exact definition.
-First, we will need some preliminary definitions.
-
-Consider the case of a arbitrary, ambiguous rule symch.
-The ambiguous rule symch can be seen as a set of factorings.
-We need a way to identify individual downglades within
-each factoring of the set.
-Within a factoring,
-there is a one-to-one correspondence between
-downglade and locations in the string of symbols that
-is the RHS.
-Therefore downglades can be identified uniquely as
-C<glade_id, symch_ix, factor_ix, rhs_ix>,
-where C<glade_id> is a unique identifier of the glade,
-C<symch_ix> is a zero-based symch index,
-C<factor_ix> is a zero-based factoring index, and
-C<rhs_ix> is a zero-based index identifying a
-symbol location in the RHS string.
-
-In much of what follows,
-we will assume we are talking about a specific
-glade and rule symch, which is understood in context,
-so that we can take
-C<factor_ix, rhs_ix> as uniquely identifying a downglade.
-We will call
-C<factor_ix, rhs_ix> a downglade duple.
-
-Let I<N> be the number of factorings in the rule symch of interest.
-Since we are dealing with a specific rule symch, we also
-have a specific rule that is of interest.
-Call the length of the RHS of that rule, C<rhs_length>.
-For every C<factor_ix>, the values of C<rhs_ix>
-will be in the range C<0 ... rhs_length-1>.
-
-Each downglade C<factor_ix, rhs_ix>
-corresponds one-to-one to a G1 span.
-This means that
-there is a total function
-C<G1_start(factor_ix, rhs_ix)> from a downglade
-to a G1 start location;
-and that there is a total function
-C<G1_length(factor_ix, rhs_ix)>
-from a downglade
-to a G1 length.
-
-A B<symch location set>
-is a set of I<N> downglade duples
-such there is exactly one element
-C<factor_ix, rhs_ix>
-in the set for each
-C<< 0 <= factor_ix < N >>.
-In other words, a symch location set is
-a total function from the factor indexes
-to the RHS indexes.
-
-A B<symch alignment> is a symch location set
-whose elements shares a common G1 start location.
-A symch alignment is synced if its elements share a common G1 length as well.
-A symch alignment is unsynced if it is not synced.
-
-More formally, if we represent the symch location set
-function as C<SLS>,
-C<SLS> is a symch alignment if and only if
-there is some constant G1 location I<pos> such
-that, for all C<factor_ix>
-such that C<< 0 <= factor_ix < N >>,
-C<G1_start(factor_ix, SLS(factor_ix)) = pos>.
-We say the C<pos> is the location of the symch alignment.
-C<SLS> is a synced symch alignment if and only if
-it is a symch aligment and
-there is some constant number I<L> such
-C<G1_length(factor_ix, SLS(factor_ix)) = L>.
-
-Of special interest is the B<initial symch location set>.
-The initial symch location set is the symch position all of whose RHS indexes
-are 0.
-Equivalently, it is the constant function C<ISLS>
-where C<ISLS(factor_ix)=0> for all C<factor_ix>
-such that C<< 0 <= factor_ix < N >>.
-The initial symch location set is always a symch alignment,
-and is called the B<initial symch alignment>.
-
-We are now in a position to define a B<multifactored stretch>
-for a specific rule symch.
-Call a G1 location an B<anchor> if it is the location
-of a synced symch alignment or,
-as a special case,
-if it is one past the last location of the G1 stream.
-We say that a G1 span is B<anchored> if its start
-and end G1 locations are anchors.
-A B<multifactored stretch> is an anchored G1 span
-which contains only one anchored G1 location.
-(Recall that, by the definition of a span,
-the end location of a span
-is not contained in the span.)
-
-As a consequence of its definition,
-the start location of a multifactored stretch
-will always be an anchor,
-and the only anchored location in the multifactored
-stretch will be its start location.
-(Again, by definition,
-the end location of the stretch is not
-contained in the stretch.)
-
-Multifactored stretches
-are aligned and anchored in terms of G1 locations,
-and B<not> in terms of input stream locations or RHS indexes.
-It may be useful, however, to look at syncing and alignment
-from other points of view.
-This is done in the next two sections.
+Therefore,
+the maximum number of symches in a glade is 
+the number of rules with the glade symbol on their LHS.
 
 =head3 Alignment and input stream locations
 
@@ -1141,7 +979,7 @@ point.
 =head3 Alignment and RHS indexes
 
 Symch location sets that are aligned
-from the G1 location point will typically not be
+from the G1 location point are not necessarily
 aligned from the point of
 the RHS indexes.
 Non-aligned RHS indexes are particularly likely for

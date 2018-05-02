@@ -230,6 +230,7 @@ t/00-load.t
 t/01-lua.t
 t/25_ah2.t
 t/25_asfah2.t
+t/50d-ambig.t
 t/50d-block.t
 t/50d-debug.t
 t/50d-external.t
