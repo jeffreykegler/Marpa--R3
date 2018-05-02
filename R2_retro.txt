@@ -1,0 +1,7 @@
+Retroports for R2:
+
+Documentation of trigger location -- needs fixing?
+
+Showing ambiguous factorings is over-engineering.  Also does it miss
+some cases?  And detailed description of mulitpartitioned sequences in
+Glade.pod is wrong.

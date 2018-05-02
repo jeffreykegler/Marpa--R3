@@ -11,14 +11,16 @@
 # of the licenses in the directory LICENSES.
 
 # Tests of ambiguity detection in the target grammar
-# (as opposed to the SLIF DSL itself).
+# (as opposed to the meta-grammar itself).
+#
+# This script is devoted to testing displays
 
 use 5.010001;
 
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 4;
 use English qw( -no_match_vars );
 use POSIX qw(setlocale LC_ALL);
 
@@ -70,6 +72,9 @@ PROCESSING: {
         last PROCESSING;
     } ## end if ( not defined eval { $recce->read( \$input ); 1 })
 
+# Marpa::R3::Display
+# name: ASF ambiguity reporting
+
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     if ( $valuer->ambiguity_level() > 1 ) {
         my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
@@ -84,6 +89,8 @@ PROCESSING: {
             Marpa::R3::Internal_ASF2::ambiguities_show( $asf, \@ambiguities );
         last PROCESSING;
     }
+
+# Marpa::R3::Display::End
 
     $is_ambiguous_parse = 0;
 
@@ -114,66 +121,16 @@ else {
     my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
     my $glade_id = $asf->peak;
 
+# Marpa::R3::Display
+# name: glade_g1_span() example
+
     my ( $glade_start, $glade_length ) = $asf->glade_g1_span($glade_id);
+
+# Marpa::R3::Display::End
 
     Test::More::is( $glade_start,  0, qq{glade_g1_span() start} );
     Test::More::is( $glade_length, 2, qq{glade_g1_span() length} );
 
 } ## end else [ if ( !$is_ambiguous_parse ) ]
-
-# Tests of ambiguity_level() anb ambiguous() across all ranking methods
-$source = \(<<'END_OF_SOURCE');
-
-top ::= unchoice rank => 1
-top ::= choice
-unchoice ::= choice1
-choice ::= choice1 | choice2
-choice1 ::= A1 B1
-choice2 ::= A2 B2
-A1 ~ 'a'
-A2 ~ 'a'
-B1 ~ 'b'
-B2 ~ 'b'
-
-:discard ~ ws
-ws ~ [\s]+
-END_OF_SOURCE
-
-$input = q{a b};
-
-for my $ranking_method ( 'none', 'rule', 'high_rank_only' ) {
-
-    my $ranking_grammar = Marpa::R3::Grammar->new(
-        { ranking_method => $ranking_method, source => $source } );
-
-    $recce = Marpa::R3::Recognizer->new( { grammar => $ranking_grammar } );
-
-    $recce->read( \$input );
-
-    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
-
-    if ( $ranking_method eq 'high_rank_only' ) {
-
-        # count parses and test that there is only one
-        my $parse_count = 0;
-        while ( defined $valuer->value() ) { ++$parse_count }
-        Test::More::is( $parse_count, 1,
-            "$ranking_method ranking, single parse" );
-
-        # reset recognizer and test ambiguity methods
-        Test::More::is( $valuer->ambiguous(), '',
-            "$ranking_method ranking, single parse, ambiguous status is empty"
-        );
-        Test::More::is( $valuer->ambiguity_level(),
-            1, "$ranking_method ranking, single parse, ambiguity level is 1" );
-    }
-    else {
-        Test::More::isnt( $valuer->ambiguous(), '',
-            "$ranking_method ranking, many parses, ambiguous status isn't empty"
-        );
-        Test::More::ok( $valuer->ambiguity_level() > 1,
-            "$ranking_method ranking, many parses, ambiguity level > 1" );
-    }
-} ## end for my $ranking_method ...
 
 # vim: expandtab shiftwidth=4:

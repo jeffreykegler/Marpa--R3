@@ -312,8 +312,8 @@ for my $i ( 0 .. $input_length ) {
         die 'No ASF' if not defined $asf;
     }
 
-    # TODO: Commented out for now.
-    if (0) {
+    # TODO: Remove if(0|1) after development
+    if (1) {
 
         my $ambiguity_desc = 'No ambiguity';
         if ( $ambiguity_level > 1 ) {
