@@ -1,6 +1,5 @@
 #!perl
 # Marpa::R3 is Copyright (C) 2018, Jeffrey Kegler.
-#
 # This module is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.10.1. For more details, see the full text
 # of the licenses in the directory LICENSES.
@@ -118,13 +117,13 @@ if ( !$is_ambiguous_parse ) {
     Test::More::fail(qq{glade_g1_span() length});
 }
 else {
-    my $asf = Marpa::R3::ASF2->new( { recognizer => $recce } );
-    my $glade_id = $asf->peak;
+    my $asf = Marpa::R3::ASF->new( { recognizer => $recce } );
+    my $glade = $asf->peak;
 
 # Marpa::R3::Display
 # name: glade_g1_span() example
 
-    my ( $glade_start, $glade_length ) = $asf->glade_g1_span($glade_id);
+    my ( $glade_start, $glade_length ) = $glade->g1_span();
 
 # Marpa::R3::Display::End
 

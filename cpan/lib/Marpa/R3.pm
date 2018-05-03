@@ -88,6 +88,10 @@ require Marpa::R3::MetaAST;
 ( $version_result = version_ok($Marpa::R3::MetaAST::VERSION) )
     and die 'Marpa::R3::MetaAST::VERSION ', $version_result;
 
+require Marpa::R3::Glade;
+( $version_result = version_ok($Marpa::R3::Glade::VERSION) )
+    and die 'Marpa::R3::Glade::VERSION ', $version_result;
+
 require Marpa::R3::ASF;
 ( $version_result = version_ok($Marpa::R3::ASF::VERSION) )
     and die 'Marpa::R3::ASF::VERSION ', $version_result;

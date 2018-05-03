@@ -250,12 +250,7 @@ END__OF_LUA
 sub Marpa::R3::ASF::peak {
     my ($asf) = @_;
 
-    my ($peak) = $asf->call_by_tag(
-    ('@' . __FILE__ . ':' . __LINE__),
-    <<'END__OF_LUA', '>*' );
-    local asf = ...
-    return asf:peak()
-END__OF_LUA
+    my ($peak) = Marpa::R3::Internal_Glade::peak($asf);
     return $peak;
 }
 

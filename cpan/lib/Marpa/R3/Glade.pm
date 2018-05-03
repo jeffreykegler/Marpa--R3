@@ -55,24 +55,16 @@ sub glade_common_set {
     return $flat_args;
 }
 
-# Returns undef if no parse
-sub Marpa::R3::Glade::peak {
-    my ( $class, @args ) = @_;
-    my $asf = bless [], $class;
+sub Marpa::R3::Internal_Glade::peak {
+    my ( $asf, @args ) = @_;
+    my $glade = bless [], "Marpa::R3::Glade";
 
     my $end_of_parse;
 
     my ( $flat_args, $error_message ) = Marpa::R3::flatten_hash_args( \@args );
-    Marpa::R3::exception( sprintf $error_message, '$asf->new' )
+    Marpa::R3::exception( sprintf $error_message, '$glade->peak' )
       if not $flat_args;
-    $flat_args = asf_common_set( $asf, $flat_args );
-
-    my $asf = $flat_args->{asf};
-    Marpa::R3::exception(
-        qq{Marpa::R3::Glade::peak() called without an "asf" argument} )
-      if not defined $asf;
-    # $asf->[Marpa::R3::Internal_Glade::ASF] = $slr;
-    delete $flat_args->{recognizer};
+    $flat_args = glade_common_set( $glade, $flat_args );
 
     my $asf_class = 'Marpa::R3::ASF';
     if ( not blessed $asf or not $asf->isa($asf_class) ) {
@@ -230,6 +222,18 @@ sub Marpa::R3::Glade::coro_by_tag {
         Marpa::R3::exception($eval_error);
     }
     return @results;
+}
+
+sub Marpa::R3::Glade::g1_span {
+    my ($glade) = @_;
+
+    my ($g1_start, $g1_length) = $glade->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local glade = ...
+    return glade:g1_span()
+END__OF_LUA
+    return $g1_start, $g1_length;
 }
 
 # not to be documented
