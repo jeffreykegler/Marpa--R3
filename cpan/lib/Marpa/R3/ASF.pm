@@ -93,15 +93,6 @@ sub Marpa::R3::ASF::new {
     my $lua = $slr->[Marpa::R3::Internal_R::L];
     $asf->[Marpa::R3::Internal_ASF::L] = $lua;
 
-        ARG: for my $arg ( keys %{$flat_args} ) {
-            if ( $arg eq 'factoring_max' ) {
-                $asf->[Marpa::R3::Internal_ASF::FACTORING_MAX] =
-                    $flat_args->{$arg};
-                delete $flat_args->{$arg};
-                next ARG;
-            }
-        }
-
     my ( $regix ) = $slr->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
@@ -254,6 +245,18 @@ sub Marpa::R3::ASF::ambiguity_level {
     return asf:ambiguity_level()
 END__OF_LUA
     return $metric;
+}
+
+sub Marpa::R3::ASF::peak {
+    my ($asf) = @_;
+
+    my ($peak) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local asf = ...
+    return asf:peak()
+END__OF_LUA
+    return $peak;
 }
 
 sub Marpa::R3::ASF::g1_pos {
