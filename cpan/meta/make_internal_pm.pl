@@ -124,6 +124,14 @@ __DATA__
     CAUSE_IS_EXPANDED
     PREDECESSOR_IS_EXPANDED
 
+    :package=Marpa::R3::Internal_Glade
+
+    TRACE_FILE_HANDLE
+
+    L { Lua Interpreter }
+    REGIX { Registry index in Lua interpreter --
+        a valid Lua index but not a pseudo-index. }
+
     :package=Marpa::R3::Internal_ASF
 
     TRACE_FILE_HANDLE

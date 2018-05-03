@@ -46,6 +46,11 @@ use constant IS_PREDECESSOR => 5;
 use constant CAUSE_IS_EXPANDED => 6;
 use constant PREDECESSOR_IS_EXPANDED => 7;
 
+package Marpa::R3::Internal_Glade;
+use constant TRACE_FILE_HANDLE => 0;
+use constant L => 1;
+use constant REGIX => 2;
+
 package Marpa::R3::Internal_ASF;
 use constant TRACE_FILE_HANDLE => 0;
 use constant L => 1;

@@ -6344,6 +6344,9 @@ arguments are correct.
         end
         -- soft failure if no match
         if #symches < 0 then return end
+        glade.xsyid = xsyid
+        glade.g1_start = g1_start
+        glade.g1_end = g1_end
         glade.rule_symches = symches
         glade.type = 'rule'
         return glade
@@ -6796,6 +6799,24 @@ and "leo" for a Leo glade.
 
     -- miranda: insert class_glade field declarations
     declarations(_M.class_glade, class_glade_fields, 'glade')
+```
+
+### Glade accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_glade.xsyid(glade)
+        return glade.xsyid
+    end
+    function _M.class_glade.g1_start(glade)
+        return glade.g1_start
+    end
+    function _M.class_glade.g1_end(glade)
+        return glade.g1_end
+    end
+    function _M.class_glade.id(glade)
+        return glade.xsyid .. glade.g1_start .. glade.g1_end
+    end
 ```
 
 ## Kollos semantics
