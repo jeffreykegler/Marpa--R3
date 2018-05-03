@@ -6110,10 +6110,10 @@ This is a registry object.
 
     class_asf_fields.top_xsyid = true
     class_asf_fields.g1_start = true
-    class_asf_fields.g1_end = true
-    class_asf_fields.peak = true
+    class_asf_fields.g1_length = true
 
-    -- underscore ("_") to prevent override of function of same name
+    -- underscore ("_") to prevent override of functions of same name
+    class_asf_fields._peak = true
     class_asf_fields._ambiguity_level = true
 ```
 
@@ -6214,7 +6214,6 @@ which is not kept in the registry.
                 \u{20}  ASF's are not defined for null parses\n\z
             ]])
         end
-        asf.g1_end = end_of_parse
 
         -- 'start' named argument --
         local start_of_parse
@@ -6237,6 +6236,7 @@ which is not kept in the registry.
                    inspect(raw_arg))
         end
         asf.g1_start = start_of_parse
+        asf.g1_length = end_of_parse - start_of_parse
 
         -- 'top' named argument --
         local top_xsyid
@@ -6256,14 +6256,13 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local peak = glade_from_triple(asf, asf.top_xsyid, asf.g1_start, asf.g1_end)
+        local peak = glade_from_span(asf, asf.top_xsyid, asf.g1_start, asf.g1_length)
         if not peak then
-            _M.userX("No parse at G1 location %d", asf.g1_end)
+            _M.userX("No parse at G1 location %d", g1_end)
         end
-        asf.peak = peak
+        asf._peak = peak
 
         -- TODO Delete after development
-        print(inspect(asf.peak, {depth=1}))
         -- print('preglade_sets: ', inspect(slg.preglade_sets))
 
         return asf_register(asf)
@@ -6305,28 +6304,30 @@ illegal named arguments.
 
 ### ASF mutators
 
-`glade_from_triple` assumes that the caller ensured its
+`glade_from_span` assumes that the caller ensured its
 arguments are correct.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_from_triple
+    local glade_from_span
     -- miranda: section+ most Lua function definitions
-    function glade_from_triple(asf, xsyid, g1_start, g1_end)
+    function glade_from_span(asf, xsyid, g1_start, g1_length)
         -- TODO what if xsyid is token?
-        -- TODO what if g1_start, g1_end invalid?
+        -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
+        local top_xsyid = asf.top_xsyid
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
         local glade = setmetatable({}, _M.class_glade)
-        local xsy = xsys[xsyid]
+        local xsy = slg.xsys[xsyid]
         local is_terminal = xsy.lexeme
         if is_terminal then
             M.userX(
-               "glade_from_triple() for terminals not yet implemented",
+               "glade_from_span() for terminals not yet implemented",
                inspect(xsy))
         end
+        local g1_end = g1_start + g1_length
         local max_eim = g1r:_earley_set_size(g1_end) - 1
 
         local symches = {}
@@ -6346,9 +6347,11 @@ arguments are correct.
         if #symches < 0 then return end
         glade.xsyid = xsyid
         glade.g1_start = g1_start
-        glade.g1_end = g1_end
+        glade.g1_length = g1_length
         glade.rule_symches = symches
         glade.type = 'rule'
+        local regix = _M.register(_M.registry, glade)
+        glade.regix = regix
         return glade
     end
 ```
@@ -6365,7 +6368,7 @@ arguments are correct.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.peak(asf)
-         return asf.peak
+         return asf._peak
     end
 ```
 
@@ -6774,11 +6777,21 @@ make this a Perl object.
     -- miranda: section+ class_glade field declarations
     -- TODO Do I need the `asf` field?
     class_glade_fields.asf = true
-    class_glade_fields.xsyid = true
-    class_glade_fields.g1_start = true
-    class_glade_fields.g1_end = true
+    class_glade_fields.regix = true
     class_glade_fields.token_symch = true
     class_glade_fields.rule_symches = true
+```
+
+With an asf, the triple of xsyid, g1_start,
+and g1_length identifies a glade.
+But glade objects are traversers and more
+than one can be active at once.
+
+```
+    -- miranda: section+ class_glade field declarations
+    class_glade_fields.xsyid = true
+    class_glade_fields.g1_start = true
+    class_glade_fields.g1_length = true
 ```
 
 Glade type is "trivial" for the peak of a null parse;
@@ -6808,14 +6821,11 @@ and "leo" for a Leo glade.
     function _M.class_glade.xsyid(glade)
         return glade.xsyid
     end
-    function _M.class_glade.g1_start(glade)
-        return glade.g1_start
-    end
-    function _M.class_glade.g1_end(glade)
-        return glade.g1_end
+    function _M.class_glade.g1_span(glade)
+        return glade.g1_start, glade.g1_length
     end
     function _M.class_glade.id(glade)
-        return glade.xsyid .. glade.g1_start .. glade.g1_end
+        return glade.xsyid .. glade.g1_start .. glade.g1_length
     end
 ```
 

@@ -442,6 +442,7 @@ WriteMakefile(
         q[lib/Marpa/R3/ASF.pm]       => q[$(INST_LIB)/Marpa/R3/ASF.pm],
         q[lib/Marpa/R3/ASF2.pm]       => q[$(INST_LIB)/Marpa/R3/ASF2.pm],
         q[lib/Marpa/R3/Common.pm]    => q[$(INST_LIB)/Marpa/R3/Common.pm],
+        q[lib/Marpa/R3/Glade.pm]    => q[$(INST_LIB)/Marpa/R3/Glade.pm],
         q[lib/Marpa/R3/Installed.pm] => q[$(INST_LIB)/Marpa/R3/Installed.pm],
         q[lib/Marpa/R3/Internal.pm]  => q[$(INST_LIB)/Marpa/R3/Internal.pm],
         q[lib/Marpa/R3/MetaAST.pm]   => q[$(INST_LIB)/Marpa/R3/MetaAST.pm],
