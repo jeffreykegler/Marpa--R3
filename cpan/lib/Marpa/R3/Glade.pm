@@ -56,7 +56,7 @@ sub glade_common_set {
 }
 
 # Returns undef if no parse
-sub Marpa::R3::ASF::new {
+sub Marpa::R3::Glade::peak {
     my ( $class, @args ) = @_;
     my $asf = bless [], $class;
 
@@ -67,33 +67,33 @@ sub Marpa::R3::ASF::new {
       if not $flat_args;
     $flat_args = asf_common_set( $asf, $flat_args );
 
-    my $slr = $flat_args->{recognizer};
+    my $asf = $flat_args->{asf};
     Marpa::R3::exception(
-        qq{Marpa::R3::ASF::new() called without a "recognizer" argument} )
-      if not defined $slr;
-    $asf->[Marpa::R3::Internal_ASF::SLR] = $slr;
+        qq{Marpa::R3::Glade::peak() called without an "asf" argument} )
+      if not defined $asf;
+    # $asf->[Marpa::R3::Internal_Glade::ASF] = $slr;
     delete $flat_args->{recognizer};
 
-    my $slr_class = 'Marpa::R3::Recognizer';
-    if ( not blessed $slr or not $slr->isa($slr_class) ) {
-        my $ref_type = ref $slr;
+    my $asf_class = 'Marpa::R3::ASF';
+    if ( not blessed $asf or not $asf->isa($asf_class) ) {
+        my $ref_type = ref $asf;
         my $desc = $ref_type ? "a ref to $ref_type" : 'not a ref';
         Marpa::R3::exception(
             qq{'recognizer' named argument to new() is $desc\n},
-            "  It should be a ref to $slr_class\n"
+            "  It should be a ref to $asf_class\n"
         );
     }
 
-    $asf->[Marpa::R3::Internal_ASF::TRACE_FILE_HANDLE] //=
-      $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
-
-    my $trace_file_handle =
+    $glade->[Marpa::R3::Internal_Glade::TRACE_FILE_HANDLE] //=
       $asf->[Marpa::R3::Internal_ASF::TRACE_FILE_HANDLE];
 
-    my $lua = $slr->[Marpa::R3::Internal_R::L];
-    $asf->[Marpa::R3::Internal_ASF::L] = $lua;
+    my $trace_file_handle =
+      $glade->[Marpa::R3::Internal_Glade::TRACE_FILE_HANDLE];
 
-    my ( $regix ) = $slr->coro_by_tag(
+    my $lua = $asf->[Marpa::R3::Internal_ASF::L];
+    $glade->[Marpa::R3::Internal_Glade::L] = $lua;
+
+    my ( $regix ) = $asf->coro_by_tag(
         ( '@' . __FILE__ . ':' . __LINE__ ),
         {
             signature => 's',
@@ -107,22 +107,19 @@ sub Marpa::R3::ASF::new {
             }
         },
         <<'END_OF_LUA');
-        local slr, flat_args = ...
+        local asf, flat_args = ...
         _M.wrap(function ()
-            local glade = slr:glade_new(flat_args)
-            if not glade then return 'ok', -1 end
-            return 'ok', glade.regix
+            local peak = asf:peak(flat_args)
+            if not peak then return 'ok', -1 end
+            return 'ok', peak.regix
         end)
 END_OF_LUA
 
     return if $regix < 0;
-    $glade->[Marpa::R3::Internal_ASF::REGIX]  = $regix;
-
-    $glade->[Marpa::R3::Internal_ASF::FACTORING_MAX] //= 42;
-
+    $glade->[Marpa::R3::Internal_Glade::REGIX]  = $regix;
     return $glade;
 
-} ## end sub Marpa::R3::ASF::new
+}
 
 sub Marpa::R3::Glade::DESTROY {
     # say STDERR "In Marpa::R3::Glade::DESTROY before test";
