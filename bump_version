@@ -45,6 +45,7 @@ my @versioned_files = split /\n/xms, <<'END_OF_LIST';
 cpan/engine/Makefile.PL
 cpan/lib/Marpa/R3/ASF.pm
 cpan/lib/Marpa/R3/ASF2.pm
+cpan/lib/Marpa/R3/Glade.pm
 cpan/lib/Marpa/R3/Common.pm
 cpan/lib/Marpa/R3/MetaAST.pm
 cpan/lib/Marpa/R3/MetaG.pm

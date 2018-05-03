@@ -129,6 +129,7 @@ lib/Marpa/R3.pm
 lib/Marpa/R3/ASF.pm
 lib/Marpa/R3/ASF2.pm
 lib/Marpa/R3/Common.pm
+lib/Marpa/R3/Glade.pm
 lib/Marpa/R3/Internal.pm
 lib/Marpa/R3/MetaAST.pm
 lib/Marpa/R3/MetaG.pm
