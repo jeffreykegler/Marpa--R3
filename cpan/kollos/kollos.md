@@ -6256,12 +6256,11 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local eims = eims_from_triple(asf,
-            asf.top_xsyid, asf.g1_start, asf.g1_end)
-        if not eims then
-            _M.userX("No parse at G1 location %d", start_of_parse)
+        local peak = glade_from_triple(asf, asf.top_xsyid, asf.g1_start, asf.g1_end)
+        if not peak then
+            _M.userX("No parse at G1 location %d", asf.g1_end)
         end
-        asf.peak = glade_from_eims(asf, end_of_parse, eims)
+        asf.peak = peak
 
         -- TODO Delete after development
         print(inspect(asf.peak, {depth=1}))
@@ -6306,16 +6305,31 @@ illegal named arguments.
 
 ### ASF mutators
 
+`glade_from_triple` assumes that the caller ensured its
+arguments are correct.
+
 ```
     -- miranda: section+ forward declarations
-    local eims_from_triple
+    local glade_from_triple
     -- miranda: section+ most Lua function definitions
-    function eims_from_triple(asf, top_xsyid, g1_start, g1_end)
+    function glade_from_triple(asf, xsyid, g1_start, g1_end)
+        -- TODO what if xsyid is token?
+        -- TODO what if g1_start, g1_end invalid?
+        -- TODO hash glades per asf
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
+        local glade = setmetatable({}, _M.class_glade)
+        local xsy = xsys[xsyid]
+        local is_terminal = xsy.lexeme
+        if is_terminal then
+            M.userX(
+               "glade_from_triple() for terminals not yet implemented",
+               inspect(xsy))
+        end
         local max_eim = g1r:_earley_set_size(g1_end) - 1
-        local matches = {}
+
+        local symches = {}
         for eim_id = 0, max_eim do
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
@@ -6324,55 +6338,14 @@ illegal named arguments.
             local xpr = g1_xpr_top_from_trv(slg, trv)
             if not xpr then goto NEXT_EIM end
             local xsy_id = xpr.lhs.id
-            if xsy_id == top_xsyid then
-                io.stderr:write('=== xsy_id is a match: ', xsy_id, "\n")
-                matches[#matches+1] = eim_id
-            end
+            if xsy_id ~= top_xsyid then goto NEXT_EIM end
+            symches[#symches+1] = trv
             ::NEXT_EIM::
         end
-        if #matches == 0 then return end
-        return matches
-    end
-```
-
-```
-    -- miranda: section+ forward declarations
-    local glade_from_eims
-    -- miranda: section+ most Lua function definitions
-    function glade_from_eims(asf, g1_location, eims)
-        local slr = asf.slr
-        local slg = slr.slg
-        local g1r = slr.g1
-        local glade = setmetatable(asf, _M.class_asf)
-        local symch_hash = {}
-        for ix = 1, #eims do
-            local eim_id = eims[ix]
-            local trv = _M.traverser_new(g1r, g1_location, eim_id)
-            local xpr = g1_xpr_top_from_trv(slg, trv)
-            if not xpr then
-                _M._internal_error("Bad eim id %d %d",
-                    g1_location, eim_id)
-            end
-            local xpr_id = xpr.id
-            local symch = symch_hash[xpr_id] or {}
-            if not symch then
-                symch = {}
-                symch_hash[xpr_id] = symch
-            end
-            symch[#symch+1] = eim_id
-        end
-        local xpr_ids = {}
-        for xpr_id, _ in pairs(symch_hash) do
-            xpr_ids[#xpr_ids+1] = xpr_id
-        end
-        table.sort(xpr_ids)
-        local symches = {}
-        for ix = 1, #xpr_ids do
-            local xpr_id = xpr_ids[ix]
-            local symch = symch_hash[xpr_id]
-            table.sort(symch)
-            symches[#symches+1] = symch
-        end
+        -- soft failure if no match
+        if #symches < 0 then return end
+        glade.rule_symches = symches
+        glade.type = 'rule'
         return glade
     end
 ```
@@ -6383,6 +6356,13 @@ illegal named arguments.
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.ambiguity_level(asf)
          return asf._ambiguity_level
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_asf.peak(asf)
+         return asf.peak
     end
 ```
 
@@ -6794,8 +6774,18 @@ make this a Perl object.
     class_glade_fields.xsyid = true
     class_glade_fields.g1_start = true
     class_glade_fields.g1_end = true
-    class_glade_fields.token_symches = true
+    class_glade_fields.token_symch = true
     class_glade_fields.rule_symches = true
+```
+
+Glade type is "trivial" for the peak of a null parse;
+"rule" for a normal rule glade;
+"token" for a normal non-null token glade;
+and "leo" for a Leo glade.
+
+```
+    -- miranda: section+ class_glade field declarations
+    class_glade_fields.type = true
 ```
 
 ```

@@ -11687,7 +11687,7 @@ ltrv_new(RECCE r, LIM lim)
     LTRAVERSER ltrv;
 
     ltrv = my_malloc (sizeof (*ltrv));
-    @<Initialize LIM  traverser |ltrv|@>
+    @<Initialize LIM  traverser |ltrv|@>@;
     recce_ref(r);
     LIM_of_LTRV(ltrv) = lim;
     return ltrv;
