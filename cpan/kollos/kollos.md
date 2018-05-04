@@ -6256,7 +6256,7 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local peak = glade_from_span(asf, asf.top_xsyid, asf.g1_start, asf.g1_length)
+        local peak = glade_from_instance(asf, asf.top_xsyid, asf.g1_start, asf.g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
         end
@@ -6271,7 +6271,7 @@ which is not kept in the registry.
 ```
 
 A common processor for
-the valuator's Lua-level settings.
+the ASF's Lua-level settings.
 Right now most args are constructor-only,
 so all this currently does is check for
 illegal named arguments.
@@ -6302,60 +6302,6 @@ illegal named arguments.
     end
 ```
 
-### ASF mutators
-
-`glade_from_span` assumes that the caller ensured its
-arguments are correct.
-
-```
-    -- miranda: section+ forward declarations
-    local glade_from_span
-    -- miranda: section+ most Lua function definitions
-    function glade_from_span(asf, xsyid, g1_start, g1_length)
-        -- TODO what if xsyid is token?
-        -- TODO what if g1_start, g1_length invalid?
-        -- TODO hash glades per asf
-        local top_xsyid = asf.top_xsyid
-        local slr = asf.slr
-        local slg = slr.slg
-        local g1r = slr.g1
-        local glade = setmetatable({}, _M.class_glade)
-        local xsy = slg.xsys[xsyid]
-        local is_terminal = xsy.lexeme
-        if is_terminal then
-            M.userX(
-               "glade_from_span() for terminals not yet implemented",
-               inspect(xsy))
-        end
-        local g1_end = g1_start + g1_length
-        local max_eim = g1r:_earley_set_size(g1_end) - 1
-
-        local symches = {}
-        for eim_id = 0, max_eim do
-            -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
-            local trv = _M.traverser_new(g1r, g1_end, eim_id)
-            local origin = trv:origin()
-            if origin ~= g1_start then goto NEXT_EIM end
-            local xpr = g1_xpr_top_from_trv(slg, trv)
-            if not xpr then goto NEXT_EIM end
-            local xsy_id = xpr.lhs.id
-            if xsy_id ~= top_xsyid then goto NEXT_EIM end
-            symches[#symches+1] = trv
-            ::NEXT_EIM::
-        end
-        -- soft failure if no match
-        if #symches < 0 then return end
-        glade.xsyid = xsyid
-        glade.g1_start = g1_start
-        glade.g1_length = g1_length
-        glade.rule_symches = symches
-        glade.type = 'rule'
-        local regix = _M.register(_M.registry, glade)
-        glade.regix = regix
-        return glade
-    end
-```
-
 ### ASF accessors
 
 ```
@@ -6369,6 +6315,25 @@ arguments are correct.
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.peak(asf)
          return asf._peak
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_asf.dump(asf)
+         local lines = asf._peak:dump({})
+         local dump = {}
+         for ix = 1, #lines do
+            local line = lines[ix]
+            local indent, glade_id, body = table.unpack(line)
+            -- indent = indent - 2 -- needed?
+            dump[#dump+1] = string.rep(" ", indent)
+            if glade_id then
+                dump[#dump+1] = 'GL' .. glade_id .. " "
+            end
+            dump[#dump+1] = body .. "\n"
+         end
+         return table.concat(dump)
     end
 ```
 
@@ -6825,7 +6790,94 @@ and "leo" for a Leo glade.
         return glade.g1_start, glade.g1_length
     end
     function _M.class_glade.id(glade)
-        return glade.xsyid .. glade.g1_start .. glade.g1_length
+        return glade.g1_start .. glade.g1_length .. glade.xsyid
+    end
+    function _M.class_glade.dump(glade, seen)
+
+        local function form_symch_choice(parent, ix)
+           if not parent then return ix end
+           return parent .. "." .. ix
+        end
+
+        local id = glade:id()
+        local lines = {}
+        local symch_indent = 0
+        local asf = glade.asf
+        local slr = asf.slr
+        local slg = slr.slg
+
+        if seen[id] then
+            return { 0, id, "already displayed" }
+        end
+        if rule_symches then
+            local symch_choice
+            local symch_count = #rule_symches
+            if symch_count == 1 then
+               local trv = rule_symches[1]
+               local xpr_id = trv:xpr_id()
+               body = string.format("Rule %d: %s", slg:xpr_show(xpr_id))
+               lines[#lines+1] = { 0, id, body }
+               return lines
+            end
+            return { 0, id, "dump of multi-symch glade not yet implemented" }
+            -- return lines
+        end
+        return { 0, id, "dump of non-rule glade not yet implemented" }
+    end
+```
+
+### Glade mutators
+
+`glade_from_instance` assumes that the caller ensured its
+arguments are correct.
+
+```
+    -- miranda: section+ forward declarations
+    local glade_from_instance
+    -- miranda: section+ most Lua function definitions
+    function glade_from_instance(asf, xsyid, g1_start, g1_length)
+        -- TODO what if xsyid is token?
+        -- TODO what if g1_start, g1_length invalid?
+        -- TODO hash glades per asf
+        local top_xsyid = asf.top_xsyid
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1r = slr.g1
+        local glade = setmetatable({}, _M.class_glade)
+        local xsy = slg.xsys[xsyid]
+        local is_terminal = xsy.lexeme
+        if is_terminal then
+            M.userX(
+               "glade_from_instance() for terminals not yet implemented",
+               inspect(xsy))
+        end
+        local g1_end = g1_start + g1_length
+        local max_eim = g1r:_earley_set_size(g1_end) - 1
+
+        local symches = {}
+        for eim_id = 0, max_eim do
+            -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
+            local trv = _M.traverser_new(g1r, g1_end, eim_id)
+            local origin = trv:origin()
+            if origin ~= g1_start then goto NEXT_EIM end
+            local xpr = g1_xpr_top_from_trv(slg, trv)
+            if not xpr then goto NEXT_EIM end
+            local xsy_id = xpr.lhs.id
+            if xsy_id ~= top_xsyid then goto NEXT_EIM end
+            symches[#symches+1] = trv
+            ::NEXT_EIM::
+        end
+        -- soft failure if no match
+        if #symches < 0 then return end
+        glade.asf = asf
+        glade.xsyid = xsyid
+        glade.g1_start = g1_start
+        glade.g1_length = g1_length
+        glade.rule_symches = symches
+        glade.type = 'rule'
+        local regix = _M.register(_M.registry, glade)
+        glade.regix = regix
+        return glade
     end
 ```
 
