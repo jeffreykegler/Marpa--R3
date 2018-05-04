@@ -236,6 +236,11 @@ END__OF_LUA
     return $g1_start, $g1_length;
 }
 
+sub Marpa::R3::Glade::dump {
+  my ($glade) = @_;
+  return "";
+}
+
 # not to be documented
 sub Marpa::R3::Glade::regix {
     my ( $glade ) = @_;
