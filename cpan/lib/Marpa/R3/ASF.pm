@@ -254,6 +254,11 @@ sub Marpa::R3::ASF::peak {
     return $peak;
 }
 
+sub Marpa::R3::ASF::dump {
+    my ($asf) = @_;
+    return $asf->peak()->dump();
+}
+
 sub Marpa::R3::ASF::g1_pos {
     my ( $asf ) = @_;
     my ($g1_pos) = $asf->call_by_tag(

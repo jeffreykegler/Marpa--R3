@@ -66,11 +66,6 @@ END_OF_SOURCE
     }
 );
 
-# Marpa::R3::Display
-# name: ASF symch dump example grammar
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
 my $venus_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= planet
@@ -82,13 +77,6 @@ venus ~ 'venus'
 END_OF_SOURCE
     }
 );
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: ASF symch dump example output
-# start-after-line: END_OF_OUTPUT
-# end-before-line: '^END_OF_OUTPUT$'
 
 push @tests_data, [
     $venus_grammar, 'venus',
@@ -108,8 +96,6 @@ END_OF_OUTPUT
     ]
     if 1;
 
-# Marpa::R3::Display::End
-
 push @tests_data, [
     $abcd_grammar, 'abcd',
     <<'END_OF_ASF',
@@ -124,11 +110,6 @@ END_OF_ASF
     ]
     if 1;
 
-# Marpa::R3::Display
-# name: ASF factoring dump example grammar
-# start-after-line: END_OF_SOURCE
-# end-before-line: '^END_OF_SOURCE$'
-
 my $bb_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),
 :start ::= top
@@ -139,13 +120,6 @@ a ~ 'a'
 END_OF_SOURCE
     }
 );
-
-# Marpa::R3::Display::End
-
-# Marpa::R3::Display
-# name: ASF factoring dump example output
-# start-after-line: END_OF_OUTPUT
-# end-before-line: '^END_OF_OUTPUT$'
 
 push @tests_data, [
     $bb_grammar, 'aaa',
@@ -168,8 +142,6 @@ END_OF_OUTPUT
     '"b b" grammar'
     ]
     if 1;
-
-# Marpa::R3::Display::End
 
 my $seq_grammar = Marpa::R3::Grammar->new(
     {   source => \(<<'END_OF_SOURCE'),

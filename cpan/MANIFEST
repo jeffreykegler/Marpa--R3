@@ -237,6 +237,7 @@ t/50d-debug.t
 t/50d-external.t
 t/50d-gia.t
 t/50d-gie.t
+t/50d-gif.t
 t/50d-lexevent.t
 t/50d-ranksyn.t
 t/action.t
@@ -282,7 +283,7 @@ t/gabend.t
 t/gia.t
 t/gia_err.t
 t/gie.t
-t/gif1.t
+t/gif.t
 t/gires.t
 t/gsyn.t
 t/incremental.t
