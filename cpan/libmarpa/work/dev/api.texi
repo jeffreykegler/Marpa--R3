@@ -3475,6 +3475,15 @@ Return value on failure: @minus{}2.
 @node Traverser link constructors,  , Traverser mutators, Traverser methods
 @section Link constructors
 
+@deftypefun Marpa_Traverser marpa_trv_completion_cause(Marpa_Traverser @var{trv})
+
+Return value on success: A traverser for the completion cause.
+
+Return value on failure: NULL.
+Sets the soft error flag to 1 if the error was ``soft'',
+and to 0 otherwise.
+@end deftypefun
+
 @deftypefun Marpa_Traverser marpa_trv_completion_predecessor(Marpa_Traverser @var{trv})
 
 Return value on success: A traverser for the completion predecessor.
