@@ -34,7 +34,12 @@ my $use_perl_autoconf = $ENV{MARPA_USE_PERL_AUTOCONF}
 
 my $marpa_debug_flags = '';
 if ($ENV{MARPA_DEBUG_FLAG}) {
-  $marpa_debug_flags = 'MARPA_DEBUG_FLAG=' .  $ENV{MARPA_DEBUG_FLAG};
+  $marpa_debug_flags = '"MARPA_DEBUG_FLAG=' .  $ENV{MARPA_DEBUG_FLAG} . '"';
+}
+
+my $cflags = '';
+if ($ENV{CFLAGS}) {
+  $cflags = '"CFLAGS=' .  $ENV{CFLAGS} . '"';
 }
 
 my $define = q{};
@@ -121,6 +126,7 @@ END_OF_POSTAMBLE_PIECE
             join( q{ },
                 '$(SHELL) configure',
                 $marpa_debug_flags,
+                $cflags,
                 '--with-pic --disable-shared --disable-maintainer-mode' )
         );
 

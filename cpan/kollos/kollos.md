@@ -1496,6 +1496,7 @@ Display any XPR
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slg.xpr_show_o(slg, xpr, options)
+        options = options or {}
         local name_fn = options.diag and _M.class_xsy.diag_form
             or _M.class_xsy.display_form
         local pieces = {}
@@ -2254,6 +2255,21 @@ Lowest ISYID is 0.
     end
     function _M.class_slg.l0_rules_show(slg, verbose)
         return slg:lmg_rules_show('l0', verbose)
+    end
+```
+
+```
+    -- miranda: section+ forward declarations
+    local dotted_irl_to_xpr
+    -- miranda: section+ most Lua function definitions
+    local function dotted_irl_to_xpr(slg, irl_id, irl_dot)
+        local xpr_id = slg:g1_rule_to_xprid(irl_id)
+        local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
+        local xpr_dot
+        if irl_dot == -1 then
+            return xpr_id, xpr_dots[#xpr_dots]
+        end
+        return xpr_id, xpr_dots[irl_dot+1]
     end
 ```
 
@@ -3854,15 +3870,15 @@ rule, false otherwise.
         local max_eim = l0r:_earley_set_size(es_id) - 1
         for eim_id = 0, max_eim do
             local trv = _M.traverser_new(l0r, es_id, eim_id)
-            local rule_id = trv:rule_id()
-            if not rule_id then goto NEXT_EIM end
+            local irl_id = trv:rule_id()
+            if not irl_id then goto NEXT_EIM end
             local dot = trv:dot()
             if dot >= 0 then goto NEXT_EIM end
             complete_lexemes = true
             -- when we expand this, the ID of the g1 lexeme
             -- will matter; right now it does not.
-            -- local g1_lexeme = l0_rules[rule_id].g1_lexeme
-            eager = eager or l0_rules[rule_id].eager
+            -- local g1_lexeme = l0_rules[irl_id].g1_lexeme
+            eager = eager or l0_rules[irl_id].eager
             ::NEXT_EIM::
         end
         if complete_lexemes then return es_id, eager end
@@ -5152,16 +5168,6 @@ TODO: Make `collected_progress_items` a local, after development.
           end
           local max_eim = g1r:_earley_set_size(earley_set_id) - 1
 
-          local function irl_to_xpr_dotted(irl_id, irl_dot)
-              local xpr_id = slg:g1_rule_to_xprid(irl_id)
-              local xpr_dots = slg:g1_rule_to_xpr_dots(irl_id)
-              local xpr_dot
-              if irl_dot == -1 then
-                  return xpr_id, xpr_dots[#xpr_dots]
-              end
-              return xpr_id, xpr_dots[irl_dot+1]
-          end
-
           for item_id = 0, max_eim do
               -- IRL data for debugging only -- delete
               local trv = _M.traverser_new(g1r, earley_set_id, item_id)
@@ -5170,7 +5176,7 @@ TODO: Make `collected_progress_items` a local, after development.
               local irl_dot = trv:dot()
               -- io.stderr:write(string.format("item: %d R%d:%d@%d\n", earley_set_id,
                    -- irl_id, irl_dot, trv:origin()))
-              local xpr_id, xpr_dot = irl_to_xpr_dotted(irl_id, irl_dot)
+              local xpr_id, xpr_dot = dotted_irl_to_xpr(slg, irl_id, irl_dot)
               for origin in origins(trv) do
                   local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
                   uniq_items[vlq] = true
@@ -5182,7 +5188,7 @@ TODO: Make `collected_progress_items` a local, after development.
                   local ltrv = trv:lim()
                   while ltrv do
                       local irl_id, irl_dot, origin = ltrv:trailhead_eim()
-                      local xpr_id, xpr_dot = irl_to_xpr_dotted(irl_id, irl_dot)
+                      local xpr_id, xpr_dot = dotted_irl_to_xpr(slg, irl_id, irl_dot)
                       local vlq = _M.to_vlq{ xpr_id, xpr_dot, origin }
                       uniq_items[vlq] = true
                       ltrv = ltrv:predecessor()
@@ -6792,6 +6798,30 @@ and "leo" for a Leo glade.
     function _M.class_glade.id(glade)
         return glade.g1_start .. glade.g1_length .. glade.xsyid
     end
+```
+
+#### Glade dump accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    local function glade_partitions_dump(glade, symch, seen)
+        local id = glade:id()
+        local lines1 = {{0, id, 'debug!'}}
+        local lines2 = {}
+        local at_token = symch:at_token()
+        if at_token then print('at token ON') end
+        while at_token do
+            lines2[#lines2+1] = { 0, id, "at token link!" }
+            at_token = symch:token_next()
+        end
+        local at_completion = symch:at_completion()
+        while at_completion do
+            lines2[#lines2+1] = { 0, id, "at completion link!" }
+            at_completion = symch:completion_next()
+        end
+        return lines1, lines2
+    end
+
     function _M.class_glade.dump(glade, seen)
 
         local function form_symch_choice(parent, ix)
@@ -6809,14 +6839,25 @@ and "leo" for a Leo glade.
         if seen[id] then
             return { 0, id, "already displayed" }
         end
+        local rule_symches = glade.rule_symches
         if rule_symches then
             local symch_choice
             local symch_count = #rule_symches
             if symch_count == 1 then
-               local trv = rule_symches[1]
-               local xpr_id = trv:xpr_id()
-               body = string.format("Rule %d: %s", slg:xpr_show(xpr_id))
+               local symch = rule_symches[1]
+               local irlid = symch:rule_id()
+               local xprid = slg:g1_rule_to_xprid(irlid)
+               local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
                lines[#lines+1] = { 0, id, body }
+               local lines1, lines2 = glade_partitions_dump(glade, symch, seen)
+               for ix = 1, #lines1 do
+                   local line = lines1[ix]
+                   lines[#lines+1] = line
+               end
+               for ix = 1, #lines2 do
+                   local line = lines2[ix]
+                   lines[#lines+1] = line
+               end
                return lines
             end
             return { 0, id, "dump of multi-symch glade not yet implemented" }
