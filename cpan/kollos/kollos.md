@@ -6802,13 +6802,25 @@ and "leo" for a Leo glade.
 
 #### Glade dump accessors
 
+The glade dump accessors share the `seen` variable.
+Where `id` is a glade ID, `seen[id]` is `true` if the
+glade has already been dumped.
+
 ```
+    -- miranda: section+ forward declarations
+    local glade_sequence_symch_dump
     -- miranda: section+ most Lua function definitions
-    local function glade_sequence_symch_dump(glade, symch, seen)
+    function glade_sequence_symch_dump(glade, symch, seen)
         local id = glade:id()
         return { 0, id, "sequence rule dump NOT YET IMPLEMENTED" }
     end
-    local function glade_partitions_dump(glade, symch, seen)
+```
+
+```
+    -- miranda: section+ forward declarations
+    local glade_partitions_dump
+    -- miranda: section+ most Lua function definitions
+    function glade_partitions_dump(glade, symch, seen)
         local id = glade:id()
         local lines1 = {{0, id, 'debug!'}}
         local lines2 = {}
@@ -6828,6 +6840,14 @@ and "leo" for a Leo glade.
         local at_completion = symch:at_completion()
         while at_completion do
             lines2[#lines2+1] = { 0, id, "at completion link!" }
+            print('symch:', inspect(symch, { depth = 2}))
+            local predecessor_trv = symch:completion_predecessor()
+            print('predecessor:', inspect(predecessor_trv, { depth = 2}))
+            local child_trv = symch:completion_cause()
+            print('cause child_trv:', inspect(child_trv, { depth = 2}))
+            local child_origin = child_trv:origin()
+            local child_current = child_trv:current()
+            local child_irl = child_trv:rule_id()
             at_completion = symch:completion_next()
         end
         local at_leo = symch:at_leo()
@@ -6837,7 +6857,10 @@ and "leo" for a Leo glade.
         end
         return lines1, lines2
     end
+```
 
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_glade.dump(glade, seen)
 
         local function form_symch_choice(parent, ix)
@@ -6852,8 +6875,9 @@ and "leo" for a Leo glade.
         local slr = asf.slr
         local slg = slr.slg
 
-        if seen[id] then
-            return { 0, id, "already displayed" }
+        if seen[id] == true then
+            local body = string.format("Glade %s already displayed", id)
+            return {{ 0, id, body }}
         end
         local rule_symches = glade.rule_symches
         if rule_symches then
@@ -6870,6 +6894,7 @@ and "leo" for a Leo glade.
                        local line = lines1[ix]
                        lines[#lines+1] = line
                    end
+                   seen[id] = true
                    return lines
                end
                local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
@@ -6883,12 +6908,15 @@ and "leo" for a Leo glade.
                    local line = lines2[ix]
                    lines[#lines+1] = line
                end
+               seen[id] = true
                return lines
             end
-            return { 0, id, "dump of multi-symch glade NOT YET IMPLEMENTED" }
+            seen[id] = true
+            return {{ 0, id, "dump of multi-symch glade NOT YET IMPLEMENTED" }}
             -- return lines
         end
-        return { 0, id, "dump of non-rule glade NOT YET IMPLEMENTED" }
+        seen[id] = true
+        return {{ 0, id, "dump of non-rule glade NOT YET IMPLEMENTED" }}
     end
 ```
 
@@ -8989,6 +9017,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_trv_is_trivial"},
     {"marpa_trv_leo_next", return_type='boolean'},
     {"marpa_trv_nrl_id"},
+    {"marpa_trv_current"},
     {"marpa_trv_origin"},
     {"marpa_trv_rule_id"},
     {"marpa_trv_token_next", return_type='boolean'},
@@ -9264,8 +9293,11 @@ traversers are not a "main sequence" class.
 
       marpa_lua_newtable(L);
       traverser_stack_ix = marpa_lua_gettop(L);
+
       /* push "class_traverser" metatable */
-      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_getglobal(L, "_M");
+      marpa_lua_getfield(L, -1, "class_traverser");
+
       marpa_lua_setmetatable (L, traverser_stack_ix);
 
       {
@@ -9321,8 +9353,11 @@ traversers are not a "main sequence" class.
 
       marpa_lua_newtable(L);
       traverser_stack_ix = marpa_lua_gettop(L);
+
       /* push "class_traverser" metatable */
-      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_getglobal(L, "_M");
+      marpa_lua_getfield(L, -1, "class_traverser");
+
       marpa_lua_setmetatable (L, traverser_stack_ix);
 
       {
