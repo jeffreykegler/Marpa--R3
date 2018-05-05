@@ -11130,8 +11130,8 @@ typedef struct marpa_traverser TRAVERSER_Object;
 @
 @d YIM_of_TRV(trv) ((trv)->t_trv_yim)
 @d YS_of_TRV(trv) (YS_of_YIM(YIM_of_TRV(trv))
-@d LEO_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
-@d TOKEN_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
+@d LEO_SRCL_of_TRV(trv) ((trv)->t_trv_completion_srcl)
+@d TOKEN_SRCL_of_TRV(trv) ((trv)->t_trv_token_srcl)
 @d COMPLETION_SRCL_of_TRV(trv) ((trv)->t_trv_leo_srcl)
 
 @<Widely aligned traverser elements@> =

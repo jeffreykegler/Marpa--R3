@@ -256,7 +256,13 @@ sub Marpa::R3::ASF::peak {
 
 sub Marpa::R3::ASF::dump {
     my ($asf) = @_;
-    return $asf->peak()->dump();
+    my ($dump) = $asf->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+    <<'END__OF_LUA', '>*' );
+    local asf = ...
+    return asf:dump()
+END__OF_LUA
+    return $dump;
 }
 
 sub Marpa::R3::ASF::g1_pos {

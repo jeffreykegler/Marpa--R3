@@ -31,6 +31,7 @@ $define .= ' -DLUA_USE_POSIX' if ($^O eq 'freebsd');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'linux');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'darwin');
 $define .= ' -DLUA_USE_POSIX' if ($^O eq 'solaris');
+$define .= ' -DLUA_USE_APICHECK' if $ENV{MARPA_DEBUG};
 
 WriteMakefile(
     NAME   => 'marpa',

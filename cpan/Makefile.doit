@@ -18,7 +18,7 @@ dummy:
 # the make and when I do I expect these issues will go away
 debug:
 	make clean
-	MARPA_DEBUG_FLAG="-DMARPA_DEBUG=1" perl Makefile.PL OPTIMIZE=-g
+	MARPA_DEBUG=1 CFLAGS="-g -O0" MARPA_DEBUG_FLAG="-DMARPA_DEBUG=1 -g -O0" perl Makefile.PL OPTIMIZE="-g -O0"
 	make
 
 texi:

@@ -453,8 +453,8 @@ WHEID_of_IRL(IRL_of_OR(or) )  \
 #define Cause_OR_of_AND(and) ((and) ->t_cause) 
 #define YIM_of_TRV(trv) ((trv) ->t_trv_yim) 
 #define YS_of_TRV(trv) (YS_of_YIM(YIM_of_TRV(trv) ) 
-#define LEO_SRCL_of_TRV(trv) ((trv) ->t_trv_leo_srcl) 
-#define TOKEN_SRCL_of_TRV(trv) ((trv) ->t_trv_leo_srcl) 
+#define LEO_SRCL_of_TRV(trv) ((trv) ->t_trv_completion_srcl) 
+#define TOKEN_SRCL_of_TRV(trv) ((trv) ->t_trv_token_srcl) 
 #define COMPLETION_SRCL_of_TRV(trv) ((trv) ->t_trv_leo_srcl)  \
 
 #define TRV_has_Soft_Error(trv) ((trv) ->t_trv_soft_error) 
