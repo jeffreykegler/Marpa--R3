@@ -3420,6 +3420,18 @@ the current Earley item.
 To check, use @code{trv_rule_id()}.
 @end deftypefun
 
+@deftypefun int marpa_trv_current(Marpa_Traverser @var{trv})
+
+Return value on success: The current
+location of the base Earley item.
+
+Return value on failure:
+If the grammar is trivial,
+if there is no IRL for the current item,
+or on other failure, @minus{}2.
+
+@end deftypefun
+
 @deftypefun int marpa_trv_origin(Marpa_Traverser @var{trv})
 
 Return value on success: The origin of the base Earley item.

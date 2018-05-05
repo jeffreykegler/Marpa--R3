@@ -11614,6 +11614,20 @@ int marpa_trv_dot(Marpa_Traverser trv)
 
 @
 @<Function definitions@> =
+int marpa_trv_current(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    return YS_Ord_of_YIM(yim);
+  }
+}
+
+@
+@<Function definitions@> =
 int marpa_trv_origin(Marpa_Traverser trv)
 {
   @<Return |-2| on failure@>@;
