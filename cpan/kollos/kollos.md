@@ -6804,20 +6804,36 @@ and "leo" for a Leo glade.
 
 ```
     -- miranda: section+ most Lua function definitions
+    local function glade_sequence_symch_dump(glade, symch, seen)
+        local id = glade:id()
+        return { 0, id, "sequence rule dump NOT YET IMPLEMENTED" }
+    end
     local function glade_partitions_dump(glade, symch, seen)
         local id = glade:id()
         local lines1 = {{0, id, 'debug!'}}
         local lines2 = {}
         local at_token = symch:at_token()
-        if at_token then print('at token ON') end
         while at_token do
-            lines2[#lines2+1] = { 0, id, "at token link!" }
+            local asf = glade.asf
+            local slr = asf.slr
+            local xsyid = glade.xsyid
+            local xsy = slg.xsys[xsyid]
+            local g1_start = glade.g1_start
+            local g1_length = glade.g1_end - glade.g1_start
+            local literal = slr:g1_literal(g1_start, g1_length)
+            local body = string.format('Token %s: "%s"', xsy:angled_form(), literal);
+            lines2[#lines2+1] = { 0, id, body }
             at_token = symch:token_next()
         end
         local at_completion = symch:at_completion()
         while at_completion do
             lines2[#lines2+1] = { 0, id, "at completion link!" }
             at_completion = symch:completion_next()
+        end
+        local at_leo = symch:at_leo()
+        while at_leo do
+            lines2[#lines2+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
+            at_leo = symch:leo()
         end
         return lines1, lines2
     end
@@ -6847,6 +6863,15 @@ and "leo" for a Leo glade.
                local symch = rule_symches[1]
                local irlid = symch:rule_id()
                local xprid = slg:g1_rule_to_xprid(irlid)
+               local xpr = slg.xprs[xprid]
+               if xpr.min then
+                   local lines1 = glade_sequence_partitions_dump(glade, symch, seen)
+                   for ix = 1, #lines1 do
+                       local line = lines1[ix]
+                       lines[#lines+1] = line
+                   end
+                   return lines
+               end
                local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
                lines[#lines+1] = { 0, id, body }
                local lines1, lines2 = glade_partitions_dump(glade, symch, seen)
@@ -6860,10 +6885,10 @@ and "leo" for a Leo glade.
                end
                return lines
             end
-            return { 0, id, "dump of multi-symch glade not yet implemented" }
+            return { 0, id, "dump of multi-symch glade NOT YET IMPLEMENTED" }
             -- return lines
         end
-        return { 0, id, "dump of non-rule glade not yet implemented" }
+        return { 0, id, "dump of non-rule glade NOT YET IMPLEMENTED" }
     end
 ```
 
@@ -6889,7 +6914,7 @@ arguments are correct.
         local is_terminal = xsy.lexeme
         if is_terminal then
             M.userX(
-               "glade_from_instance() for terminals not yet implemented",
+               "glade_from_instance() for terminals NOT YET IMPLEMENTED",
                inspect(xsy))
         end
         local g1_end = g1_start + g1_length
@@ -9279,6 +9304,63 @@ traversers are not a "main sequence" class.
 ```
     -- miranda: section+ non-standard wrappers
     static int
+    lca_trv_completion_cause (lua_State * L)
+    {
+      const int base_traverser_stack_ix = 1;
+      int traverser_stack_ix;
+      Marpa_Traverser *base_traverser_ud;
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      if (1)
+        {
+          marpa_luaL_checktype(L, base_traverser_stack_ix, LUA_TTABLE);
+        }
+      marpa_lua_getfield (L, base_traverser_stack_ix, "_libmarpa");
+      base_traverser_ud = marpa_lua_touserdata(L, -1);
+
+      marpa_lua_newtable(L);
+      traverser_stack_ix = marpa_lua_gettop(L);
+      /* push "class_traverser" metatable */
+      marpa_lua_pushvalue(L, marpa_lua_upvalueindex(2));
+      marpa_lua_setmetatable (L, traverser_stack_ix);
+
+      {
+        Marpa_Traverser *traverser_ud =
+          (Marpa_Traverser *) marpa_lua_newuserdata (L, sizeof (Marpa_Traverser));
+        /* [ base_table, class_table, class_ud ] */
+        marpa_lua_rawgetp (L, LUA_REGISTRYINDEX, &kollos_trv_ud_mt_key);
+        /* [ class_table, class_ud, class_ud_mt ] */
+        marpa_lua_setmetatable (L, -2);
+        /* [ class_table, class_ud ] */
+
+        marpa_lua_setfield (L, traverser_stack_ix, "_libmarpa");
+        marpa_lua_getfield (L, base_traverser_stack_ix, "lmw_g");
+        marpa_lua_setfield (L, traverser_stack_ix, "lmw_g");
+
+        *traverser_ud = marpa_trv_completion_cause (*base_traverser_ud);
+        if (!*traverser_ud)
+          {
+            if (marpa_trv_soft_error(*base_traverser_ud)) {
+                marpa_lua_pushnil(L);
+                return 1;
+            }
+            return libmarpa_error_handle (L, base_traverser_stack_ix, "marpa_trv_completion_cause()");
+          }
+      }
+
+      if (0)
+        printf ("%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
+      marpa_lua_settop(L, traverser_stack_ix );
+      /* [ base_table, class_table ] */
+      return 1;
+    }
+
+```
+
+```
+    -- miranda: section+ non-standard wrappers
+    static int
     lca_trv_token_predecessor (lua_State * L)
     {
       const int base_traverser_stack_ix = 1;
@@ -10950,6 +11032,7 @@ not a soft error.
 
     -- miranda: section+ luaL_Reg definitions
     static const struct luaL_Reg traverser_methods[] = {
+      { "completion_cause", lca_trv_completion_cause },
       { "completion_predecessor", lca_trv_completion_predecessor },
       { "dot", wrap_trv_dot },
       { "error", lca_libmarpa_error },
