@@ -6827,15 +6827,14 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_partitions_dump
+    local glade_rh_cell_dump
     -- miranda: section+ most Lua function definitions
-    function glade_partitions_dump(glade, symch, seen)
+    function glade_rh_cell_dump(glade, lines, symch, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
         local id = glade:id()
-        local lines1 = {{0, id, 'debug!'}}
-        local lines2 = {}
+
         local at_token = symch:at_token()
         while at_token do
             local xsyid = glade.xsyid
@@ -6844,15 +6843,18 @@ glade has already been dumped.
             local g1_length = glade.g1_end - glade.g1_start
             local literal = slr:g1_literal(g1_start, g1_length)
             local body = string.format('Token %s: "%s"', xsy:angled_form(), literal);
-            lines2[#lines2+1] = { 0, id, body }
+            lines[#lines+1] = { 0, id, body }
+            rhs[#rhs+1] = { 'token', body }
             at_token = symch:token_next()
         end
+
+        -- Note: we never have both token and completion (or leo) links
 
         local cause_symches = {} -- by origin and IRL ID
         local at_completion = symch:at_completion()
         while at_completion do
             do
-                lines2[#lines2+1] = { 0, id, "at completion link!" }
+                lines[#lines+1] = { 0, id, "at completion link!" }
                 local predecessor_trv = symch:completion_predecessor()
                 -- TODO optimize via symch:completion_cause_ahm_instance()
                 --   to return AHM ID, origin without creating traverser?
@@ -6863,7 +6865,7 @@ glade has already been dumped.
                    child_origin,
                    slg:g1_rule_show(child_irlid, { diag = true })
                 )
-                lines2[#lines2+1] = { 0, id, body }
+                lines[#lines+1] = { 0, id, body }
                 local symches_by_origin = cause_symches[child_origin]
                 if not symches_by_origin then
                     cause_symches[child_origin] = {}
@@ -6880,9 +6882,27 @@ glade has already been dumped.
 
         local at_leo = symch:at_leo()
         while at_leo do
-            lines2[#lines2+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
+            lines[#lines+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
             at_leo = symch:leo()
         end
+        return lines
+    end
+```
+
+```
+    -- miranda: section+ forward declarations
+    local glade_partitions_dump
+    -- miranda: section+ most Lua function definitions
+    function glade_partitions_dump(glade, symch, seen)
+        local asf = glade.asf
+        local slr = asf.slr
+        local slg = slr.slg
+        local id = glade:id()
+        local lines1 = {{0, id, 'debug!'}}
+        local lines2 = {}
+
+        -- a stack containing the current RHS
+        local rh_stack_entry = glade_rh_cell_dump(glade, lines2, symch, seen)
         return lines1, lines2
     end
 ```
@@ -6981,7 +7001,7 @@ arguments are correct.
         return symches
     end
 
-    function glade_from_instance(asf, xsyid, g1_start, g1_length)
+    function glade_from_instance(asf, xsyid, g1_start, g1_length, symchsets)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
@@ -6996,7 +7016,8 @@ arguments are correct.
                "glade_from_instance() for terminals NOT YET IMPLEMENTED",
                inspect(xsy))
         end
-        local symches = symchsets_from_instance(asf, xsyid, g1_start, g1_length)
+        local symches = symchsets
+            or symchsets_from_instance(asf, xsyid, g1_start, g1_length)
         -- soft failure if no match
         if #symches < 0 then return end
         glade.asf = asf
