@@ -1093,8 +1093,8 @@ in `lmw_g`.
                     if xsy_id then
                         local xsy = xsys[xsy_id]
                         local is_terminal = xsy.lexeme
-                        local xsy_type = is_terminal and 't' or 'b'
-                        preglades[#preglades+1] = { xsy_id, xsy_type }
+                        local xsy_type = is_terminal and 'token' or 'brick'
+                        preglades[#preglades+1] = { xsy_type, xsy_id }
                     end
                 end
             end
@@ -1104,9 +1104,18 @@ in `lmw_g`.
                 if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
                     local xsy_id = g1g:xsyid_by_nsy(nsy_id)
                     if xsy_id then
-                        preglades[#preglades+1] = { xsy_id, 'n' }
+                        preglades[#preglades+1] = { 'null', xsy_id }
                     end
                 end
+            end
+            for ix = 1, #preglades do
+               local item = preglades[ix]
+               local key = item[1]
+               local xsy_id = item[2]
+               local by_key = preglades[key] or {}
+               by_key[#by_key+1] = xsy_id
+               preglades[key] = by_key
+               preglades[ix] = nil
             end
             preglade_sets[ahm_id] = preglades
         end
@@ -6821,13 +6830,14 @@ glade has already been dumped.
     local glade_partitions_dump
     -- miranda: section+ most Lua function definitions
     function glade_partitions_dump(glade, symch, seen)
+        local asf = glade.asf
+        local slr = asf.slr
+        local slg = slr.slg
         local id = glade:id()
         local lines1 = {{0, id, 'debug!'}}
         local lines2 = {}
         local at_token = symch:at_token()
         while at_token do
-            local asf = glade.asf
-            local slr = asf.slr
             local xsyid = glade.xsyid
             local xsy = slg.xsys[xsyid]
             local g1_start = glade.g1_start
@@ -6840,14 +6850,18 @@ glade has already been dumped.
         local at_completion = symch:at_completion()
         while at_completion do
             lines2[#lines2+1] = { 0, id, "at completion link!" }
-            print('symch:', inspect(symch, { depth = 2}))
             local predecessor_trv = symch:completion_predecessor()
-            print('predecessor:', inspect(predecessor_trv, { depth = 2}))
             local child_trv = symch:completion_cause()
-            print('cause child_trv:', inspect(child_trv, { depth = 2}))
             local child_origin = child_trv:origin()
             local child_current = child_trv:current()
-            local child_irl = child_trv:rule_id()
+            local child_irlid = child_trv:rule_id()
+            local ahmid = child_trv:ahm_id()
+            local body = string.format('Debug: @%d-%d AHMID: %d IRL: %s',
+               child_origin, child_current, ahmid,
+               slg:g1_rule_show(child_irlid, { diag = true })
+            )
+            print("preglade:", inspect(slg.preglade_sets[ahmid]))
+            lines2[#lines2+1] = { 0, id, body }
             at_completion = symch:completion_next()
         end
         local at_leo = symch:at_leo()
@@ -9010,14 +9024,15 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_ptrv_at_eim", return_type='boolean'},
     {"marpa_ptrv_at_lim", return_type='boolean'},
     {"marpa_ptrv_is_trivial"},
+    {"marpa_trv_ahm_id"},
     {"marpa_trv_at_completion", return_type='boolean'},
     {"marpa_trv_at_leo", return_type='boolean'},
     {"marpa_trv_at_token", return_type='boolean'},
     {"marpa_trv_completion_next", return_type='boolean'},
+    {"marpa_trv_current"},
     {"marpa_trv_is_trivial"},
     {"marpa_trv_leo_next", return_type='boolean'},
     {"marpa_trv_nrl_id"},
-    {"marpa_trv_current"},
     {"marpa_trv_origin"},
     {"marpa_trv_rule_id"},
     {"marpa_trv_token_next", return_type='boolean'},

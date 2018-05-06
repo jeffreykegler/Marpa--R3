@@ -11575,6 +11575,20 @@ int marpa_trv_is_trivial(Marpa_Traverser trv)
 
 @*0 Earley item accessors.
 
+@ Returns the AHM ID.
+@<Function definitions@> =
+int marpa_trv_ahm_id(Marpa_Traverser trv)
+{
+  @<Return |-2| on failure@>@;
+  @<Unpack traverser objects@>@;
+  @<Fail if fatal error@>@;
+  @<Fail if traverser grammar is trivial@>@;
+  {
+    const YIM yim = YIM_of_TRV(trv);
+    return AHMID_of_YIM(yim);
+  }
+}
+
 @
 @<Function definitions@> =
 Marpa_Rule_ID marpa_trv_rule_id(Marpa_Traverser trv)
