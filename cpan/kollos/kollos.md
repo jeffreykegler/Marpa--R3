@@ -6848,7 +6848,7 @@ glade has already been dumped.
             at_token = symch:token_next()
         end
 
-        local cause_symches = {} -- by origin and ahm ID
+        local cause_symches = {} -- by origin and IRL ID
         local at_completion = symch:at_completion()
         while at_completion do
             do
@@ -6857,22 +6857,26 @@ glade has already been dumped.
                 -- TODO optimize via symch:completion_cause_ahm_instance()
                 --   to return AHM ID, origin without creating traverser?
                 local child_trv = symch:completion_cause()
-                local ahmid = child_trv:ahm_id()
-                local body = string.format('Debug: Completion AHMID: %d', ahmid)
-                lines2[#lines2+1] = { 0, id, body }
-                local preglade = slg.preglade_sets[ahmid]
-                print("preglade:", inspect(preglade))
-                if not preglade then goto NEXT_COMPLETION end
-                local bricks = preglade.brick
-                if not bricks then goto NEXT_COMPLETION end
+                local child_irlid = child_trv:rule_id()
                 local child_origin = child_trv:origin()
-                local key = string.pack('II', child_origin, ahmid)
-                if cause_symches[key] then goto NEXT_COMPLETION end
-                cause_symches[key] = child_trv
+                local body = string.format('Debug completion: Origin %d IRL: %s',
+                   child_origin,
+                   slg:g1_rule_show(child_irlid, { diag = true })
+                )
+                lines2[#lines2+1] = { 0, id, body }
+                local symches_by_origin = cause_symches[child_origin]
+                if not symches_by_origin then
+                    cause_symches[child_origin] = {}
+                end
+                local trv_by_instance = cause_symches[child_origin][child_irlid]
+                if trv_by_instance then goto NEXT_COMPLETION end
+                cause_symches[child_origin][child_irlid] = child_trv
             end
             ::NEXT_COMPLETION::
             at_completion = symch:completion_next()
         end
+        -- create sets of symches to be used in glade constructor
+        local symch_sets = {}
 
         local at_leo = symch:at_leo()
         while at_leo do
@@ -6953,26 +6957,15 @@ arguments are correct.
     -- miranda: section+ forward declarations
     local glade_from_instance
     -- miranda: section+ most Lua function definitions
-    function glade_from_instance(asf, xsyid, g1_start, g1_length)
-        -- TODO what if xsyid is token?
-        -- TODO what if g1_start, g1_length invalid?
-        -- TODO hash glades per asf
-        local top_xsyid = asf.top_xsyid
+    local function symchsets_from_instance(asf, xsyid, g1_start, g1_length)
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
-        local glade = setmetatable({}, _M.class_glade)
-        local xsy = slg.xsys[xsyid]
-        local is_terminal = xsy.lexeme
-        if is_terminal then
-            M.userX(
-               "glade_from_instance() for terminals NOT YET IMPLEMENTED",
-               inspect(xsy))
-        end
         local g1_end = g1_start + g1_length
         local max_eim = g1r:_earley_set_size(g1_end) - 1
-
+        local top_xsyid = asf.top_xsyid
         local symches = {}
+
         for eim_id = 0, max_eim do
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
@@ -6985,6 +6978,25 @@ arguments are correct.
             symches[#symches+1] = trv
             ::NEXT_EIM::
         end
+        return symches
+    end
+
+    function glade_from_instance(asf, xsyid, g1_start, g1_length)
+        -- TODO what if xsyid is token?
+        -- TODO what if g1_start, g1_length invalid?
+        -- TODO hash glades per asf
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1r = slr.g1
+        local glade = setmetatable({}, _M.class_glade)
+        local xsy = slg.xsys[xsyid]
+        local is_terminal = xsy.lexeme
+        if is_terminal then
+            M.userX(
+               "glade_from_instance() for terminals NOT YET IMPLEMENTED",
+               inspect(xsy))
+        end
+        local symches = symchsets_from_instance(asf, xsyid, g1_start, g1_length)
         -- soft failure if no match
         if #symches < 0 then return end
         glade.asf = asf
