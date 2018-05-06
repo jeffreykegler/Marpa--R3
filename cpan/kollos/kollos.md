@@ -6847,23 +6847,33 @@ glade has already been dumped.
             lines2[#lines2+1] = { 0, id, body }
             at_token = symch:token_next()
         end
+
+        local cause_symches = {} -- by origin and ahm ID
         local at_completion = symch:at_completion()
         while at_completion do
-            lines2[#lines2+1] = { 0, id, "at completion link!" }
-            local predecessor_trv = symch:completion_predecessor()
-            local child_trv = symch:completion_cause()
-            local child_origin = child_trv:origin()
-            local child_current = child_trv:current()
-            local child_irlid = child_trv:rule_id()
-            local ahmid = child_trv:ahm_id()
-            local body = string.format('Debug: @%d-%d AHMID: %d IRL: %s',
-               child_origin, child_current, ahmid,
-               slg:g1_rule_show(child_irlid, { diag = true })
-            )
-            print("preglade:", inspect(slg.preglade_sets[ahmid]))
-            lines2[#lines2+1] = { 0, id, body }
+            do
+                lines2[#lines2+1] = { 0, id, "at completion link!" }
+                local predecessor_trv = symch:completion_predecessor()
+                -- TODO optimize via symch:completion_cause_ahm_instance()
+                --   to return AHM ID, origin without creating traverser?
+                local child_trv = symch:completion_cause()
+                local ahmid = child_trv:ahm_id()
+                local body = string.format('Debug: Completion AHMID: %d', ahmid)
+                lines2[#lines2+1] = { 0, id, body }
+                local preglade = slg.preglade_sets[ahmid]
+                print("preglade:", inspect(preglade))
+                if not preglade then goto NEXT_COMPLETION end
+                local bricks = preglade.brick
+                if not bricks then goto NEXT_COMPLETION end
+                local child_origin = child_trv:origin()
+                local key = string.pack('II', child_origin, ahmid)
+                if cause_symches[key] then goto NEXT_COMPLETION end
+                cause_symches[key] = child_trv
+            end
+            ::NEXT_COMPLETION::
             at_completion = symch:completion_next()
         end
+
         local at_leo = symch:at_leo()
         while at_leo do
             lines2[#lines2+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
