@@ -8469,9 +8469,10 @@ indexed by isyid.
         pieces[#pieces+1] = '\n'
         if verbose > 0 then
             local slg = lmw_g.slg
-            pieces[#pieces+1] = '    '
-            pieces[#pieces+1] = inspect(slg.preglade_sets[ahm_id])
-            pieces[#pieces+1] = '\n'
+            local body = inspect(slg.preglade_sets[ahm_id],
+               { indent = '        ' })
+            local indented = body == '{}' and body or body:gsub('}$', '    }')
+            pieces[#pieces+1] = '    ' .. indented .. '\n'
         end
         return table.concat(pieces)
     end
