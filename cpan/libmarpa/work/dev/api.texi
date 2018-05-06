@@ -3354,6 +3354,14 @@ to zero, it too is destroyed.
 @node Traverser accessors, Traverser mutators, Traverser reference counting, Traverser methods
 @section Accessors
 
+@deftypefun Marpa_Rule_ID marpa_trv_ahm_id(Marpa_Traverser @var{trv})
+
+Return value on success: the AHM ID.
+
+Return value on failure:
+If the grammar is trivial, or on other failure, @minus{}2.
+@end deftypefun
+
 @deftypefun int marpa_trv_at_completion(Marpa_Traverser @var{trv})
 
 Return value on success: 1 if the traverser is at a valid completion link,
