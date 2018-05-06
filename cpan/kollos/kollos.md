@@ -6834,13 +6834,14 @@ glade has already been dumped.
         local slr = asf.slr
         local slg = slr.slg
         local id = glade:id()
+        local xsyid = glade.xsyid
+        local xsy = slg.xsys[xsyid]
+        local g1_start = glade.g1_start
+        local g1_length = glade.g1_length
+        local g1_end = g1_start + g1_length
 
         local at_token = symch:at_token()
         while at_token do
-            local xsyid = glade.xsyid
-            local xsy = slg.xsys[xsyid]
-            local g1_start = glade.g1_start
-            local g1_length = glade.g1_end - glade.g1_start
             local literal = slr:g1_literal(g1_start, g1_length)
             local body = string.format('Token %s: "%s"', xsy:angled_form(), literal);
             lines[#lines+1] = { 0, id, body }
@@ -6879,6 +6880,39 @@ glade has already been dumped.
         end
         -- create sets of symches to be used in glade constructor
         local symch_sets = {}
+        for origin, symches_at_origin in pairs(cause_symches) do
+            local glade_symches = {}
+            for _, eim_trv in pairs(symches_at_origin) do
+                glade_symches[#glade_symches+1] = eim_trv
+            end
+            symch_sets[#symch_sets+1] = glade_symches
+            table.sort(symch_sets,
+               function (i,j)
+                   -- compare origins, which are the same for every
+                   -- element of the set
+                   return i[1]:origin() < i[1]:origin()
+               end
+            )
+        end
+        local downglades = {}
+        for ix = 1, #symch_sets do
+            local symchset = symch_sets[ix]
+            local downglade =
+                glade_from_instance(asf, xsyid, g1_start, g1_length, symchset)
+            downglades[#downglades+1] = downglade
+        end
+        table.sort(downglades,
+            function (i,j)
+                -- compare origins, which are the same for every
+                -- element of the set
+                local i_origin = i:origin()
+                local j_origin = j:origin()
+                if i_origin < j_origin then return true end
+                if i_origin > j_origin then return false end
+                if i:xsyid() < j:xsyid() then return true end
+                return false
+            end)
+        print('downglades:', inspect(downglades, {depth = 3}))
 
         local at_leo = symch:at_leo()
         while at_leo do
@@ -6977,7 +7011,7 @@ arguments are correct.
     -- miranda: section+ forward declarations
     local glade_from_instance
     -- miranda: section+ most Lua function definitions
-    local function symchsets_from_instance(asf, xsyid, g1_start, g1_length)
+    local function symchset_from_instance(asf, xsyid, g1_start, g1_length)
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
@@ -7001,7 +7035,7 @@ arguments are correct.
         return symches
     end
 
-    function glade_from_instance(asf, xsyid, g1_start, g1_length, symchsets)
+    function glade_from_instance(asf, xsyid, g1_start, g1_length, symchset)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
@@ -7016,10 +7050,15 @@ arguments are correct.
                "glade_from_instance() for terminals NOT YET IMPLEMENTED",
                inspect(xsy))
         end
-        local symches = symchsets
-            or symchsets_from_instance(asf, xsyid, g1_start, g1_length)
+        local symches = symchset
+            or symchset_from_instance(asf, xsyid, g1_start, g1_length)
         -- soft failure if no match
         if #symches < 0 then return end
+        table.sort(symches,
+           function (i,j)
+               return i:rule_id() < j:rule_id()
+           end
+        )
         glade.asf = asf
         glade.xsyid = xsyid
         glade.g1_start = g1_start
