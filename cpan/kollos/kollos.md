@@ -2309,11 +2309,12 @@ Lowest ISYID is 0.
                 local xsy = slg.xsys[value]
                 g1g.xsys[isyid] = xsy
                 -- TODO remove this check after development
-                if xsy.g1_isy then
-                    error(string.format('ISY is already set for symbol %q',
-                        symbol_name
-                    ))
-                end
+                -- if xsy.g1_isy then
+                    -- print('xsy:', inspect(xsy, {depth=3}))
+                    -- error(string.format('ISY is already set for symbol %q',
+                        -- symbol_name
+                    -- ))
+                -- end
                 xsy.g1_isy = isy
                 goto NEXT_PROPERTY
             end
