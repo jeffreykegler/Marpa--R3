@@ -2308,6 +2308,13 @@ Lowest ISYID is 0.
             if property == 'xsy' then
                 local xsy = slg.xsys[value]
                 g1g.xsys[isyid] = xsy
+                -- TODO remove this check after development
+                if xsy.g1_isy then
+                    error(string.format('ISY is already set for symbol %q',
+                        symbol_name
+                    ))
+                end
+                xsy.g1_isy = isy
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
@@ -2361,6 +2368,13 @@ Lowest ISYID is 0.
             if property == 'xsy' then
                 local xsy = slg.xsys[value]
                 l0g.xsys[isyid] = xsy
+                -- TODO remove this check after development
+                if xsy.l0_isy then
+                    error(string.format('ISY is already set for symbol %q has unknown property %q',
+                        symbol_name
+                    ))
+                end
+                xsy.l0_isy = isy
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
@@ -6124,6 +6138,7 @@ This is a registry object.
     class_asf_fields.regix = true
 
     class_asf_fields.top_xsyid = true
+    class_asf_fields.top_isyid = true
     class_asf_fields.g1_start = true
     class_asf_fields.g1_length = true
 
@@ -6205,11 +6220,12 @@ which is not kept in the registry.
         local g1r = slr.g1
         local g1g = slg.g1
         local raw_arg
+        local latest_earley_set = g1r:latest_earley_set()
 
         -- 'end' named argument --
         local end_of_parse
-        raw_arg = flat_args["end"]
-        if raw_arg then
+        local end_of_parse_arg = flat_args["end"]
+        if end_of_parse_arg then
             local value = math.tointeger(raw_arg)
             if not value then
                error(string.format(
@@ -6217,61 +6233,86 @@ which is not kept in the registry.
                    inspect(raw_arg)))
             end
             end_of_parse = value
+        else
+            end_of_parse = latest_earley_set
         end
         flat_args["end"] = nil
-        if not end_of_parse or end_of_parse < 0 then
-            end_of_parse = g1r:latest_earley_set()
+        if end_of_parse < 0 then
+            end_of_parse = latest_earley_set + end_of_parse + 1
         end
-        if end_of_parse == 0 then
+        if end_of_parse < 0 then
             _M.userX([[
-                An attempt was make to create an ASF for a null parse\n\z
-                \u{20}  A null parse is a successful parse of a zero-length string\n\z
-                \u{20}  ASF's are not defined for null parses\n\z
-            ]])
+                End of parse (%d) is before start of parse (0)\n\z
+            ]], inspect(end_of_parse_arg))
+            end_of_parse = latest_earley_set + end_of_parse + 1
         end
 
         -- 'start' named argument --
-        local start_of_parse
-        raw_arg = flat_args.start
-        if raw_arg then
+        local g1_start
+        local start_of_parse_arg = flat_args.start
+        if start_of_parse_arg then
             local value = math.tointeger(raw_arg)
             if not value then
               _M.userX('Bad value for "start" named argument: %s',
                    inspect(raw_arg))
             end
-            start_of_parse = value
+            g1_start = value
+        else
+            g1_start = 0
         end
         flat_args.start = nil
-        start_of_parse = start_of_parse or 0
-        if start_of_parse < 0 then
-            start_of_parse = start_of_parse + end_of_parse
+        if g1_start < 0 then
+            g1_start = g1_start + latest_earley_set + 1
         end
-        if start_of_parse < 0 then
-              _M.userX('"start" named argument is before first G1 location: %s',
-                   inspect(raw_arg))
+        if g1_start < 0 then
+              _M.userX('"start" named argument is less than zero: %s',
+                   inspect(start_of_parse_arg))
         end
-        asf.g1_start = start_of_parse
-        asf.g1_length = end_of_parse - start_of_parse
+
+        asf.g1_start = g1_start
+        local g1_length = end_of_parse - g1_start
+        asf.g1_length = g1_length
+
+        if g1_length == 0 then
+            _M.userX([[
+                Zero length parse NOT YET IMPLEMENTED\n\z
+            ]])
+        end
+        if g1_length < 0 then
+            _M.userX([[
+                Negative length parse requested, start=%s end=%d\n\z
+                \u{20}  Marpa cannot make sense of that\n\z
+            ]],
+                inspect(start_of_parse_arg),
+                inspect(end_of_parse_arg)
+            )
+        end
 
         -- 'top' named argument --
         local top_xsyid
-        raw_arg = flat_args["top"]
-        if raw_arg then
-            local value = math.tointeger(raw_arg)
+        local top_xsyid_arg = flat_args["top"]
+        if top_xsyid_arg then
+            local value = math.tointeger(top_xsyid_arg)
             if not value or value < 0 then
                error(string.format(
                    'Bad value for "top" named argument: %s',
-                   inspect(raw_arg)))
+                   inspect(top_xsyid_arg)))
             end
             top_xsyid = value
+        else
+            top_xsyid = slg:start_symbol_id()
         end
-        top_xsyid = top_xsyid or slg:start_symbol_id()
-        flat_args["top"] = nil
+        flat_args.top = nil
         asf.top_xsyid = top_xsyid
+        -- There is at most one non-nullable G1 ISY for
+        -- an XSY.
+        local top_isy = g1g.xsys[top_xsyid].g1_isy
+        local top_isyid = top_isy.id
+        asf.top_isyid = top_isyid
 
         asf:common_set(flat_args, {})
 
-        local peak = glade_from_instance(asf, asf.top_xsyid, asf.g1_start, asf.g1_length)
+        local peak = glade_from_instance(asf, top_isyid, g1_start, g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
         end
@@ -6414,6 +6455,7 @@ which is not kept in the registry.
         asf.slr = slr
         local slg = slr.slg
         local g1r = slr.g1
+        local g1g = slg.g1
 
         asf:common_set(flat_args, {'end'})
 
@@ -6769,7 +6811,7 @@ than one can be active at once.
 
 ```
     -- miranda: section+ class_glade field declarations
-    class_glade_fields.xsyid = true
+    class_glade_fields.isyid = true
     class_glade_fields.g1_start = true
     class_glade_fields.g1_length = true
 ```
@@ -6805,7 +6847,7 @@ and "leo" for a Leo glade.
         return glade.g1_start, glade.g1_length
     end
     function _M.class_glade.id(glade)
-        return glade.g1_start .. glade.g1_length .. glade.xsyid
+        return glade.g1_start .. glade.g1_length .. glade.isyid
     end
 ```
 
@@ -6833,9 +6875,9 @@ glade has already been dumped.
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
+        local g1g = slg.g1
+        local isyid = glade.isyid
         local id = glade:id()
-        local xsyid = glade.xsyid
-        local xsy = slg.xsys[xsyid]
         local g1_start = glade.g1_start
         local g1_length = glade.g1_length
         local g1_end = g1_start + g1_length
@@ -6843,7 +6885,9 @@ glade has already been dumped.
         local at_token = symch:at_token()
         while at_token do
             local literal = slr:g1_literal(g1_start, g1_length)
-            local body = string.format('Token %s: "%s"', xsy:angled_form(), literal);
+            local body = string.format('Token %s: "%s"',
+                slg:g1_angled_form(isyid),
+                literal)
             lines[#lines+1] = { 0, id, body }
             rhs[#rhs+1] = { 'token', body }
             at_token = symch:token_next()
@@ -6851,7 +6895,9 @@ glade has already been dumped.
 
         -- Note: we never have both token and completion (or leo) links
 
-        local cause_symches = {} -- by origin and IRL ID
+        local cause_eim_db = {} -- by origin and IRL ID
+        local predecessor_eim_db = {} -- by origin
+        local cause_lhs
         local at_completion = symch:at_completion()
         while at_completion do
             do
@@ -6859,60 +6905,42 @@ glade has already been dumped.
                 local predecessor_trv = symch:completion_predecessor()
                 -- TODO optimize via symch:completion_cause_ahm_instance()
                 --   to return AHM ID, origin without creating traverser?
-                local child_trv = symch:completion_cause()
-                local child_irlid = child_trv:rule_id()
-                local child_origin = child_trv:origin()
+                local cause_trv = symch:completion_cause()
+                local cause_irlid = cause_trv:rule_id()
+                if not cause_lhs then cause_lhs = g1g:rule_lhs(cause_irlid) end
+                local cause_origin = cause_trv:origin()
                 local body = string.format('Debug completion: Origin %d IRL: %s',
-                   child_origin,
-                   slg:g1_rule_show(child_irlid, { diag = true })
+                   cause_origin,
+                   slg:g1_rule_show(cause_irlid, { diag = true })
                 )
                 lines[#lines+1] = { 0, id, body }
-                local symches_by_origin = cause_symches[child_origin]
-                if not symches_by_origin then
-                    cause_symches[child_origin] = {}
+                local eims_by_irlid = cause_eim_db[cause_origin]
+                if not eims_by_irlid then
+                    eims_by_irlid = {}
+                    cause_eim_db[cause_origin] = eims_by_irlid
+                    predecessor_eim_db[cause_origin] = predecessor_trv
                 end
-                local trv_by_instance = cause_symches[child_origin][child_irlid]
-                if trv_by_instance then goto NEXT_COMPLETION end
-                cause_symches[child_origin][child_irlid] = child_trv
+                local cause_eim = eims_by_irlid[cause_irlid]
+                if cause_eim then goto NEXT_COMPLETION end
+                eims_by_irlid[cause_irlid] = cause_trv
             end
             ::NEXT_COMPLETION::
             at_completion = symch:completion_next()
         end
-        -- create sets of symches to be used in glade constructor
-        local symch_sets = {}
-        for origin, symches_at_origin in pairs(cause_symches) do
-            local glade_symches = {}
-            for _, eim_trv in pairs(symches_at_origin) do
-                glade_symches[#glade_symches+1] = eim_trv
-            end
-            symch_sets[#symch_sets+1] = glade_symches
-            table.sort(symch_sets,
-               function (i,j)
-                   -- compare origins, which are the same for every
-                   -- element of the set
-                   return i[1]:origin() < i[1]:origin()
-               end
-            )
-        end
+
+        -- create down glades
         local downglades = {}
-        for ix = 1, #symch_sets do
-            local symchset = symch_sets[ix]
-            local downglade =
-                glade_from_instance(asf, xsyid, g1_start, g1_length, symchset)
+        for origin, eims_by_irlid in pairs(cause_eim_db) do
+            local symch = {}
+            for _, eim_trv in pairs(eims_by_irlid) do
+                symch[#symch+1] = eim_trv
+            end
+            local g1_length = g1_end - origin
+            local predecessor_eim = predecessor_eim_db[origin]
+            local glade = glade_from_instance(asf, cause_lhs, origin, g1_length)
+            local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
         end
-        table.sort(downglades,
-            function (i,j)
-                -- compare origins, which are the same for every
-                -- element of the set
-                local i_origin = i:origin()
-                local j_origin = j:origin()
-                if i_origin < j_origin then return true end
-                if i_origin > j_origin then return false end
-                if i:xsyid() < j:xsyid() then return true end
-                return false
-            end)
-        print('downglades:', inspect(downglades, {depth = 3}))
 
         local at_leo = symch:at_leo()
         while at_leo do
@@ -7011,14 +7039,14 @@ arguments are correct.
     -- miranda: section+ forward declarations
     local glade_from_instance
     -- miranda: section+ most Lua function definitions
-    local function symchset_from_instance(asf, xsyid, g1_start, g1_length)
+    local function eimset_from_instance(asf, isyid, g1_start, g1_length)
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
         local g1_end = g1_start + g1_length
         local max_eim = g1r:_earley_set_size(g1_end) - 1
         local top_xsyid = asf.top_xsyid
-        local symches = {}
+        local eimset = {}
 
         for eim_id = 0, max_eim do
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
@@ -7029,41 +7057,43 @@ arguments are correct.
             if not xpr then goto NEXT_EIM end
             local xsy_id = xpr.lhs.id
             if xsy_id ~= top_xsyid then goto NEXT_EIM end
-            symches[#symches+1] = trv
+            eimset[#eimset+1] = trv
             ::NEXT_EIM::
         end
-        return symches
+        return eimset
     end
 
-    function glade_from_instance(asf, xsyid, g1_start, g1_length, symchset)
+    function glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
         local slr = asf.slr
         local slg = slr.slg
+        local g1g = slg.g1
         local g1r = slr.g1
         local glade = setmetatable({}, _M.class_glade)
-        local xsy = slg.xsys[xsyid]
-        local is_terminal = xsy.lexeme
+        local isy = g1g.isys[isyid]
+        local is_terminal = isy.lexeme
         if is_terminal then
             M.userX(
                "glade_from_instance() for terminals NOT YET IMPLEMENTED",
                inspect(xsy))
         end
-        local symches = symchset
-            or symchset_from_instance(asf, xsyid, g1_start, g1_length)
+        if not eimset then
+            eimset = eimset_from_instance(asf, isyid, g1_start, g1_length)
+        end
         -- soft failure if no match
-        if #symches < 0 then return end
-        table.sort(symches,
+        if #eimset < 0 then return end
+        table.sort(eimset,
            function (i,j)
                return i:rule_id() < j:rule_id()
            end
         )
         glade.asf = asf
-        glade.xsyid = xsyid
+        glade.isyid = isyid
         glade.g1_start = g1_start
         glade.g1_length = g1_length
-        glade.rule_symches = symches
+        glade.rule_symches = eimset
         glade.type = 'rule'
         local regix = _M.register(_M.registry, glade)
         glade.regix = regix
@@ -8201,6 +8231,27 @@ the "no lexeme" and "discard" situations.
     class_xsy_fields.name_source = true
     class_xsy_fields.lexeme = true
     class_xsy_fields.is_start = true
+```
+
+The ISYs for this XSY.
+For each subgrammar, only
+two ISYs are allowed -- nulling
+and non-nullable.
+That means that, for each subgrammar,
+the ISY is unique by instance,
+since each instance is either zero-length
+or not.
+
+Currently, there are no nulling ISYs but
+that will change when the CHAF rewrite is
+moved into the Lua layer.
+
+```
+    -- miranda: section+ class_xsy field declarations
+    class_xsy_fields.g1_isy = true
+    class_xsy_fields.g1_null_isy = true
+    class_xsy_fields.l0_isy = true
+    class_xsy_fields.l0_null_isy = true
 ```
 
 The "blessing" facility exists to provide strings
