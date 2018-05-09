@@ -2322,6 +2322,10 @@ Lowest ISYID is 0.
                 g1g:symbol_is_terminal_set(isyid, value)
                 goto NEXT_PROPERTY
             end
+            if property == 'precedence' then
+                isy.xsy_precedence = value
+                goto NEXT_PROPERTY
+            end
             if property == 'rank' then
                 int_value = math.tointeger(value)
                 if not int_value then
@@ -8318,6 +8322,13 @@ TODO: Delete `blessing`.  Rename `new_blessing`.
     class_isy_fields.eager = true
     class_isy_fields.character_class = true
     class_isy_fields.character_flags = true
+```
+
+`xsy_precedence` is precedence of the base xsy.
+
+```
+    -- miranda: section+ class_isy field declarations
+    class_isy_fields.xsy_precedence = true
 ```
 
 ```
