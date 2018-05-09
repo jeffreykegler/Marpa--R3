@@ -2299,50 +2299,72 @@ Lowest ISYID is 0.
         local isy = g1g:symbol_new(symbol_name)
         isyid = isy.id
         g1g.isys[isyid] = isy
-        local properties = {}
         -- Assuming order does not matter
-        for property, value in pairs(options or {}) do
-            if property == 'wsyid' then
-                goto NEXT_PROPERTY
+        if not options then options = {} end
+        options.wsyid = nil
+
+        local precedence = options.precedence
+        if precedence then
+            local int_value = math.tointeger(precedence)
+            if not int_value then
+                error(string.format('Symbol %q": precedence is %s; must be an integer',
+                    symbol_name,
+                    inspect(value, {depth = 1})
+                ))
             end
-            if property == 'xsy' then
-                local xsy = slg.xsys[value]
-                g1g.xsys[isyid] = xsy
-                -- TODO remove this check after development
-                -- if xsy.g1_isy then
-                    -- print('xsy:', inspect(xsy, {depth=3}))
-                    -- error(string.format('ISY is already set for symbol %q',
-                        -- symbol_name
-                    -- ))
-                -- end
-                xsy.g1_isy = isy
-                goto NEXT_PROPERTY
+            precedence = int_value
+            isy.xsy_precedence = precedence
+            options.precedence = nil
+        end
+        if precedence and precedence < 0 then
+            precedence = nil
+        end
+
+        local is_terminal = options.terminal
+        if is_terminal then
+            g1g:symbol_is_terminal_set(isyid, value)
+            options.terminal = nil
+        end
+
+        local rank = options.rank
+        if rank then
+            local int_value = math.tointeger(rank)
+            if not int_value then
+                error(string.format('Symbol %q": rank is %s; must be an integer',
+                    symbol_name,
+                    inspect(value, {depth = 1})
+                ))
             end
-            if property == 'terminal' then
-                g1g:symbol_is_terminal_set(isyid, value)
-                goto NEXT_PROPERTY
-            end
-            if property == 'precedence' then
-                isy.xsy_precedence = value
-                goto NEXT_PROPERTY
-            end
-            if property == 'rank' then
-                int_value = math.tointeger(value)
-                if not int_value then
-                    error(string.format('Symbol %q": rank is %s; must be an integer',
-                        symbol_name,
-                        inspect(value, {depth = 1})
+            g1g:symbol_rank_set(isyid, int_value)
+            options.rank = nil
+        end
+
+        local xsyid = options.xsy
+        if xsyid then
+            local xsy = slg.xsys[xsyid]
+            g1g.xsys[isyid] = xsy
+            -- G1 ISY of XSY set only to unprecedenced ISY
+            if not precedence then
+                if xsy.g1_isy then
+                    print('xsy:', inspect(xsy, {depth=3}))
+                    error(string.format('ISY is already set for symbol %q',
+                        symbol_name
                     ))
                 end
-                g1g:symbol_rank_set(isyid, value)
-                goto NEXT_PROPERTY
+                xsy.g1_isy = isy
             end
-            error(string.format('Internal error: Symbol %q has unknown property %q',
-                symbol_name,
-                property
-            ))
-            ::NEXT_PROPERTY::
+            options.xsy = nil
         end
+
+        for property, value in pairs(options) do
+            error(string.format('Internal error: Symbol %q has unknown property %s with value %s',
+                symbol_name,
+                inspect(property),
+                inspect(value)
+            ))
+            -- loop abends on 1st pass; this point is never reached --
+        end
+
         return isyid
     end
 
