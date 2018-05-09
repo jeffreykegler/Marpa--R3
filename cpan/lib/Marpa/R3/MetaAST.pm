@@ -1850,7 +1850,10 @@ sub Marpa::R3::Internal::MetaAST::Parse::prioritized_symbol {
         name_source => 'lexical',
     };
     $parse->xsy_assign( $base_symbol, $symbol_data );
-    $symbol_data = { xsy => $base_symbol };
+    $symbol_data = {
+        xsy => $base_symbol,
+        precedence => $priority,
+    };
     $parse->symbol_names_set( $symbol_name, $Marpa::R3::Internal::SUBGRAMMAR,
         $symbol_data );
     return $symbol_name;
