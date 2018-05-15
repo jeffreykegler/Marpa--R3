@@ -6886,9 +6886,15 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_partition_iter
+    local glade_partitions
+    local glade_partition_gen
     -- miranda: section+ most Lua function definitions
-    function glade_partition_iter(glade, lines, symch, seen)
+    function glade_partitions(glade, lines, symch, seen)
+        return coroutine.wrap(function ()
+            glade_partition_gen(glade, lines, symch, seen)
+        end)
+    end
+    function glade_partition_gen(glade, lines, symch, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
@@ -6968,7 +6974,7 @@ glade has already been dumped.
             lines[#lines+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
             at_leo = symch:leo()
         end
-        return lines
+        return { 'dummy' }
     end
 ```
 
@@ -6984,7 +6990,9 @@ glade has already been dumped.
         lines[#lines+1] = {0, id, 'glade symch dump'}
 
         -- a stack containing the current RHS
-        local rh_stack_entry = glade_partition_iter(glade, lines, symch, seen)
+        for partition in glade_partitions(glade, lines, symch, seen) do
+            table.insert(lines, "Partition!")
+        end
         return lines
     end
 ```
