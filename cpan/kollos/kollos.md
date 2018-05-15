@@ -6339,7 +6339,7 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local peak = glade_from_instance(asf, top_isyid, g1_start, g1_length)
+        local peak = asf_glade_from_instance(asf, top_isyid, g1_start, g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
         end
@@ -6404,19 +6404,11 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-         local lines = asf._peak:dump({})
-         local dump = {}
-         for ix = 1, #lines do
-            local line = lines[ix]
-            local indent, glade_id, body = table.unpack(line)
-            -- indent = indent - 2 -- needed?
-            dump[#dump+1] = string.rep(" ", indent)
-            if glade_id then
-                dump[#dump+1] = 'GL' .. glade_id .. " "
-            end
-            dump[#dump+1] = body .. "\n"
-         end
-         return table.concat(dump)
+        local dump = {'Dump:'}
+        for v in glade_values(asf._peak, {}) do
+            table.insert(dump, 'glade value')
+        end
+        return table.concat(dump)
     end
 ```
 
@@ -6886,19 +6878,15 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_sequence_symch_dump
+    local glade_partitions
+    local glade_partition_gen
     -- miranda: section+ most Lua function definitions
-    function glade_sequence_symch_dump(glade, symch, seen)
-        local id = glade:id()
-        return { 0, id, "sequence rule dump NOT YET IMPLEMENTED" }
+    function glade_partitions(glade, lines, symch, seen)
+        return coroutine.wrap(function ()
+            glade_partition_gen(glade, lines, symch, seen)
+        end)
     end
-```
-
-```
-    -- miranda: section+ forward declarations
-    local glade_rh_cell_dump
-    -- miranda: section+ most Lua function definitions
-    function glade_rh_cell_dump(glade, lines, symch, seen)
+    function glade_partition_gen(glade, lines, symch, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
@@ -6945,6 +6933,8 @@ glade has already been dumped.
                 if not eims_by_irlid then
                     eims_by_irlid = {}
                     cause_eim_db[cause_origin] = eims_by_irlid
+                    -- predecessor is determined by AHM, origin and "middle"
+                    -- so there is only one
                     predecessor_eim_db[cause_origin] = predecessor_trv
                 end
                 local cause_eim = eims_by_irlid[cause_irlid]
@@ -6964,15 +6954,40 @@ glade has already been dumped.
             end
             local g1_length = g1_end - origin
             local predecessor_eim = predecessor_eim_db[origin]
-            local glade = glade_from_instance(asf, cause_lhs, origin, g1_length)
+            local glade = asf_glade_from_instance(asf, cause_lhs, origin, g1_length, symch)
             local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
         end
 
+        for ix = 1,#downglades do
+           local predecessor_eim, glade = downglades[ix]
+        end
+
+        -- will I need to mix Leo and completion causes in the same
+        -- glade/downglade?
         local at_leo = symch:at_leo()
         while at_leo do
             lines[#lines+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
             at_leo = symch:leo()
+        end
+        return { 'dummy' }
+    end
+```
+
+```
+    -- miranda: section+ forward declarations
+    local glade_symch_dump
+    -- miranda: section+ most Lua function definitions
+    function glade_symch_dump(glade, symch, lines, seen)
+        local asf = glade.asf
+        local slr = asf.slr
+        local slg = slr.slg
+        local id = glade:id()
+        lines[#lines+1] = {0, id, 'glade symch dump'}
+
+        -- a stack containing the current RHS
+        for partition in glade_partitions(glade, lines, symch, seen) do
+            table.insert(lines, "Partition!")
         end
         return lines
     end
@@ -6980,25 +6995,15 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_partitions_dump
+    local glade_values
+    local glade_values_gen
     -- miranda: section+ most Lua function definitions
-    function glade_partitions_dump(glade, symch, seen)
-        local asf = glade.asf
-        local slr = asf.slr
-        local slg = slr.slg
-        local id = glade:id()
-        local lines1 = {{0, id, 'debug!'}}
-        local lines2 = {}
-
-        -- a stack containing the current RHS
-        local rh_stack_entry = glade_rh_cell_dump(glade, lines2, symch, seen)
-        return lines1, lines2
+    function glade_values(glade, seen)
+        return coroutine.wrap(
+            function () glade_values_gen()
+        end)
     end
-```
-
-```
-    -- miranda: section+ most Lua function definitions
-    function _M.class_glade.dump(glade, seen)
+    function glade_values_gen(glade, seen)
 
         local function form_symch_choice(parent, ix)
            if not parent then return ix end
@@ -7026,25 +7031,14 @@ glade has already been dumped.
                local xprid = slg:g1_rule_to_xprid(irlid)
                local xpr = slg.xprs[xprid]
                if xpr.min then
-                   local lines1 = glade_sequence_partitions_dump(glade, symch, seen)
-                   for ix = 1, #lines1 do
-                       local line = lines1[ix]
-                       lines[#lines+1] = line
-                   end
+                   local body = string.format("Sequence NOT YET IMPLEMENT %d: %s", xprid, slg:xpr_show(xprid))
+                   lines[#lines+1] = { 0, id, body }
                    seen[id] = true
                    return lines
                end
                local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
                lines[#lines+1] = { 0, id, body }
-               local lines1, lines2 = glade_partitions_dump(glade, symch, seen)
-               for ix = 1, #lines1 do
-                   local line = lines1[ix]
-                   lines[#lines+1] = line
-               end
-               for ix = 1, #lines2 do
-                   local line = lines2[ix]
-                   lines[#lines+1] = line
-               end
+               glade_symch_dump(glade, symch, lines, seen)
                seen[id] = true
                return lines
             end
@@ -7059,12 +7053,12 @@ glade has already been dumped.
 
 ### Glade mutators
 
-`glade_from_instance` assumes that the caller ensured its
+`asf_glade_from_instance` assumes that the caller ensured its
 arguments are correct.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_from_instance
+    local asf_glade_from_instance
     -- miranda: section+ most Lua function definitions
     local function eimset_from_instance(asf, isyid, g1_start, g1_length)
         local slr = asf.slr
@@ -7090,7 +7084,7 @@ arguments are correct.
         return eimset
     end
 
-    function glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
+    function asf_glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
@@ -7103,7 +7097,7 @@ arguments are correct.
         local is_terminal = isy.lexeme
         if is_terminal then
             M.userX(
-               "glade_from_instance() for terminals NOT YET IMPLEMENTED",
+               "asf_glade_from_instance() for terminals NOT YET IMPLEMENTED",
                inspect(xsy))
         end
         if not eimset then
