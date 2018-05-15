@@ -6404,19 +6404,11 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-         local lines = asf_glade_dump(asf._peak, {})
-         local dump = {}
-         for ix = 1, #lines do
-            local line = lines[ix]
-            local indent, glade_id, body = table.unpack(line)
-            -- indent = indent - 2 -- needed?
-            dump[#dump+1] = string.rep(" ", indent)
-            if glade_id then
-                dump[#dump+1] = 'GL' .. glade_id .. " "
-            end
-            dump[#dump+1] = body .. "\n"
-         end
-         return table.concat(dump)
+        local dump = {'Dump:'}
+        for v in glade_values(asf._peak, {}) do
+            table.insert(dump, 'glade value')
+        end
+        return table.concat(dump)
     end
 ```
 
@@ -6967,6 +6959,10 @@ glade has already been dumped.
             downglades[#downglades+1] = downglade
         end
 
+        for ix = 1,#downglades do
+           local predecessor_eim, glade = downglades[ix]
+        end
+
         -- will I need to mix Leo and completion causes in the same
         -- glade/downglade?
         local at_leo = symch:at_leo()
@@ -6999,9 +6995,15 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local asf_glade_dump
+    local glade_values
+    local glade_values_gen
     -- miranda: section+ most Lua function definitions
-    function asf_glade_dump(glade, seen)
+    function glade_values(glade, seen)
+        return coroutine.wrap(
+            function () glade_values_gen()
+        end)
+    end
+    function glade_values_gen(glade, seen)
 
         local function form_symch_choice(parent, ix)
            if not parent then return ix end
