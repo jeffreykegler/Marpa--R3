@@ -6404,11 +6404,33 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-        local dump = {'Dump:'}
+        local glades = {{0, -1, 'Dump:'}}
         for v in glade_values(asf._peak, {}) do
-            table.insert(dump, 'glade value')
+            table.insert(glades, v)
         end
-        return table.concat(dump)
+
+        print(inspect(glades))
+
+        local function recursive_dump(dump_table, lines, indent)
+            for ix = 1, #dump_table do
+                local element = dump_table[ix]
+                if type(element) == 'number' then
+                    local indent = element
+                    local body = dump_table[2]
+                    table.insert(lines, string.rep(' ', indent) .. body)
+                    return
+                end
+                if type(element) ~= 'table' then
+                    recursive_dump({0, 'Error:' .. tostring(element)}, lines, indent)
+                    return
+                end
+                recursive_dump(element, lines, indent+1)
+            end
+        end
+
+        local lines = {}
+        recursive_dump(glades, lines, 0)
+        return table.concat(lines, "\n")
     end
 ```
 
@@ -6903,7 +6925,7 @@ glade has already been dumped.
             local body = string.format('Token %s: "%s"',
                 slg:g1_angled_form(isyid),
                 literal)
-            lines[#lines+1] = { 0, id, body }
+            lines[#lines+1] = { 0, body }
             rhs[#rhs+1] = { 'token', body }
             at_token = symch:token_next()
         end
@@ -6916,7 +6938,7 @@ glade has already been dumped.
         local at_completion = symch:at_completion()
         while at_completion do
             do
-                lines[#lines+1] = { 0, id, "at completion link!" }
+                lines[#lines+1] = { 0, "at completion link!" }
                 local predecessor_trv = symch:completion_predecessor()
                 -- TODO optimize via symch:completion_cause_ahm_instance()
                 --   to return AHM ID, origin without creating traverser?
@@ -6928,7 +6950,7 @@ glade has already been dumped.
                    cause_origin,
                    slg:g1_rule_show(cause_irlid, { diag = true })
                 )
-                lines[#lines+1] = { 0, id, body }
+                lines[#lines+1] = { 0, body }
                 local eims_by_irlid = cause_eim_db[cause_origin]
                 if not eims_by_irlid then
                     eims_by_irlid = {}
@@ -6967,7 +6989,7 @@ glade has already been dumped.
         -- glade/downglade?
         local at_leo = symch:at_leo()
         while at_leo do
-            lines[#lines+1] = { 0, id, "leo links NOT YET IMPLEMENTED" }
+            lines[#lines+1] = { 0, "leo links NOT YET IMPLEMENTED" }
             at_leo = symch:leo()
         end
         return { 'dummy' }
@@ -6976,18 +6998,24 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_symch_dump
+    local glade_symch_values
+    local glade_symch_values_gen
     -- miranda: section+ most Lua function definitions
-    function glade_symch_dump(glade, symch, lines, seen)
+    function glade_symch_values(glade, symch, lines, seen)
+        return coroutine.wrap(
+            function () glade_symch_values_gen(glade, symch, lines, seen)
+        end)
+    end
+    function glade_symch_values_gen(glade, symch, lines, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
         local id = glade:id()
-        lines[#lines+1] = {0, id, 'glade symch dump'}
+        coroutine.yield{0, 'glade symch dump'}
 
         -- a stack containing the current RHS
         for partition in glade_partitions(glade, lines, symch, seen) do
-            table.insert(lines, "Partition!")
+            coroutine.yield{0, 'Partition!'}
         end
         return lines
     end
@@ -7000,7 +7028,7 @@ glade has already been dumped.
     -- miranda: section+ most Lua function definitions
     function glade_values(glade, seen)
         return coroutine.wrap(
-            function () glade_values_gen()
+            function () glade_values_gen(glade, seen)
         end)
     end
     function glade_values_gen(glade, seen)
@@ -7019,7 +7047,8 @@ glade has already been dumped.
 
         if seen[id] == true then
             local body = string.format("Glade %s already displayed", id)
-            return {{ 0, id, body }}
+            coroutine.yield{ 0, body }
+            return
         end
         local rule_symches = glade.rule_symches
         if rule_symches then
@@ -7032,22 +7061,24 @@ glade has already been dumped.
                local xpr = slg.xprs[xprid]
                if xpr.min then
                    local body = string.format("Sequence NOT YET IMPLEMENT %d: %s", xprid, slg:xpr_show(xprid))
-                   lines[#lines+1] = { 0, id, body }
+                   coroutine.yield{ 0, body }
                    seen[id] = true
                    return lines
                end
                local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
-               lines[#lines+1] = { 0, id, body }
-               glade_symch_dump(glade, symch, lines, seen)
+               coroutine.yield{ 0, body }
+               for v in glade_symch_values(glade, symch, lines, seen) do
+                   coroutine.yield(v)
+               end
                seen[id] = true
                return lines
             end
             seen[id] = true
-            return {{ 0, id, "dump of multi-symch glade NOT YET IMPLEMENTED" }}
+            coroutine.yield{ 0, "dump of multi-symch glade NOT YET IMPLEMENTED" }
             -- return lines
         end
         seen[id] = true
-        return {{ 0, id, "dump of non-rule glade NOT YET IMPLEMENTED" }}
+        coroutine.yield{ 0, "dump of non-rule glade NOT YET IMPLEMENTED" }
     end
 ```
 
