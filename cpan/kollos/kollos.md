@@ -6339,7 +6339,7 @@ which is not kept in the registry.
 
         asf:common_set(flat_args, {})
 
-        local peak = glade_from_instance(asf, top_isyid, g1_start, g1_length)
+        local peak = asf_glade_from_instance(asf, top_isyid, g1_start, g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
         end
@@ -6404,7 +6404,7 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-         local lines = asf._peak:dump({})
+         local lines = asf_glade_dump(asf._peak, {})
          local dump = {}
          for ix = 1, #lines do
             local line = lines[ix]
@@ -6886,19 +6886,9 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_sequence_symch_dump
+    local glade_partition_iter
     -- miranda: section+ most Lua function definitions
-    function glade_sequence_symch_dump(glade, symch, seen)
-        local id = glade:id()
-        return { 0, id, "sequence rule dump NOT YET IMPLEMENTED" }
-    end
-```
-
-```
-    -- miranda: section+ forward declarations
-    local glade_rh_cell_dump
-    -- miranda: section+ most Lua function definitions
-    function glade_rh_cell_dump(glade, lines, symch, seen)
+    function glade_partition_iter(glade, lines, symch, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
@@ -6966,7 +6956,7 @@ glade has already been dumped.
             end
             local g1_length = g1_end - origin
             local predecessor_eim = predecessor_eim_db[origin]
-            local glade = glade_from_instance(asf, cause_lhs, origin, g1_length, symch)
+            local glade = asf_glade_from_instance(asf, cause_lhs, origin, g1_length, symch)
             local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
         end
@@ -6984,24 +6974,26 @@ glade has already been dumped.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_partitions_dump
+    local glade_symch_dump
     -- miranda: section+ most Lua function definitions
-    function glade_partitions_dump(glade, symch, lines, seen)
+    function glade_symch_dump(glade, symch, lines, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
         local id = glade:id()
-        lines[#lines+1] = {0, id, 'glade partitions dump'}
+        lines[#lines+1] = {0, id, 'glade symch dump'}
 
         -- a stack containing the current RHS
-        local rh_stack_entry = glade_rh_cell_dump(glade, lines, symch, seen)
+        local rh_stack_entry = glade_partition_iter(glade, lines, symch, seen)
         return lines
     end
 ```
 
 ```
+    -- miranda: section+ forward declarations
+    local asf_glade_dump
     -- miranda: section+ most Lua function definitions
-    function _M.class_glade.dump(glade, seen)
+    function asf_glade_dump(glade, seen)
 
         local function form_symch_choice(parent, ix)
            if not parent then return ix end
@@ -7031,13 +7023,12 @@ glade has already been dumped.
                if xpr.min then
                    local body = string.format("Sequence NOT YET IMPLEMENT %d: %s", xprid, slg:xpr_show(xprid))
                    lines[#lines+1] = { 0, id, body }
-                   -- glade_sequence_partitions_dump(glade, symch, lines, seen)
                    seen[id] = true
                    return lines
                end
                local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
                lines[#lines+1] = { 0, id, body }
-               glade_partitions_dump(glade, symch, lines, seen)
+               glade_symch_dump(glade, symch, lines, seen)
                seen[id] = true
                return lines
             end
@@ -7052,12 +7043,12 @@ glade has already been dumped.
 
 ### Glade mutators
 
-`glade_from_instance` assumes that the caller ensured its
+`asf_glade_from_instance` assumes that the caller ensured its
 arguments are correct.
 
 ```
     -- miranda: section+ forward declarations
-    local glade_from_instance
+    local asf_glade_from_instance
     -- miranda: section+ most Lua function definitions
     local function eimset_from_instance(asf, isyid, g1_start, g1_length)
         local slr = asf.slr
@@ -7083,7 +7074,7 @@ arguments are correct.
         return eimset
     end
 
-    function glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
+    function asf_glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
@@ -7096,7 +7087,7 @@ arguments are correct.
         local is_terminal = isy.lexeme
         if is_terminal then
             M.userX(
-               "glade_from_instance() for terminals NOT YET IMPLEMENTED",
+               "asf_glade_from_instance() for terminals NOT YET IMPLEMENTED",
                inspect(xsy))
         end
         if not eimset then
