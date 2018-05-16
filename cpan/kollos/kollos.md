@@ -6888,7 +6888,9 @@ and "leo" for a Leo glade.
         return glade.g1_start, glade.g1_length
     end
     function _M.class_glade.id(glade)
-        return glade.g1_start .. glade.g1_length .. glade.isyid
+        return glade.g1_start
+            .. '.' .. glade.g1_length
+            .. '.' .. glade.isyid
     end
 ```
 
@@ -6903,12 +6905,12 @@ glade has already been dumped.
     local glade_partitions
     local glade_partition_gen
     -- miranda: section+ most Lua function definitions
-    function glade_partitions(glade, lines, symch, seen)
+    function glade_partitions(glade, symch, seen)
         return coroutine.wrap(function ()
-            glade_partition_gen(glade, lines, symch, seen)
+            glade_partition_gen(glade, symch, seen)
         end)
     end
-    function glade_partition_gen(glade, lines, symch, seen)
+    function glade_partition_gen(glade, symch, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
@@ -6923,10 +6925,9 @@ glade has already been dumped.
         while at_token do
             local literal = slr:g1_literal(g1_start, g1_length)
             local body = string.format('Token %s: "%s"',
-                slg:g1_angled_form(isyid),
+                slg:g1_symbol_angled_form(isyid),
                 literal)
-            lines[#lines+1] = { 0, body }
-            rhs[#rhs+1] = { 'token', body }
+            coroutine.yield{ 0, body }
             at_token = symch:token_next()
         end
 
@@ -6938,7 +6939,7 @@ glade has already been dumped.
         local at_completion = symch:at_completion()
         while at_completion do
             do
-                lines[#lines+1] = { 0, "at completion link!" }
+                coroutine.yield{ 0, "at completion link!" }
                 local predecessor_trv = symch:completion_predecessor()
                 -- TODO optimize via symch:completion_cause_ahm_instance()
                 --   to return AHM ID, origin without creating traverser?
@@ -6950,7 +6951,7 @@ glade has already been dumped.
                    cause_origin,
                    slg:g1_rule_show(cause_irlid, { diag = true })
                 )
-                lines[#lines+1] = { 0, body }
+                coroutine.yield{ 0, body }
                 local eims_by_irlid = cause_eim_db[cause_origin]
                 if not eims_by_irlid then
                     eims_by_irlid = {}
@@ -6982,17 +6983,19 @@ glade has already been dumped.
         end
 
         for ix = 1,#downglades do
-           local predecessor_eim, glade = downglades[ix]
+           local predecessor_eim, glade = table.unpack(downglades[ix])
+           for v in glade_values(glade, seen) do
+               coroutine.yield(v)
+           end
         end
 
         -- will I need to mix Leo and completion causes in the same
         -- glade/downglade?
         local at_leo = symch:at_leo()
         while at_leo do
-            lines[#lines+1] = { 0, "leo links NOT YET IMPLEMENTED" }
+            coroutine.yield{ 0, "leo links NOT YET IMPLEMENTED" }
             at_leo = symch:leo()
         end
-        return { 'dummy' }
     end
 ```
 
@@ -7001,12 +7004,12 @@ glade has already been dumped.
     local glade_symch_values
     local glade_symch_values_gen
     -- miranda: section+ most Lua function definitions
-    function glade_symch_values(glade, symch, lines, seen)
+    function glade_symch_values(glade, symch, seen)
         return coroutine.wrap(
-            function () glade_symch_values_gen(glade, symch, lines, seen)
+            function () glade_symch_values_gen(glade, symch, seen)
         end)
     end
-    function glade_symch_values_gen(glade, symch, lines, seen)
+    function glade_symch_values_gen(glade, symch, seen)
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
@@ -7014,10 +7017,10 @@ glade has already been dumped.
         coroutine.yield{0, 'glade symch dump'}
 
         -- a stack containing the current RHS
-        for partition in glade_partitions(glade, lines, symch, seen) do
+        for partition in glade_partitions(glade, symch, seen) do
             coroutine.yield{0, 'Partition!'}
+            coroutine.yield(partition)
         end
-        return lines
     end
 ```
 
@@ -7039,7 +7042,6 @@ glade has already been dumped.
         end
 
         local id = glade:id()
-        local lines = {}
         local symch_indent = 0
         local asf = glade.asf
         local slr = asf.slr
@@ -7052,33 +7054,30 @@ glade has already been dumped.
         end
         local rule_symches = glade.rule_symches
         if rule_symches then
-            local symch_choice
-            local symch_count = #rule_symches
-            if symch_count == 1 then
-               local symch = rule_symches[1]
+            coroutine.yield{0, 'rule symch count: ' .. #rule_symches}
+            for ix = 1, #rule_symches do
+               local body
+               local symch = rule_symches[ix]
                local irlid = symch:rule_id()
                local xprid = slg:g1_rule_to_xprid(irlid)
                local xpr = slg.xprs[xprid]
                if xpr.min then
-                   local body = string.format("Sequence NOT YET IMPLEMENT %d: %s", xprid, slg:xpr_show(xprid))
+                   body = string.format("Sequence NOT YET IMPLEMENT %d: %s", xprid, slg:xpr_show(xprid))
                    coroutine.yield{ 0, body }
-                   seen[id] = true
-                   return lines
+                   goto NEXT_RULE_SYMCH
                end
-               local body = string.format("Rule %d: %s", xprid, slg:xpr_show(xprid))
+               body = string.format("Glade %s; Rule %d: %s", glade:id(), xprid, slg:xpr_show(xprid))
                coroutine.yield{ 0, body }
-               for v in glade_symch_values(glade, symch, lines, seen) do
+               for v in glade_symch_values(glade, symch, seen) do
                    coroutine.yield(v)
                end
-               seen[id] = true
-               return lines
+               ::NEXT_RULE_SYMCH::
             end
-            seen[id] = true
-            coroutine.yield{ 0, "dump of multi-symch glade NOT YET IMPLEMENTED" }
-            -- return lines
+           seen[id] = true
+           return
         end
-        seen[id] = true
         coroutine.yield{ 0, "dump of non-rule glade NOT YET IMPLEMENTED" }
+        seen[id] = true
     end
 ```
 
