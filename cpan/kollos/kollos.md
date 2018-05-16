@@ -6935,23 +6935,15 @@ glade has already been dumped.
 
         local cause_eim_db = {} -- by origin and IRL ID
         local predecessor_eim_db = {} -- by origin
-        local cause_lhs
         local at_completion = symch:at_completion()
         while at_completion do
             do
-                coroutine.yield{ 0, "at completion link!" }
                 local predecessor_trv = symch:completion_predecessor()
-                -- TODO optimize via symch:completion_cause_ahm_instance()
-                --   to return AHM ID, origin without creating traverser?
+                -- TODO optimize by memoization?  Special C call?
+                --   look at this after NRLs are eliminated
                 local cause_trv = symch:completion_cause()
                 local cause_irlid = cause_trv:rule_id()
-                if not cause_lhs then cause_lhs = g1g:rule_lhs(cause_irlid) end
                 local cause_origin = cause_trv:origin()
-                local body = string.format('Debug completion: Origin %d IRL: %s',
-                   cause_origin,
-                   slg:g1_rule_show(cause_irlid, { diag = true })
-                )
-                coroutine.yield{ 0, body }
                 local eims_by_irlid = cause_eim_db[cause_origin]
                 if not eims_by_irlid then
                     eims_by_irlid = {}
@@ -6972,12 +6964,14 @@ glade has already been dumped.
         local downglades = {}
         for origin, eims_by_irlid in pairs(cause_eim_db) do
             local symch = {}
-            for _, eim_trv in pairs(eims_by_irlid) do
+            local cause_isyid
+            for cause_irlid, eim_trv in pairs(eims_by_irlid) do
+                if not cause_isyid then cause_isyid = g1g:rule_lhs(cause_irlid) end
                 symch[#symch+1] = eim_trv
             end
             local g1_length = g1_end - origin
             local predecessor_eim = predecessor_eim_db[origin]
-            local glade = asf_glade_from_instance(asf, cause_lhs, origin, g1_length, symch)
+            local glade = asf_glade_from_instance(asf, cause_isyid, origin, g1_length, symch)
             local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
         end
@@ -7053,21 +7047,21 @@ glade has already been dumped.
         end
         local rule_symches = glade.rule_symches
         if rule_symches then
-            coroutine.yield{0, 'rule symch count: ' .. #rule_symches}
+            local body = string.format("Rule glade %s; %s @%d-%d: %d symches", id,
+                g1g:symbol_angled_form(glade.isyid), glade.g1_start,
+                glade.g1_start + glade.g1_length,
+                #rule_symches)
+            coroutine.yield{ 0, body }
             for ix = 1, #rule_symches do
-               local body
                local symch = rule_symches[ix]
                local irlid = symch:rule_id()
-               local symch_symbol = g1g:rule_lhs(irlid)
                if g1g:sequence_min(irlid) then
-                   body = string.format("Sequence NOT YET IMPLEMENT %d: %s", symch_symbol, slg:xpr_show(xprid))
+                   body = string.format("Sequence rules NOT YET IMPLEMENTED: %s", slg:g1_rule_show(irlid))
                    coroutine.yield{ 0, body }
                    goto NEXT_RULE_SYMCH
                end
-               body = string.format("Glade %s; %s @%d-%d: %s", glade:id(),
-                   g1g:symbol_angled_form(symch_symbol), glade.g1_start,
-                   glade.g1_start + glade.g1_length,
-                   slg:g1_rule_show(irlid))
+               body = string.format("Rule symch %s.%d: %s",
+                   glade:id(), ix, slg:g1_rule_show(irlid))
                coroutine.yield{ 0, body }
                for v in glade_symch_values(glade, symch, seen) do
                    coroutine.yield(v)
