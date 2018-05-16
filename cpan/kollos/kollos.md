@@ -7014,11 +7014,9 @@ glade has already been dumped.
         local slr = asf.slr
         local slg = slr.slg
         local id = glade:id()
-        coroutine.yield{0, 'glade symch dump'}
 
         -- a stack containing the current RHS
         for partition in glade_partitions(glade, symch, seen) do
-            coroutine.yield{0, 'Partition!'}
             coroutine.yield(partition)
         end
     end
@@ -7046,6 +7044,7 @@ glade has already been dumped.
         local asf = glade.asf
         local slr = asf.slr
         local slg = slr.slg
+        local g1g = slg.g1
 
         if seen[id] == true then
             local body = string.format("Glade %s already displayed", id)
@@ -7059,14 +7058,16 @@ glade has already been dumped.
                local body
                local symch = rule_symches[ix]
                local irlid = symch:rule_id()
-               local xprid = slg:g1_rule_to_xprid(irlid)
-               local xpr = slg.xprs[xprid]
-               if xpr.min then
-                   body = string.format("Sequence NOT YET IMPLEMENT %d: %s", xprid, slg:xpr_show(xprid))
+               local symch_symbol = g1g:rule_lhs(irlid)
+               if g1g:sequence_min(irlid) then
+                   body = string.format("Sequence NOT YET IMPLEMENT %d: %s", symch_symbol, slg:xpr_show(xprid))
                    coroutine.yield{ 0, body }
                    goto NEXT_RULE_SYMCH
                end
-               body = string.format("Glade %s; Rule %d: %s", glade:id(), xprid, slg:xpr_show(xprid))
+               body = string.format("Glade %s; %s @%d-%d: %s", glade:id(),
+                   g1g:symbol_angled_form(symch_symbol), glade.g1_start,
+                   glade.g1_start + glade.g1_length,
+                   slg:g1_rule_show(irlid))
                coroutine.yield{ 0, body }
                for v in glade_symch_values(glade, symch, seen) do
                    coroutine.yield(v)
