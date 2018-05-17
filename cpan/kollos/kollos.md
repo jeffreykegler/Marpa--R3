@@ -6410,17 +6410,9 @@ illegal named arguments.
         local slr = asf.slr
         local slg = slr.slg
         local g1g = slg.g1
-        local cmds = { type = 'iglade', glade = peak }
-
-        for v in glade_values(peak, {}) do
-            table.insert(cmds, v)
-        end
-
-        -- print(inspect(cmds))
-
         local function recursive_dump(dumpee, lines, indent)
             if type(dumpee) ~= 'table' then
-                return table.insert(lines, string.rep(' ', indent+2) .. tostring(dumpee))
+                return table.insert(lines, string.rep(' ', indent) .. tostring(dumpee))
             end
             if dumpee.type == 'iglade' then
                 local symch_count = #dumpee
@@ -6430,7 +6422,7 @@ illegal named arguments.
                     g1g:symbol_angled_form(glade.isyid), glade.g1_start,
                     glade.g1_start + glade.g1_length,
                     symch_count)
-                table.insert(lines, string.rep(' ', indent+2) .. header)
+                table.insert(lines, string.rep(' ', indent) .. header)
                 if symch_count < 1 then
                    error(string.format("Bad symch count (%d) in iglade %s",
                       symch_count, inspect(dumpee, { depth = 3 } )))
@@ -6454,7 +6446,7 @@ illegal named arguments.
                 local ix = dumpee.ix
                 local header = string.format("Symch %s.%d: %s; %d partitions",
                    id, ix, slg:g1_rule_show(irlid), partition_count)
-                table.insert(lines, string.rep(' ', indent+2) .. header)
+                table.insert(lines, string.rep(' ', indent) .. header)
                 if partition_count < 1 then
                    error(string.format("Bad partition count (%d) in isymch %s",
                       partition_count, inspect(dumpee, { depth = 3 } )))
@@ -6476,7 +6468,15 @@ illegal named arguments.
         end
 
         local lines = {}
-        recursive_dump(cmds, lines, 0)
+        local top_cmd = { type = 'iglade', glade = peak }
+
+        for v in glade_values(peak, {}) do
+            table.insert(top_cmd, v)
+        end
+
+        -- print(inspect(top_cmd))
+
+        recursive_dump(top_cmd, lines, 0)
         return table.concat(lines, "\n")
     end
 ```
