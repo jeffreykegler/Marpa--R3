@@ -6333,12 +6333,14 @@ which is not kept in the registry.
         asf.top_xsyid = top_xsyid
         -- There is at most one non-nullable G1 ISY for
         -- an XSY.
-        local top_isy = g1g.xsys[top_xsyid].g1_isy
+        local top_xsy = slg.xsys[top_xsyid]
+        local top_isy = top_xsy.g1_isy
         local top_isyid = top_isy.id
         asf.top_isyid = top_isyid
 
         asf:common_set(flat_args, {})
 
+        asf.glades = {}
         local peak = asf_glade_from_instance(asf, top_isyid, g1_start, g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
@@ -6404,12 +6406,13 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-        local glades = {{0, -1, 'Dump:'}}
+        local glades = {}
+
         for v in glade_values(asf._peak, {}) do
             table.insert(glades, v)
         end
 
-        print(inspect(glades))
+        -- print(inspect(glades))
 
         local function recursive_dump(dump_table, lines, indent)
             for ix = 1, #dump_table do
@@ -7113,11 +7116,18 @@ arguments are correct.
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
+
+        local id = g1_start
+            .. '.' .. g1_length
+            .. '.' .. isyid
+        local glade = asf.glades[id]
+        if glade then return glade end
+
         local slr = asf.slr
         local slg = slr.slg
         local g1g = slg.g1
         local g1r = slr.g1
-        local glade = setmetatable({}, _M.class_glade)
+        glade = setmetatable({}, _M.class_glade)
         local isy = g1g.isys[isyid]
         local is_terminal = isy.lexeme
         if is_terminal then
@@ -8291,6 +8301,9 @@ or not.
 Currently, there are no nulling ISYs but
 that will change when the CHAF rewrite is
 moved into the Lua layer.
+
+Only the non-precedenced ISYs are memoized
+here.
 
 ```
     -- miranda: section+ class_xsy field declarations
