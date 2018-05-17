@@ -6406,19 +6406,29 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-        local glades = {}
+        local cmds = { type = 'iglade' }
 
         for v in glade_values(asf._peak, {}) do
-            table.insert(glades, v)
+            table.insert(cmds, v)
         end
 
-        -- print(inspect(glades))
+        print(inspect(cmds))
 
         local function recursive_dump(dump_table, lines, indent)
+            if dump_table.type == 'iglade' then
+                for ix = 1, #dump_table do
+                    local element = dump_table[ix]
+                    if type(element) == 'table' then
+                        recursive_dump(element, lines, indent+2)
+                    else
+                        table.insert(lines, string.rep(' ', indent+2) .. element)
+                    end
+                end
+                return
+            end
             for ix = 1, #dump_table do
                 local element = dump_table[ix]
                 if type(element) == 'number' then
-                    local indent = element
                     local body = dump_table[2]
                     table.insert(lines, string.rep(' ', indent) .. body)
                     return
@@ -6427,12 +6437,12 @@ illegal named arguments.
                     recursive_dump({0, 'Error:' .. tostring(element)}, lines, indent)
                     return
                 end
-                recursive_dump(element, lines, indent+1)
+                recursive_dump(element, lines, indent+2)
             end
         end
 
         local lines = {}
-        recursive_dump(glades, lines, 0)
+        recursive_dump(cmds, lines, 0)
         return table.concat(lines, "\n")
     end
 ```
@@ -6981,9 +6991,11 @@ glade has already been dumped.
 
         for ix = 1,#downglades do
            local predecessor_eim, glade = table.unpack(downglades[ix])
+           local iglade = { type = 'iglade' }
            for v in glade_values(glade, seen) do
-               coroutine.yield(v)
+               table.insert(iglade, v)
            end
+           coroutine.yield(iglade)
         end
 
         -- will I need to mix Leo and completion causes in the same
