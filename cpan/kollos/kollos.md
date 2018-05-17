@@ -6406,18 +6406,37 @@ illegal named arguments.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_asf.dump(asf)
-        local cmds = { type = 'iglade' }
+        local peak = asf._peak
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1g = slg.g1
+        local cmds = { type = 'iglade', glade = peak }
 
-        for v in glade_values(asf._peak, {}) do
+        for v in glade_values(peak, {}) do
             table.insert(cmds, v)
         end
 
-        print(inspect(cmds))
+        -- print(inspect(cmds))
 
-        local function recursive_dump(dump_table, lines, indent)
-            if dump_table.type == 'iglade' then
-                for ix = 1, #dump_table do
-                    local element = dump_table[ix]
+        local function recursive_dump(dumpee, lines, indent)
+            if type(dumpee) ~= 'table' then
+                return table.insert(lines, string.rep(' ', indent+2) .. tostring(dumpee))
+            end
+            if dumpee.type == 'iglade' then
+                local symch_count = #dumpee
+                local glade = dumpee.glade
+                local id = glade:id()
+                local header = string.format("Glade %s; %s @%d-%d: %d symches", id,
+                    g1g:symbol_angled_form(glade.isyid), glade.g1_start,
+                    glade.g1_start + glade.g1_length,
+                    symch_count)
+                table.insert(lines, string.rep(' ', indent+2) .. header)
+                if symch_count < 1 then
+                   error(string.format("Bad symch count (%d) in iglade %s",
+                      symch_count, inspect(dumpee, { depth = 3 } )))
+                end
+                for ix = 1, #dumpee do
+                    local element = dumpee[ix]
                     if type(element) == 'table' then
                         recursive_dump(element, lines, indent+2)
                     else
@@ -6426,17 +6445,32 @@ illegal named arguments.
                 end
                 return
             end
-            for ix = 1, #dump_table do
-                local element = dump_table[ix]
-                if type(element) == 'number' then
-                    local body = dump_table[2]
-                    table.insert(lines, string.rep(' ', indent) .. body)
-                    return
+            if dumpee.type == 'isymch' then
+                local partition_count = #dumpee
+                local glade = dumpee.glade
+                local id = glade:id()
+                local symch = dumpee.symch
+                local irlid = symch:rule_id()
+                local ix = dumpee.ix
+                local header = string.format("Symch %s.%d: %s; %d partitions",
+                   id, ix, slg:g1_rule_show(irlid), partition_count)
+                table.insert(lines, string.rep(' ', indent+2) .. header)
+                if partition_count < 1 then
+                   error(string.format("Bad partition count (%d) in isymch %s",
+                      partition_count, inspect(dumpee, { depth = 3 } )))
                 end
-                if type(element) ~= 'table' then
-                    recursive_dump({0, 'Error:' .. tostring(element)}, lines, indent)
-                    return
+                for ix = 1, #dumpee do
+                    local element = dumpee[ix]
+                    if type(element) == 'table' then
+                        recursive_dump(element, lines, indent+2)
+                    else
+                        table.insert(lines, string.rep(' ', indent+2) .. element)
+                    end
                 end
+                return
+            end
+            for ix = 1, #dumpee do
+                local element = dumpee[ix]
                 recursive_dump(element, lines, indent+2)
             end
         end
@@ -6940,7 +6974,7 @@ glade has already been dumped.
             local body = string.format('Token %s: "%s"',
                 slg:g1_symbol_angled_form(isyid),
                 literal)
-            coroutine.yield{ 0, body }
+            coroutine.yield{ body }
             at_token = symch:token_next()
         end
 
@@ -6991,7 +7025,7 @@ glade has already been dumped.
 
         for ix = 1,#downglades do
            local predecessor_eim, glade = table.unpack(downglades[ix])
-           local iglade = { type = 'iglade' }
+           local iglade = { type = 'iglade', glade = glade }
            for v in glade_values(glade, seen) do
                table.insert(iglade, v)
            end
@@ -7002,7 +7036,7 @@ glade has already been dumped.
         -- glade/downglade?
         local at_leo = symch:at_leo()
         while at_leo do
-            coroutine.yield{ 0, "leo links NOT YET IMPLEMENTED" }
+            coroutine.yield{ "leo links NOT YET IMPLEMENTED" }
             at_leo = symch:leo()
         end
     end
@@ -7019,11 +7053,6 @@ glade has already been dumped.
         end)
     end
     function glade_symch_values_gen(glade, symch, seen)
-        local asf = glade.asf
-        local slr = asf.slr
-        local slg = slr.slg
-        local id = glade:id()
-
         -- a stack containing the current RHS
         for partition in glade_partitions(glade, symch, seen) do
             coroutine.yield(partition)
@@ -7057,36 +7086,33 @@ glade has already been dumped.
 
         if seen[id] == true then
             local body = string.format("Glade %s already displayed", id)
-            coroutine.yield{ 0, body }
+            coroutine.yield{ body }
             return
         end
         local rule_symches = glade.rule_symches
         if rule_symches then
-            local body = string.format("Rule glade %s; %s @%d-%d: %d symches", id,
-                g1g:symbol_angled_form(glade.isyid), glade.g1_start,
-                glade.g1_start + glade.g1_length,
-                #rule_symches)
-            coroutine.yield{ 0, body }
             for ix = 1, #rule_symches do
                local symch = rule_symches[ix]
                local irlid = symch:rule_id()
+               local body
                if g1g:sequence_min(irlid) then
                    body = string.format("Sequence rules NOT YET IMPLEMENTED: %s", slg:g1_rule_show(irlid))
-                   coroutine.yield{ 0, body }
+                   coroutine.yield{ body }
                    goto NEXT_RULE_SYMCH
                end
-               body = string.format("Rule symch %s.%d: %s",
-                   glade:id(), ix, slg:g1_rule_show(irlid))
-               coroutine.yield{ 0, body }
-               for v in glade_symch_values(glade, symch, seen) do
-                   coroutine.yield(v)
+
+               local isymch = { type = 'isymch', glade = glade, symch = symch, ix = ix }
+
+               for partition in glade_symch_values(glade, symch, seen) do
+                   table.insert(isymch, partition)
                end
+               coroutine.yield(isymch)
                ::NEXT_RULE_SYMCH::
             end
            seen[id] = true
            return
         end
-        coroutine.yield{ 0, "dump of non-rule glade NOT YET IMPLEMENTED" }
+        coroutine.yield{ "dump of non-rule glade NOT YET IMPLEMENTED" }
         seen[id] = true
     end
 ```
