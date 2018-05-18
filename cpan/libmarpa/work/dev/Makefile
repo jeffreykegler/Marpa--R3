@@ -45,7 +45,7 @@ CTANGLE = ctangle -p
 	make $*.tex
 	pdftex -interaction=batchmode -halt-on-error $* || cat $*.log
 
-all: legacy.pdf marpa.pdf sources
+all: marpa.pdf sources
 
 sources: marpa.c marpa.h.p50 marpa.h.p80 marpa.h.p80
 
@@ -72,9 +72,7 @@ cwebmac.tex: ../shared/cwebmac.tex
 
 marpa.pdf: marpa.tex cwebmac.tex
 
-legacy.pdf: legacy.tex cwebmac.tex
-
-docs: marpa.pdf legacy.pdf
+docs: marpa.pdf
 
 update_texi:
 	emacs -batch api.texi \
@@ -86,8 +84,7 @@ update_texi:
 
 CLEAN_FILES = marpa.c marpa.c.p10 marpa.c.p40 marpa.c.p50 \
   marpa.h.p50 marpa.h.p80 \
-  marpa.idx marpa.log marpa.pdf marpa.scn marpa.tex marpa.toc \
-  legacy.idx legacy.log legacy.pdf legacy.scn legacy.tex legacy.toc
+  marpa.idx marpa.log marpa.pdf marpa.scn marpa.tex marpa.toc
 
 clean:
 	rm -f $(CLEAN_FILES)
