@@ -75,42 +75,42 @@ MARPA_LIB_MAJOR_VERSION!=MARPA_MAJOR_VERSION \
 #define G_EVENT_PUSH(g) MARPA_DSTACK_PUSH((g) ->t_events,GEV_Object) 
 #define I_AM_OK 0x69734f4b
 #define IS_G_OK(g) ((g) ->t_is_ok==I_AM_OK) 
-#define ID_of_ISY(xsy) ((xsy) ->t_symbol_id) 
+#define ID_of_ISY(isy) ((isy) ->t_symbol_id) 
 #define Rank_of_ISY(symbol) ((symbol) ->t_rank) 
-#define ISY_is_LHS(xsy) ((xsy) ->t_is_lhs) 
-#define ISY_is_Sequence_LHS(xsy) ((xsy) ->t_is_sequence_lhs) 
+#define ISY_is_LHS(isy) ((isy) ->t_is_lhs) 
+#define ISY_is_Sequence_LHS(isy) ((isy) ->t_is_sequence_lhs) 
 #define ISY_is_Valued(symbol) ((symbol) ->t_is_valued) 
 #define ISY_is_Valued_Locked(symbol) ((symbol) ->t_is_valued_locked) 
-#define ISY_is_Accessible(xsy) ((xsy) ->t_is_accessible) 
+#define ISY_is_Accessible(isy) ((isy) ->t_is_accessible) 
 #define ISY_is_Nulling(sym) ((sym) ->t_is_nulling) 
-#define ISY_is_Nullable(xsy) ((xsy) ->t_is_nullable) 
-#define ISYID_is_Nullable(xsyid) ISY_is_Nullable(ISY_by_ID(xsyid) ) 
-#define ISY_is_Terminal(xsy) ((xsy) ->t_is_terminal) 
-#define ISY_is_Locked_Terminal(xsy) ((xsy) ->t_is_locked_terminal) 
+#define ISY_is_Nullable(isy) ((isy) ->t_is_nullable) 
+#define ISYID_is_Nullable(isyid) ISY_is_Nullable(ISY_by_ID(isyid) ) 
+#define ISY_is_Terminal(isy) ((isy) ->t_is_terminal) 
+#define ISY_is_Locked_Terminal(isy) ((isy) ->t_is_locked_terminal) 
 #define ISYID_is_Terminal(id) (ISY_is_Terminal(ISY_by_ID(id) ) ) 
-#define ISY_is_Productive(xsy) ((xsy) ->t_is_productive) 
-#define ISY_is_Completion_Event(xsy) ((xsy) ->t_is_completion_event) 
-#define ISYID_is_Completion_Event(xsyid) ISY_is_Completion_Event(ISY_by_ID(xsyid) ) 
-#define ISY_Completion_Event_Starts_Active(xsy) ((xsy) ->t_completion_event_starts_active) 
-#define ISYID_Completion_Event_Starts_Active(xsyid) ISY_Completion_Event_Starts_Active(ISY_by_ID(xsyid) ) 
-#define ISY_is_Nulled_Event(xsy) ((xsy) ->t_is_nulled_event) 
-#define ISYID_is_Nulled_Event(xsyid) ISY_is_Nulled_Event(ISY_by_ID(xsyid) ) 
-#define ISY_Nulled_Event_Starts_Active(xsy) ((xsy) ->t_nulled_event_starts_active) 
-#define ISYID_Nulled_Event_Starts_Active(xsyid) ISY_Nulled_Event_Starts_Active(ISY_by_ID(xsyid) ) 
-#define ISY_is_Prediction_Event(xsy) ((xsy) ->t_is_prediction_event) 
-#define ISYID_is_Prediction_Event(xsyid) ISY_is_Prediction_Event(ISY_by_ID(xsyid) ) 
-#define ISY_Prediction_Event_Starts_Active(xsy) ((xsy) ->t_prediction_event_starts_active) 
-#define ISYID_Prediction_Event_Starts_Active(xsyid) ISY_Prediction_Event_Starts_Active(ISY_by_ID(xsyid) ) 
-#define Nulled_ISYIDs_of_ISY(xsy) ((xsy) ->t_nulled_event_isyids) 
-#define Nulled_ISYIDs_of_ISYID(xsyid)  \
-Nulled_ISYIDs_of_ISY(ISY_by_ID(xsyid) ) 
-#define NSY_of_ISY(xsy) ((xsy) ->t_nsy_equivalent) 
-#define NSYID_of_ISY(xsy) ID_of_NSY(NSY_of_ISY(xsy) ) 
+#define ISY_is_Productive(isy) ((isy) ->t_is_productive) 
+#define ISY_is_Completion_Event(isy) ((isy) ->t_is_completion_event) 
+#define ISYID_is_Completion_Event(isyid) ISY_is_Completion_Event(ISY_by_ID(isyid) ) 
+#define ISY_Completion_Event_Starts_Active(isy) ((isy) ->t_completion_event_starts_active) 
+#define ISYID_Completion_Event_Starts_Active(isyid) ISY_Completion_Event_Starts_Active(ISY_by_ID(isyid) ) 
+#define ISY_is_Nulled_Event(isy) ((isy) ->t_is_nulled_event) 
+#define ISYID_is_Nulled_Event(isyid) ISY_is_Nulled_Event(ISY_by_ID(isyid) ) 
+#define ISY_Nulled_Event_Starts_Active(isy) ((isy) ->t_nulled_event_starts_active) 
+#define ISYID_Nulled_Event_Starts_Active(isyid) ISY_Nulled_Event_Starts_Active(ISY_by_ID(isyid) ) 
+#define ISY_is_Prediction_Event(isy) ((isy) ->t_is_prediction_event) 
+#define ISYID_is_Prediction_Event(isyid) ISY_is_Prediction_Event(ISY_by_ID(isyid) ) 
+#define ISY_Prediction_Event_Starts_Active(isy) ((isy) ->t_prediction_event_starts_active) 
+#define ISYID_Prediction_Event_Starts_Active(isyid) ISY_Prediction_Event_Starts_Active(ISY_by_ID(isyid) ) 
+#define Nulled_ISYIDs_of_ISY(isy) ((isy) ->t_nulled_event_isyids) 
+#define Nulled_ISYIDs_of_ISYID(isyid)  \
+Nulled_ISYIDs_of_ISY(ISY_by_ID(isyid) ) 
+#define NSY_of_ISY(isy) ((isy) ->t_nsy_equivalent) 
+#define NSYID_of_ISY(isy) ID_of_NSY(NSY_of_ISY(isy) ) 
 #define NSY_by_ISYID(isy_id) (ISY_by_ID(isy_id) ->t_nsy_equivalent) 
 #define NSYID_by_ISYID(isy_id) ID_of_NSY(NSY_of_ISY(ISY_by_ID(isy_id) ) ) 
-#define Nulling_NSY_of_ISY(xsy) ((xsy) ->t_nulling_nsy) 
-#define Nulling_NSY_by_ISYID(xsy) (ISY_by_ID(xsy) ->t_nulling_nsy) 
-#define Nulling_NSYID_by_ISYID(xsy) ID_of_NSY(ISY_by_ID(xsy) ->t_nulling_nsy) 
+#define Nulling_NSY_of_ISY(isy) ((isy) ->t_nulling_nsy) 
+#define Nulling_NSY_by_ISYID(isy) (ISY_by_ID(isy) ->t_nulling_nsy) 
+#define Nulling_NSYID_by_ISYID(isy) ID_of_NSY(ISY_by_ID(isy) ->t_nulling_nsy) 
 #define Nulling_OR_by_NSYID(nsyid) ((OR) &NSY_by_ID(nsyid) ->t_nulling_or_node) 
 #define Unvalued_OR_by_NSYID(nsyid) ((OR) &NSY_by_ID(nsyid) ->t_unvalued_or_node) 
 #define NSY_by_ID(id) (*MARPA_DSTACK_INDEX(g->t_nsy_stack,NSY,(id) ) ) 
@@ -130,8 +130,8 @@ Nulled_ISYIDs_of_ISY(ISY_by_ID(xsyid) )
 ID_of_ISY(Source_ISY_of_NSYID(nsyid) ) 
 #define LHS_XRL_of_NSY(nsy) ((nsy) ->t_lhs_xrl) 
 #define XRL_Offset_of_NSY(nsy) ((nsy) ->t_xrl_offset) 
-#define NSY_Rank_by_ISY(xsy)  \
-((xsy) ->t_rank*EXTERNAL_RANK_FACTOR+MAXIMUM_CHAF_RANK) 
+#define NSY_Rank_by_ISY(isy)  \
+((isy) ->t_rank*EXTERNAL_RANK_FACTOR+MAXIMUM_CHAF_RANK) 
 #define Rank_of_NSY(nsy) ((nsy) ->t_rank) 
 #define MAX_RHS_LENGTH (INT_MAX>>(2) ) 
 #define Length_of_XRL(xrl) ((xrl) ->t_rhs_length) 
@@ -482,8 +482,8 @@ WHEID_of_NRL(NRL_of_OR(or) )  \
 #define OBS_of_B(b) ((b) ->t_obs) 
 #define Valued_BV_of_B(b) ((b) ->t_valued_bv) 
 #define Valued_Locked_BV_of_B(b) ((b) ->t_valued_locked_bv) 
-#define ISYID_is_Valued_in_B(b,xsyid)  \
-(lbv_bit_test(Valued_BV_of_B(b) ,(xsyid) ) ) 
+#define ISYID_is_Valued_in_B(b,isyid)  \
+(lbv_bit_test(Valued_BV_of_B(b) ,(isyid) ) ) 
 #define NSYID_is_Valued_in_B(b,nsyid)  \
 ISYID_is_Valued_in_B((b) ,Source_ISYID_of_NSYID(nsyid) ) 
 #define OR_by_PSI(psi_data,set_ordinal,item_ordinal)  \
@@ -2301,7 +2301,7 @@ nsy_new(GRAMMAR g, ISY source);
 static inline NSY
 semantic_nsy_new(GRAMMAR g, ISY source);
 static inline NSY
-nsy_clone(GRAMMAR g, ISY xsy);
+nsy_clone(GRAMMAR g, ISY isy);
 static inline   XRL xrl_start (GRAMMAR g, const ISYID lhs, const ISYID * rhs, int length);
 static inline XRL xrl_finish(GRAMMAR g, XRL rule);
 static inline NRL
@@ -3461,83 +3461,83 @@ return g->t_error;
 PRIVATE ISY
 symbol_new(GRAMMAR g)
 {
-ISY xsy= marpa_obs_new(g->t_obs,struct s_isy,1);
+ISY isy= marpa_obs_new(g->t_obs,struct s_isy,1);
 /*151:*/
 #line 1312 "./marpa.w"
 
-xsy->t_rank= Default_Rank_of_G(g);
+isy->t_rank= Default_Rank_of_G(g);
 /*:151*//*155:*/
 #line 1358 "./marpa.w"
 
-ISY_is_LHS(xsy)= 0;
+ISY_is_LHS(isy)= 0;
 
 /*:155*//*157:*/
 #line 1365 "./marpa.w"
 
-ISY_is_Sequence_LHS(xsy)= 0;
+ISY_is_Sequence_LHS(isy)= 0;
 
 /*:157*//*159:*/
 #line 1381 "./marpa.w"
 
-ISY_is_Valued(xsy)= g->t_force_valued?1:0;
-ISY_is_Valued_Locked(xsy)= g->t_force_valued?1:0;
+ISY_is_Valued(isy)= g->t_force_valued?1:0;
+ISY_is_Valued_Locked(isy)= g->t_force_valued?1:0;
 
 /*:159*//*167:*/
 #line 1449 "./marpa.w"
 
-xsy->t_is_accessible= 0;
+isy->t_is_accessible= 0;
 /*:167*//*170:*/
 #line 1470 "./marpa.w"
 
-xsy->t_is_counted= 0;
+isy->t_is_counted= 0;
 /*:170*//*173:*/
 #line 1486 "./marpa.w"
 
-xsy->t_is_nulling= 0;
+isy->t_is_nulling= 0;
 /*:173*//*176:*/
 #line 1503 "./marpa.w"
 
-xsy->t_is_nullable= 0;
+isy->t_is_nullable= 0;
 /*:176*//*179:*/
 #line 1526 "./marpa.w"
 
-xsy->t_is_terminal= 0;
-xsy->t_is_locked_terminal= 0;
+isy->t_is_terminal= 0;
+isy->t_is_locked_terminal= 0;
 /*:179*//*184:*/
 #line 1571 "./marpa.w"
 
-xsy->t_is_productive= 0;
+isy->t_is_productive= 0;
 /*:184*//*187:*/
 #line 1594 "./marpa.w"
 
-xsy->t_is_completion_event= 0;
-xsy->t_completion_event_starts_active= 0;
+isy->t_is_completion_event= 0;
+isy->t_completion_event_starts_active= 0;
 /*:187*//*192:*/
 #line 1664 "./marpa.w"
 
-xsy->t_is_nulled_event= 0;
-xsy->t_nulled_event_starts_active= 0;
+isy->t_is_nulled_event= 0;
+isy->t_nulled_event_starts_active= 0;
 /*:192*//*197:*/
 #line 1737 "./marpa.w"
 
-xsy->t_is_prediction_event= 0;
-xsy->t_prediction_event_starts_active= 0;
+isy->t_is_prediction_event= 0;
+isy->t_prediction_event_starts_active= 0;
 /*:197*//*203:*/
 #line 1816 "./marpa.w"
 
-Nulled_ISYIDs_of_ISY(xsy)= NULL;
+Nulled_ISYIDs_of_ISY(isy)= NULL;
 
 /*:203*//*206:*/
 #line 1832 "./marpa.w"
-NSY_of_ISY(xsy)= NULL;
+NSY_of_ISY(isy)= NULL;
 /*:206*//*210:*/
 #line 1864 "./marpa.w"
-Nulling_NSY_of_ISY(xsy)= NULL;
+Nulling_NSY_of_ISY(isy)= NULL;
 /*:210*/
 #line 1284 "./marpa.w"
 
-symbol_add(g,xsy);
-return xsy;
+symbol_add(g,isy);
+return isy;
 }
 
 /*:146*//*147:*/
@@ -3607,7 +3607,7 @@ return isy_id==g->t_start_isy_id?1:0;
 int marpa_g_symbol_rank(Marpa_Grammar g,
 Marpa_Symbol_ID isy_id)
 {
-ISY xsy;
+ISY isy;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -3652,8 +3652,8 @@ return failure_indicator;
 /*:1321*/
 #line 1324 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
-return Rank_of_ISY(xsy);
+isy= ISY_by_ID(isy_id);
+return Rank_of_ISY(isy);
 }
 /*:152*//*153:*/
 #line 1328 "./marpa.w"
@@ -3661,7 +3661,7 @@ return Rank_of_ISY(xsy);
 int marpa_g_symbol_rank_set(
 Marpa_Grammar g,Marpa_Symbol_ID isy_id,Marpa_Rank rank)
 {
-ISY xsy;
+ISY isy;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -3717,7 +3717,7 @@ return failure_indicator;
 /*:1321*/
 #line 1338 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
+isy= ISY_by_ID(isy_id);
 if(_MARPA_UNLIKELY(rank<MINIMUM_RANK))
 {
 MARPA_ERROR(MARPA_ERR_RANK_TOO_LOW);
@@ -3728,7 +3728,7 @@ if(_MARPA_UNLIKELY(rank> MAXIMUM_RANK))
 MARPA_ERROR(MARPA_ERR_RANK_TOO_HIGH);
 return failure_indicator;
 }
-return Rank_of_ISY(xsy)= rank;
+return Rank_of_ISY(isy)= rank;
 }
 
 /*:153*//*163:*/
@@ -3736,7 +3736,7 @@ return Rank_of_ISY(xsy)= rank;
 
 int marpa_g_force_valued(Marpa_Grammar g)
 {
-ISYID xsyid;
+ISYID isyid;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -3744,15 +3744,15 @@ const int failure_indicator= -2;
 /*:1316*/
 #line 1396 "./marpa.w"
 
-for(xsyid= 0;xsyid<ISY_Count_of_G(g);xsyid++){
-const ISY xsy= ISY_by_ID(xsyid);
-if(!ISY_is_Valued(xsy)&&ISY_is_Valued_Locked(xsy))
+for(isyid= 0;isyid<ISY_Count_of_G(g);isyid++){
+const ISY isy= ISY_by_ID(isyid);
+if(!ISY_is_Valued(isy)&&ISY_is_Valued_Locked(isy))
 {
 MARPA_ERROR(MARPA_ERR_VALUED_IS_LOCKED);
 return failure_indicator;
 }
-ISY_is_Valued(xsy)= 1;
-ISY_is_Valued_Locked(xsy)= 1;
+ISY_is_Valued(isy)= 1;
+ISY_is_Valued_Locked(isy)= 1;
 }
 g->t_force_valued= 1;
 return 0;
@@ -4320,7 +4320,7 @@ return ISYID_is_Completion_Event(isy_id);
 int marpa_g_symbol_is_completion_event_set(
 Marpa_Grammar g,Marpa_Symbol_ID isy_id,int value)
 {
-ISY xsy;
+ISY isy;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -4374,11 +4374,11 @@ return-1;
 /*:1320*/
 #line 1616 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
+isy= ISY_by_ID(isy_id);
 switch(value){
 case 0:case 1:
-ISY_Completion_Event_Starts_Active(xsy)= Boolean(value);
-return ISY_is_Completion_Event(xsy)= Boolean(value);
+ISY_Completion_Event_Starts_Active(isy)= Boolean(value);
+return ISY_is_Completion_Event(isy)= Boolean(value);
 }
 MARPA_ERROR(MARPA_ERR_INVALID_BOOLEAN);
 return failure_indicator;
@@ -4520,7 +4520,7 @@ return ISYID_is_Nulled_Event(isy_id);
 int marpa_g_symbol_is_nulled_event_set(
 Marpa_Grammar g,Marpa_Symbol_ID isy_id,int value)
 {
-ISY xsy;
+ISY isy;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -4574,11 +4574,11 @@ return-1;
 /*:1320*/
 #line 1689 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
+isy= ISY_by_ID(isy_id);
 switch(value){
 case 0:case 1:
-ISY_Nulled_Event_Starts_Active(xsy)= Boolean(value);
-return ISY_is_Nulled_Event(xsy)= Boolean(value);
+ISY_Nulled_Event_Starts_Active(isy)= Boolean(value);
+return ISY_is_Nulled_Event(isy)= Boolean(value);
 }
 MARPA_ERROR(MARPA_ERR_INVALID_BOOLEAN);
 return failure_indicator;
@@ -4719,7 +4719,7 @@ return ISYID_is_Prediction_Event(isy_id);
 int marpa_g_symbol_is_prediction_event_set(
 Marpa_Grammar g,Marpa_Symbol_ID isy_id,int value)
 {
-ISY xsy;
+ISY isy;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -4773,11 +4773,11 @@ return-1;
 /*:1320*/
 #line 1759 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
+isy= ISY_by_ID(isy_id);
 switch(value){
 case 0:case 1:
-ISY_Prediction_Event_Starts_Active(xsy)= Boolean(value);
-return ISY_is_Prediction_Event(xsy)= Boolean(value);
+ISY_Prediction_Event_Starts_Active(isy)= Boolean(value);
+return ISY_is_Prediction_Event(isy)= Boolean(value);
 }
 MARPA_ERROR(MARPA_ERR_INVALID_BOOLEAN);
 return failure_indicator;
@@ -4872,7 +4872,7 @@ Marpa_NSY_ID _marpa_g_isy_nsy(
 Marpa_Grammar g,
 Marpa_Symbol_ID isy_id)
 {
-ISY xsy;
+ISY isy;
 NSY nsy;
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -4901,8 +4901,8 @@ return-1;
 /*:1320*/
 #line 1842 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
-nsy= NSY_of_ISY(xsy);
+isy= ISY_by_ID(isy_id);
+nsy= NSY_of_ISY(isy);
 return nsy?ID_of_NSY(nsy):-1;
 }
 
@@ -4913,7 +4913,7 @@ Marpa_NSY_ID _marpa_g_isy_nulling_nsy(
 Marpa_Grammar g,
 Marpa_Symbol_ID isy_id)
 {
-ISY xsy;
+ISY isy;
 NSY nsy;
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -4942,8 +4942,8 @@ return-1;
 /*:1320*/
 #line 1874 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
-nsy= Nulling_NSY_of_ISY(xsy);
+isy= ISY_by_ID(isy_id);
+nsy= Nulling_NSY_of_ISY(isy);
 return nsy?ID_of_NSY(nsy):-1;
 }
 
@@ -5039,13 +5039,13 @@ return new_nsy;
 #line 1980 "./marpa.w"
 
 PRIVATE NSY
-nsy_clone(GRAMMAR g,ISY xsy)
+nsy_clone(GRAMMAR g,ISY isy)
 {
 const NSY new_nsy= nsy_start(g);
-Source_ISY_of_NSY(new_nsy)= xsy;
+Source_ISY_of_NSY(new_nsy)= isy;
 NSY_is_Semantic(new_nsy)= 1;
-Rank_of_NSY(new_nsy)= NSY_Rank_by_ISY(xsy);
-NSY_is_Nulling(new_nsy)= ISY_is_Nulling(xsy);
+Rank_of_NSY(new_nsy)= NSY_Rank_by_ISY(isy);
+NSY_is_Nulling(new_nsy)= ISY_is_Nulling(isy);
 return new_nsy;
 }
 
@@ -7579,9 +7579,9 @@ for(start= 0;bv_scan(nullable_v,start,&min,&max);start= max+2)
 for(isy_id= min;isy_id<=max;
 isy_id++)
 {
-ISY xsy= ISY_by_ID(isy_id);
-ISY_is_Nullable(xsy)= 1;
-if(_MARPA_UNLIKELY(xsy->t_is_counted))
+ISY isy= ISY_by_ID(isy_id);
+ISY_is_Nullable(isy)= 1;
+if(_MARPA_UNLIKELY(isy->t_is_counted))
 {
 counted_nullables++;
 int_event_new(g,MARPA_EVENT_COUNTED_NULLABLE,isy_id);
@@ -7822,11 +7822,11 @@ for(isy_id= 0;isy_id<pre_census_isy_count;isy_id++)
 {
 if(bv_bit_test(terminal_v,isy_id)&&bv_bit_test(lhs_v,isy_id))
 {
-const ISY xsy= ISY_by_ID(isy_id);
-if(ISY_is_Valued_Locked(xsy))
+const ISY isy= ISY_by_ID(isy_id);
+if(ISY_is_Valued_Locked(isy))
 continue;
-ISY_is_Valued(xsy)= 1;
-ISY_is_Valued_Locked(xsy)= 1;
+ISY_is_Valued(isy)= 1;
+ISY_is_Valued_Locked(isy)= 1;
 }
 }
 }
@@ -7838,7 +7838,7 @@ ISY_is_Valued_Locked(xsy)= 1;
 #line 3867 "./marpa.w"
 
 {
-ISYID xsyid;
+ISYID isyid;
 XRLID xrlid;
 
 
@@ -7854,13 +7854,13 @@ Bit_Matrix nullification_matrix=
 matrix_buffer_create(matrix_buffer,pre_census_isy_count,
 pre_census_isy_count);
 
-for(xsyid= 0;xsyid<pre_census_isy_count;xsyid++)
+for(isyid= 0;isyid<pre_census_isy_count;isyid++)
 {
-if(!ISYID_is_Nullable(xsyid))
+if(!ISYID_is_Nullable(isyid))
 continue;
 nullable_isy_count++;
-matrix_bit_set(nullification_matrix,xsyid,
-xsyid);
+matrix_bit_set(nullification_matrix,isyid,
+isyid);
 }
 for(xrlid= 0;xrlid<xrl_count;xrlid++)
 {
@@ -7878,11 +7878,11 @@ rhs_id);
 }
 }
 transitive_closure(nullification_matrix);
-for(xsyid= 0;xsyid<pre_census_isy_count;xsyid++)
+for(isyid= 0;isyid<pre_census_isy_count;isyid++)
 {
 Bit_Vector bv_nullifications_by_to_isy= 
-matrix_row(nullification_matrix,xsyid);
-Nulled_ISYIDs_of_ISYID(xsyid)= 
+matrix_row(nullification_matrix,isyid);
+Nulled_ISYIDs_of_ISYID(isyid)= 
 cil_bv_add(&g->t_cilar,bv_nullifications_by_to_isy);
 }
 my_free(matrix_buffer);
@@ -9154,7 +9154,7 @@ post_census_isy_count= ISY_Count_of_G(g);
 #line 5627 "./marpa.w"
 
 {
-int xsyid;
+int isyid;
 g->t_lbv_isyid_is_completion_event= 
 bv_obs_create(g->t_obs,post_census_isy_count);
 g->t_lbv_isyid_completion_event_starts_active= 
@@ -9167,31 +9167,31 @@ g->t_lbv_isyid_is_prediction_event=
 bv_obs_create(g->t_obs,post_census_isy_count);
 g->t_lbv_isyid_prediction_event_starts_active= 
 bv_obs_create(g->t_obs,post_census_isy_count);
-for(xsyid= 0;xsyid<post_census_isy_count;xsyid++)
+for(isyid= 0;isyid<post_census_isy_count;isyid++)
 {
-if(ISYID_is_Completion_Event(xsyid))
+if(ISYID_is_Completion_Event(isyid))
 {
-lbv_bit_set(g->t_lbv_isyid_is_completion_event,xsyid);
+lbv_bit_set(g->t_lbv_isyid_is_completion_event,isyid);
 }
-if(ISYID_Completion_Event_Starts_Active(xsyid))
+if(ISYID_Completion_Event_Starts_Active(isyid))
 {
-lbv_bit_set(g->t_lbv_isyid_completion_event_starts_active,xsyid);
+lbv_bit_set(g->t_lbv_isyid_completion_event_starts_active,isyid);
 }
-if(ISYID_is_Nulled_Event(xsyid))
+if(ISYID_is_Nulled_Event(isyid))
 {
-lbv_bit_set(g->t_lbv_isyid_is_nulled_event,xsyid);
+lbv_bit_set(g->t_lbv_isyid_is_nulled_event,isyid);
 }
-if(ISYID_Nulled_Event_Starts_Active(xsyid))
+if(ISYID_Nulled_Event_Starts_Active(isyid))
 {
-lbv_bit_set(g->t_lbv_isyid_nulled_event_starts_active,xsyid);
+lbv_bit_set(g->t_lbv_isyid_nulled_event_starts_active,isyid);
 }
-if(ISYID_is_Prediction_Event(xsyid))
+if(ISYID_is_Prediction_Event(isyid))
 {
-lbv_bit_set(g->t_lbv_isyid_is_prediction_event,xsyid);
+lbv_bit_set(g->t_lbv_isyid_is_prediction_event,isyid);
 }
-if(ISYID_Prediction_Event_Starts_Active(xsyid))
+if(ISYID_Prediction_Event_Starts_Active(isyid))
 {
-lbv_bit_set(g->t_lbv_isyid_prediction_event_starts_active,xsyid);
+lbv_bit_set(g->t_lbv_isyid_prediction_event_starts_active,isyid);
 }
 }
 }
@@ -9736,27 +9736,27 @@ raw_position= Length_of_NRL(nrl);
 if(!NRL_has_Virtual_LHS(nrl))
 {
 const NSY lhs= LHS_of_NRL(nrl);
-const ISY xsy= Source_ISY_of_NSY(lhs);
-if(ISY_is_Completion_Event(xsy))
+const ISY isy= Source_ISY_of_NSY(lhs);
+if(ISY_is_Completion_Event(isy))
 {
-const ISYID xsyid= ID_of_ISY(xsy);
-bv_bit_set(bv_completion_isyid,xsyid);
+const ISYID isyid= ID_of_ISY(isy);
+bv_bit_set(bv_completion_isyid,isyid);
 }
 }
 }
 if(postdot_nsyid>=0)
 {
-const ISY xsy= Source_ISY_of_NSYID(postdot_nsyid);
-const ISYID xsyid= ID_of_ISY(xsy);
-bv_bit_set(bv_prediction_isyid,xsyid);
+const ISY isy= Source_ISY_of_NSYID(postdot_nsyid);
+const ISYID isyid= ID_of_ISY(isy);
+bv_bit_set(bv_prediction_isyid,isyid);
 }
 for(rhs_ix= raw_position-Null_Count_of_AHM(ahm);
 rhs_ix<raw_position;rhs_ix++)
 {
 int cil_ix;
 const NSYID rhs_nsyid= RHSID_of_NRL(nrl,rhs_ix);
-const ISY xsy= Source_ISY_of_NSYID(rhs_nsyid);
-const CIL nulled_isyids= Nulled_ISYIDs_of_ISY(xsy);
+const ISY isy= Source_ISY_of_NSYID(rhs_nsyid);
+const CIL nulled_isyids= Nulled_ISYIDs_of_ISY(isy);
 const int cil_count= Count_of_CIL(nulled_isyids);
 for(cil_ix= 0;cil_ix<cil_count;cil_ix++)
 {
@@ -10890,17 +10890,17 @@ start= max+2)
 NSYID nsyid;
 for(nsyid= min;nsyid<=max;nsyid++)
 {
-const ISY xsy= Source_ISY_of_NSYID(nsyid);
-bv_bit_set(bv_terminals,ID_of_ISY(xsy));
+const ISY isy= Source_ISY_of_NSYID(nsyid);
+bv_bit_set(bv_terminals,ID_of_ISY(isy));
 }
 }
 
 for(start= 0;bv_scan(bv_terminals,start,&min,&max);start= max+2)
 {
-ISYID xsyid;
-for(xsyid= min;xsyid<=max;xsyid++)
+ISYID isyid;
+for(isyid= min;isyid<=max;isyid++)
 {
-buffer[next_buffer_ix++]= xsyid;
+buffer[next_buffer_ix++]= isyid;
 }
 }
 bv_free(bv_terminals);
@@ -10927,7 +10927,7 @@ const GRAMMAR g= G_of_R(r);
 /*:563*/
 #line 6305 "./marpa.w"
 
-ISY xsy;
+ISY isy;
 NSY nsy;
 /*1336:*/
 #line 15822 "./marpa.w"
@@ -10975,11 +10975,11 @@ return failure_indicator;
 /*:1321*/
 #line 6311 "./marpa.w"
 
-xsy= ISY_by_ID(isy_id);
-if(_MARPA_UNLIKELY(!ISY_is_Terminal(xsy))){
+isy= ISY_by_ID(isy_id);
+if(_MARPA_UNLIKELY(!ISY_is_Terminal(isy))){
 return 0;
 }
-nsy= NSY_of_ISY(xsy);
+nsy= NSY_of_ISY(isy);
 if(_MARPA_UNLIKELY(!nsy))return 0;
 return bv_bit_test(r->t_bv_nsyid_is_expected,ID_of_NSY(nsy));
 }
@@ -10991,7 +10991,7 @@ int
 marpa_r_expected_symbol_event_set(Marpa_Recognizer r,Marpa_Symbol_ID isy_id,
 int value)
 {
-ISY xsy;
+ISY isy;
 NSY nsy;
 NSYID nsyid;
 /*1316:*/
@@ -11048,12 +11048,12 @@ if(_MARPA_UNLIKELY(value<0||value> 1))
 MARPA_ERROR(MARPA_ERR_INVALID_BOOLEAN);
 return failure_indicator;
 }
-xsy= ISY_by_ID(isy_id);
-if(_MARPA_UNLIKELY(ISY_is_Nulling(xsy))){
+isy= ISY_by_ID(isy_id);
+if(_MARPA_UNLIKELY(ISY_is_Nulling(isy))){
 MARPA_ERROR(MARPA_ERR_SYMBOL_IS_NULLING);
 return-2;
 }
-nsy= NSY_of_ISY(xsy);
+nsy= NSY_of_ISY(isy);
 if(_MARPA_UNLIKELY(!nsy)){
 MARPA_ERROR(MARPA_ERR_SYMBOL_IS_UNUSED);
 return-2;
@@ -12133,15 +12133,15 @@ r->t_unvalued= lbv_obs_new0(r->t_obs,isy_count);
 r->t_valued_locked= lbv_obs_new0(r->t_obs,isy_count);
 for(isy_id= 0;isy_id<isy_count;isy_id++)
 {
-const ISY xsy= ISY_by_ID(isy_id);
-if(ISY_is_Valued_Locked(xsy))
+const ISY isy= ISY_by_ID(isy_id);
+if(ISY_is_Valued_Locked(isy))
 {
 lbv_bit_set(r->t_valued_locked,isy_id);
 }
-if(ISY_is_Valued(xsy))
+if(ISY_is_Valued(isy))
 {
 lbv_bit_set(r->t_valued,isy_id);
-if(ISY_is_Terminal(xsy))
+if(ISY_is_Terminal(isy))
 {
 lbv_bit_set(r->t_valued_terminal,isy_id);
 }
@@ -12149,7 +12149,7 @@ lbv_bit_set(r->t_valued_terminal,isy_id);
 else
 {
 lbv_bit_set(r->t_unvalued,isy_id);
-if(ISY_is_Terminal(xsy))
+if(ISY_is_Terminal(isy))
 {
 lbv_bit_set(r->t_unvalued_terminal,isy_id);
 }
@@ -13513,8 +13513,8 @@ NSYID nsyid;
 for(nsyid= min;nsyid<=max;nsyid++){
 PIM this_pim= r->t_pim_workarea[nsyid];
 if(lbv_bit_test(r->t_nsy_expected_is_event,nsyid)){
-ISY xsy= Source_ISY_of_NSYID(nsyid);
-int_event_new(g,MARPA_EVENT_SYMBOL_EXPECTED,ID_of_ISY(xsy));
+ISY isy= Source_ISY_of_NSYID(nsyid);
+int_event_new(g,MARPA_EVENT_SYMBOL_EXPECTED,ID_of_ISY(isy));
 }
 if(this_pim)postdot_array[postdot_array_ix++]= this_pim;
 }
