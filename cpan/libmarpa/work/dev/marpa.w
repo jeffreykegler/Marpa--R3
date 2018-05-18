@@ -15740,7 +15740,7 @@ if (_MARPA_UNLIKELY(!NSYID_of_G_Exists(nsy_id))) {
 
 @ @<Fail if |irl_id| is invalid@> =
 if (_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))) {
-    MARPA_ERROR (MARPA_ERR_INVALID_IRLID);
+    MARPA_ERROR (MARPA_ERR_INVALID_NRLID);
     return failure_indicator;
 }
 @ For well-formed, but non-existent rule ids,

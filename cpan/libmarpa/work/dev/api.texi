@@ -5807,8 +5807,12 @@ be kept for backward compatibility.
 Numeric value: 21.
 
 @end deftypevr
-@deftypevr Macro int MARPA_ERR_INVALID_IRLID
+@deftypevr Macro int MARPA_ERR_INVALID_NRLID
+The NRL ID was invalid.
+NRLs will eventually be eliminated at which
+point this error code will be unused.
 Numeric value: 23.
+
 @end deftypevr
 @deftypevr Macro int MARPA_ERR_INVALID_NSYID
 Numeric value: 24.

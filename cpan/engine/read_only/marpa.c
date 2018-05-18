@@ -6810,7 +6810,7 @@ const int failure_indicator= -2;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -6862,7 +6862,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -6913,7 +6913,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -6964,7 +6964,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7001,7 +7001,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7038,7 +7038,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7075,7 +7075,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7113,7 +7113,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7152,7 +7152,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7181,7 +7181,7 @@ const int failure_indicator= -2;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -7209,7 +7209,7 @@ const int failure_indicator= -2;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
@@ -9997,7 +9997,7 @@ return failure_indicator;
 #line 15741 "./marpa.w"
 
 if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
-MARPA_ERROR(MARPA_ERR_INVALID_IRLID);
+MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/

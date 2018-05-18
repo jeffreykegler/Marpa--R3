@@ -60,7 +60,7 @@ const struct marpa_error_description_s marpa_error_description[] = {
   { 20, "MARPA_ERR_INVALID_AHFA_ID", "MARPA_ERR_INVALID_AHFA_ID" },
   { 21, "MARPA_ERR_INVALID_AIMID", "MARPA_ERR_INVALID_AIMID" },
   { 22, "MARPA_ERR_INVALID_BOOLEAN", "Argument is not boolean" },
-  { 23, "MARPA_ERR_INVALID_IRLID", "MARPA_ERR_INVALID_IRLID" },
+  { 23, "MARPA_ERR_INVALID_NRLID", "MARPA_ERR_INVALID_NRLID" },
   { 24, "MARPA_ERR_INVALID_NSYID", "MARPA_ERR_INVALID_NSYID" },
   { 25, "MARPA_ERR_INVALID_LOCATION", "Location is not valid" },
   { 26, "MARPA_ERR_INVALID_RULE_ID", "Rule ID is malformed" },

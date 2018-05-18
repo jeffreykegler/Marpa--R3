@@ -6341,7 +6341,7 @@ which is not kept in the registry.
         asf:common_set(flat_args, {})
 
         asf.glades = {}
-        local peak = asf_glade_from_instance(asf, top_isyid, g1_start, g1_length)
+        local peak = glade_from_instance(asf, top_isyid, g1_start, g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
         end
@@ -6978,7 +6978,7 @@ glade has already been dumped.
             at_token = symch:token_next()
         end
 
-        -- Note: we never have both token and completion (or leo) links
+        -- Note: we never have both token and completion/Leo links
 
         local cause_eim_db = {} -- by origin and IRL ID
         local predecessor_eim_db = {} -- by origin
@@ -7018,7 +7018,7 @@ glade has already been dumped.
             end
             local g1_length = g1_end - origin
             local predecessor_eim = predecessor_eim_db[origin]
-            local glade = asf_glade_from_instance(asf, cause_isyid, origin, g1_length, symch)
+            local glade = glade_from_instance(asf, cause_isyid, origin, g1_length, symch)
             local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
         end
@@ -7119,12 +7119,44 @@ glade has already been dumped.
 
 ### Glade mutators
 
-`asf_glade_from_instance` assumes that the caller ensured its
+`glade_from_token` assumes that the caller ensured its
 arguments are correct.
 
 ```
     -- miranda: section+ forward declarations
-    local asf_glade_from_instance
+    local glade_from_token
+    -- miranda: section+ most Lua function definitions
+    function glade_from_token(asf, isyid, g1_start, g1_length)
+        -- TODO hash glades per asf
+
+        local id = g1_start
+            .. '.' .. g1_length
+            .. '.' .. isyid
+        local glade = asf.glades[id]
+        if glade then return glade end
+
+        local slr = asf.slr
+        local slg = slr.slg
+        local g1g = slg.g1
+        glade = setmetatable({}, _M.class_glade)
+        local isy = g1g.isys[isyid]
+        glade.asf = asf
+        glade.isyid = isyid
+        glade.g1_start = g1_start
+        glade.g1_length = g1_length
+        glade.type = 'token'
+        local regix = _M.register(_M.registry, glade)
+        glade.regix = regix
+        return glade
+    end
+```
+
+`glade_from_instance` assumes that the caller ensured its
+arguments are correct.
+
+```
+    -- miranda: section+ forward declarations
+    local glade_from_instance
     -- miranda: section+ most Lua function definitions
     local function eimset_from_instance(asf, isyid, g1_start, g1_length)
         local slr = asf.slr
@@ -7150,7 +7182,7 @@ arguments are correct.
         return eimset
     end
 
-    function asf_glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
+    function glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
@@ -7160,18 +7192,17 @@ arguments are correct.
             .. '.' .. isyid
         local glade = asf.glades[id]
         if glade then return glade end
+        glade = setmetatable({}, _M.class_glade)
+        asf.glades[id] = glade
 
         local slr = asf.slr
         local slg = slr.slg
         local g1g = slg.g1
         local g1r = slr.g1
-        glade = setmetatable({}, _M.class_glade)
         local isy = g1g.isys[isyid]
         local is_terminal = isy.lexeme
         if is_terminal then
-            M.userX(
-               "asf_glade_from_instance() for terminals NOT YET IMPLEMENTED",
-               inspect(xsy))
+            return glade_from_token(asf, isyid, g1_start, g1_length)
         end
         if not eimset then
             eimset = eimset_from_instance(asf, isyid, g1_start, g1_length)
