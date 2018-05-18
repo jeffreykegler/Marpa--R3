@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Fri May 18 11:44:22 2018
+; Fri May 18 15:44:00 2018
 EXPORTS
    marpa_check_version
    marpa_version
@@ -169,22 +169,22 @@ EXPORTS
    _marpa_g_nsy_xrl_offset
    _marpa_g_rule_is_keep_separation
    _marpa_g_nsy_count
-   _marpa_g_irl_count
-   _marpa_g_irl_lhs
-   _marpa_g_irl_length
-   _marpa_g_irl_rhs
+   _marpa_g_nrl_count
+   _marpa_g_nrl_lhs
+   _marpa_g_nrl_length
+   _marpa_g_nrl_rhs
    _marpa_g_rule_is_used
-   _marpa_g_irl_is_virtual_lhs
-   _marpa_g_irl_is_virtual_rhs
+   _marpa_g_nrl_is_virtual_lhs
+   _marpa_g_nrl_is_virtual_rhs
    _marpa_g_virtual_start
    _marpa_g_virtual_end
    _marpa_g_source_xrl
    _marpa_g_real_symbol_count
-   _marpa_g_irl_semantic_equivalent
-   _marpa_g_irl_rank
+   _marpa_g_nrl_semantic_equivalent
+   _marpa_g_nrl_rank
    _marpa_g_nsy_rank
    _marpa_g_ahm_count
-   _marpa_g_ahm_irl
+   _marpa_g_ahm_nrl
    _marpa_g_ahm_position
    _marpa_g_ahm_raw_position
    _marpa_g_ahm_null_count
@@ -223,7 +223,7 @@ EXPORTS
    _marpa_b_top_or_node
    _marpa_b_or_node_set
    _marpa_b_or_node_origin
-   _marpa_b_or_node_irl
+   _marpa_b_or_node_nrl
    _marpa_b_or_node_position
    _marpa_b_or_node_is_whole
    _marpa_b_or_node_is_semantic

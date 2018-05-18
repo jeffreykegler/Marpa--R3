@@ -302,7 +302,7 @@ typedef int Marpa_Rule_ID;
 /*:253*//*327:*/
 #line 2918 "./marpa.w"
 
-typedef int Marpa_IRL_ID;
+typedef int Marpa_NRL_ID;
 /*:327*//*452:*/
 #line 4854 "./marpa.w"
 
@@ -417,9 +417,9 @@ extern int marpa__debug_level;
 /*411:*/
 #line 4074 "./marpa.w"
 
-int _marpa_g_irl_is_chaf(
+int _marpa_g_nrl_is_chaf(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id);
+Marpa_NRL_ID nrl_id);
 /*:411*/
 #line 17424 "./marpa.w"
 
@@ -517,7 +517,7 @@ int marpa_trv_soft_error(Marpa_Traverser trv);
 int marpa_trv_dot(Marpa_Traverser trv);
 int marpa_trv_current(Marpa_Traverser trv);
 int marpa_trv_origin(Marpa_Traverser trv);
-Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv);
+Marpa_NRL_ID marpa_trv_nrl_id(Marpa_Traverser trv);
 int marpa_trv_nrl_dot(Marpa_Traverser trv);
 int marpa_trv_completion_next(Marpa_Traverser trv);
 int marpa_trv_leo_next(Marpa_Traverser trv);
@@ -593,22 +593,22 @@ Marpa_Rule_ID _marpa_g_nsy_lhs_xrl ( Marpa_Grammar g, Marpa_NSY_ID nsy_id);
 int _marpa_g_nsy_xrl_offset ( Marpa_Grammar g, Marpa_NSY_ID nsy_id );
 int _marpa_g_rule_is_keep_separation ( Marpa_Grammar g, Marpa_Rule_ID rule_id);
 int _marpa_g_nsy_count ( Marpa_Grammar g);
-int _marpa_g_irl_count ( Marpa_Grammar g);
-Marpa_Symbol_ID _marpa_g_irl_lhs ( Marpa_Grammar g, Marpa_IRL_ID irl_id);
-int _marpa_g_irl_length ( Marpa_Grammar g, Marpa_IRL_ID irl_id);
-Marpa_Symbol_ID _marpa_g_irl_rhs ( Marpa_Grammar g, Marpa_IRL_ID irl_id, int ix);
+int _marpa_g_nrl_count ( Marpa_Grammar g);
+Marpa_Symbol_ID _marpa_g_nrl_lhs ( Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+int _marpa_g_nrl_length ( Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+Marpa_Symbol_ID _marpa_g_nrl_rhs ( Marpa_Grammar g, Marpa_NRL_ID nrl_id, int ix);
 int _marpa_g_rule_is_used (Marpa_Grammar g, Marpa_Rule_ID rule_id);
-int _marpa_g_irl_is_virtual_lhs (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-int _marpa_g_irl_is_virtual_rhs (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-int _marpa_g_virtual_start (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-int _marpa_g_virtual_end (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-Marpa_Rule_ID _marpa_g_source_xrl (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-int _marpa_g_real_symbol_count (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-Marpa_Rule_ID _marpa_g_irl_semantic_equivalent (Marpa_Grammar g, Marpa_IRL_ID irl_id);
-Marpa_Rank _marpa_g_irl_rank ( Marpa_Grammar g, Marpa_IRL_ID irl_id);
-Marpa_Rank _marpa_g_nsy_rank ( Marpa_Grammar g, Marpa_IRL_ID nsy_id);
+int _marpa_g_nrl_is_virtual_lhs (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+int _marpa_g_nrl_is_virtual_rhs (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+int _marpa_g_virtual_start (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+int _marpa_g_virtual_end (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+Marpa_Rule_ID _marpa_g_source_xrl (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+int _marpa_g_real_symbol_count (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+Marpa_Rule_ID _marpa_g_nrl_semantic_equivalent (Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+Marpa_Rank _marpa_g_nrl_rank ( Marpa_Grammar g, Marpa_NRL_ID nrl_id);
+Marpa_Rank _marpa_g_nsy_rank ( Marpa_Grammar g, Marpa_NRL_ID nsy_id);
 int _marpa_g_ahm_count (Marpa_Grammar g);
-Marpa_Rule_ID _marpa_g_ahm_irl (Marpa_Grammar g, Marpa_AHM_ID item_id);
+Marpa_Rule_ID _marpa_g_ahm_nrl (Marpa_Grammar g, Marpa_AHM_ID item_id);
 int _marpa_g_ahm_position (Marpa_Grammar g, Marpa_AHM_ID item_id);
 int _marpa_g_ahm_raw_position (Marpa_Grammar g, Marpa_AHM_ID item_id);
 int _marpa_g_ahm_null_count (Marpa_Grammar g, Marpa_AHM_ID item_id);
@@ -647,7 +647,7 @@ Marpa_Symbol_ID _marpa_b_and_node_token ( Marpa_Bocage b, Marpa_And_Node_ID and_
 Marpa_Or_Node_ID _marpa_b_top_or_node ( Marpa_Bocage b);
 int _marpa_b_or_node_set ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);
 int _marpa_b_or_node_origin ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);
-Marpa_IRL_ID _marpa_b_or_node_irl ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);
+Marpa_NRL_ID _marpa_b_or_node_nrl ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);
 int _marpa_b_or_node_position ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);
 int _marpa_b_or_node_is_whole ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);
 int _marpa_b_or_node_is_semantic ( Marpa_Bocage b, Marpa_Or_Node_ID or_node_id);

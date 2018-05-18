@@ -818,7 +818,7 @@ sub Marpa::R3::Grammar::nrls_show {
         <<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1
-    local nrl_count = g1g:_irl_count()
+    local nrl_count = g1g:_nrl_count()
     local pieces = {}
     for nrl_id = 0, nrl_count - 1 do
         pieces[#pieces+1] = g1g:brief_nrl(nrl_id)

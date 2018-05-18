@@ -110,7 +110,7 @@
 @s DSTACK int
 @s LBV int
 @s Marpa_Bocage int
-@s Marpa_IRL_ID int
+@s Marpa_NRL_ID int
 @s Marpa_Rule_ID int
 @s Marpa_Symbol_ID int
 @s NOOKID int

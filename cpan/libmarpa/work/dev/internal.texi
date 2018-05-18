@@ -186,73 +186,73 @@ On failure, returns -2.
 @deftypefun int _marpa_g_nsy_count ( @
   Marpa_Grammar @var{g})
 @end deftypefun
-@deftypefun int _marpa_g_irl_count ( @
+@deftypefun int _marpa_g_nrl_count ( @
   Marpa_Grammar @var{g})
 @end deftypefun
 
-@deftypefun Marpa_Symbol_ID _marpa_g_irl_lhs ( @
+@deftypefun Marpa_Symbol_ID _marpa_g_nrl_lhs ( @
     Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
-Return value: On success, the LHS symbol of the IRL.
+    Marpa_NRL_ID @var{nrl_id})
+Return value: On success, the LHS symbol of the NRL.
 On failure, -2.
 @end deftypefun
 
-@deftypefun int _marpa_g_irl_length ( @
+@deftypefun int _marpa_g_nrl_length ( @
     Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
-The length of a IRL is the number of symbols on its RHS.
+    Marpa_NRL_ID @var{nrl_id})
+The length of a NRL is the number of symbols on its RHS.
 
-Return value: On success, the IRL length.
+Return value: On success, the NRL length.
 On failure, -2.
 @end deftypefun
 
-@deftypefun Marpa_Symbol_ID _marpa_g_irl_rhs ( @
+@deftypefun Marpa_Symbol_ID _marpa_g_nrl_rhs ( @
     Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id}, @
+    Marpa_NRL_ID @var{nrl_id}, @
     int @var{ix})
-The position in the IRL, @var{ix}, is zero-based.
+The position in the NRL, @var{ix}, is zero-based.
 If @var{ix} is greater than or equal the length of the
-IRL, it is a soft failure.
+NRL, it is a soft failure.
 This can be used in loops, to avoid having to determine
-the IRL's length explicitly.
+the NRL's length explicitly.
 
 Return value: On success, the symbol in position @var{ix}
-on the IRL's RHS.
+on the NRL's RHS.
 If @var{ix} is greater than or equal to the length of
-the IRL, -1.
+the NRL, -1.
 On other failures, -2.
 @end deftypefun
 @deftypefun int _marpa_g_rule_is_used (Marpa_Grammar @var{g}, @
     Marpa_Rule_ID @var{rule_id})
 @end deftypefun
-@deftypefun int _marpa_g_irl_is_virtual_lhs (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+@deftypefun int _marpa_g_nrl_is_virtual_lhs (Marpa_Grammar @var{g}, @
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
-@deftypefun int _marpa_g_irl_is_virtual_rhs (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+@deftypefun int _marpa_g_nrl_is_virtual_rhs (Marpa_Grammar @var{g}, @
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
 @deftypefun @code{int} _marpa_g_virtual_start (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
 @deftypefun @code{int} _marpa_g_virtual_end (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
 @deftypefun Marpa_Rule_ID _marpa_g_source_xrl (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
 @deftypefun int _marpa_g_real_symbol_count (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
-@deftypefun Marpa_Rule_ID _marpa_g_irl_semantic_equivalent (Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+@deftypefun Marpa_Rule_ID _marpa_g_nrl_semantic_equivalent (Marpa_Grammar @var{g}, @
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
-@deftypefun Marpa_Rank _marpa_g_irl_rank ( @
+@deftypefun Marpa_Rank _marpa_g_nrl_rank ( @
     Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{irl_id})
+    Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
 @deftypefun Marpa_Rank _marpa_g_nsy_rank ( @
     Marpa_Grammar @var{g}, @
-    Marpa_IRL_ID @var{nsy_id})
+    Marpa_NRL_ID @var{nsy_id})
 @end deftypefun
 
 @node Grammar internals, Recognizer internals, Rule internals, Internal Interface
@@ -265,7 +265,7 @@ Marpa's internals, as described in
 
 @deftypefun int _marpa_g_ahm_count (Marpa_Grammar @var{g})
 @end deftypefun
-@deftypefun Marpa_Rule_ID _marpa_g_ahm_irl (Marpa_Grammar @var{g}, @
+@deftypefun Marpa_Rule_ID _marpa_g_ahm_nrl (Marpa_Grammar @var{g}, @
     Marpa_AHM_ID @var{item_id})
 @end deftypefun
 @deftypefun int _marpa_g_ahm_position (Marpa_Grammar @var{g}, @
@@ -425,7 +425,7 @@ the or-node.
     Marpa_Bocage @var{b}, @
     Marpa_Or_Node_ID @var{or_node_id})
 @end deftypefun
-@deftypefun Marpa_IRL_ID _marpa_b_or_node_irl ( @
+@deftypefun Marpa_NRL_ID _marpa_b_or_node_nrl ( @
     Marpa_Bocage @var{b}, @
     Marpa_Or_Node_ID @var{or_node_id})
 @end deftypefun

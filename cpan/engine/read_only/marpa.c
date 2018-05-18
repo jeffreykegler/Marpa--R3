@@ -54,16 +54,16 @@ MARPA_LIB_MAJOR_VERSION!=MARPA_MAJOR_VERSION \
 #define NSYID_is_Malformed(nsy_id) ((nsy_id) <0) 
 #define NSYID_of_G_Exists(nsy_id) ((nsy_id) <NSY_Count_of_G(g) ) 
 #define XRL_Count_of_G(g) (MARPA_DSTACK_LENGTH((g) ->t_xrl_stack) ) 
-#define IRL_Count_of_G(g) (MARPA_DSTACK_LENGTH((g) ->t_irl_stack) ) 
+#define NRL_Count_of_G(g) (MARPA_DSTACK_LENGTH((g) ->t_nrl_stack) ) 
 #define XRL_by_ID(id) (*MARPA_DSTACK_INDEX((g) ->t_xrl_stack,XRL,(id) ) ) 
-#define IRL_by_ID(id) (*MARPA_DSTACK_INDEX((g) ->t_irl_stack,IRL,(id) ) )  \
+#define NRL_by_ID(id) (*MARPA_DSTACK_INDEX((g) ->t_nrl_stack,NRL,(id) ) )  \
 
 #define XRLID_is_Malformed(rule_id) ((rule_id) <0) 
 #define XRLID_of_G_Exists(rule_id) ((rule_id) <XRL_Count_of_G(g) ) 
-#define IRLID_of_G_is_Valid(irl_id)  \
-((irl_id) >=0&&(irl_id) <IRL_Count_of_G(g) )  \
+#define NRLID_of_G_is_Valid(nrl_id)  \
+((nrl_id) >=0&&(nrl_id) <NRL_Count_of_G(g) )  \
 
-#define G_is_Trivial(g) (!(g) ->t_start_irl) 
+#define G_is_Trivial(g) (!(g) ->t_start_nrl) 
 #define External_Size_of_G(g) ((g) ->t_external_size) 
 #define MAXIMUM_RANK (INT_MAX/4) 
 #define MINIMUM_RANK (INT_MIN/4+(INT_MIN%4> 0?1:0) ) 
@@ -156,66 +156,66 @@ ID_of_XSY(Source_XSY_of_NSYID(nsyid) )
 #define XRL_is_Accessible(rule) ((rule) ->t_is_accessible) 
 #define XRL_is_Productive(rule) ((rule) ->t_is_productive) 
 #define XRL_is_Used(rule) ((rule) ->t_is_used) 
-#define ID_of_IRL(irl) ((irl) ->t_irl_id) 
-#define LHSID_of_IRL(irlid) ((irlid) ->t_nsyid_array[0]) 
-#define LHS_of_IRL(irl) (NSY_by_ID(LHSID_of_IRL(irl) ) )  \
+#define ID_of_NRL(nrl) ((nrl) ->t_nrl_id) 
+#define LHSID_of_NRL(nrlid) ((nrlid) ->t_nsyid_array[0]) 
+#define LHS_of_NRL(nrl) (NSY_by_ID(LHSID_of_NRL(nrl) ) )  \
 
-#define RHSID_of_IRL(irl,position) ((irl) ->t_nsyid_array[(position) +1]) 
-#define RHS_of_IRL(irl,position) NSY_by_ID(RHSID_of_IRL((irl) ,(position) ) ) 
-#define Length_of_IRL(irl) ((irl) ->t_length) 
-#define IRL_is_Unit_Rule(irl) ((irl) ->t_ahm_count==2) 
-#define AHM_Count_of_IRL(irl) ((irl) ->t_ahm_count) 
-#define IRL_has_Virtual_LHS(irl) ((irl) ->t_is_virtual_lhs) 
-#define IRL_has_Virtual_RHS(irl) ((irl) ->t_is_virtual_rhs) 
-#define IRL_is_Right_Recursive(irl) ((irl) ->t_is_right_recursive) 
-#define IRL_is_Leo(irl) IRL_is_Right_Recursive(irl) 
-#define Real_SYM_Count_of_IRL(irl) ((irl) ->t_real_symbol_count) 
-#define Virtual_Start_of_IRL(irl) ((irl) ->t_virtual_start) 
-#define Virtual_End_of_IRL(irl) ((irl) ->t_virtual_end) 
-#define Source_XRL_of_IRL(irl) ((irl) ->t_source_xrl) 
+#define RHSID_of_NRL(nrl,position) ((nrl) ->t_nsyid_array[(position) +1]) 
+#define RHS_of_NRL(nrl,position) NSY_by_ID(RHSID_of_NRL((nrl) ,(position) ) ) 
+#define Length_of_NRL(nrl) ((nrl) ->t_length) 
+#define NRL_is_Unit_Rule(nrl) ((nrl) ->t_ahm_count==2) 
+#define AHM_Count_of_NRL(nrl) ((nrl) ->t_ahm_count) 
+#define NRL_has_Virtual_LHS(nrl) ((nrl) ->t_is_virtual_lhs) 
+#define NRL_has_Virtual_RHS(nrl) ((nrl) ->t_is_virtual_rhs) 
+#define NRL_is_Right_Recursive(nrl) ((nrl) ->t_is_right_recursive) 
+#define NRL_is_Leo(nrl) NRL_is_Right_Recursive(nrl) 
+#define Real_SYM_Count_of_NRL(nrl) ((nrl) ->t_real_symbol_count) 
+#define Virtual_Start_of_NRL(nrl) ((nrl) ->t_virtual_start) 
+#define Virtual_End_of_NRL(nrl) ((nrl) ->t_virtual_end) 
+#define Source_XRL_of_NRL(nrl) ((nrl) ->t_source_xrl) 
 #define EXTERNAL_RANK_FACTOR 4
 #define MAXIMUM_CHAF_RANK 3
-#define IRL_CHAF_Rank_by_XRL(xrl,chaf_rank) ( \
+#define NRL_CHAF_Rank_by_XRL(xrl,chaf_rank) ( \
 ((xrl) ->t_rank*EXTERNAL_RANK_FACTOR) + \
 (((xrl) ->t_null_ranks_high) ?(MAXIMUM_CHAF_RANK- \
 (chaf_rank) ) :(chaf_rank) )  \
 ) 
-#define IRL_Rank_by_XRL(xrl) IRL_CHAF_Rank_by_XRL((xrl) ,MAXIMUM_CHAF_RANK) 
-#define Rank_of_IRL(irl) ((irl) ->t_rank) 
-#define First_AHM_of_IRL(irl) ((irl) ->t_first_ahm) 
-#define First_AHM_of_IRLID(irlid) (IRL_by_ID(irlid) ->t_first_ahm) 
-#define IRL_is_CHAF(irl) ((irl) ->t_is_chaf) 
+#define NRL_Rank_by_XRL(xrl) NRL_CHAF_Rank_by_XRL((xrl) ,MAXIMUM_CHAF_RANK) 
+#define Rank_of_NRL(nrl) ((nrl) ->t_rank) 
+#define First_AHM_of_NRL(nrl) ((nrl) ->t_first_ahm) 
+#define First_AHM_of_NRLID(nrlid) (NRL_by_ID(nrlid) ->t_first_ahm) 
+#define NRL_is_CHAF(nrl) ((nrl) ->t_is_chaf) 
 #define AHM_by_ID(id) (g->t_ahms+(id) ) 
 #define ID_of_AHM(ahm) (AHMID) ((ahm) -g->t_ahms) 
 #define Next_AHM_of_AHM(ahm) ((ahm) +1) 
 #define Prev_AHM_of_AHM(ahm) ((ahm) -1)  \
 
 #define AHM_Count_of_G(g) ((g) ->t_ahm_count) 
-#define IRL_of_AHM(ahm) ((ahm) ->t_irl) 
-#define IRLID_of_AHM(item) ID_of_IRL(IRL_of_AHM(item) ) 
-#define LHS_NSYID_of_AHM(item) LHSID_of_IRL(IRL_of_AHM(item) ) 
+#define NRL_of_AHM(ahm) ((ahm) ->t_nrl) 
+#define NRLID_of_AHM(item) ID_of_NRL(NRL_of_AHM(item) ) 
+#define LHS_NSYID_of_AHM(item) LHSID_of_NRL(NRL_of_AHM(item) ) 
 #define LHSID_of_AHM(item) LHS_NSYID_of_AHM(item) 
 #define Postdot_NSYID_of_AHM(item) ((item) ->t_postdot_nsyid) 
 #define AHM_is_Completion(ahm) (Postdot_NSYID_of_AHM(ahm) <0) 
-#define AHM_is_Leo(ahm) (IRL_is_Leo(IRL_of_AHM(ahm) ) ) 
+#define AHM_is_Leo(ahm) (NRL_is_Leo(NRL_of_AHM(ahm) ) ) 
 #define AHM_is_Leo_Completion(ahm)  \
 (AHM_is_Completion(ahm) &&AHM_is_Leo(ahm) ) 
 #define Null_Count_of_AHM(ahm) ((ahm) ->t_leading_nulls) 
 #define Position_of_AHM(ahm) ((ahm) ->t_position) 
 #define Raw_Position_of_AHM(ahm)  \
 (Position_of_AHM(ahm) <0 \
-?((Length_of_IRL(IRL_of_AHM(ahm) ) ) +Position_of_AHM(ahm) +1)  \
+?((Length_of_NRL(NRL_of_AHM(ahm) ) ) +Position_of_AHM(ahm) +1)  \
 :Position_of_AHM(ahm) ) 
 #define AHM_is_Prediction(ahm) (Quasi_Position_of_AHM(ahm) ==0)  \
 
 #define Quasi_Position_of_AHM(ahm) ((ahm) ->t_quasi_position) 
 #define SYMI_of_AHM(ahm) ((ahm) ->t_symbol_instance) 
 #define SYMI_Count_of_G(g) ((g) ->t_symbol_instance_count) 
-#define SYMI_of_IRL(irl) ((irl) ->t_symbol_instance_base) 
-#define Last_Proper_SYMI_of_IRL(irl) ((irl) ->t_last_proper_symi) 
-#define SYMI_of_Completed_IRL(irl)  \
-(SYMI_of_IRL(irl) +Length_of_IRL(irl) -1) 
-#define Predicted_IRL_CIL_of_AHM(ahm) ((ahm) ->t_predicted_irl_cil) 
+#define SYMI_of_NRL(nrl) ((nrl) ->t_symbol_instance_base) 
+#define Last_Proper_SYMI_of_NRL(nrl) ((nrl) ->t_last_proper_symi) 
+#define SYMI_of_Completed_NRL(nrl)  \
+(SYMI_of_NRL(nrl) +Length_of_NRL(nrl) -1) 
+#define Predicted_NRL_CIL_of_AHM(ahm) ((ahm) ->t_predicted_nrl_cil) 
 #define LHS_CIL_of_AHM(ahm) ((ahm) ->t_lhs_cil) 
 #define ZWA_CIL_of_AHM(ahm) ((ahm) ->t_zwa_cil) 
 #define AHM_predicts_ZWA(ahm) ((ahm) ->t_predicts_zwa) 
@@ -291,8 +291,8 @@ LHS_NSYID_of_AHM(AHM_of_YIM(yim) )
 #define AHM_of_YIM(yim) ((yim) ->t_key.t_ahm) 
 #define AHMID_of_YIM(yim) ID_of_AHM(AHM_of_YIM(yim) ) 
 #define Postdot_NSYID_of_YIM(yim) Postdot_NSYID_of_AHM(AHM_of_YIM(yim) ) 
-#define IRL_of_YIM(yim) IRL_of_AHM(AHM_of_YIM(yim) ) 
-#define IRLID_of_YIM(yim) ID_of_IRL(IRL_of_YIM(yim) ) 
+#define NRL_of_YIM(yim) NRL_of_AHM(AHM_of_YIM(yim) ) 
+#define NRLID_of_YIM(yim) ID_of_NRL(NRL_of_YIM(yim) ) 
 #define XRL_of_YIM(yim) XRL_of_AHM(AHM_of_YIM(yim) ) 
 #define Origin_Earleme_of_YIM(yim) (Earleme_of_YS(Origin_of_YIM(yim) ) ) 
 #define Origin_Ord_of_YIM(yim) (Ord_of_YS(Origin_of_YIM(yim) ) ) 
@@ -426,8 +426,8 @@ LV_First_Leo_SRCL_of_YIM(item) :NULL)  \
 #define OR_is_Token(or) (Type_of_OR(or) <=MAX_TOKEN_OR_NODE) 
 #define Position_of_OR(or) ((or) ->t_final.t_position) 
 #define Type_of_OR(or) ((or) ->t_final.t_position) 
-#define IRL_of_OR(or) ((or) ->t_final.t_irl) 
-#define IRLID_of_OR(or) ID_of_IRL(IRL_of_OR(or) ) 
+#define NRL_of_OR(or) ((or) ->t_final.t_nrl) 
+#define NRLID_of_OR(or) ID_of_NRL(NRL_of_OR(or) ) 
 #define Origin_Ord_of_OR(or) ((or) ->t_final.t_start_set_ordinal) 
 #define ID_of_OR(or) ((or) ->t_final.t_id) 
 #define YS_Ord_of_OR(or) ((or) ->t_draft.t_end_set_ordinal) 
@@ -436,13 +436,13 @@ LV_First_Leo_SRCL_of_YIM(item) :NULL)  \
 #define AND_Count_of_OR(or) ((or) ->t_final.t_and_node_count) 
 #define NSYID_of_OR(or) ((or) ->t_token.t_nsyid) 
 #define Value_of_OR(or) ((or) ->t_token.t_value) 
-#define WHEID_of_NSYID(nsyid) (irl_count+(nsyid) ) 
-#define WHEID_of_IRLID(irlid) (irlid) 
-#define WHEID_of_IRL(irl) WHEID_of_IRLID(ID_of_IRL(irl) ) 
+#define WHEID_of_NSYID(nsyid) (nrl_count+(nsyid) ) 
+#define WHEID_of_NRLID(nrlid) (nrlid) 
+#define WHEID_of_NRL(nrl) WHEID_of_NRLID(ID_of_NRL(nrl) ) 
 #define WHEID_of_OR(or) ( \
 wheid= OR_is_Token(or) ? \
 WHEID_of_NSYID(NSYID_of_OR(or) ) : \
-WHEID_of_IRL(IRL_of_OR(or) )  \
+WHEID_of_NRL(NRL_of_OR(or) )  \
 )  \
 
 #define Next_DAND_of_DAND(dand) ((dand) ->t_next) 
@@ -765,9 +765,9 @@ typedef Marpa_Rule_ID XRLID;
 /*:255*//*328:*/
 #line 2920 "./marpa.w"
 
-struct s_irl;
-typedef struct s_irl*IRL;
-typedef Marpa_IRL_ID IRLID;
+struct s_nrl;
+typedef struct s_nrl*NRL;
+typedef Marpa_NRL_ID NRLID;
 
 /*:328*//*471:*/
 #line 4978 "./marpa.w"
@@ -896,7 +896,7 @@ MARPA_DSTACK_DECLARE(t_nsy_stack);
 #line 808 "./marpa.w"
 
 MARPA_DSTACK_DECLARE(t_xrl_stack);
-MARPA_DSTACK_DECLARE(t_irl_stack);
+MARPA_DSTACK_DECLARE(t_nrl_stack);
 /*:68*//*103:*/
 #line 1003 "./marpa.w"
 Bit_Vector t_bv_nsyid_is_terminal;
@@ -954,7 +954,7 @@ XSYID t_start_xsy_id;
 /*:78*//*82:*/
 #line 895 "./marpa.w"
 
-IRL t_start_irl;
+NRL t_start_nrl;
 /*:82*//*85:*/
 #line 909 "./marpa.w"
 
@@ -1200,7 +1200,7 @@ Marpa_Symbol_ID t_symbols[1];
 /*:254*//*326:*/
 #line 2909 "./marpa.w"
 
-struct s_irl{
+struct s_nrl{
 /*359:*/
 #line 3122 "./marpa.w"
 XRL t_source_xrl;
@@ -1212,7 +1212,7 @@ AHM t_first_ahm;
 
 /*329:*/
 #line 2931 "./marpa.w"
-IRLID t_irl_id;
+NRLID t_nrl_id;
 
 /*:329*//*336:*/
 #line 2968 "./marpa.w"
@@ -1265,7 +1265,7 @@ NSYID t_nsyid_array[1];
 #line 2914 "./marpa.w"
 
 };
-typedef struct s_irl IRL_Object;
+typedef struct s_nrl NRL_Object;
 
 /*:326*//*378:*/
 #line 3359 "./marpa.w"
@@ -1283,12 +1283,12 @@ struct s_ahm{
 /*463:*/
 #line 4908 "./marpa.w"
 
-IRL t_irl;
+NRL t_nrl;
 
 /*:463*//*476:*/
 #line 5001 "./marpa.w"
 
-CIL t_predicted_irl_cil;
+CIL t_predicted_nrl_cil;
 CIL t_lhs_cil;
 
 /*:476*//*477:*/
@@ -1524,7 +1524,7 @@ int t_position;
 int t_end_set_ordinal;
 int t_start_set_ordinal;
 ORID t_id;
-IRL t_irl;
+NRL t_nrl;
 
 /*:883*/
 #line 10340 "./marpa.w"
@@ -1551,7 +1551,7 @@ int t_position;
 int t_end_set_ordinal;
 int t_start_set_ordinal;
 ORID t_id;
-IRL t_irl;
+NRL t_nrl;
 
 /*:883*/
 #line 10347 "./marpa.w"
@@ -1873,8 +1873,8 @@ LBV t_nsy_expected_is_event;
 /*:587*//*609:*/
 #line 6604 "./marpa.w"
 
-Bit_Vector t_bv_irl_seen;
-MARPA_DSTACK_DECLARE(t_irl_cil_stack);
+Bit_Vector t_bv_nrl_seen;
+MARPA_DSTACK_DECLARE(t_nrl_cil_stack);
 /*:609*//*618:*/
 #line 6658 "./marpa.w"
 struct marpa_obstack*t_obs;
@@ -2304,16 +2304,16 @@ static inline NSY
 nsy_clone(GRAMMAR g, XSY xsy);
 static inline   XRL xrl_start (GRAMMAR g, const XSYID lhs, const XSYID * rhs, int length);
 static inline XRL xrl_finish(GRAMMAR g, XRL rule);
-static inline IRL
-irl_start(GRAMMAR g, int length);
+static inline NRL
+nrl_start(GRAMMAR g, int length);
 static inline void
-irl_finish( GRAMMAR g, IRL irl);
+nrl_finish( GRAMMAR g, NRL nrl);
 static inline Marpa_Symbol_ID rule_lhs_get(RULE rule);
 static inline Marpa_Symbol_ID* rule_rhs_get(RULE rule);
 static inline int ahm_is_valid(
 GRAMMAR g, AHMID item_id);
 static inline void
-memoize_xrl_data_for_AHM(AHM current_item, IRL irl);
+memoize_xrl_data_for_AHM(AHM current_item, NRL nrl);
 static inline void
 recce_unref (RECCE r);
 static inline RECCE recce_ref (RECCE r);
@@ -2619,7 +2619,7 @@ if(!or)return"NULL";
 if(OR_is_Token(or))return"TOKEN";
 if(Type_of_OR(or)==DUMMY_OR_NODE)return"DUMMY";
 sprintf(buffer,"R%d:%d@%d-%d",
-IRLID_of_OR(or),Position_of_OR(or),
+NRLID_of_OR(or),Position_of_OR(or),
 Origin_Ord_of_OR(or),
 YS_Ord_of_OR(or));
 return buffer;
@@ -2641,9 +2641,9 @@ ahm_tag_safe(char*buffer,AHM ahm)
 if(!ahm)return"NULL";
 const int ahm_position= Position_of_AHM(ahm);
 if(ahm_position>=0){
-sprintf(buffer,"R%d@%d",IRLID_of_AHM(ahm),Position_of_AHM(ahm));
+sprintf(buffer,"R%d@%d",NRLID_of_AHM(ahm),Position_of_AHM(ahm));
 }else{
-sprintf(buffer,"R%d@end",IRLID_of_AHM(ahm));
+sprintf(buffer,"R%d@end",NRLID_of_AHM(ahm));
 }
 return buffer;
 }
@@ -2766,7 +2766,7 @@ MARPA_DSTACK_SAFE(g->t_nsy_stack);
 #line 811 "./marpa.w"
 
 MARPA_DSTACK_INIT2(g->t_xrl_stack,RULE);
-MARPA_DSTACK_SAFE(g->t_irl_stack);
+MARPA_DSTACK_SAFE(g->t_nrl_stack);
 
 /*:69*//*79:*/
 #line 859 "./marpa.w"
@@ -2775,7 +2775,7 @@ g->t_start_xsy_id= -1;
 /*:79*//*83:*/
 #line 897 "./marpa.w"
 
-g->t_start_irl= NULL;
+g->t_start_nrl= NULL;
 
 /*:83*//*86:*/
 #line 911 "./marpa.w"
@@ -2914,7 +2914,7 @@ MARPA_DSTACK_DESTROY(g->t_nsy_stack);
 /*:61*//*70:*/
 #line 815 "./marpa.w"
 
-MARPA_DSTACK_DESTROY(g->t_irl_stack);
+MARPA_DSTACK_DESTROY(g->t_nrl_stack);
 MARPA_DSTACK_DESTROY(g->t_xrl_stack);
 
 /*:70*//*114:*/
@@ -3068,7 +3068,7 @@ return failure_indicator;
 
 return XRL_Count_of_G(g)-1;
 }
-int _marpa_g_irl_count(Marpa_Grammar g){
+int _marpa_g_nrl_count(Marpa_Grammar g){
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -3091,7 +3091,7 @@ return failure_indicator;
 /*:1336*/
 #line 830 "./marpa.w"
 
-return IRL_Count_of_G(g);
+return NRL_Count_of_G(g);
 }
 
 /*:74*//*76:*/
@@ -5233,7 +5233,7 @@ return NSY_is_Nulling(NSY_by_ID(nsy_id));
 
 int _marpa_g_nsy_is_semantic(
 Marpa_Grammar g,
-Marpa_IRL_ID nsy_id)
+Marpa_NRL_ID nsy_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -5260,7 +5260,7 @@ return NSYID_is_Semantic(nsy_id);
 
 Marpa_Rule_ID _marpa_g_source_xsy(
 Marpa_Grammar g,
-Marpa_IRL_ID nsy_id)
+Marpa_NRL_ID nsy_id)
 {
 XSY source_xsy;
 /*1316:*/
@@ -5473,72 +5473,72 @@ return rule;
 /*:258*//*259:*/
 #line 2247 "./marpa.w"
 
-PRIVATE IRL
-irl_start(GRAMMAR g,int length)
+PRIVATE NRL
+nrl_start(GRAMMAR g,int length)
 {
-IRL irl;
-const size_t sizeof_irl= offsetof(struct s_irl,t_nsyid_array)+
-((size_t)length+1)*sizeof(irl->t_nsyid_array[0]);
+NRL nrl;
+const size_t sizeof_nrl= offsetof(struct s_nrl,t_nsyid_array)+
+((size_t)length+1)*sizeof(nrl->t_nsyid_array[0]);
 
 
-irl= marpa__obs_alloc(g->t_obs,sizeof_irl,ALIGNOF(IRL_Object));
+nrl= marpa__obs_alloc(g->t_obs,sizeof_nrl,ALIGNOF(NRL_Object));
 
-ID_of_IRL(irl)= MARPA_DSTACK_LENGTH((g)->t_irl_stack);
-Length_of_IRL(irl)= length;
+ID_of_NRL(nrl)= MARPA_DSTACK_LENGTH((g)->t_nrl_stack);
+Length_of_NRL(nrl)= length;
 /*342:*/
 #line 3017 "./marpa.w"
 
-IRL_has_Virtual_LHS(irl)= 0;
+NRL_has_Virtual_LHS(nrl)= 0;
 /*:342*//*345:*/
 #line 3033 "./marpa.w"
 
-IRL_has_Virtual_RHS(irl)= 0;
+NRL_has_Virtual_RHS(nrl)= 0;
 /*:345*//*348:*/
 #line 3052 "./marpa.w"
 
-IRL_is_Right_Recursive(irl)= 0;
+NRL_is_Right_Recursive(nrl)= 0;
 
 /*:348*//*351:*/
 #line 3063 "./marpa.w"
-Real_SYM_Count_of_IRL(irl)= 0;
+Real_SYM_Count_of_NRL(nrl)= 0;
 /*:351*//*354:*/
 #line 3081 "./marpa.w"
-irl->t_virtual_start= -1;
+nrl->t_virtual_start= -1;
 /*:354*//*357:*/
 #line 3101 "./marpa.w"
-irl->t_virtual_end= -1;
+nrl->t_virtual_end= -1;
 /*:357*//*360:*/
 #line 3123 "./marpa.w"
-Source_XRL_of_IRL(irl)= NULL;
+Source_XRL_of_NRL(nrl)= NULL;
 /*:360*//*363:*/
 #line 3150 "./marpa.w"
 
-Rank_of_IRL(irl)= Default_Rank_of_G(g)*EXTERNAL_RANK_FACTOR+MAXIMUM_CHAF_RANK;
+Rank_of_NRL(nrl)= Default_Rank_of_G(g)*EXTERNAL_RANK_FACTOR+MAXIMUM_CHAF_RANK;
 /*:363*//*366:*/
 #line 3172 "./marpa.w"
 
-First_AHM_of_IRL(irl)= NULL;
+First_AHM_of_NRL(nrl)= NULL;
 
 /*:366*//*410:*/
 #line 4072 "./marpa.w"
 
-IRL_is_CHAF(irl)= 0;
+NRL_is_CHAF(nrl)= 0;
 /*:410*//*474:*/
 #line 4989 "./marpa.w"
 
-Last_Proper_SYMI_of_IRL(irl)= -1;
+Last_Proper_SYMI_of_NRL(nrl)= -1;
 
 /*:474*/
 #line 2260 "./marpa.w"
 
-*MARPA_DSTACK_PUSH((g)->t_irl_stack,IRL)= irl;
-return irl;
+*MARPA_DSTACK_PUSH((g)->t_nrl_stack,NRL)= nrl;
+return nrl;
 }
 
 PRIVATE void
-irl_finish(GRAMMAR g,IRL irl)
+nrl_finish(GRAMMAR g,NRL nrl)
 {
-const NSY lhs_nsy= LHS_of_IRL(irl);
+const NSY lhs_nsy= LHS_of_NRL(nrl);
 NSY_is_LHS(lhs_nsy)= 1;
 }
 
@@ -6796,9 +6796,9 @@ return XRL_is_Used(XRL_by_ID(xrl_id));
 #line 2895 "./marpa.w"
 
 Marpa_Rule_ID
-_marpa_g_irl_semantic_equivalent(Marpa_Grammar g,Marpa_IRL_ID irl_id)
+_marpa_g_nrl_semantic_equivalent(Marpa_Grammar g,Marpa_NRL_ID nrl_id)
 {
-IRL irl;
+NRL nrl;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -6809,23 +6809,23 @@ const int failure_indicator= -2;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 2901 "./marpa.w"
 
-irl= IRL_by_ID(irl_id);
-if(IRL_has_Virtual_LHS(irl))return-1;
-return ID_of_XRL(Source_XRL_of_IRL(irl));
+nrl= NRL_by_ID(nrl_id);
+if(NRL_has_Virtual_LHS(nrl))return-1;
+return ID_of_XRL(Source_XRL_of_NRL(nrl));
 }
 
 /*:324*//*333:*/
 #line 2942 "./marpa.w"
 
-Marpa_NSY_ID _marpa_g_irl_lhs(Marpa_Grammar g,Marpa_IRL_ID irl_id){
-IRL irl;
+Marpa_NSY_ID _marpa_g_nrl_lhs(Marpa_Grammar g,Marpa_NRL_ID nrl_id){
+NRL nrl;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -6861,22 +6861,22 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 2948 "./marpa.w"
 
-irl= IRL_by_ID(irl_id);
-return LHSID_of_IRL(irl);
+nrl= NRL_by_ID(nrl_id);
+return LHSID_of_NRL(nrl);
 }
 
 /*:333*//*335:*/
 #line 2955 "./marpa.w"
 
-Marpa_NSY_ID _marpa_g_irl_rhs(Marpa_Grammar g,Marpa_IRL_ID irl_id,int ix){
-IRL irl;
+Marpa_NSY_ID _marpa_g_nrl_rhs(Marpa_Grammar g,Marpa_NRL_ID nrl_id,int ix){
+NRL nrl;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -6912,22 +6912,22 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 2961 "./marpa.w"
 
-irl= IRL_by_ID(irl_id);
-if(Length_of_IRL(irl)<=ix)return-1;
-return RHSID_of_IRL(irl,ix);
+nrl= NRL_by_ID(nrl_id);
+if(Length_of_NRL(nrl)<=ix)return-1;
+return RHSID_of_NRL(nrl,ix);
 }
 
 /*:335*//*337:*/
 #line 2969 "./marpa.w"
 
-int _marpa_g_irl_length(Marpa_Grammar g,Marpa_IRL_ID irl_id){
+int _marpa_g_nrl_length(Marpa_Grammar g,Marpa_NRL_ID nrl_id){
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -6963,22 +6963,22 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 2974 "./marpa.w"
 
-return Length_of_IRL(IRL_by_ID(irl_id));
+return Length_of_NRL(NRL_by_ID(nrl_id));
 }
 
 /*:337*//*343:*/
 #line 3019 "./marpa.w"
 
-int _marpa_g_irl_is_virtual_lhs(
+int _marpa_g_nrl_is_virtual_lhs(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -7000,22 +7000,22 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3026 "./marpa.w"
 
-return IRL_has_Virtual_LHS(IRL_by_ID(irl_id));
+return NRL_has_Virtual_LHS(NRL_by_ID(nrl_id));
 }
 
 /*:343*//*346:*/
 #line 3035 "./marpa.w"
 
-int _marpa_g_irl_is_virtual_rhs(
+int _marpa_g_nrl_is_virtual_rhs(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -7037,14 +7037,14 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3042 "./marpa.w"
 
-return IRL_has_Virtual_RHS(IRL_by_ID(irl_id));
+return NRL_has_Virtual_RHS(NRL_by_ID(nrl_id));
 }
 
 /*:346*//*352:*/
@@ -7052,7 +7052,7 @@ return IRL_has_Virtual_RHS(IRL_by_ID(irl_id));
 
 int _marpa_g_real_symbol_count(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -7074,14 +7074,14 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3071 "./marpa.w"
 
-return Real_SYM_Count_of_IRL(IRL_by_ID(irl_id));
+return Real_SYM_Count_of_NRL(NRL_by_ID(nrl_id));
 }
 
 /*:352*//*355:*/
@@ -7089,9 +7089,9 @@ return Real_SYM_Count_of_IRL(IRL_by_ID(irl_id));
 
 int _marpa_g_virtual_start(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
-IRL irl;
+NRL nrl;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -7112,15 +7112,15 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3090 "./marpa.w"
 
-irl= IRL_by_ID(irl_id);
-return Virtual_Start_of_IRL(irl);
+nrl= NRL_by_ID(nrl_id);
+return Virtual_Start_of_NRL(nrl);
 }
 
 /*:355*//*358:*/
@@ -7128,9 +7128,9 @@ return Virtual_Start_of_IRL(irl);
 
 int _marpa_g_virtual_end(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
-IRL irl;
+NRL nrl;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -7151,15 +7151,15 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3110 "./marpa.w"
 
-irl= IRL_by_ID(irl_id);
-return Virtual_End_of_IRL(irl);
+nrl= NRL_by_ID(nrl_id);
+return Virtual_End_of_NRL(nrl);
 }
 
 /*:358*//*361:*/
@@ -7167,7 +7167,7 @@ return Virtual_End_of_IRL(irl);
 
 Marpa_Rule_ID _marpa_g_source_xrl(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
 XRL source_xrl;
 /*1316:*/
@@ -7180,23 +7180,23 @@ const int failure_indicator= -2;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3131 "./marpa.w"
 
-source_xrl= Source_XRL_of_IRL(IRL_by_ID(irl_id));
+source_xrl= Source_XRL_of_NRL(NRL_by_ID(nrl_id));
 return source_xrl?ID_of_XRL(source_xrl):-1;
 }
 
 /*:361*//*364:*/
 #line 3152 "./marpa.w"
 
-Marpa_Rank _marpa_g_irl_rank(
+Marpa_Rank _marpa_g_nrl_rank(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -7208,14 +7208,14 @@ const int failure_indicator= -2;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 3158 "./marpa.w"
 
-return Rank_of_IRL(IRL_by_ID(irl_id));
+return Rank_of_NRL(NRL_by_ID(nrl_id));
 }
 
 /*:364*//*368:*/
@@ -8034,7 +8034,7 @@ int_event_new(g,MARPA_EVENT_LOOP_RULES,loop_rule_count);
 /*515:*/
 #line 5430 "./marpa.w"
 
-MARPA_DSTACK_INIT(g->t_irl_stack,IRL,2*MARPA_DSTACK_CAPACITY(g->t_xrl_stack));
+MARPA_DSTACK_INIT(g->t_nrl_stack,NRL,2*MARPA_DSTACK_CAPACITY(g->t_xrl_stack));
 
 /*:515*/
 #line 3222 "./marpa.w"
@@ -8142,14 +8142,14 @@ LHS_XRL_of_NSY(internal_lhs_nsy)= rule;
 #line 3949 "./marpa.w"
 
 {
-IRL rewrite_irl= irl_start(g,1);
-LHSID_of_IRL(rewrite_irl)= lhs_nsyid;
-RHSID_of_IRL(rewrite_irl,0)= internal_lhs_nsyid;
-irl_finish(g,rewrite_irl);
-Source_XRL_of_IRL(rewrite_irl)= rule;
-Rank_of_IRL(rewrite_irl)= IRL_Rank_by_XRL(rule);
+NRL rewrite_nrl= nrl_start(g,1);
+LHSID_of_NRL(rewrite_nrl)= lhs_nsyid;
+RHSID_of_NRL(rewrite_nrl,0)= internal_lhs_nsyid;
+nrl_finish(g,rewrite_nrl);
+Source_XRL_of_NRL(rewrite_nrl)= rule;
+Rank_of_NRL(rewrite_nrl)= NRL_Rank_by_XRL(rule);
 
-IRL_has_Virtual_RHS(rewrite_irl)= 1;
+NRL_has_Virtual_RHS(rewrite_nrl)= 1;
 }
 
 /*:399*/
@@ -8160,16 +8160,16 @@ if(separator_nsyid>=0&&!XRL_is_Proper_Separation(rule)){
 #line 3962 "./marpa.w"
 
 {
-IRL rewrite_irl;
-rewrite_irl= irl_start(g,2);
-LHSID_of_IRL(rewrite_irl)= lhs_nsyid;
-RHSID_of_IRL(rewrite_irl,0)= internal_lhs_nsyid;
-RHSID_of_IRL(rewrite_irl,1)= separator_nsyid;
-irl_finish(g,rewrite_irl);
-Source_XRL_of_IRL(rewrite_irl)= rule;
-Rank_of_IRL(rewrite_irl)= IRL_Rank_by_XRL(rule);
-IRL_has_Virtual_RHS(rewrite_irl)= 1;
-Real_SYM_Count_of_IRL(rewrite_irl)= 1;
+NRL rewrite_nrl;
+rewrite_nrl= nrl_start(g,2);
+LHSID_of_NRL(rewrite_nrl)= lhs_nsyid;
+RHSID_of_NRL(rewrite_nrl,0)= internal_lhs_nsyid;
+RHSID_of_NRL(rewrite_nrl,1)= separator_nsyid;
+nrl_finish(g,rewrite_nrl);
+Source_XRL_of_NRL(rewrite_nrl)= rule;
+Rank_of_NRL(rewrite_nrl)= NRL_Rank_by_XRL(rule);
+NRL_has_Virtual_RHS(rewrite_nrl)= 1;
+Real_SYM_Count_of_NRL(rewrite_nrl)= 1;
 }
 
 /*:400*/
@@ -8180,14 +8180,14 @@ Real_SYM_Count_of_IRL(rewrite_irl)= 1;
 #line 3979 "./marpa.w"
 
 {
-const IRL rewrite_irl= irl_start(g,1);
-LHSID_of_IRL(rewrite_irl)= internal_lhs_nsyid;
-RHSID_of_IRL(rewrite_irl,0)= rhs_nsyid;
-irl_finish(g,rewrite_irl);
-Source_XRL_of_IRL(rewrite_irl)= rule;
-Rank_of_IRL(rewrite_irl)= IRL_Rank_by_XRL(rule);
-IRL_has_Virtual_LHS(rewrite_irl)= 1;
-Real_SYM_Count_of_IRL(rewrite_irl)= 1;
+const NRL rewrite_nrl= nrl_start(g,1);
+LHSID_of_NRL(rewrite_nrl)= internal_lhs_nsyid;
+RHSID_of_NRL(rewrite_nrl,0)= rhs_nsyid;
+nrl_finish(g,rewrite_nrl);
+Source_XRL_of_NRL(rewrite_nrl)= rule;
+Rank_of_NRL(rewrite_nrl)= NRL_Rank_by_XRL(rule);
+NRL_has_Virtual_LHS(rewrite_nrl)= 1;
+Real_SYM_Count_of_NRL(rewrite_nrl)= 1;
 }
 /*:401*/
 #line 3945 "./marpa.w"
@@ -8196,21 +8196,21 @@ Real_SYM_Count_of_IRL(rewrite_irl)= 1;
 #line 3990 "./marpa.w"
 
 {
-IRL rewrite_irl;
+NRL rewrite_nrl;
 int rhs_ix= 0;
 const int length= separator_nsyid>=0?3:2;
-rewrite_irl= irl_start(g,length);
-LHSID_of_IRL(rewrite_irl)= internal_lhs_nsyid;
-RHSID_of_IRL(rewrite_irl,rhs_ix++)= internal_lhs_nsyid;
+rewrite_nrl= nrl_start(g,length);
+LHSID_of_NRL(rewrite_nrl)= internal_lhs_nsyid;
+RHSID_of_NRL(rewrite_nrl,rhs_ix++)= internal_lhs_nsyid;
 if(separator_nsyid>=0)
-RHSID_of_IRL(rewrite_irl,rhs_ix++)= separator_nsyid;
-RHSID_of_IRL(rewrite_irl,rhs_ix)= rhs_nsyid;
-irl_finish(g,rewrite_irl);
-Source_XRL_of_IRL(rewrite_irl)= rule;
-Rank_of_IRL(rewrite_irl)= IRL_Rank_by_XRL(rule);
-IRL_has_Virtual_LHS(rewrite_irl)= 1;
-IRL_has_Virtual_RHS(rewrite_irl)= 1;
-Real_SYM_Count_of_IRL(rewrite_irl)= length-1;
+RHSID_of_NRL(rewrite_nrl,rhs_ix++)= separator_nsyid;
+RHSID_of_NRL(rewrite_nrl,rhs_ix)= rhs_nsyid;
+nrl_finish(g,rewrite_nrl);
+Source_XRL_of_NRL(rewrite_nrl)= rule;
+Rank_of_NRL(rewrite_nrl)= NRL_Rank_by_XRL(rule);
+NRL_has_Virtual_LHS(rewrite_nrl)= 1;
+NRL_has_Virtual_RHS(rewrite_nrl)= 1;
+Real_SYM_Count_of_NRL(rewrite_nrl)= length-1;
 }
 
 /*:402*/
@@ -8306,30 +8306,30 @@ const int real_symbol_count= piece_end-piece_start+1;
 
 {
 int piece_ix;
-const int chaf_irl_length= (piece_end-piece_start)+2;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
-for(piece_ix= 0;piece_ix<chaf_irl_length-1;piece_ix++)
+const int chaf_nrl_length= (piece_end-piece_start)+2;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
+for(piece_ix= 0;piece_ix<chaf_nrl_length-1;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,chaf_irl_length-1)= chaf_virtual_nsyid;
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,3);
+RHSID_of_NRL(chaf_nrl,chaf_nrl_length-1)= chaf_virtual_nsyid;
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,3);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8349,37 +8349,37 @@ XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 {
 int piece_ix;
 const int second_nulling_piece_ix= second_factor_position-piece_start;
-const int chaf_irl_length= rewrite_xrl_length-piece_start;
-const int real_symbol_count= chaf_irl_length;
+const int chaf_nrl_length= rewrite_xrl_length-piece_start;
+const int real_symbol_count= chaf_nrl_length;
 
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<second_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-for(piece_ix= second_nulling_piece_ix;piece_ix<chaf_irl_length;
+for(piece_ix= second_nulling_piece_ix;piece_ix<chaf_nrl_length;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,2);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,2);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8400,39 +8400,39 @@ const int real_symbol_count= piece_end-piece_start+1;
 {
 int piece_ix;
 const int first_nulling_piece_ix= first_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+2;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+2;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<first_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,first_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,first_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+first_nulling_piece_ix));
 for(piece_ix= first_nulling_piece_ix+1;
-piece_ix<chaf_irl_length-1;piece_ix++)
+piece_ix<chaf_nrl_length-1;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,chaf_irl_length-1)= chaf_virtual_nsyid;
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,1);
+RHSID_of_NRL(chaf_nrl,chaf_nrl_length-1)= chaf_virtual_nsyid;
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,1);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8456,49 +8456,49 @@ int piece_ix;
 const int first_nulling_piece_ix= first_factor_position-piece_start;
 const int second_nulling_piece_ix= 
 second_factor_position-piece_start;
-const int chaf_irl_length= rewrite_xrl_length-piece_start;
-const int real_symbol_count= chaf_irl_length;
+const int chaf_nrl_length= rewrite_xrl_length-piece_start;
+const int real_symbol_count= chaf_nrl_length;
 
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<first_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,first_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,first_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+first_nulling_piece_ix));
 for(piece_ix= first_nulling_piece_ix+1;
 piece_ix<second_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+piece_ix));
 }
-for(piece_ix= second_nulling_piece_ix;piece_ix<chaf_irl_length;
+for(piece_ix= second_nulling_piece_ix;piece_ix<chaf_nrl_length;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,0);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,0);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8542,30 +8542,30 @@ const int real_symbol_count= piece_end-piece_start+1;
 
 {
 int piece_ix;
-const int chaf_irl_length= (piece_end-piece_start)+2;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
-for(piece_ix= 0;piece_ix<chaf_irl_length-1;piece_ix++)
+const int chaf_nrl_length= (piece_end-piece_start)+2;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
+for(piece_ix= 0;piece_ix<chaf_nrl_length-1;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,chaf_irl_length-1)= chaf_virtual_nsyid;
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,3);
+RHSID_of_NRL(chaf_nrl,chaf_nrl_length-1)= chaf_virtual_nsyid;
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,3);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8584,39 +8584,39 @@ XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 {
 int piece_ix;
 const int second_nulling_piece_ix= second_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+2;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+2;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<second_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,second_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,second_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+second_nulling_piece_ix));
 for(piece_ix= second_nulling_piece_ix+1;
-piece_ix<chaf_irl_length-1;piece_ix++)
+piece_ix<chaf_nrl_length-1;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,chaf_irl_length-1)= chaf_virtual_nsyid;
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,2);
+RHSID_of_NRL(chaf_nrl,chaf_nrl_length-1)= chaf_virtual_nsyid;
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,2);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8635,39 +8635,39 @@ XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 {
 int piece_ix;
 const int first_nulling_piece_ix= first_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+2;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+2;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<first_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,first_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,first_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+first_nulling_piece_ix));
 for(piece_ix= first_nulling_piece_ix+1;
-piece_ix<chaf_irl_length-1;piece_ix++)
+piece_ix<chaf_nrl_length-1;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,chaf_irl_length-1)= chaf_virtual_nsyid;
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,1);
+RHSID_of_NRL(chaf_nrl,chaf_nrl_length-1)= chaf_virtual_nsyid;
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,1);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8687,48 +8687,48 @@ XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 int piece_ix;
 const int first_nulling_piece_ix= first_factor_position-piece_start;
 const int second_nulling_piece_ix= second_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+2;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+2;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<first_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,first_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,first_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+first_nulling_piece_ix));
 for(piece_ix= first_nulling_piece_ix+1;
 piece_ix<second_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,second_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,second_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+second_nulling_piece_ix));
-for(piece_ix= second_nulling_piece_ix+1;piece_ix<chaf_irl_length-1;
+for(piece_ix= second_nulling_piece_ix+1;piece_ix<chaf_nrl_length-1;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,chaf_irl_length-1)= chaf_virtual_nsyid;
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,0);
+RHSID_of_NRL(chaf_nrl,chaf_nrl_length-1)= chaf_virtual_nsyid;
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,0);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8770,29 +8770,29 @@ piece_end= Length_of_XRL(rule)-1;
 
 {
 int piece_ix;
-const int chaf_irl_length= (piece_end-piece_start)+1;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
-for(piece_ix= 0;piece_ix<chaf_irl_length;piece_ix++)
+const int chaf_nrl_length= (piece_end-piece_start)+1;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
+for(piece_ix= 0;piece_ix<chaf_nrl_length;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,3);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,3);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8811,38 +8811,38 @@ XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 {
 int piece_ix;
 const int second_nulling_piece_ix= second_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+1;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+1;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<second_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,second_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,second_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+second_nulling_piece_ix));
-for(piece_ix= second_nulling_piece_ix+1;piece_ix<chaf_irl_length;
+for(piece_ix= second_nulling_piece_ix+1;piece_ix<chaf_nrl_length;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,2);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,2);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8861,38 +8861,38 @@ XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 {
 int piece_ix;
 const int first_nulling_piece_ix= first_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+1;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+1;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<first_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,first_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,first_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+first_nulling_piece_ix));
-for(piece_ix= first_nulling_piece_ix+1;piece_ix<chaf_irl_length;
+for(piece_ix= first_nulling_piece_ix+1;piece_ix<chaf_nrl_length;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,1);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,1);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8913,50 +8913,50 @@ if(piece_start<nullable_suffix_ix){
 int piece_ix;
 const int first_nulling_piece_ix= first_factor_position-piece_start;
 const int second_nulling_piece_ix= second_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+1;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+1;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<first_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
 
-RHSID_of_IRL(chaf_irl,first_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,first_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+first_nulling_piece_ix));
 for(piece_ix= first_nulling_piece_ix+1;
 piece_ix<second_nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
 
-RHSID_of_IRL(chaf_irl,second_nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,second_nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+second_nulling_piece_ix));
-for(piece_ix= second_nulling_piece_ix+1;piece_ix<chaf_irl_length;
+for(piece_ix= second_nulling_piece_ix+1;piece_ix<chaf_nrl_length;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
 
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,0);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,0);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -8989,29 +8989,29 @@ real_symbol_count= piece_end-piece_start+1;
 
 {
 int piece_ix;
-const int chaf_irl_length= (piece_end-piece_start)+1;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
-for(piece_ix= 0;piece_ix<chaf_irl_length;piece_ix++)
+const int chaf_nrl_length= (piece_end-piece_start)+1;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
+for(piece_ix= 0;piece_ix<chaf_nrl_length;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,3);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,3);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -9032,39 +9032,39 @@ if(piece_start<nullable_suffix_ix)
 {
 int piece_ix;
 const int nulling_piece_ix= first_factor_position-piece_start;
-const int chaf_irl_length= (piece_end-piece_start)+1;
-IRL chaf_irl= irl_start(g,chaf_irl_length);
-LHSID_of_IRL(chaf_irl)= current_lhs_nsyid;
+const int chaf_nrl_length= (piece_end-piece_start)+1;
+NRL chaf_nrl= nrl_start(g,chaf_nrl_length);
+LHSID_of_NRL(chaf_nrl)= current_lhs_nsyid;
 for(piece_ix= 0;piece_ix<nulling_piece_ix;piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+piece_ix));
 }
-RHSID_of_IRL(chaf_irl,nulling_piece_ix)= 
+RHSID_of_NRL(chaf_nrl,nulling_piece_ix)= 
 Nulling_NSYID_by_XSYID(RHS_ID_of_RULE(rule,piece_start+nulling_piece_ix));
-for(piece_ix= nulling_piece_ix+1;piece_ix<chaf_irl_length;
+for(piece_ix= nulling_piece_ix+1;piece_ix<chaf_nrl_length;
 piece_ix++)
 {
-RHSID_of_IRL(chaf_irl,piece_ix)= 
+RHSID_of_NRL(chaf_nrl,piece_ix)= 
 NSYID_by_XSYID(RHS_ID_of_RULE
 (rule,piece_start+piece_ix));
 }
-irl_finish(g,chaf_irl);
-Rank_of_IRL(chaf_irl)= IRL_CHAF_Rank_by_XRL(rule,0);
+nrl_finish(g,chaf_nrl);
+Rank_of_NRL(chaf_nrl)= NRL_CHAF_Rank_by_XRL(rule,0);
 /*440:*/
 #line 4651 "./marpa.w"
 
 {
 const int is_virtual_lhs= (piece_start> 0);
-IRL_is_CHAF(chaf_irl)= 1;
-Source_XRL_of_IRL(chaf_irl)= rule;
-IRL_has_Virtual_LHS(chaf_irl)= Boolean(is_virtual_lhs);
-IRL_has_Virtual_RHS(chaf_irl)= 
-Length_of_IRL(chaf_irl)> real_symbol_count;
-Virtual_Start_of_IRL(chaf_irl)= piece_start;
-Virtual_End_of_IRL(chaf_irl)= piece_start+real_symbol_count-1;
-Real_SYM_Count_of_IRL(chaf_irl)= real_symbol_count;
+NRL_is_CHAF(chaf_nrl)= 1;
+Source_XRL_of_NRL(chaf_nrl)= rule;
+NRL_has_Virtual_LHS(chaf_nrl)= Boolean(is_virtual_lhs);
+NRL_has_Virtual_RHS(chaf_nrl)= 
+Length_of_NRL(chaf_nrl)> real_symbol_count;
+Virtual_Start_of_NRL(chaf_nrl)= piece_start;
+Virtual_End_of_NRL(chaf_nrl)= piece_start+real_symbol_count-1;
+Real_SYM_Count_of_NRL(chaf_nrl)= real_symbol_count;
 LHS_XRL_of_NSY(current_lhs_nsy)= chaf_xrl;
 XRL_Offset_of_NSY(current_lhs_nsy)= piece_start;
 }
@@ -9096,15 +9096,15 @@ continue;
 
 {
 int symbol_ix;
-const IRL new_irl= irl_start(g,rewrite_xrl_length);
-Source_XRL_of_IRL(new_irl)= rule;
-Rank_of_IRL(new_irl)= IRL_Rank_by_XRL(rule);
+const NRL new_nrl= nrl_start(g,rewrite_xrl_length);
+Source_XRL_of_NRL(new_nrl)= rule;
+Rank_of_NRL(new_nrl)= NRL_Rank_by_XRL(rule);
 for(symbol_ix= 0;symbol_ix<=rewrite_xrl_length;symbol_ix++)
 {
-new_irl->t_nsyid_array[symbol_ix]= 
+new_nrl->t_nsyid_array[symbol_ix]= 
 NSYID_by_XSYID(rule->t_symbols[symbol_ix]);
 }
-irl_finish(g,new_irl);
+nrl_finish(g,new_nrl);
 }
 
 /*:260*/
@@ -9125,18 +9125,18 @@ if(_MARPA_LIKELY(!XSY_is_Nulling(start_xsy))){
 /*443:*/
 #line 4677 "./marpa.w"
 {
-IRL new_start_irl;
+NRL new_start_nrl;
 
 const NSY new_start_nsy= nsy_new(g,start_xsy);
 NSY_is_Start(new_start_nsy)= 1;
 
-new_start_irl= irl_start(g,1);
-LHSID_of_IRL(new_start_irl)= ID_of_NSY(new_start_nsy);
-RHSID_of_IRL(new_start_irl,0)= NSYID_of_XSY(start_xsy);
-irl_finish(g,new_start_irl);
-IRL_has_Virtual_LHS(new_start_irl)= 1;
-Real_SYM_Count_of_IRL(new_start_irl)= 1;
-g->t_start_irl= new_start_irl;
+new_start_nrl= nrl_start(g,1);
+LHSID_of_NRL(new_start_nrl)= ID_of_NSY(new_start_nsy);
+RHSID_of_NRL(new_start_nrl,0)= NSYID_of_XSY(start_xsy);
+nrl_finish(g,new_start_nrl);
+NRL_has_Virtual_LHS(new_start_nrl)= 1;
+Real_SYM_Count_of_NRL(new_start_nrl)= 1;
+g->t_start_nrl= new_start_nrl;
 
 }
 
@@ -9206,10 +9206,10 @@ if(!G_is_Trivial(g)){
 /*514:*/
 #line 5421 "./marpa.w"
 
-const RULEID irl_count= IRL_Count_of_G(g);
+const RULEID nrl_count= NRL_Count_of_G(g);
 const NSYID nsy_count= NSY_Count_of_G(g);
 Bit_Matrix nsy_by_right_nsy_matrix;
-Bit_Matrix prediction_nsy_by_irl_matrix;
+Bit_Matrix prediction_nsy_by_nrl_matrix;
 
 /*:514*/
 #line 3233 "./marpa.w"
@@ -9224,16 +9224,16 @@ NSYID lhsid;
 
 
 void*matrix_buffer= my_malloc(matrix_sizeof(
-nsy_count,irl_count));
-Bit_Matrix irl_by_lhs_matrix= 
-matrix_buffer_create(matrix_buffer,nsy_count,irl_count);
+nsy_count,nrl_count));
+Bit_Matrix nrl_by_lhs_matrix= 
+matrix_buffer_create(matrix_buffer,nsy_count,nrl_count);
 
-IRLID irl_id;
-for(irl_id= 0;irl_id<irl_count;irl_id++)
+NRLID nrl_id;
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++)
 {
-const IRL irl= IRL_by_ID(irl_id);
-const NSYID lhs_nsyid= LHSID_of_IRL(irl);
-matrix_bit_set(irl_by_lhs_matrix,lhs_nsyid,irl_id);
+const NRL nrl= NRL_by_ID(nrl_id);
+const NSYID lhs_nsyid= LHSID_of_NRL(nrl);
+matrix_bit_set(nrl_by_lhs_matrix,lhs_nsyid,nrl_id);
 }
 
 
@@ -9241,17 +9241,17 @@ matrix_bit_set(irl_by_lhs_matrix,lhs_nsyid,irl_id);
 
 for(lhsid= 0;lhsid<nsy_count;lhsid++)
 {
-IRLID irlid;
+NRLID nrlid;
 int min,max,start;
 cil_buffer_clear(&g->t_cilar);
 for(start= 0;
 bv_scan(matrix_row
-(irl_by_lhs_matrix,lhsid),
+(nrl_by_lhs_matrix,lhsid),
 start,&min,&max);start= max+2)
 {
-for(irlid= min;irlid<=max;irlid++)
+for(nrlid= min;nrlid<=max;nrlid++)
 {
-cil_buffer_push(&g->t_cilar,irlid);
+cil_buffer_push(&g->t_cilar,nrlid);
 }
 }
 LHS_CIL_of_NSYID(lhsid)= cil_buffer_add(&g->t_cilar);
@@ -9268,21 +9268,21 @@ my_free(matrix_buffer);
 #line 5077 "./marpa.w"
 
 {
-IRLID irl_id;
+NRLID nrl_id;
 int ahm_count= 0;
 AHM base_item;
 AHM current_item;
 int symbol_instance_of_next_rule= 0;
-for(irl_id= 0;irl_id<irl_count;irl_id++){
-const IRL irl= IRL_by_ID(irl_id);
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++){
+const NRL nrl= NRL_by_ID(nrl_id);
 /*490:*/
 #line 5130 "./marpa.w"
 
 {
 int rhs_ix;
-for(rhs_ix= 0;rhs_ix<Length_of_IRL(irl);rhs_ix++)
+for(rhs_ix= 0;rhs_ix<Length_of_NRL(nrl);rhs_ix++)
 {
-const NSYID rh_nsyid= RHSID_of_IRL(irl,rhs_ix);
+const NSYID rh_nsyid= RHSID_of_NRL(nrl,rhs_ix);
 const NSY nsy= NSY_by_ID(rh_nsyid);
 if(!NSY_is_Nulling(nsy))ahm_count++;
 }
@@ -9294,22 +9294,22 @@ ahm_count++;
 
 }
 current_item= base_item= marpa_new(struct s_ahm,ahm_count);
-for(irl_id= 0;irl_id<irl_count;irl_id++){
-const IRL irl= IRL_by_ID(irl_id);
-SYMI_of_IRL(irl)= symbol_instance_of_next_rule;
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++){
+const NRL nrl= NRL_by_ID(nrl_id);
+SYMI_of_NRL(nrl)= symbol_instance_of_next_rule;
 /*489:*/
 #line 5105 "./marpa.w"
 
 {
 int leading_nulls= 0;
 int rhs_ix;
-const AHM first_ahm_of_irl= current_item;
-for(rhs_ix= 0;rhs_ix<Length_of_IRL(irl);rhs_ix++)
+const AHM first_ahm_of_nrl= current_item;
+for(rhs_ix= 0;rhs_ix<Length_of_NRL(nrl);rhs_ix++)
 {
-NSYID rh_nsyid= RHSID_of_IRL(irl,rhs_ix);
+NSYID rh_nsyid= RHSID_of_NRL(nrl,rhs_ix);
 if(!NSY_is_Nulling(NSY_by_ID(rh_nsyid)))
 {
-Last_Proper_SYMI_of_IRL(irl)= symbol_instance_of_next_rule+rhs_ix;
+Last_Proper_SYMI_of_NRL(nrl)= symbol_instance_of_next_rule+rhs_ix;
 /*491:*/
 #line 5142 "./marpa.w"
 
@@ -9318,11 +9318,11 @@ Last_Proper_SYMI_of_IRL(irl)= symbol_instance_of_next_rule+rhs_ix;
 #line 5165 "./marpa.w"
 
 {
-IRL_of_AHM(current_item)= irl;
+NRL_of_AHM(current_item)= nrl;
 Null_Count_of_AHM(current_item)= leading_nulls;
-Quasi_Position_of_AHM(current_item)= (int)(current_item-first_ahm_of_irl);
+Quasi_Position_of_AHM(current_item)= (int)(current_item-first_ahm_of_nrl);
 if(Quasi_Position_of_AHM(current_item)==0){
-if(ID_of_IRL(irl)==ID_of_IRL(g->t_start_irl))
+if(ID_of_NRL(nrl)==ID_of_NRL(g->t_start_nrl))
 {
 AHM_was_Predicted(current_item)= 0;
 AHM_is_Initial(current_item)= 1;
@@ -9355,8 +9355,8 @@ Position_of_AHM(current_item)= rhs_ix;
 SYMI_of_AHM(current_item)
 = AHM_is_Prediction(current_item)
 ?-1
-:SYMI_of_IRL(irl)+Position_of_AHM(current_item-1);
-memoize_xrl_data_for_AHM(current_item,irl);
+:SYMI_of_NRL(nrl)+Position_of_AHM(current_item-1);
+memoize_xrl_data_for_AHM(current_item,nrl);
 }
 
 /*:491*/
@@ -9378,11 +9378,11 @@ leading_nulls++;
 #line 5165 "./marpa.w"
 
 {
-IRL_of_AHM(current_item)= irl;
+NRL_of_AHM(current_item)= nrl;
 Null_Count_of_AHM(current_item)= leading_nulls;
-Quasi_Position_of_AHM(current_item)= (int)(current_item-first_ahm_of_irl);
+Quasi_Position_of_AHM(current_item)= (int)(current_item-first_ahm_of_nrl);
 if(Quasi_Position_of_AHM(current_item)==0){
-if(ID_of_IRL(irl)==ID_of_IRL(g->t_start_irl))
+if(ID_of_NRL(nrl)==ID_of_NRL(g->t_start_nrl))
 {
 AHM_was_Predicted(current_item)= 0;
 AHM_is_Initial(current_item)= 1;
@@ -9410,22 +9410,22 @@ Event_Group_Size_of_AHM(current_item)= 0;
 
 Postdot_NSYID_of_AHM(current_item)= -1;
 Position_of_AHM(current_item)= -1;
-SYMI_of_AHM(current_item)= SYMI_of_IRL(irl)+Position_of_AHM(current_item-1);
-memoize_xrl_data_for_AHM(current_item,irl);
+SYMI_of_AHM(current_item)= SYMI_of_NRL(nrl)+Position_of_AHM(current_item-1);
+memoize_xrl_data_for_AHM(current_item,nrl);
 }
 
 /*:492*/
 #line 5125 "./marpa.w"
 
 current_item++;
-AHM_Count_of_IRL(irl)= (int)(current_item-first_ahm_of_irl);
+AHM_Count_of_NRL(nrl)= (int)(current_item-first_ahm_of_nrl);
 }
 
 /*:489*/
 #line 5092 "./marpa.w"
 
 {
-symbol_instance_of_next_rule+= Length_of_IRL(irl);
+symbol_instance_of_next_rule+= Length_of_NRL(nrl);
 }
 }
 SYMI_Count_of_G(g)= symbol_instance_of_next_rule;
@@ -9442,8 +9442,8 @@ AHMID item_id= (AHMID)ahm_count;
 for(item_id--;item_id>=0;item_id--)
 {
 AHM item= items+item_id;
-IRL irl= IRL_of_AHM(item);
-First_AHM_of_IRL(irl)= item;
+NRL nrl= NRL_of_AHM(item);
+First_AHM_of_NRL(nrl)= item;
 }
 }
 
@@ -9464,7 +9464,7 @@ matrix_obs_create(obs_precompute,nsy_count,nsy_count);
 #line 5504 "./marpa.w"
 
 {
-IRLID irl_id;
+NRLID nrl_id;
 NSYID nsyid;
 for(nsyid= 0;nsyid<nsy_count;nsyid++)
 {
@@ -9474,12 +9474,12 @@ if(!NSY_is_LHS(nsy))continue;
 matrix_bit_set(prediction_nsy_by_nsy_matrix,nsyid,
 nsyid);
 }
-for(irl_id= 0;irl_id<irl_count;irl_id++)
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++)
 {
 NSYID from_nsyid,to_nsyid;
-const IRL irl= IRL_by_ID(irl_id);
+const NRL nrl= NRL_by_ID(nrl_id);
 
-const AHM item= First_AHM_of_IRL(irl);
+const AHM item= First_AHM_of_NRL(nrl);
 to_nsyid= Postdot_NSYID_of_AHM(item);
 
 if(to_nsyid<0)
@@ -9504,9 +9504,9 @@ transitive_closure(prediction_nsy_by_nsy_matrix);
 
 {
 NSYID from_nsyid;
-prediction_nsy_by_irl_matrix= 
+prediction_nsy_by_nrl_matrix= 
 matrix_obs_create(obs_precompute,nsy_count,
-irl_count);
+nrl_count);
 for(from_nsyid= 0;from_nsyid<nsy_count;from_nsyid++)
 {
 
@@ -9528,9 +9528,9 @@ const CIL lhs_cil= LHS_CIL_of_NSYID(to_nsyid);
 const int cil_count= Count_of_CIL(lhs_cil);
 for(cil_ix= 0;cil_ix<cil_count;cil_ix++)
 {
-const IRLID irlid= Item_of_CIL(lhs_cil,cil_ix);
-matrix_bit_set(prediction_nsy_by_irl_matrix,
-from_nsyid,irlid);
+const NRLID nrlid= Item_of_CIL(lhs_cil,cil_ix);
+matrix_bit_set(prediction_nsy_by_nrl_matrix,
+from_nsyid,nrlid);
 }
 }
 }
@@ -9559,22 +9559,22 @@ matrix_obs_create(obs_precompute,nsy_count,nsy_count);
 #line 5342 "./marpa.w"
 
 {
-IRLID irl_id;
-for(irl_id= 0;irl_id<irl_count;irl_id++)
+NRLID nrl_id;
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++)
 {
-const IRL irl= IRL_by_ID(irl_id);
+const NRL nrl= NRL_by_ID(nrl_id);
 int rhs_ix;
-for(rhs_ix= Length_of_IRL(irl)-1;
+for(rhs_ix= Length_of_NRL(nrl)-1;
 rhs_ix>=0;
 rhs_ix--)
 {
 
 
-const NSYID rh_nsyid= RHSID_of_IRL(irl,rhs_ix);
+const NSYID rh_nsyid= RHSID_of_NRL(nrl,rhs_ix);
 if(!NSY_is_Nulling(NSY_by_ID(rh_nsyid)))
 {
 matrix_bit_set(nsy_by_right_nsy_matrix,
-LHSID_of_IRL(irl),
+LHSID_of_NRL(nrl),
 rh_nsyid);
 break;
 }
@@ -9590,14 +9590,14 @@ transitive_closure(nsy_by_right_nsy_matrix);
 #line 5367 "./marpa.w"
 
 {
-IRLID irl_id;
-for(irl_id= 0;irl_id<irl_count;irl_id++)
+NRLID nrl_id;
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++)
 {
-const IRL irl= IRL_by_ID(irl_id);
+const NRL nrl= NRL_by_ID(nrl_id);
 int rhs_ix;
-for(rhs_ix= Length_of_IRL(irl)-1;rhs_ix>=0;rhs_ix--)
+for(rhs_ix= Length_of_NRL(nrl)-1;rhs_ix>=0;rhs_ix--)
 {
-const NSYID rh_nsyid= RHSID_of_IRL(irl,rhs_ix);
+const NSYID rh_nsyid= RHSID_of_NRL(nrl,rhs_ix);
 if(!NSY_is_Nulling(NSY_by_ID(rh_nsyid)))
 {
 
@@ -9605,9 +9605,9 @@ if(!NSY_is_Nulling(NSY_by_ID(rh_nsyid)))
 
 if(matrix_bit_test(nsy_by_right_nsy_matrix,
 rh_nsyid,
-LHSID_of_IRL(irl)))
+LHSID_of_NRL(nrl)))
 {
-IRL_is_Right_Recursive(irl)= 1;
+NRL_is_Right_Recursive(nrl)= 1;
 }
 break;
 }
@@ -9623,23 +9623,23 @@ matrix_clear(nsy_by_right_nsy_matrix);
 #line 5394 "./marpa.w"
 
 {
-IRLID irl_id;
-for(irl_id= 0;irl_id<irl_count;irl_id++)
+NRLID nrl_id;
+for(nrl_id= 0;nrl_id<nrl_count;nrl_id++)
 {
 int rhs_ix;
-const IRL irl= IRL_by_ID(irl_id);
-if(!IRL_is_Right_Recursive(irl)){continue;}
-for(rhs_ix= Length_of_IRL(irl)-1;
+const NRL nrl= NRL_by_ID(nrl_id);
+if(!NRL_is_Right_Recursive(nrl)){continue;}
+for(rhs_ix= Length_of_NRL(nrl)-1;
 rhs_ix>=0;
 rhs_ix--)
 {
 
 
-const NSYID rh_nsyid= RHSID_of_IRL(irl,rhs_ix);
+const NSYID rh_nsyid= RHSID_of_NRL(nrl,rhs_ix);
 if(!NSY_is_Nulling(NSY_by_ID(rh_nsyid)))
 {
 matrix_bit_set(nsy_by_right_nsy_matrix,
-LHSID_of_IRL(irl),
+LHSID_of_NRL(nrl),
 rh_nsyid);
 break;
 }
@@ -9668,14 +9668,14 @@ const AHM ahm= AHM_by_ID(ahm_id);
 const NSYID postdot_nsyid= Postdot_NSYID_of_AHM(ahm);
 if(postdot_nsyid<0)
 {
-Predicted_IRL_CIL_of_AHM(ahm)= cil_empty(&g->t_cilar);
+Predicted_NRL_CIL_of_AHM(ahm)= cil_empty(&g->t_cilar);
 LHS_CIL_of_AHM(ahm)= cil_empty(&g->t_cilar);
 }
 else
 {
-Predicted_IRL_CIL_of_AHM(ahm)= 
+Predicted_NRL_CIL_of_AHM(ahm)= 
 cil_bv_add(&g->t_cilar,
-matrix_row(prediction_nsy_by_irl_matrix,postdot_nsyid));
+matrix_row(prediction_nsy_by_nrl_matrix,postdot_nsyid));
 LHS_CIL_of_AHM(ahm)= LHS_CIL_of_NSYID(postdot_nsyid);
 }
 }
@@ -9723,7 +9723,7 @@ for(ahm_id= 0;ahm_id<ahm_count_of_g;ahm_id++)
 {
 const AHM ahm= AHM_by_ID(ahm_id);
 const NSYID postdot_nsyid= Postdot_NSYID_of_AHM(ahm);
-const IRL irl= IRL_of_AHM(ahm);
+const NRL nrl= NRL_of_AHM(ahm);
 bv_clear(bv_completion_xsyid);
 bv_clear(bv_prediction_xsyid);
 bv_clear(bv_nulled_xsyid);
@@ -9732,10 +9732,10 @@ int rhs_ix;
 int raw_position= Position_of_AHM(ahm);
 if(raw_position<0)
 {
-raw_position= Length_of_IRL(irl);
-if(!IRL_has_Virtual_LHS(irl))
+raw_position= Length_of_NRL(nrl);
+if(!NRL_has_Virtual_LHS(nrl))
 {
-const NSY lhs= LHS_of_IRL(irl);
+const NSY lhs= LHS_of_NRL(nrl);
 const XSY xsy= Source_XSY_of_NSY(lhs);
 if(XSY_is_Completion_Event(xsy))
 {
@@ -9754,7 +9754,7 @@ for(rhs_ix= raw_position-Null_Count_of_AHM(ahm);
 rhs_ix<raw_position;rhs_ix++)
 {
 int cil_ix;
-const NSYID rhs_nsyid= RHSID_of_IRL(irl,rhs_ix);
+const NSYID rhs_nsyid= RHSID_of_NRL(nrl,rhs_ix);
 const XSY xsy= Source_XSY_of_NSYID(rhs_nsyid);
 const CIL nulled_xsyids= Nulled_XSYIDs_of_XSY(xsy);
 const int cil_count= Count_of_CIL(nulled_xsyids);
@@ -9911,15 +9911,15 @@ const AHM ahm_to_populate= AHM_by_ID(ahm_id);
 
 
 
-const CIL prediction_cil= Predicted_IRL_CIL_of_AHM(ahm_to_populate);
+const CIL prediction_cil= Predicted_NRL_CIL_of_AHM(ahm_to_populate);
 const int prediction_count= Count_of_CIL(prediction_cil);
 
 int cil_ix;
 for(cil_ix= 0;cil_ix<prediction_count;cil_ix++)
 {
-const IRLID prediction_irlid= Item_of_CIL(prediction_cil,cil_ix);
-const AHM prediction_ahm_of_irl= First_AHM_of_IRLID(prediction_irlid);
-const CIL zwaids_of_prediction= ZWA_CIL_of_AHM(prediction_ahm_of_irl);
+const NRLID prediction_nrlid= Item_of_CIL(prediction_cil,cil_ix);
+const AHM prediction_ahm_of_nrl= First_AHM_of_NRLID(prediction_nrlid);
+const CIL zwaids_of_prediction= ZWA_CIL_of_AHM(prediction_ahm_of_nrl);
 if(Count_of_CIL(zwaids_of_prediction)> 0){
 AHM_predicts_ZWA(ahm_to_populate)= 1;
 break;
@@ -9972,9 +9972,9 @@ return pair_a->t_ruleid-pair_b->t_ruleid;
 /*:379*//*412:*/
 #line 4078 "./marpa.w"
 
-int _marpa_g_irl_is_chaf(
+int _marpa_g_nrl_is_chaf(
 Marpa_Grammar g,
-Marpa_IRL_ID irl_id)
+Marpa_NRL_ID nrl_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -9996,14 +9996,14 @@ return failure_indicator;
 /*1325:*/
 #line 15741 "./marpa.w"
 
-if(_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))){
+if(_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))){
 MARPA_ERROR(MARPA_ERR_INVALID_NRLID);
 return failure_indicator;
 }
 /*:1325*/
 #line 4085 "./marpa.w"
 
-return IRL_is_CHAF(IRL_by_ID(irl_id));
+return NRL_is_CHAF(NRL_by_ID(nrl_id));
 }
 
 /*:412*//*462:*/
@@ -10042,7 +10042,7 @@ return AHM_Count_of_G(g);
 /*:479*//*480:*/
 #line 5029 "./marpa.w"
 
-Marpa_IRL_ID _marpa_g_ahm_irl(Marpa_Grammar g,
+Marpa_NRL_ID _marpa_g_ahm_nrl(Marpa_Grammar g,
 Marpa_AHM_ID item_id){
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -10072,7 +10072,7 @@ return failure_indicator;
 /*:1331*/
 #line 5034 "./marpa.w"
 
-return IRLID_of_AHM(AHM_by_ID(item_id));
+return NRLID_of_AHM(AHM_by_ID(item_id));
 }
 
 /*:480*//*482:*/
@@ -10223,9 +10223,9 @@ return Postdot_NSYID_of_AHM(AHM_by_ID(item_id));
 #line 5186 "./marpa.w"
 
 PRIVATE void
-memoize_xrl_data_for_AHM(AHM current_item,IRL irl)
+memoize_xrl_data_for_AHM(AHM current_item,NRL nrl)
 {
-XRL source_xrl= Source_XRL_of_IRL(irl);
+XRL source_xrl= Source_XRL_of_NRL(nrl);
 XRL_of_AHM(current_item)= source_xrl;
 if(!source_xrl){
 
@@ -10234,31 +10234,31 @@ XRL_Position_of_AHM(current_item)= -2;
 return;
 }
 {
-const int virtual_start= Virtual_Start_of_IRL(irl);
-const int irl_position= Position_of_AHM(current_item);
+const int virtual_start= Virtual_Start_of_NRL(nrl);
+const int nrl_position= Position_of_AHM(current_item);
 if(XRL_is_Sequence(source_xrl))
 {
 
 
 
 
-XRL_Position_of_AHM(current_item)= irl_position?-1:0;
+XRL_Position_of_AHM(current_item)= nrl_position?-1:0;
 return;
 }
 
 
-if(IRL_is_CHAF(irl)&&
-(irl_position<0||irl_position>=Length_of_IRL(irl)))
+if(NRL_is_CHAF(nrl)&&
+(nrl_position<0||nrl_position>=Length_of_NRL(nrl)))
 {
 XRL_Position_of_AHM(current_item)= -1;
 return;
 }
 if(virtual_start>=0)
 {
-XRL_Position_of_AHM(current_item)= irl_position+virtual_start;
+XRL_Position_of_AHM(current_item)= nrl_position+virtual_start;
 return;
 }
-XRL_Position_of_AHM(current_item)= irl_position;
+XRL_Position_of_AHM(current_item)= nrl_position;
 }
 return;
 }
@@ -10481,7 +10481,7 @@ Marpa_Recognizer marpa_r_new(Marpa_Grammar g)
 {
 RECCE r;
 int nsy_count;
-int irl_count;
+int nrl_count;
 /*1315:*/
 #line 15686 "./marpa.w"
 void*const failure_indicator= NULL;
@@ -10499,7 +10499,7 @@ return failure_indicator;
 #line 6056 "./marpa.w"
 
 nsy_count= NSY_Count_of_G(g);
-irl_count= IRL_Count_of_G(g);
+nrl_count= NRL_Count_of_G(g);
 r= my_malloc(sizeof(struct marpa_r));
 /*619:*/
 #line 6659 "./marpa.w"
@@ -10555,8 +10555,8 @@ r->t_is_using_leo= 0;
 /*:606*//*610:*/
 #line 6607 "./marpa.w"
 
-r->t_bv_irl_seen= bv_obs_create(r->t_obs,irl_count);
-MARPA_DSTACK_INIT2(r->t_irl_cil_stack,CIL);
+r->t_bv_nrl_seen= bv_obs_create(r->t_obs,nrl_count);
+MARPA_DSTACK_INIT2(r->t_nrl_cil_stack,CIL);
 /*:610*//*613:*/
 #line 6624 "./marpa.w"
 r->t_is_exhausted= 0;
@@ -10723,7 +10723,7 @@ grammar_unref(g);
 /*:564*//*611:*/
 #line 6610 "./marpa.w"
 
-MARPA_DSTACK_DESTROY(r->t_irl_cil_stack);
+MARPA_DSTACK_DESTROY(r->t_nrl_cil_stack);
 
 /*:611*//*706:*/
 #line 7580 "./marpa.w"
@@ -12082,7 +12082,7 @@ int return_value= 1;
 YS set0;
 YIK_Object key;
 
-IRL start_irl;
+NRL start_nrl;
 AHM start_ahm;
 
 /*563:*/
@@ -12219,8 +12219,8 @@ MARPA_DSTACK_INIT2(r->t_completion_stack,YIM);
 #line 7728 "./marpa.w"
 
 
-start_irl= g->t_start_irl;
-start_ahm= First_AHM_of_IRL(start_irl);
+start_nrl= g->t_start_nrl;
+start_ahm= First_AHM_of_NRL(start_nrl);
 
 
 
@@ -12230,14 +12230,14 @@ key.t_set= set0;
 key.t_ahm= start_ahm;
 earley_item_create(r,key);
 
-bv_clear(r->t_bv_irl_seen);
-bv_bit_set(r->t_bv_irl_seen,ID_of_IRL(start_irl));
-MARPA_DSTACK_CLEAR(r->t_irl_cil_stack);
-*MARPA_DSTACK_PUSH(r->t_irl_cil_stack,CIL)= LHS_CIL_of_AHM(start_ahm);
+bv_clear(r->t_bv_nrl_seen);
+bv_bit_set(r->t_bv_nrl_seen,ID_of_NRL(start_nrl));
+MARPA_DSTACK_CLEAR(r->t_nrl_cil_stack);
+*MARPA_DSTACK_PUSH(r->t_nrl_cil_stack,CIL)= LHS_CIL_of_AHM(start_ahm);
 
 while(1)
 {
-const CIL*const p_cil= MARPA_DSTACK_POP(r->t_irl_cil_stack,CIL);
+const CIL*const p_cil= MARPA_DSTACK_POP(r->t_nrl_cil_stack,CIL);
 if(!p_cil)
 break;
 {
@@ -12246,18 +12246,18 @@ const CIL this_cil= *p_cil;
 const int prediction_count= Count_of_CIL(this_cil);
 for(cil_ix= 0;cil_ix<prediction_count;cil_ix++)
 {
-const IRLID prediction_irlid= Item_of_CIL(this_cil,cil_ix);
-if(!bv_bit_test_then_set(r->t_bv_irl_seen,prediction_irlid))
+const NRLID prediction_nrlid= Item_of_CIL(this_cil,cil_ix);
+if(!bv_bit_test_then_set(r->t_bv_nrl_seen,prediction_nrlid))
 {
-const IRL prediction_irl= IRL_by_ID(prediction_irlid);
-const AHM prediction_ahm= First_AHM_of_IRL(prediction_irl);
+const NRL prediction_nrl= NRL_by_ID(prediction_nrlid);
+const AHM prediction_ahm= First_AHM_of_NRL(prediction_nrl);
 
 
 
 if(!evaluate_zwas(r,0,prediction_ahm))continue;
 key.t_ahm= prediction_ahm;
 earley_item_create(r,key);
-*MARPA_DSTACK_PUSH(r->t_irl_cil_stack,CIL)
+*MARPA_DSTACK_PUSH(r->t_nrl_cil_stack,CIL)
 = LHS_CIL_of_AHM(prediction_ahm);
 }
 }
@@ -12543,7 +12543,7 @@ struct marpa_obstack*const earleme_complete_obs= marpa_obs_init;
 G_EVENTS_CLEAR(g);
 psar_dealloc(Dot_PSAR_of_R(r));
 bv_clear(r->t_bv_nsyid_is_expected);
-bv_clear(r->t_bv_irl_seen);
+bv_clear(r->t_bv_nrl_seen);
 /*744:*/
 #line 8197 "./marpa.w"
 {
@@ -12807,13 +12807,13 @@ YIM earley_item= WORK_YIM_ITEM(r,ix);
 
 int cil_ix;
 const AHM ahm= AHM_of_YIM(earley_item);
-const CIL prediction_cil= Predicted_IRL_CIL_of_AHM(ahm);
+const CIL prediction_cil= Predicted_NRL_CIL_of_AHM(ahm);
 const int prediction_count= Count_of_CIL(prediction_cil);
 for(cil_ix= 0;cil_ix<prediction_count;cil_ix++)
 {
-const IRLID prediction_irlid= Item_of_CIL(prediction_cil,cil_ix);
-const IRL prediction_irl= IRL_by_ID(prediction_irlid);
-const AHM prediction_ahm= First_AHM_of_IRL(prediction_irl);
+const NRLID prediction_nrlid= Item_of_CIL(prediction_cil,cil_ix);
+const NRL prediction_nrl= NRL_by_ID(prediction_nrlid);
+const AHM prediction_ahm= First_AHM_of_NRL(prediction_nrl);
 earley_item_assign(r,current_earley_set,current_earley_set,
 prediction_ahm);
 }
@@ -13189,9 +13189,9 @@ goto NEXT_NSYID;
 const YIM leo_base= YIM_of_PIM(this_pim);
 AHM potential_leo_penult_ahm= NULL;
 const AHM leo_base_ahm= AHM_of_YIM(leo_base);
-const IRL leo_base_irl= IRL_of_AHM(leo_base_ahm);
+const NRL leo_base_nrl= NRL_of_AHM(leo_base_ahm);
 
-if(!IRL_is_Leo(leo_base_irl))
+if(!NRL_is_Leo(leo_base_nrl))
 goto NEXT_NSYID;
 potential_leo_penult_ahm= leo_base_ahm;
 MARPA_ASSERT((int)potential_leo_penult_ahm);
@@ -13563,8 +13563,8 @@ int count_of_expected_terminals;
 
 struct marpa_obstack*const method_obstack= marpa_obs_init;
 
-YIMID*prediction_by_irl= 
-marpa_obs_new(method_obstack,YIMID,IRL_Count_of_G(g));
+YIMID*prediction_by_nrl= 
+marpa_obs_new(method_obstack,YIMID,NRL_Count_of_G(g));
 
 /*:807*/
 #line 9208 "./marpa.w"
@@ -13631,7 +13631,7 @@ YIM yim= yims_to_clean[yim_ix];
 
 
 while(YIM_was_Predicted(yim)){
-prediction_by_irl[IRLID_of_YIM(yim)]= yim_ix;
+prediction_by_nrl[NRLID_of_YIM(yim)]= yim_ix;
 yim= yims_to_clean[--yim_ix];
 }
 }
@@ -13680,8 +13680,8 @@ const CIL lhs_cil= LHS_CIL_of_NSYID(postdot_nsyid);
 const int cil_count= Count_of_CIL(lhs_cil);
 for(cil_ix= 0;cil_ix<cil_count;cil_ix++)
 {
-const IRLID irlid= Item_of_CIL(lhs_cil,cil_ix);
-const int predicted_yim_ix= prediction_by_irl[irlid];
+const NRLID nrlid= Item_of_CIL(lhs_cil,cil_ix);
+const int predicted_yim_ix= prediction_by_nrl[nrlid];
 const YIM predicted_yim= yims_to_clean[predicted_yim_ix];
 if(YIM_is_Rejected(predicted_yim))continue;
 matrix_bit_set(acceptance_matrix,yim_to_clean_ix,
@@ -14316,7 +14316,7 @@ if(!source_xrl)return;
 
 
 
-if(!IRL_has_Virtual_LHS(IRL_of_YIM(origin_yim))){
+if(!NRL_has_Virtual_LHS(NRL_of_YIM(origin_yim))){
 int xrl_position= XRL_Position_of_AHM(report_ahm);
 int origin_of_xrl= Origin_Ord_of_YIM(origin_yim);
 XRLID xrl_id= ID_of_XRL(source_xrl);
@@ -14326,8 +14326,8 @@ marpa_obs_new(MARPA_AVL_OBSTACK(report_tree),
 struct marpa_progress_item,1);
 
 MARPA_OFF_DEBUG2("%s, === Adding report item ===",STRLOC);
-MARPA_OFF_DEBUG3("%s, report irl = %d",STRLOC,IRLID_of_AHM(report_ahm));
-MARPA_OFF_DEBUG3("%s, report irl position = %d",STRLOC,Position_of_AHM(report_ahm));
+MARPA_OFF_DEBUG3("%s, report nrl = %d",STRLOC,NRLID_of_AHM(report_ahm));
+MARPA_OFF_DEBUG3("%s, report nrl position = %d",STRLOC,Position_of_AHM(report_ahm));
 
 MARPA_OFF_DEBUG3("%s, xrl = %d",STRLOC,ID_of_XRL(source_xrl));
 MARPA_OFF_DEBUG3("%s, xrl dot = %d",STRLOC,XRL_Position_of_AHM(report_ahm));
@@ -14705,9 +14705,9 @@ return nsyid_of_a==nsyid_of_b;
 }
 {
 
-const IRLID irlid_of_a= IRLID_of_OR(cause_a);
-const IRLID irlid_of_b= IRLID_of_OR(cause_b);
-return irlid_of_a==irlid_of_b;
+const NRLID nrlid_of_a= NRLID_of_OR(cause_a);
+const NRLID nrlid_of_b= NRLID_of_OR(cause_b);
+return nrlid_of_a==nrlid_of_b;
 }
 
 }
@@ -15782,7 +15782,7 @@ return Origin_Ord_of_YIM(yim);
 /*:976*//*977:*/
 #line 11658 "./marpa.w"
 
-Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
+Marpa_NRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -15829,8 +15829,8 @@ return failure_indicator;
 {
 const YIM yim= YIM_of_TRV(trv);
 const AHM ahm= AHM_of_YIM(yim);
-const IRL nrl= IRL_of_AHM(ahm);
-if(nrl)return ID_of_IRL(nrl);
+const NRL nrl= NRL_of_AHM(ahm);
+if(nrl)return ID_of_NRL(nrl);
 }
 return-1;
 }
@@ -16635,8 +16635,8 @@ return b;
 {
 int yim_ix;
 YIM*const earley_items= YIMs_of_YS(end_of_parse_earley_set);
-const IRL start_irl= g->t_start_irl;
-const IRLID sought_irl_id= ID_of_IRL(start_irl);
+const NRL start_nrl= g->t_start_nrl;
+const NRLID sought_nrl_id= ID_of_NRL(start_nrl);
 const int earley_item_count= YIM_Count_of_YS(end_of_parse_earley_set);
 for(yim_ix= 0;yim_ix<earley_item_count;yim_ix++){
 const YIM earley_item= earley_items[yim_ix];
@@ -16644,7 +16644,7 @@ if(Origin_Earleme_of_YIM(earley_item)> 0)continue;
 if(YIM_was_Predicted(earley_item))continue;
 {
 const AHM ahm= AHM_of_YIM(earley_item);
-if(IRLID_of_AHM(ahm)==sought_irl_id){
+if(NRLID_of_AHM(ahm)==sought_nrl_id){
 start_yim= earley_item;
 break;
 }
@@ -16862,14 +16862,14 @@ MARPA_ASSERT(ahm_symbol_instance<SYMI_Count_of_G(g))
 or_node= PSL_Datum(or_psl,ahm_symbol_instance);
 if(!or_node||YS_Ord_of_OR(or_node)!=work_earley_set_ordinal)
 {
-const IRL irl= IRL_of_AHM(ahm);
+const NRL nrl= NRL_of_AHM(ahm);
 or_node= last_or_node= or_node_new(b);
 PSL_Datum(or_psl,ahm_symbol_instance)= last_or_node;
 Origin_Ord_of_OR(or_node)= Origin_Ord_of_YIM(work_earley_item);
 YS_Ord_of_OR(or_node)= work_earley_set_ordinal;
-IRL_of_OR(or_node)= irl;
+NRL_of_OR(or_node)= nrl;
 Position_of_OR(or_node)= 
-ahm_symbol_instance-SYMI_of_IRL(irl)+1;
+ahm_symbol_instance-SYMI_of_NRL(nrl)+1;
 }
 psi_or_node= or_node;
 }
@@ -16885,8 +16885,8 @@ psi_or_node= or_node;
 const int null_count= Null_Count_of_AHM(ahm);
 if(null_count> 0)
 {
-const IRL irl= IRL_of_AHM(ahm);
-const int symbol_instance_of_rule= SYMI_of_IRL(irl);
+const NRL nrl= NRL_of_AHM(ahm);
+const int symbol_instance_of_rule= SYMI_of_NRL(nrl);
 const int first_null_symbol_instance= 
 ahm_symbol_instance<
 0?symbol_instance_of_rule:ahm_symbol_instance+1;
@@ -16898,12 +16898,12 @@ OR or_node= PSL_Datum(or_psl,symbol_instance);
 if(!or_node||YS_Ord_of_OR(or_node)!=work_earley_set_ordinal){
 const int rhs_ix= symbol_instance-symbol_instance_of_rule;
 const OR predecessor= rhs_ix?last_or_node:NULL;
-const OR cause= Nulling_OR_by_NSYID(RHSID_of_IRL(irl,rhs_ix));
+const OR cause= Nulling_OR_by_NSYID(RHSID_of_NRL(nrl,rhs_ix));
 or_node= PSL_Datum(or_psl,symbol_instance)
 = last_or_node= or_node_new(b);
 Origin_Ord_of_OR(or_node)= work_origin_ordinal;
 YS_Ord_of_OR(or_node)= work_earley_set_ordinal;
-IRL_of_OR(or_node)= irl;
+NRL_of_OR(or_node)= nrl;
 Position_of_OR(or_node)= rhs_ix+1;
 MARPA_ASSERT(Position_of_OR(or_node)<=1||predecessor);
 draft_and_node_add(bocage_setup_obs,or_node,predecessor,
@@ -16948,7 +16948,7 @@ while((this_leo_item= Predecessor_LIM_of_LIM(this_leo_item)))
 {
 const int ordinal_of_set_of_this_leo_item= Ord_of_YS(YS_of_LIM(this_leo_item));
 const AHM path_ahm= Trailhead_AHM_of_LIM(previous_leo_item);
-const IRL path_irl= IRL_of_AHM(path_ahm);
+const NRL path_nrl= NRL_of_AHM(path_ahm);
 const int symbol_instance_of_path_ahm= SYMI_of_AHM(path_ahm);
 {
 OR last_or_node= NULL;
@@ -16968,9 +16968,9 @@ PSL_Datum(leo_psl,symbol_instance_of_path_ahm)= or_node=
 last_or_node;
 Origin_Ord_of_OR(or_node)= ordinal_of_set_of_this_leo_item;
 YS_Ord_of_OR(or_node)= work_earley_set_ordinal;
-IRL_of_OR(or_node)= path_irl;
+NRL_of_OR(or_node)= path_nrl;
 Position_of_OR(or_node)= 
-symbol_instance_of_path_ahm-SYMI_of_IRL(path_irl)+1;
+symbol_instance_of_path_ahm-SYMI_of_NRL(path_nrl)+1;
 }
 }
 }
@@ -16991,24 +16991,24 @@ OR or_node= PSL_Datum(this_earley_set_psl,symbol_instance);
 MARPA_ASSERT(symbol_instance<SYMI_Count_of_G(g))
 if(!or_node||YS_Ord_of_OR(or_node)!=work_earley_set_ordinal)
 {
-const int rhs_ix= symbol_instance-SYMI_of_IRL(path_irl);
-MARPA_ASSERT(rhs_ix<Length_of_IRL(path_irl))
+const int rhs_ix= symbol_instance-SYMI_of_NRL(path_nrl);
+MARPA_ASSERT(rhs_ix<Length_of_NRL(path_nrl))
 const OR predecessor= rhs_ix?last_or_node:NULL;
-const OR cause= Nulling_OR_by_NSYID(RHSID_of_IRL(path_irl,rhs_ix));
-MARPA_ASSERT(symbol_instance<Length_of_IRL(path_irl))
+const OR cause= Nulling_OR_by_NSYID(RHSID_of_NRL(path_nrl,rhs_ix));
+MARPA_ASSERT(symbol_instance<Length_of_NRL(path_nrl))
 MARPA_ASSERT(symbol_instance>=0)
 or_node= last_or_node= or_node_new(b);
 PSL_Datum(this_earley_set_psl,symbol_instance)= or_node;
 Origin_Ord_of_OR(or_node)= ordinal_of_set_of_this_leo_item;
 YS_Ord_of_OR(or_node)= work_earley_set_ordinal;
-IRL_of_OR(or_node)= path_irl;
+NRL_of_OR(or_node)= path_nrl;
 Position_of_OR(or_node)= rhs_ix+1;
 MARPA_ASSERT(Position_of_OR(or_node)<=1||predecessor);
 draft_and_node_add(bocage_setup_obs,or_node,predecessor,cause);
 }
 MARPA_ASSERT(Position_of_OR(or_node)<=
-SYMI_of_IRL(path_irl)+Length_of_IRL(path_irl))
-MARPA_ASSERT(Position_of_OR(or_node)>=SYMI_of_IRL(path_irl))
+SYMI_of_NRL(path_nrl)+Length_of_NRL(path_nrl))
+MARPA_ASSERT(Position_of_OR(or_node)>=SYMI_of_NRL(path_nrl))
 }
 }
 
@@ -17104,9 +17104,9 @@ if(leo_predecessor){
 
 {
 
-IRL path_irl= NULL;
+NRL path_nrl= NULL;
 
-IRL previous_path_irl;
+NRL previous_path_nrl;
 LIM path_leo_item= leo_predecessor;
 LIM higher_path_leo_item= Predecessor_LIM_of_LIM(path_leo_item);
 OR dand_predecessor;
@@ -17125,8 +17125,8 @@ if(higher_path_leo_item){
 int symbol_instance;
 const int origin_ordinal= Origin_Ord_of_YIM(base_earley_item);
 const AHM ahm= AHM_of_YIM(base_earley_item);
-path_irl= IRL_of_AHM(ahm);
-symbol_instance= Last_Proper_SYMI_of_IRL(path_irl);
+path_nrl= NRL_of_AHM(ahm);
+symbol_instance= Last_Proper_SYMI_of_NRL(path_nrl);
 path_or_node= or_by_origin_and_symi(per_ys_data,origin_ordinal,symbol_instance);
 }
 
@@ -17157,7 +17157,7 @@ dand_predecessor,dand_cause);
 /*:914*/
 #line 10802 "./marpa.w"
 
-previous_path_irl= path_irl;
+previous_path_nrl= path_nrl;
 while(higher_path_leo_item){
 path_leo_item= higher_path_leo_item;
 higher_path_leo_item= Predecessor_LIM_of_LIM(path_leo_item);
@@ -17176,8 +17176,8 @@ if(higher_path_leo_item){
 int symbol_instance;
 const int origin_ordinal= Origin_Ord_of_YIM(base_earley_item);
 const AHM ahm= AHM_of_YIM(base_earley_item);
-path_irl= IRL_of_AHM(ahm);
-symbol_instance= Last_Proper_SYMI_of_IRL(path_irl);
+path_nrl= NRL_of_AHM(ahm);
+symbol_instance= Last_Proper_SYMI_of_NRL(path_nrl);
 path_or_node= or_by_origin_and_symi(per_ys_data,origin_ordinal,symbol_instance);
 }
 
@@ -17197,7 +17197,7 @@ path_or_node= work_proper_or_node;
 #line 10861 "./marpa.w"
 
 {
-const SYMI symbol_instance= SYMI_of_Completed_IRL(previous_path_irl);
+const SYMI symbol_instance= SYMI_of_Completed_NRL(previous_path_nrl);
 const int origin= Ord_of_YS(YS_of_LIM(path_leo_item));
 const OR dand_cause= or_by_origin_and_symi(per_ys_data,origin,symbol_instance);
 if(!dand_is_duplicate(path_or_node,dand_predecessor,dand_cause)){
@@ -17209,7 +17209,7 @@ dand_predecessor,dand_cause);
 /*:917*/
 #line 10811 "./marpa.w"
 
-previous_path_irl= path_irl;
+previous_path_nrl= path_nrl;
 }
 }
 
@@ -17271,7 +17271,7 @@ YIM cause_earley_item= Cause_of_SRCL(source_link);
 const int middle_ordinal= Origin_Ord_of_YIM(cause_earley_item);
 const AHM cause_ahm= AHM_of_YIM(cause_earley_item);
 const SYMI cause_symbol_instance= 
-SYMI_of_Completed_IRL(IRL_of_AHM(cause_ahm));
+SYMI_of_Completed_NRL(NRL_of_AHM(cause_ahm));
 OR dand_predecessor= safe_or_from_yim(per_ys_data,
 predecessor_earley_item);
 const OR dand_cause= 
@@ -18143,7 +18143,7 @@ if(OR_is_Token(cause_or)){
 const NSYID nsy_id= NSYID_of_OR(cause_or);
 and_node_rank= Rank_of_NSY(NSY_by_ID(nsy_id));
 }else{
-and_node_rank= Rank_of_IRL(IRL_of_OR(cause_or));
+and_node_rank= Rank_of_NRL(NRL_of_OR(cause_or));
 }
 }
 
@@ -18201,7 +18201,7 @@ if(OR_is_Token(cause_or)){
 const NSYID nsy_id= NSYID_of_OR(cause_or);
 and_node_rank= Rank_of_NSY(NSY_by_ID(nsy_id));
 }else{
-and_node_rank= Rank_of_IRL(IRL_of_OR(cause_or));
+and_node_rank= Rank_of_NRL(NRL_of_OR(cause_or));
 }
 }
 
@@ -19994,7 +19994,7 @@ NOOK_of_V(v)= Size_of_TREE(t);
 while(1)
 {
 OR or;
-IRL nook_irl;
+NRL nook_nrl;
 Token_Value_of_V(v)= -1;
 RULEID_of_V(v)= -1;
 NOOK_of_V(v)--;
@@ -20063,16 +20063,16 @@ default:
 Token_Type_of_V(v)= DUMMY_OR_NODE;
 }
 }
-nook_irl= IRL_of_OR(or);
-if(Position_of_OR(or)==Length_of_IRL(nook_irl))
+nook_nrl= NRL_of_OR(or);
+if(Position_of_OR(or)==Length_of_NRL(nook_nrl))
 {
-int virtual_rhs= IRL_has_Virtual_RHS(nook_irl);
-int virtual_lhs= IRL_has_Virtual_LHS(nook_irl);
+int virtual_rhs= NRL_has_Virtual_RHS(nook_nrl);
+int virtual_lhs= NRL_has_Virtual_LHS(nook_nrl);
 int real_symbol_count;
 const MARPA_DSTACK virtual_stack= &VStack_of_V(v);
 if(virtual_lhs)
 {
-real_symbol_count= Real_SYM_Count_of_IRL(nook_irl);
+real_symbol_count= Real_SYM_Count_of_NRL(nook_nrl);
 if(virtual_rhs)
 {
 *(MARPA_DSTACK_TOP(*virtual_stack,int))+= real_symbol_count;
@@ -20087,17 +20087,17 @@ else
 
 if(virtual_rhs)
 {
-real_symbol_count= Real_SYM_Count_of_IRL(nook_irl);
+real_symbol_count= Real_SYM_Count_of_NRL(nook_nrl);
 real_symbol_count+= *MARPA_DSTACK_POP(*virtual_stack,int);
 }
 else
 {
-real_symbol_count= Length_of_IRL(nook_irl);
+real_symbol_count= Length_of_NRL(nook_nrl);
 }
 {
 
 
-XRLID original_rule_id= ID_of_XRL(Source_XRL_of_IRL(nook_irl));
+XRLID original_rule_id= ID_of_XRL(Source_XRL_of_NRL(nook_nrl));
 Arg_0_of_V(v)= Arg_N_of_V(v)-real_symbol_count+1;
 pop_arguments= 1;
 if(lbv_bit_test(XRL_is_Valued_BV_of_V(v),original_rule_id))
@@ -23241,7 +23241,7 @@ return Origin_Ord_of_OR(or_node);
 /*:1406*//*1407:*/
 #line 16840 "./marpa.w"
 
-Marpa_IRL_ID _marpa_b_or_node_irl(Marpa_Bocage b,
+Marpa_NRL_ID _marpa_b_or_node_nrl(Marpa_Bocage b,
 Marpa_Or_Node_ID or_node_id)
 {
 OR or_node;
@@ -23307,7 +23307,7 @@ or_node= OR_of_B_by_ID(b,or_node_id);
 /*:1404*/
 #line 16849 "./marpa.w"
 
-return IRLID_of_OR(or_node);
+return NRLID_of_OR(or_node);
 }
 
 /*:1407*//*1408:*/
@@ -23451,7 +23451,7 @@ or_node= OR_of_B_by_ID(b,or_node_id);
 /*:1404*/
 #line 16875 "./marpa.w"
 
-return Position_of_OR(or_node)>=Length_of_IRL(IRL_of_OR(or_node))?1:0;
+return Position_of_OR(or_node)>=Length_of_NRL(NRL_of_OR(or_node))?1:0;
 }
 
 /*:1409*//*1410:*/
@@ -23523,7 +23523,7 @@ or_node= OR_of_B_by_ID(b,or_node_id);
 /*:1404*/
 #line 16888 "./marpa.w"
 
-return!IRL_has_Virtual_LHS(IRL_of_OR(or_node));
+return!NRL_has_Virtual_LHS(NRL_of_OR(or_node));
 }
 
 /*:1410*//*1411:*/

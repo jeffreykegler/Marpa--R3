@@ -114,7 +114,7 @@
 @s MARPA_DSTACK int
 @s LBV int
 @s Marpa_Bocage int
-@s Marpa_IRL_ID int
+@s Marpa_NRL_ID int
 @s Marpa_Rule_ID int
 @s Marpa_Symbol_ID int
 @s NOOKID int
@@ -362,7 +362,7 @@ macro and subroutine arguments.
 
 \li |g| is the grammar of most interest in the context.
 \li |r| is the recognizer of most interest in the context.
-\li |irl_count| is the number of internal rules in |g|.
+\li |nrl_count| is the number of internal rules in |g|.
 \li |xrl_count| is the number of external rules in |g|.
 
 @*0 Mixed case macros.
@@ -468,7 +468,7 @@ where C89 reserved names are not an issue.
 \li es: Earley set.  Used for clarity
 in a few places were
 \li g: Grammar.
-\li IRL: Internal Rule.
+\li NRL: Internal Rule.
 \li |_ix|, |_IX|, ix, IX: Index.  Often used as a suffix.
 \li JEARLEME: Used instead of |EARLEME| because C89 reserves
 names starting with a capital `E'.
@@ -491,8 +491,8 @@ can have the time complexity $O(n^2)$.
 \li LBW: LBV Word.
 \li LIM: Leo item.
 \li NOOK, nook: any node of a parse tree, a pun on both "node" and "fork".
-\li NSY, nsy: Internal symbol.  This is inconsistent with the use of `I' for
-internal, as in |IRL|, for internal rule.
+\li NSY, nsy: Internal symbol.  This is inconsistent with the use of `N' for
+internal, as in |NRL|, for internal rule.
 C89 reserves names beginning in `is', making this
 inconsistency necessary.
 \li |ord_|, |Ord_|, |_ord|, |_Ord|, ord, Ord: ordinal of the Earley set.
@@ -807,33 +807,33 @@ with their |Marpa_Rule_ID| as the index.
 The |rule_tree| is a tree for detecting duplicates.
 @<Widely aligned grammar elements@> =
     MARPA_DSTACK_DECLARE(t_xrl_stack);
-    MARPA_DSTACK_DECLARE(t_irl_stack);
+    MARPA_DSTACK_DECLARE(t_nrl_stack);
 @ @<Initialize grammar elements@> =
     MARPA_DSTACK_INIT2(g->t_xrl_stack, RULE);
-    MARPA_DSTACK_SAFE(g->t_irl_stack);
+    MARPA_DSTACK_SAFE(g->t_nrl_stack);
 
 @ @<Destroy grammar elements@> =
-    MARPA_DSTACK_DESTROY(g->t_irl_stack);
+    MARPA_DSTACK_DESTROY(g->t_nrl_stack);
     MARPA_DSTACK_DESTROY(g->t_xrl_stack);
 
 @*0 Rule count accessors.
 @ @d XRL_Count_of_G(g) (MARPA_DSTACK_LENGTH((g)->t_xrl_stack))
-@ @d IRL_Count_of_G(g) (MARPA_DSTACK_LENGTH((g)->t_irl_stack))
+@ @d NRL_Count_of_G(g) (MARPA_DSTACK_LENGTH((g)->t_nrl_stack))
 @ @<Function definitions@> =
 int marpa_g_highest_rule_id(Marpa_Grammar g) {
    @<Return |-2| on failure@>@;
    @<Fail if fatal error@>@;
    return XRL_Count_of_G(g) - 1;
 }
-int _marpa_g_irl_count(Marpa_Grammar g) {
+int _marpa_g_nrl_count(Marpa_Grammar g) {
   @<Return |-2| on failure@>@;
   @<Fail if fatal error@>@;
-  return IRL_Count_of_G(g);
+  return NRL_Count_of_G(g);
 }
 
 @ Internal accessor to find a rule by its id.
 @d XRL_by_ID(id) (*MARPA_DSTACK_INDEX((g)->t_xrl_stack, XRL, (id)))
-@d IRL_by_ID(id) (*MARPA_DSTACK_INDEX((g)->t_irl_stack, IRL, (id)))
+@d NRL_by_ID(id) (*MARPA_DSTACK_INDEX((g)->t_nrl_stack, NRL, (id)))
 
 @ Adds the rule to the list of rules kept by the Grammar
 object.
@@ -851,8 +851,8 @@ rule_add (GRAMMAR g, RULE rule)
 @ Check that rule is in valid range.
 @d XRLID_is_Malformed(rule_id) ((rule_id) < 0)
 @d XRLID_of_G_Exists(rule_id) ((rule_id) < XRL_Count_of_G(g))
-@d IRLID_of_G_is_Valid(irl_id)
-    ((irl_id) >= 0 && (irl_id) < IRL_Count_of_G(g))
+@d NRLID_of_G_is_Valid(nrl_id)
+    ((nrl_id) >= 0 && (nrl_id) < NRL_Count_of_G(g))
 
 @*0 Start symbol.
 @<Int aligned grammar elements@> = XSYID t_start_xsy_id;
@@ -891,11 +891,11 @@ These are the start rules, after the grammar is augmented.
 Only one of these needs to be non-NULL.
 A productive grammar
 with no proper start rule is considered trivial.
-@d G_is_Trivial(g) (!(g)->t_start_irl)
+@d G_is_Trivial(g) (!(g)->t_start_nrl)
 @<Int aligned grammar elements@> =
-IRL t_start_irl;
+NRL t_start_nrl;
 @ @<Initialize grammar elements@> =
-g->t_start_irl = NULL;
+g->t_start_nrl = NULL;
 
 @*0 The grammar's size.
 Intuitively,
@@ -2049,7 +2049,7 @@ int _marpa_g_nsy_is_nulling(Marpa_Grammar g, Marpa_NSY_ID nsy_id)
 }
 
 @*0 LHS CIL.
-A CIL which records the IRL's of which this NSY
+A CIL which records the NRL's of which this NSY
 is the LHS.
 @d LHS_CIL_of_NSY(nsy) ((nsy)->t_lhs_cil)
 @d LHS_CIL_of_NSYID(nsyid) LHS_CIL_of_NSY(NSY_by_ID(nsyid))
@@ -2066,7 +2066,7 @@ externally.
 @ @<Function definitions@> =
 int _marpa_g_nsy_is_semantic(
     Marpa_Grammar g,
-    Marpa_IRL_ID nsy_id)
+    Marpa_NRL_ID nsy_id)
 {
     @<Return |-2| on failure@>@;
     @<Fail if |nsy_id| is invalid@>@;
@@ -2089,7 +2089,7 @@ for tracing and debugging.
 @ @<Function definitions@> =
 Marpa_Rule_ID _marpa_g_source_xsy(
     Marpa_Grammar g,
-    Marpa_IRL_ID nsy_id)
+    Marpa_NRL_ID nsy_id)
 {
     XSY source_xsy;
     @<Return |-2| on failure@>@;
@@ -2243,44 +2243,44 @@ const XSYID lhs, const XSYID *rhs, int length)
     return rule;
 }
 
-@ This is the logic common to every IRL construction.
+@ This is the logic common to every NRL construction.
 @<Function definitions@> =
-PRIVATE IRL
-irl_start(GRAMMAR g, int length)
+PRIVATE NRL
+nrl_start(GRAMMAR g, int length)
 {
-  IRL irl;
-  const size_t sizeof_irl = offsetof (struct s_irl, t_nsyid_array) +
-    ((size_t)length + 1) * sizeof (irl->t_nsyid_array[0]);
+  NRL nrl;
+  const size_t sizeof_nrl = offsetof (struct s_nrl, t_nsyid_array) +
+    ((size_t)length + 1) * sizeof (nrl->t_nsyid_array[0]);
 
-  /* Needs to be aligned as an IRL */
-  irl = marpa__obs_alloc (g->t_obs, sizeof_irl, ALIGNOF(IRL_Object));
+  /* Needs to be aligned as an NRL */
+  nrl = marpa__obs_alloc (g->t_obs, sizeof_nrl, ALIGNOF(NRL_Object));
 
-  ID_of_IRL(irl) = MARPA_DSTACK_LENGTH((g)->t_irl_stack);
-  Length_of_IRL(irl) = length;
-  @<Initialize IRL elements@>@;
-  *MARPA_DSTACK_PUSH((g)->t_irl_stack, IRL) = irl;
-  return irl;
+  ID_of_NRL(nrl) = MARPA_DSTACK_LENGTH((g)->t_nrl_stack);
+  Length_of_NRL(nrl) = length;
+  @<Initialize NRL elements@>@;
+  *MARPA_DSTACK_PUSH((g)->t_nrl_stack, NRL) = nrl;
+  return nrl;
 }
 
 PRIVATE void
-irl_finish( GRAMMAR g, IRL irl)
+nrl_finish( GRAMMAR g, NRL nrl)
 {
-  const NSY lhs_nsy = LHS_of_IRL(irl);
+  const NSY lhs_nsy = LHS_of_NRL(nrl);
   NSY_is_LHS(lhs_nsy) = 1;
 }
 
-@ @<Clone a new IRL from |rule|@> =
+@ @<Clone a new NRL from |rule|@> =
 {
   int symbol_ix;
-  const IRL new_irl = irl_start (g, rewrite_xrl_length);
-  Source_XRL_of_IRL (new_irl) = rule;
-  Rank_of_IRL(new_irl) = IRL_Rank_by_XRL(rule);
+  const NRL new_nrl = nrl_start (g, rewrite_xrl_length);
+  Source_XRL_of_NRL (new_nrl) = rule;
+  Rank_of_NRL(new_nrl) = NRL_Rank_by_XRL(rule);
   for (symbol_ix = 0; symbol_ix <= rewrite_xrl_length; symbol_ix++)
     {
-      new_irl->t_nsyid_array[symbol_ix] =
+      new_nrl->t_nsyid_array[symbol_ix] =
         NSYID_by_XSYID(rule->t_symbols[symbol_ix]);
     }
-  irl_finish(g, new_irl);
+  nrl_finish(g, new_nrl);
 }
 
 @ @<Function definitions@> =
@@ -2894,95 +2894,95 @@ this external accessor returns the ``original rule".
 Otherwise it returns -1.
 @ @<Function definitions@> =
 Marpa_Rule_ID
-_marpa_g_irl_semantic_equivalent (Marpa_Grammar g, Marpa_IRL_ID irl_id)
+_marpa_g_nrl_semantic_equivalent (Marpa_Grammar g, Marpa_NRL_ID nrl_id)
 {
-  IRL irl;
+  NRL nrl;
   @<Return |-2| on failure@>@;
-  @<Fail if |irl_id| is invalid@>@;
-  irl = IRL_by_ID (irl_id);
-  if ( IRL_has_Virtual_LHS (irl) ) return -1;
-  return ID_of_XRL( Source_XRL_of_IRL(irl) );
+  @<Fail if |nrl_id| is invalid@>@;
+  nrl = NRL_by_ID (nrl_id);
+  if ( NRL_has_Virtual_LHS (nrl) ) return -1;
+  return ID_of_XRL( Source_XRL_of_NRL(nrl) );
 }
 
-@** Internal rule (IRL) code.
+@** Internal rule (NRL) code.
 
 @ @<Private structures@> =
-struct s_irl {
-  @<Widely aligned IRL elements@>@;
-  @<Int aligned IRL elements@>@;
-  @<Bit aligned IRL elements@>@;
-  @<Final IRL elements@>@/
+struct s_nrl {
+  @<Widely aligned NRL elements@>@;
+  @<Int aligned NRL elements@>@;
+  @<Bit aligned NRL elements@>@;
+  @<Final NRL elements@>@/
 };
-typedef struct s_irl IRL_Object;
+typedef struct s_nrl NRL_Object;
 
 @ @<Public typedefs@> =
-typedef int Marpa_IRL_ID;
+typedef int Marpa_NRL_ID;
 @ @<Private typedefs@> =
-struct s_irl;
-typedef struct s_irl* IRL;
-typedef Marpa_IRL_ID IRLID;
+struct s_nrl;
+typedef struct s_nrl* NRL;
+typedef Marpa_NRL_ID NRLID;
 
 @*0 ID.
-The {\bf IRL ID} is a number which
-acts as the unique identifier for an IRL.
-The rule ID is initialized when the IRL is
+The {\bf NRL ID} is a number which
+acts as the unique identifier for an NRL.
+The rule ID is initialized when the NRL is
 added to the list of rules.
-@d ID_of_IRL(irl) ((irl)->t_irl_id)
-@<Int aligned IRL elements@> = IRLID t_irl_id;
+@d ID_of_NRL(nrl) ((nrl)->t_nrl_id)
+@<Int aligned NRL elements@> = NRLID t_nrl_id;
 
 @*0 Symbols.
 @ The symbols come at the end of the structure,
 so that they can be variable length.
-@<Final IRL elements@> =
+@<Final NRL elements@> =
   NSYID t_nsyid_array[1];
 
-@ @d LHSID_of_IRL(irlid) ((irlid)->t_nsyid_array[0])
-@ @d LHS_of_IRL(irl) (NSY_by_ID(LHSID_of_IRL(irl)))
+@ @d LHSID_of_NRL(nrlid) ((nrlid)->t_nsyid_array[0])
+@ @d LHS_of_NRL(nrl) (NSY_by_ID(LHSID_of_NRL(nrl)))
 
 @<Function definitions@> =
-Marpa_NSY_ID _marpa_g_irl_lhs(Marpa_Grammar g, Marpa_IRL_ID irl_id) {
-    IRL irl;
+Marpa_NSY_ID _marpa_g_nrl_lhs(Marpa_Grammar g, Marpa_NRL_ID nrl_id) {
+    NRL nrl;
     @<Return |-2| on failure@>@;
     @<Fail if fatal error@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    irl = IRL_by_ID(irl_id);
-    return LHSID_of_IRL(irl);
+    @<Fail if |nrl_id| is invalid@>@;
+    nrl = NRL_by_ID(nrl_id);
+    return LHSID_of_NRL(nrl);
 }
 
-@ @d RHSID_of_IRL(irl, position) ((irl)->t_nsyid_array[(position)+1])
-@ @d RHS_of_IRL(irl, position) NSY_by_ID(RHSID_of_IRL((irl), (position)))
+@ @d RHSID_of_NRL(nrl, position) ((nrl)->t_nsyid_array[(position)+1])
+@ @d RHS_of_NRL(nrl, position) NSY_by_ID(RHSID_of_NRL((nrl), (position)))
 @<Function definitions@> =
-Marpa_NSY_ID _marpa_g_irl_rhs(Marpa_Grammar g, Marpa_IRL_ID irl_id, int ix) {
-    IRL irl;
+Marpa_NSY_ID _marpa_g_nrl_rhs(Marpa_Grammar g, Marpa_NRL_ID nrl_id, int ix) {
+    NRL nrl;
     @<Return |-2| on failure@>@;
     @<Fail if fatal error@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    irl = IRL_by_ID(irl_id);
-    if (Length_of_IRL(irl) <= ix) return -1;
-    return RHSID_of_IRL(irl, ix);
+    @<Fail if |nrl_id| is invalid@>@;
+    nrl = NRL_by_ID(nrl_id);
+    if (Length_of_NRL(nrl) <= ix) return -1;
+    return RHSID_of_NRL(nrl, ix);
 }
 
-@ @d Length_of_IRL(irl) ((irl)->t_length)
-@<Int aligned IRL elements@> = int t_length;
+@ @d Length_of_NRL(nrl) ((nrl)->t_length)
+@<Int aligned NRL elements@> = int t_length;
 @ @<Function definitions@> =
-int _marpa_g_irl_length(Marpa_Grammar g, Marpa_IRL_ID irl_id) {
+int _marpa_g_nrl_length(Marpa_Grammar g, Marpa_NRL_ID nrl_id) {
     @<Return |-2| on failure@>@;
     @<Fail if fatal error@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    return Length_of_IRL(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    return Length_of_NRL(NRL_by_ID(nrl_id));
 }
 
-@ An IRL is a unit rule (that is, a rule of length one,
+@ An NRL is a unit rule (that is, a rule of length one,
 not counting nullable symbols) if and only if its AHM
 count is 2 -- the predicted AHM and the final AHM.
-@d IRL_is_Unit_Rule(irl) ((irl)->t_ahm_count == 2)
-@d AHM_Count_of_IRL(irl) ((irl)->t_ahm_count)
-@<Int aligned IRL elements@> = int t_ahm_count;
+@d NRL_is_Unit_Rule(nrl) ((nrl)->t_ahm_count == 2)
+@d AHM_Count_of_NRL(nrl) ((nrl)->t_ahm_count)
+@<Int aligned NRL elements@> = int t_ahm_count;
 
-@*0 IRL has virtual LHS?.
+@*0 NRL has virtual LHS?.
 This is for Marpa's ``internal semantics".
 When Marpa rewrites rules, it does so in a way invisible to
 the user's semantics.
@@ -3008,49 +3008,49 @@ external as a unique ``factoring'' of the external rule's
 RHS symbols by location,
 and the rewrite must make sense when interpreted that
 way.
-@ An IRL has an external semantics if and only if it does
+@ An NRL has an external semantics if and only if it does
 have a non-virtual LHS.
 And if a rule does not have a virtual LHS, then its LHS
 side NSY must have a semantic XRL.
-@d IRL_has_Virtual_LHS(irl) ((irl)->t_is_virtual_lhs)
-@<Bit aligned IRL elements@> = BITFIELD t_is_virtual_lhs:1;
-@ @<Initialize IRL elements@> =
-IRL_has_Virtual_LHS(irl) = 0;
+@d NRL_has_Virtual_LHS(nrl) ((nrl)->t_is_virtual_lhs)
+@<Bit aligned NRL elements@> = BITFIELD t_is_virtual_lhs:1;
+@ @<Initialize NRL elements@> =
+NRL_has_Virtual_LHS(nrl) = 0;
 @ @<Function definitions@> =
-int _marpa_g_irl_is_virtual_lhs(
+int _marpa_g_nrl_is_virtual_lhs(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
     @<Return |-2| on failure@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    return IRL_has_Virtual_LHS(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    return NRL_has_Virtual_LHS(NRL_by_ID(nrl_id));
 }
 
-@*0 IRL has virtual RHS?.
-@d IRL_has_Virtual_RHS(irl) ((irl)->t_is_virtual_rhs)
-@<Bit aligned IRL elements@> = BITFIELD t_is_virtual_rhs:1;
-@ @<Initialize IRL elements@> =
-IRL_has_Virtual_RHS(irl) = 0;
+@*0 NRL has virtual RHS?.
+@d NRL_has_Virtual_RHS(nrl) ((nrl)->t_is_virtual_rhs)
+@<Bit aligned NRL elements@> = BITFIELD t_is_virtual_rhs:1;
+@ @<Initialize NRL elements@> =
+NRL_has_Virtual_RHS(nrl) = 0;
 @ @<Function definitions@> =
-int _marpa_g_irl_is_virtual_rhs(
+int _marpa_g_nrl_is_virtual_rhs(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
     @<Return |-2| on failure@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    return IRL_has_Virtual_RHS(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    return NRL_has_Virtual_RHS(NRL_by_ID(nrl_id));
 }
 
-@*0 IRL right recursion status.
-Being right recursive, for an IRL,
+@*0 NRL right recursion status.
+Being right recursive, for an NRL,
 means it will be used in the Leo logic.
-@d IRL_is_Right_Recursive(irl) ((irl)->t_is_right_recursive)
-@d IRL_is_Leo(irl) IRL_is_Right_Recursive(irl)
-@<Bit aligned IRL elements@> = BITFIELD t_is_right_recursive:1;
-@ @<Initialize IRL elements@> =
-  IRL_is_Right_Recursive(irl) = 0;
+@d NRL_is_Right_Recursive(nrl) ((nrl)->t_is_right_recursive)
+@d NRL_is_Leo(nrl) NRL_is_Right_Recursive(nrl)
+@<Bit aligned NRL elements@> = BITFIELD t_is_right_recursive:1;
+@ @<Initialize NRL elements@> =
+  NRL_is_Right_Recursive(nrl) = 0;
 
 @*0 Rule real symbol count.
 This is another data element used for the ``internal semantics" --
@@ -3058,105 +3058,105 @@ the logic to reassemble results of rewritten rules so that they
 look as if they came from the original, un-rewritten rules.
 The value of this field is meaningful if and only if
 the rule has a virtual rhs or a virtual lhs.
-@d Real_SYM_Count_of_IRL(irl) ((irl)->t_real_symbol_count)
-@ @<Int aligned IRL elements@> = int t_real_symbol_count;
-@ @<Initialize IRL elements@> = Real_SYM_Count_of_IRL(irl) = 0;
+@d Real_SYM_Count_of_NRL(nrl) ((nrl)->t_real_symbol_count)
+@ @<Int aligned NRL elements@> = int t_real_symbol_count;
+@ @<Initialize NRL elements@> = Real_SYM_Count_of_NRL(nrl) = 0;
 @ @<Function definitions@> =
 int _marpa_g_real_symbol_count(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
     @<Return |-2| on failure@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    return Real_SYM_Count_of_IRL(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    return Real_SYM_Count_of_NRL(NRL_by_ID(nrl_id));
 }
 
 @*0 Virtual start position.
-For an IRL,
+For an NRL,
 this is the RHS position in the XRL
-where the IRL starts.
-@d Virtual_Start_of_IRL(irl) ((irl)->t_virtual_start)
-@<Int aligned IRL elements@> = int t_virtual_start;
-@ @<Initialize IRL elements@> = irl->t_virtual_start = -1;
+where the NRL starts.
+@d Virtual_Start_of_NRL(nrl) ((nrl)->t_virtual_start)
+@<Int aligned NRL elements@> = int t_virtual_start;
+@ @<Initialize NRL elements@> = nrl->t_virtual_start = -1;
 @ @<Function definitions@> =
 int _marpa_g_virtual_start(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
-    IRL irl;
+    NRL nrl;
     @<Return |-2| on failure@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    irl = IRL_by_ID(irl_id);
-    return Virtual_Start_of_IRL(irl);
+    @<Fail if |nrl_id| is invalid@>@;
+    nrl = NRL_by_ID(nrl_id);
+    return Virtual_Start_of_NRL(nrl);
 }
 
 @*0 Virtual end position.
-For an IRL,
+For an NRL,
 this is the RHS position in the XRL
-where the IRL ends.
-@d Virtual_End_of_IRL(irl) ((irl)->t_virtual_end)
-@<Int aligned IRL elements@> = int t_virtual_end;
-@ @<Initialize IRL elements@> = irl->t_virtual_end = -1;
+where the NRL ends.
+@d Virtual_End_of_NRL(nrl) ((nrl)->t_virtual_end)
+@<Int aligned NRL elements@> = int t_virtual_end;
+@ @<Initialize NRL elements@> = nrl->t_virtual_end = -1;
 @ @<Function definitions@> =
 int _marpa_g_virtual_end(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
-    IRL irl;
+    NRL nrl;
     @<Return |-2| on failure@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    irl = IRL_by_ID(irl_id);
-    return Virtual_End_of_IRL(irl);
+    @<Fail if |nrl_id| is invalid@>@;
+    nrl = NRL_by_ID(nrl_id);
+    return Virtual_End_of_NRL(nrl);
 }
 
 @*0 Source XRL.
-This is the ``source'' of the IRL --
+This is the ``source'' of the NRL --
 the XRL that it is derived from.
 Currently, there is no dedicated flag for determining
 whether this rule also provides the semantics,
 because the ``virtual LHS'' flag serves that purpose.
-@d Source_XRL_of_IRL(irl) ((irl)->t_source_xrl)
-@<Widely aligned IRL elements@> = XRL t_source_xrl;
-@ @<Initialize IRL elements@> = Source_XRL_of_IRL(irl) = NULL;
+@d Source_XRL_of_NRL(nrl) ((nrl)->t_source_xrl)
+@<Widely aligned NRL elements@> = XRL t_source_xrl;
+@ @<Initialize NRL elements@> = Source_XRL_of_NRL(nrl) = NULL;
 @ @<Function definitions@> =
 Marpa_Rule_ID _marpa_g_source_xrl(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
     XRL source_xrl;
     @<Return |-2| on failure@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    source_xrl = Source_XRL_of_IRL(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    source_xrl = Source_XRL_of_NRL(NRL_by_ID(nrl_id));
     return source_xrl ? ID_of_XRL(source_xrl) : -1;
 }
 
 @*0 Rank.
 The rank of the internal rule.
-|IRL_Rank_by_XRL| and |IRL_CHAF_Rank_by_XRL|
+|NRL_Rank_by_XRL| and |NRL_CHAF_Rank_by_XRL|
 assume that |t_source_xrl| is not |NULL|.
 @d EXTERNAL_RANK_FACTOR 4
 @d MAXIMUM_CHAF_RANK 3
-@d IRL_CHAF_Rank_by_XRL( xrl, chaf_rank) (
+@d NRL_CHAF_Rank_by_XRL( xrl, chaf_rank) (
   ((xrl)->t_rank * EXTERNAL_RANK_FACTOR) +
     (((xrl)->t_null_ranks_high) ? (MAXIMUM_CHAF_RANK -
                                    (chaf_rank)) : (chaf_rank))
 )
-@d IRL_Rank_by_XRL(xrl) IRL_CHAF_Rank_by_XRL((xrl), MAXIMUM_CHAF_RANK)
-@d Rank_of_IRL(irl) ((irl)->t_rank)
-@<Int aligned IRL elements@> = Marpa_Rank t_rank;
-@ @<Initialize IRL elements@> =
-  Rank_of_IRL(irl) = Default_Rank_of_G(g) * EXTERNAL_RANK_FACTOR + MAXIMUM_CHAF_RANK;
+@d NRL_Rank_by_XRL(xrl) NRL_CHAF_Rank_by_XRL((xrl), MAXIMUM_CHAF_RANK)
+@d Rank_of_NRL(nrl) ((nrl)->t_rank)
+@<Int aligned NRL elements@> = Marpa_Rank t_rank;
+@ @<Initialize NRL elements@> =
+  Rank_of_NRL(nrl) = Default_Rank_of_G(g) * EXTERNAL_RANK_FACTOR + MAXIMUM_CHAF_RANK;
 @ @<Function definitions@> =
-Marpa_Rank _marpa_g_irl_rank(
+Marpa_Rank _marpa_g_nrl_rank(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
     @<Return |-2| on failure@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    return Rank_of_IRL(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    return Rank_of_NRL(NRL_by_ID(nrl_id));
 }
 
 @*0 First AHM.
@@ -3166,11 +3166,11 @@ Currently, this is not used after grammar precomputation,
 and there may be an optimization here.
 Perhaps later Marpa objects {\bf should}
 be using it.
-@d First_AHM_of_IRL(irl) ((irl)->t_first_ahm)
-@d First_AHM_of_IRLID(irlid) (IRL_by_ID(irlid)->t_first_ahm)
-@<Widely aligned IRL elements@> = AHM t_first_ahm;
-@ @<Initialize IRL elements@> =
-    First_AHM_of_IRL(irl) = NULL;
+@d First_AHM_of_NRL(nrl) ((nrl)->t_first_ahm)
+@d First_AHM_of_NRLID(nrlid) (NRL_by_ID(nrlid)->t_first_ahm)
+@<Widely aligned NRL elements@> = AHM t_first_ahm;
+@ @<Initialize NRL elements@> =
+    First_AHM_of_NRL(nrl) = NULL;
 
 @** Precomputing the grammar.
 Marpa's logic divides roughly into three pieces -- grammar precomputation,
@@ -3219,7 +3219,7 @@ int marpa_g_precompute(Marpa_Grammar g)
 
     @t}\comment{@>
     //  Phase 2: rewrite the grammar into internal form
-    @<Initialize IRL stack@>@;
+    @<Initialize NRL stack@>@;
     @<Initialize NSY stack@>@;
     @<Rewrite grammar |g| into CHAF form@>@;
     @<Augment grammar |g|@>@;
@@ -3235,7 +3235,7 @@ int marpa_g_precompute(Marpa_Grammar g)
         @<Create AHMs@>@;
         @<Construct prediction matrix@>@;
         @<Construct right derivation matrix@>@;
-        @<Populate the predicted IRL CIL's in the AHM's@>
+        @<Populate the predicted NRL CIL's in the AHM's@>
         @<Populate the terminal boolean vector@>@;
         @<Populate the prediction
           and nulled symbol CILs@>@;
@@ -3948,29 +3948,29 @@ Change so that this runs only if there are prediction events.
 
 @ @<Add the top rule for the sequence@> =
 {
-    IRL rewrite_irl = irl_start(g, 1);
-    LHSID_of_IRL(rewrite_irl) = lhs_nsyid;
-    RHSID_of_IRL(rewrite_irl, 0) = internal_lhs_nsyid;
-    irl_finish(g, rewrite_irl);
-    Source_XRL_of_IRL(rewrite_irl) = rule;
-    Rank_of_IRL(rewrite_irl) = IRL_Rank_by_XRL(rule);
+    NRL rewrite_nrl = nrl_start(g, 1);
+    LHSID_of_NRL(rewrite_nrl) = lhs_nsyid;
+    RHSID_of_NRL(rewrite_nrl, 0) = internal_lhs_nsyid;
+    nrl_finish(g, rewrite_nrl);
+    Source_XRL_of_NRL(rewrite_nrl) = rule;
+    Rank_of_NRL(rewrite_nrl) = NRL_Rank_by_XRL(rule);
     /* Real symbol count remains at default of 0 */
-    IRL_has_Virtual_RHS (rewrite_irl) = 1;
+    NRL_has_Virtual_RHS (rewrite_nrl) = 1;
 }
 
 @ This ``alternate" top rule is needed if a final separator is allowed.
 @<Add the alternate top rule for the sequence@> =
 {
-  IRL rewrite_irl;
-  rewrite_irl = irl_start (g, 2);
-  LHSID_of_IRL (rewrite_irl) = lhs_nsyid;
-  RHSID_of_IRL (rewrite_irl, 0) = internal_lhs_nsyid;
-  RHSID_of_IRL (rewrite_irl, 1) = separator_nsyid;
-  irl_finish (g, rewrite_irl);
-  Source_XRL_of_IRL (rewrite_irl) = rule;
-  Rank_of_IRL(rewrite_irl) = IRL_Rank_by_XRL(rule);
-  IRL_has_Virtual_RHS (rewrite_irl) = 1;
-  Real_SYM_Count_of_IRL (rewrite_irl) = 1;
+  NRL rewrite_nrl;
+  rewrite_nrl = nrl_start (g, 2);
+  LHSID_of_NRL (rewrite_nrl) = lhs_nsyid;
+  RHSID_of_NRL (rewrite_nrl, 0) = internal_lhs_nsyid;
+  RHSID_of_NRL (rewrite_nrl, 1) = separator_nsyid;
+  nrl_finish (g, rewrite_nrl);
+  Source_XRL_of_NRL (rewrite_nrl) = rule;
+  Rank_of_NRL(rewrite_nrl) = NRL_Rank_by_XRL(rule);
+  NRL_has_Virtual_RHS (rewrite_nrl) = 1;
+  Real_SYM_Count_of_NRL (rewrite_nrl) = 1;
 }
 
 @ The traditional way to write a sequence in BNF is with one
@@ -3978,32 +3978,32 @@ rule to represent the minimum, and another to deal with iteration.
 That's the core of Marpa's rewrite.
 @<Add the minimum rule for the sequence@> =
 {
-  const IRL rewrite_irl = irl_start (g, 1);
-  LHSID_of_IRL (rewrite_irl) = internal_lhs_nsyid;
-  RHSID_of_IRL (rewrite_irl, 0) = rhs_nsyid;
-  irl_finish (g, rewrite_irl);
-  Source_XRL_of_IRL (rewrite_irl) = rule;
-  Rank_of_IRL(rewrite_irl) = IRL_Rank_by_XRL(rule);
-  IRL_has_Virtual_LHS (rewrite_irl) = 1;
-  Real_SYM_Count_of_IRL (rewrite_irl) = 1;
+  const NRL rewrite_nrl = nrl_start (g, 1);
+  LHSID_of_NRL (rewrite_nrl) = internal_lhs_nsyid;
+  RHSID_of_NRL (rewrite_nrl, 0) = rhs_nsyid;
+  nrl_finish (g, rewrite_nrl);
+  Source_XRL_of_NRL (rewrite_nrl) = rule;
+  Rank_of_NRL(rewrite_nrl) = NRL_Rank_by_XRL(rule);
+  NRL_has_Virtual_LHS (rewrite_nrl) = 1;
+  Real_SYM_Count_of_NRL (rewrite_nrl) = 1;
 }
 @ @<Add the iterating rule for the sequence@> =
 {
-  IRL rewrite_irl;
+  NRL rewrite_nrl;
   int rhs_ix = 0;
   const int length = separator_nsyid >= 0 ? 3 : 2;
-  rewrite_irl = irl_start (g, length);
-  LHSID_of_IRL (rewrite_irl) = internal_lhs_nsyid;
-  RHSID_of_IRL (rewrite_irl, rhs_ix++) = internal_lhs_nsyid;
+  rewrite_nrl = nrl_start (g, length);
+  LHSID_of_NRL (rewrite_nrl) = internal_lhs_nsyid;
+  RHSID_of_NRL (rewrite_nrl, rhs_ix++) = internal_lhs_nsyid;
   if (separator_nsyid >= 0)
-    RHSID_of_IRL (rewrite_irl, rhs_ix++) = separator_nsyid;
-  RHSID_of_IRL (rewrite_irl, rhs_ix) = rhs_nsyid;
-  irl_finish (g, rewrite_irl);
-  Source_XRL_of_IRL (rewrite_irl) = rule;
-  Rank_of_IRL(rewrite_irl) = IRL_Rank_by_XRL(rule);
-  IRL_has_Virtual_LHS (rewrite_irl) = 1;
-  IRL_has_Virtual_RHS (rewrite_irl) = 1;
-  Real_SYM_Count_of_IRL (rewrite_irl) = length - 1;
+    RHSID_of_NRL (rewrite_nrl, rhs_ix++) = separator_nsyid;
+  RHSID_of_NRL (rewrite_nrl, rhs_ix) = rhs_nsyid;
+  nrl_finish (g, rewrite_nrl);
+  Source_XRL_of_NRL (rewrite_nrl) = rule;
+  Rank_of_NRL(rewrite_nrl) = NRL_Rank_by_XRL(rule);
+  NRL_has_Virtual_LHS (rewrite_nrl) = 1;
+  NRL_has_Virtual_RHS (rewrite_nrl) = 1;
+  Real_SYM_Count_of_NRL (rewrite_nrl) = length - 1;
 }
 
 @** The CHAF rewrite.
@@ -4065,25 +4065,25 @@ so that all the new
 rules will have ID's equal to or greater than
 the pre-CHAF rule count.
 
-@*0 Is this a CHAF IRL?.
-Is this IRL a product of the CHAF rewrite?
-@d IRL_is_CHAF(irl) ((irl)->t_is_chaf)
-@<Bit aligned IRL elements@> = BITFIELD t_is_chaf:1;
-@ @<Initialize IRL elements@> =
-  IRL_is_CHAF(irl) = 0;
+@*0 Is this a CHAF NRL?.
+Is this NRL a product of the CHAF rewrite?
+@d NRL_is_CHAF(nrl) ((nrl)->t_is_chaf)
+@<Bit aligned NRL elements@> = BITFIELD t_is_chaf:1;
+@ @<Initialize NRL elements@> =
+  NRL_is_CHAF(nrl) = 0;
 @ @<Public function prototypes@> =
-int _marpa_g_irl_is_chaf(
+int _marpa_g_nrl_is_chaf(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id);
+    Marpa_NRL_ID nrl_id);
 @ @<Function definitions@> =
-int _marpa_g_irl_is_chaf(
+int _marpa_g_nrl_is_chaf(
     Marpa_Grammar g,
-    Marpa_IRL_ID irl_id)
+    Marpa_NRL_ID nrl_id)
 {
     @<Return |-2| on failure@>@;
     @<Fail if not precomputed@>@;
-    @<Fail if |irl_id| is invalid@>@;
-    return IRL_is_CHAF(IRL_by_ID(irl_id));
+    @<Fail if |nrl_id| is invalid@>@;
+    return NRL_is_CHAF(NRL_by_ID(nrl_id));
 }
 
 @ @<Rewrite grammar |g| into CHAF form@> =
@@ -4113,7 +4113,7 @@ int _marpa_g_irl_is_chaf(
           @<Factor the rule into CHAF rules@>@;
           continue;
         }
-      @<Clone a new IRL from |rule|@>@;
+      @<Clone a new NRL from |rule|@>@;
     }
 }
 
@@ -4265,25 +4265,25 @@ end before the second proper nullable (or factor).
 {
   int piece_ix;
   const int second_nulling_piece_ix = second_factor_position - piece_start;
-  const int chaf_irl_length = rewrite_xrl_length - piece_start;
-  const int real_symbol_count = chaf_irl_length;
+  const int chaf_nrl_length = rewrite_xrl_length - piece_start;
+  const int real_symbol_count = chaf_nrl_length;
 
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
   for (piece_ix = 0; piece_ix < second_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  for (piece_ix = second_nulling_piece_ix; piece_ix < chaf_irl_length;
+  for (piece_ix = second_nulling_piece_ix; piece_ix < chaf_nrl_length;
        piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         Nulling_NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 2);
-  @<Add CHAF IRL@>@;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 2);
+  @<Add CHAF NRL@>@;
 }
 
 @ If this piece is nullable (|piece_start| at or
@@ -4299,37 +4299,37 @@ the Marpa parse engine.
       const int first_nulling_piece_ix = first_factor_position - piece_start;
       const int second_nulling_piece_ix =
         second_factor_position - piece_start;
-      const int chaf_irl_length = rewrite_xrl_length - piece_start;
-      const int real_symbol_count = chaf_irl_length;
+      const int chaf_nrl_length = rewrite_xrl_length - piece_start;
+      const int real_symbol_count = chaf_nrl_length;
 
-      IRL chaf_irl = irl_start (g, chaf_irl_length);
-      LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+      NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+      LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
       for (piece_ix = 0; piece_ix < first_nulling_piece_ix; piece_ix++)
         {
-          RHSID_of_IRL (chaf_irl, piece_ix) =
+          RHSID_of_NRL (chaf_nrl, piece_ix) =
             NSYID_by_XSYID(RHS_ID_of_RULE
                                  (rule, piece_start + piece_ix));
         }
-      RHSID_of_IRL (chaf_irl, first_nulling_piece_ix) =
+      RHSID_of_NRL (chaf_nrl, first_nulling_piece_ix) =
         Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                              (rule, piece_start + first_nulling_piece_ix));
       for (piece_ix = first_nulling_piece_ix + 1;
            piece_ix < second_nulling_piece_ix; piece_ix++)
         {
-          RHSID_of_IRL (chaf_irl, piece_ix) =
+          RHSID_of_NRL (chaf_nrl, piece_ix) =
             NSYID_by_XSYID(RHS_ID_of_RULE
                                  (rule, piece_start + piece_ix));
         }
-      for (piece_ix = second_nulling_piece_ix; piece_ix < chaf_irl_length;
+      for (piece_ix = second_nulling_piece_ix; piece_ix < chaf_nrl_length;
            piece_ix++)
         {
-          RHSID_of_IRL (chaf_irl, piece_ix) =
+          RHSID_of_NRL (chaf_nrl, piece_ix) =
             Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                                  (rule, piece_start + piece_ix));
         }
-      irl_finish (g, chaf_irl);
-      Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 0);
-      @<Add CHAF IRL@>@;
+      nrl_finish (g, chaf_nrl);
+      Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 0);
+      @<Add CHAF NRL@>@;
     }
 }
 
@@ -4348,18 +4348,18 @@ the Marpa parse engine.
 @<Add PP CHAF rule for proper continuation@> =
 {
   int piece_ix;
-  const int chaf_irl_length = (piece_end - piece_start) + 2;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
-  for (piece_ix = 0; piece_ix < chaf_irl_length - 1; piece_ix++)
+  const int chaf_nrl_length = (piece_end - piece_start) + 2;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
+  for (piece_ix = 0; piece_ix < chaf_nrl_length - 1; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, chaf_irl_length - 1) = chaf_virtual_nsyid;
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 3);
-  @<Add CHAF IRL@>@;
+  RHSID_of_NRL (chaf_nrl, chaf_nrl_length - 1) = chaf_virtual_nsyid;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 3);
+  @<Add CHAF NRL@>@;
 }
 
 @ The PN Rule.
@@ -4367,27 +4367,27 @@ the Marpa parse engine.
 {
   int piece_ix;
   const int second_nulling_piece_ix = second_factor_position - piece_start;
-  const int chaf_irl_length = (piece_end - piece_start) + 2;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+  const int chaf_nrl_length = (piece_end - piece_start) + 2;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
   for (piece_ix = 0; piece_ix < second_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, second_nulling_piece_ix) =
+  RHSID_of_NRL (chaf_nrl, second_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                          (rule, piece_start + second_nulling_piece_ix));
   for (piece_ix = second_nulling_piece_ix + 1;
-       piece_ix < chaf_irl_length - 1; piece_ix++)
+       piece_ix < chaf_nrl_length - 1; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, chaf_irl_length - 1) = chaf_virtual_nsyid;
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 2);
-  @<Add CHAF IRL@>@;
+  RHSID_of_NRL (chaf_nrl, chaf_nrl_length - 1) = chaf_virtual_nsyid;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 2);
+  @<Add CHAF NRL@>@;
 }
 
 @ The NP Rule.
@@ -4395,27 +4395,27 @@ the Marpa parse engine.
 {
   int piece_ix;
   const int first_nulling_piece_ix = first_factor_position - piece_start;
-  const int chaf_irl_length = (piece_end - piece_start) + 2;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+  const int chaf_nrl_length = (piece_end - piece_start) + 2;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
   for (piece_ix = 0; piece_ix < first_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, first_nulling_piece_ix) =
+  RHSID_of_NRL (chaf_nrl, first_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                          (rule, piece_start + first_nulling_piece_ix));
   for (piece_ix = first_nulling_piece_ix + 1;
-       piece_ix < chaf_irl_length - 1; piece_ix++)
+       piece_ix < chaf_nrl_length - 1; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, chaf_irl_length - 1) = chaf_virtual_nsyid;
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 1);
-  @<Add CHAF IRL@>@;
+  RHSID_of_NRL (chaf_nrl, chaf_nrl_length - 1) = chaf_virtual_nsyid;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 1);
+  @<Add CHAF NRL@>@;
 }
 
 @ The NN Rule.
@@ -4424,36 +4424,36 @@ the Marpa parse engine.
   int piece_ix;
   const int first_nulling_piece_ix = first_factor_position - piece_start;
   const int second_nulling_piece_ix = second_factor_position - piece_start;
-  const int chaf_irl_length = (piece_end - piece_start) + 2;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+  const int chaf_nrl_length = (piece_end - piece_start) + 2;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
   for (piece_ix = 0; piece_ix < first_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, first_nulling_piece_ix) =
+  RHSID_of_NRL (chaf_nrl, first_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                          (rule, piece_start + first_nulling_piece_ix));
   for (piece_ix = first_nulling_piece_ix + 1;
        piece_ix < second_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, second_nulling_piece_ix) =
+  RHSID_of_NRL (chaf_nrl, second_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                          (rule, piece_start + second_nulling_piece_ix));
-  for (piece_ix = second_nulling_piece_ix + 1; piece_ix < chaf_irl_length-1;
+  for (piece_ix = second_nulling_piece_ix + 1; piece_ix < chaf_nrl_length-1;
        piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, chaf_irl_length-1) = chaf_virtual_nsyid;
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 0);
-  @<Add CHAF IRL@>@;
+  RHSID_of_NRL (chaf_nrl, chaf_nrl_length-1) = chaf_virtual_nsyid;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 0);
+  @<Add CHAF NRL@>@;
 }
 
 @*0 Add final CHAF rules for two factors.
@@ -4474,17 +4474,17 @@ Open block, declarations and setup.
 @<Add final CHAF PP rule for two factors@> =
 {
   int piece_ix;
-  const int chaf_irl_length = (piece_end - piece_start) + 1;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
-  for (piece_ix = 0; piece_ix < chaf_irl_length; piece_ix++)
+  const int chaf_nrl_length = (piece_end - piece_start) + 1;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
+  for (piece_ix = 0; piece_ix < chaf_nrl_length; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 3);
-  @<Add CHAF IRL@>@;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 3);
+  @<Add CHAF NRL@>@;
 }
 
 @ The PN Rule.
@@ -4492,26 +4492,26 @@ Open block, declarations and setup.
 {
   int piece_ix;
   const int second_nulling_piece_ix = second_factor_position - piece_start;
-  const int chaf_irl_length = (piece_end - piece_start) + 1;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+  const int chaf_nrl_length = (piece_end - piece_start) + 1;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
   for (piece_ix = 0; piece_ix < second_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, second_nulling_piece_ix) =
+  RHSID_of_NRL (chaf_nrl, second_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                          (rule, piece_start + second_nulling_piece_ix));
-  for (piece_ix = second_nulling_piece_ix + 1; piece_ix < chaf_irl_length;
+  for (piece_ix = second_nulling_piece_ix + 1; piece_ix < chaf_nrl_length;
        piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 2);
-  @<Add CHAF IRL@>@;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 2);
+  @<Add CHAF NRL@>@;
 }
 
 @ The NP Rule.
@@ -4519,26 +4519,26 @@ Open block, declarations and setup.
 {
   int piece_ix;
   const int first_nulling_piece_ix = first_factor_position - piece_start;
-  const int chaf_irl_length = (piece_end - piece_start) + 1;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+  const int chaf_nrl_length = (piece_end - piece_start) + 1;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
   for (piece_ix = 0; piece_ix < first_nulling_piece_ix; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  RHSID_of_IRL (chaf_irl, first_nulling_piece_ix) =
+  RHSID_of_NRL (chaf_nrl, first_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID(RHS_ID_of_RULE
                          (rule, piece_start + first_nulling_piece_ix));
-  for (piece_ix = first_nulling_piece_ix + 1; piece_ix < chaf_irl_length;
+  for (piece_ix = first_nulling_piece_ix + 1; piece_ix < chaf_nrl_length;
        piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 1);
-  @<Add CHAF IRL@>@;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 1);
+  @<Add CHAF NRL@>@;
 }
 
 @ The NN Rule.  This is added only if it would not turn this into
@@ -4549,38 +4549,38 @@ a nulling rule.
     int piece_ix;
     const int first_nulling_piece_ix = first_factor_position - piece_start;
     const int second_nulling_piece_ix = second_factor_position - piece_start;
-    const int chaf_irl_length = (piece_end - piece_start) + 1;
-    IRL chaf_irl = irl_start (g, chaf_irl_length);
-    LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+    const int chaf_nrl_length = (piece_end - piece_start) + 1;
+    NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+    LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
     for (piece_ix = 0; piece_ix < first_nulling_piece_ix; piece_ix++)
       {
-        RHSID_of_IRL (chaf_irl, piece_ix) =
+        RHSID_of_NRL (chaf_nrl, piece_ix) =
           NSYID_by_XSYID (RHS_ID_of_RULE (rule, piece_start + piece_ix));
       }
 
-    RHSID_of_IRL (chaf_irl, first_nulling_piece_ix) =
+    RHSID_of_NRL (chaf_nrl, first_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID (RHS_ID_of_RULE
                             (rule, piece_start + first_nulling_piece_ix));
     for (piece_ix = first_nulling_piece_ix + 1;
          piece_ix < second_nulling_piece_ix; piece_ix++)
       {
-        RHSID_of_IRL (chaf_irl, piece_ix) =
+        RHSID_of_NRL (chaf_nrl, piece_ix) =
           NSYID_by_XSYID (RHS_ID_of_RULE (rule, piece_start + piece_ix));
       }
 
-    RHSID_of_IRL (chaf_irl, second_nulling_piece_ix) =
+    RHSID_of_NRL (chaf_nrl, second_nulling_piece_ix) =
     Nulling_NSYID_by_XSYID (RHS_ID_of_RULE
                             (rule, piece_start + second_nulling_piece_ix));
-    for (piece_ix = second_nulling_piece_ix + 1; piece_ix < chaf_irl_length;
+    for (piece_ix = second_nulling_piece_ix + 1; piece_ix < chaf_nrl_length;
          piece_ix++)
       {
-        RHSID_of_IRL (chaf_irl, piece_ix) =
+        RHSID_of_NRL (chaf_nrl, piece_ix) =
           NSYID_by_XSYID (RHS_ID_of_RULE (rule, piece_start + piece_ix));
       }
 
-    irl_finish (g, chaf_irl);
-    Rank_of_IRL (chaf_irl) = IRL_CHAF_Rank_by_XRL (rule, 0);
-    @<Add CHAF IRL@>@;
+    nrl_finish (g, chaf_nrl);
+    Rank_of_NRL (chaf_nrl) = NRL_CHAF_Rank_by_XRL (rule, 0);
+    @<Add CHAF NRL@>@;
   }
 }
 
@@ -4599,17 +4599,17 @@ a nulling rule.
 @<Add final CHAF P rule for one factor@> =
 {
   int piece_ix;
-  const int chaf_irl_length = (piece_end - piece_start) + 1;
-  IRL chaf_irl = irl_start (g, chaf_irl_length);
-  LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
-  for (piece_ix = 0; piece_ix < chaf_irl_length; piece_ix++)
+  const int chaf_nrl_length = (piece_end - piece_start) + 1;
+  NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+  LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
+  for (piece_ix = 0; piece_ix < chaf_nrl_length; piece_ix++)
     {
-      RHSID_of_IRL (chaf_irl, piece_ix) =
+      RHSID_of_NRL (chaf_nrl, piece_ix) =
         NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + piece_ix));
     }
-  irl_finish (g, chaf_irl);
-  Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 3);
-  @<Add CHAF IRL@>@;
+  nrl_finish (g, chaf_nrl);
+  Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 3);
+  @<Add CHAF NRL@>@;
 }
 
 @ The N Rule.  This is added only if it would not turn this into
@@ -4620,27 +4620,27 @@ a nulling rule.
     {
       int piece_ix;
       const int nulling_piece_ix = first_factor_position - piece_start;
-      const int chaf_irl_length = (piece_end - piece_start) + 1;
-      IRL chaf_irl = irl_start (g, chaf_irl_length);
-      LHSID_of_IRL (chaf_irl) = current_lhs_nsyid;
+      const int chaf_nrl_length = (piece_end - piece_start) + 1;
+      NRL chaf_nrl = nrl_start (g, chaf_nrl_length);
+      LHSID_of_NRL (chaf_nrl) = current_lhs_nsyid;
       for (piece_ix = 0; piece_ix < nulling_piece_ix; piece_ix++)
         {
-          RHSID_of_IRL (chaf_irl, piece_ix) =
+          RHSID_of_NRL (chaf_nrl, piece_ix) =
             NSYID_by_XSYID(RHS_ID_of_RULE
                                  (rule, piece_start + piece_ix));
         }
-      RHSID_of_IRL (chaf_irl, nulling_piece_ix) =
+      RHSID_of_NRL (chaf_nrl, nulling_piece_ix) =
         Nulling_NSYID_by_XSYID(RHS_ID_of_RULE (rule, piece_start + nulling_piece_ix));
-      for (piece_ix = nulling_piece_ix + 1; piece_ix < chaf_irl_length;
+      for (piece_ix = nulling_piece_ix + 1; piece_ix < chaf_nrl_length;
            piece_ix++)
         {
-          RHSID_of_IRL (chaf_irl, piece_ix) =
+          RHSID_of_NRL (chaf_nrl, piece_ix) =
             NSYID_by_XSYID(RHS_ID_of_RULE
                                  (rule, piece_start + piece_ix));
         }
-      irl_finish (g, chaf_irl);
-      Rank_of_IRL(chaf_irl) = IRL_CHAF_Rank_by_XRL(rule, 0);
-      @<Add CHAF IRL@>@;
+      nrl_finish (g, chaf_nrl);
+      Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_XRL(rule, 0);
+      @<Add CHAF NRL@>@;
     }
 }
 
@@ -4648,17 +4648,17 @@ a nulling rule.
 them all.
 This include the setting of many of the elements of the
 rule structure, and performing the call back.
-@<Add CHAF IRL@> =
+@<Add CHAF NRL@> =
 {
   const int is_virtual_lhs = (piece_start > 0);
-  IRL_is_CHAF(chaf_irl) = 1;
-  Source_XRL_of_IRL(chaf_irl) = rule;
-  IRL_has_Virtual_LHS (chaf_irl) = Boolean(is_virtual_lhs);
-  IRL_has_Virtual_RHS (chaf_irl) =
-    Length_of_IRL (chaf_irl) > real_symbol_count;
-  Virtual_Start_of_IRL(chaf_irl) = piece_start;
-  Virtual_End_of_IRL(chaf_irl) = piece_start + real_symbol_count - 1;
-  Real_SYM_Count_of_IRL (chaf_irl) = real_symbol_count;
+  NRL_is_CHAF(chaf_nrl) = 1;
+  Source_XRL_of_NRL(chaf_nrl) = rule;
+  NRL_has_Virtual_LHS (chaf_nrl) = Boolean(is_virtual_lhs);
+  NRL_has_Virtual_RHS (chaf_nrl) =
+    Length_of_NRL (chaf_nrl) > real_symbol_count;
+  Virtual_Start_of_NRL(chaf_nrl) = piece_start;
+  Virtual_End_of_NRL(chaf_nrl) = piece_start + real_symbol_count - 1;
+  Real_SYM_Count_of_NRL (chaf_nrl) = real_symbol_count;
   LHS_XRL_of_NSY (current_lhs_nsy) = chaf_xrl;
   XRL_Offset_of_NSY (current_lhs_nsy) = piece_start;
 }
@@ -4675,18 +4675,18 @@ in the literature --- it is called ``augmenting the grammar".
 }
 
 @ @<Set up a new proper start rule@> = {
-  IRL new_start_irl;
+  NRL new_start_nrl;
 
   const NSY new_start_nsy = nsy_new(g, start_xsy);
   NSY_is_Start(new_start_nsy) = 1;
 
-  new_start_irl = irl_start(g, 1);
-  LHSID_of_IRL(new_start_irl) = ID_of_NSY(new_start_nsy);
-  RHSID_of_IRL(new_start_irl, 0) = NSYID_of_XSY(start_xsy);
-  irl_finish(g, new_start_irl);
-  IRL_has_Virtual_LHS (new_start_irl) = 1;
-  Real_SYM_Count_of_IRL (new_start_irl) = 1;
-  g->t_start_irl = new_start_irl;
+  new_start_nrl = nrl_start(g, 1);
+  LHSID_of_NRL(new_start_nrl) = ID_of_NSY(new_start_nsy);
+  RHSID_of_NRL(new_start_nrl, 0) = NSYID_of_XSY(start_xsy);
+  nrl_finish(g, new_start_nrl);
+  NRL_has_Virtual_LHS (new_start_nrl) = 1;
+  Real_SYM_Count_of_NRL (new_start_nrl) = 1;
+  g->t_start_nrl = new_start_nrl;
 
 }
 
@@ -4901,18 +4901,18 @@ return item_id < (AHMID)AHM_Count_of_G(g) && item_id >= 0;
 }
 
 @*0 Rule.
-@d IRL_of_AHM(ahm) ((ahm)->t_irl)
-@d IRLID_of_AHM(item) ID_of_IRL(IRL_of_AHM(item))
-@d LHS_NSYID_of_AHM(item) LHSID_of_IRL(IRL_of_AHM(item))
+@d NRL_of_AHM(ahm) ((ahm)->t_nrl)
+@d NRLID_of_AHM(item) ID_of_NRL(NRL_of_AHM(item))
+@d LHS_NSYID_of_AHM(item) LHSID_of_NRL(NRL_of_AHM(item))
 @d LHSID_of_AHM(item) LHS_NSYID_of_AHM(item)
 @<Widely aligned AHM elements@> =
-    IRL t_irl;
+    NRL t_nrl;
 
 @*0 Postdot symbol.
 |-1| if the item is a completion.
 @d Postdot_NSYID_of_AHM(item) ((item)->t_postdot_nsyid)
 @d AHM_is_Completion(ahm) (Postdot_NSYID_of_AHM(ahm) < 0)
-@d AHM_is_Leo(ahm) (IRL_is_Leo(IRL_of_AHM(ahm)))
+@d AHM_is_Leo(ahm) (NRL_is_Leo(NRL_of_AHM(ahm)))
 @d AHM_is_Leo_Completion(ahm)
   (AHM_is_Completion(ahm) && AHM_is_Leo(ahm))
 @<Int aligned AHM elements@> = NSYID t_postdot_nsyid;
@@ -4931,11 +4931,11 @@ int t_leading_nulls;
 RHS position, including nulling symbols.
 Position in the RHS, -1 for a completion.
 Raw position is the same as position except
-for completions, in which case it is the length of the IRL.
+for completions, in which case it is the length of the NRL.
 @d Position_of_AHM(ahm) ((ahm)->t_position)
 @d Raw_Position_of_AHM(ahm)
   (Position_of_AHM(ahm) < 0
-    ? ((Length_of_IRL(IRL_of_AHM(ahm))) + Position_of_AHM(ahm) + 1)
+    ? ((Length_of_NRL(NRL_of_AHM(ahm))) + Position_of_AHM(ahm) + 1)
     : Position_of_AHM(ahm))
 @<Int aligned AHM elements@> =
 int t_position;
@@ -4979,27 +4979,27 @@ so the emphasis is on what precedes the dot position.
 @ @d SYMI_Count_of_G(g) ((g)->t_symbol_instance_count)
 @<Int aligned grammar elements@> =
 int t_symbol_instance_count;
-@ @d SYMI_of_IRL(irl) ((irl)->t_symbol_instance_base)
-@d Last_Proper_SYMI_of_IRL(irl) ((irl)->t_last_proper_symi)
-@d SYMI_of_Completed_IRL(irl)
-    (SYMI_of_IRL(irl) + Length_of_IRL(irl)-1)
-@<Int aligned IRL elements@> =
+@ @d SYMI_of_NRL(nrl) ((nrl)->t_symbol_instance_base)
+@d Last_Proper_SYMI_of_NRL(nrl) ((nrl)->t_last_proper_symi)
+@d SYMI_of_Completed_NRL(nrl)
+    (SYMI_of_NRL(nrl) + Length_of_NRL(nrl)-1)
+@<Int aligned NRL elements@> =
 int t_symbol_instance_base;
 int t_last_proper_symi;
-@ @<Initialize IRL elements@> =
-Last_Proper_SYMI_of_IRL(irl) = -1;
+@ @<Initialize NRL elements@> =
+Last_Proper_SYMI_of_NRL(nrl) = -1;
 
-@*0 Predicted IRL's.
-One CIL representing the predicted IRL's,
-and another representing the directly predicted IRL's.
+@*0 Predicted NRL's.
+One CIL representing the predicted NRL's,
+and another representing the directly predicted NRL's.
 Both are empty CIL if there are no predictions.
 @ {\bf To Do}: @^To Do@>
 It is not clear whether both of these will be needed,
 or if not, which one will be needed.
-@d Predicted_IRL_CIL_of_AHM(ahm) ((ahm)->t_predicted_irl_cil)
+@d Predicted_NRL_CIL_of_AHM(ahm) ((ahm)->t_predicted_nrl_cil)
 @d LHS_CIL_of_AHM(ahm) ((ahm)->t_lhs_cil)
 @<Widely aligned AHM elements@> =
-    CIL t_predicted_irl_cil;
+    CIL t_predicted_nrl_cil;
     CIL t_lhs_cil;
 
 @*0 Zero-width assertions at this AHM.
@@ -5027,12 +5027,12 @@ int _marpa_g_ahm_count(Marpa_Grammar g) {
 }
 
 @ @<Function definitions@> =
-Marpa_IRL_ID _marpa_g_ahm_irl(Marpa_Grammar g,
+Marpa_NRL_ID _marpa_g_ahm_nrl(Marpa_Grammar g,
         Marpa_AHM_ID item_id) {
     @<Return |-2| on failure@>@/
     @<Fail if not precomputed@>@/
     @<Fail if |item_id| is invalid@>@/
-    return IRLID_of_AHM(AHM_by_ID(item_id));
+    return NRLID_of_AHM(AHM_by_ID(item_id));
 }
 
 @ |-1| is the value for completions, so |-2| is the failure indicator.
@@ -5076,22 +5076,22 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
 @** Creating the AHMs.
 @ @<Create AHMs@> =
 {
-    IRLID irl_id;
+    NRLID nrl_id;
     int ahm_count = 0;
     AHM base_item;
     AHM current_item;
     int symbol_instance_of_next_rule = 0;
-    for (irl_id = 0; irl_id < irl_count; irl_id++) {
-      const IRL irl = IRL_by_ID(irl_id);
+    for (nrl_id = 0; nrl_id < nrl_count; nrl_id++) {
+      const NRL nrl = NRL_by_ID(nrl_id);
       @<Count the AHMs in a rule@>@;
     }
     current_item = base_item = marpa_new(struct s_ahm, ahm_count);
-    for (irl_id = 0; irl_id < irl_count; irl_id++) {
-      const IRL irl = IRL_by_ID(irl_id);
-      SYMI_of_IRL(irl) = symbol_instance_of_next_rule;
-      @<Create the AHMs for |irl|@>@;
+    for (nrl_id = 0; nrl_id < nrl_count; nrl_id++) {
+      const NRL nrl = NRL_by_ID(nrl_id);
+      SYMI_of_NRL(nrl) = symbol_instance_of_next_rule;
+      @<Create the AHMs for |nrl|@>@;
       {
-        symbol_instance_of_next_rule += Length_of_IRL(irl);
+        symbol_instance_of_next_rule += Length_of_NRL(nrl);
       }
     }
     SYMI_Count_of_G(g) = symbol_instance_of_next_rule;
@@ -5102,17 +5102,17 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     @<Populate the first |AHM|'s of the |RULE|'s@>@;
 }
 
-@ @<Create the AHMs for |irl|@> =
+@ @<Create the AHMs for |nrl|@> =
 {
   int leading_nulls = 0;
   int rhs_ix;
-  const AHM first_ahm_of_irl = current_item;
-  for (rhs_ix = 0; rhs_ix < Length_of_IRL(irl); rhs_ix++)
+  const AHM first_ahm_of_nrl = current_item;
+  for (rhs_ix = 0; rhs_ix < Length_of_NRL(nrl); rhs_ix++)
     {
-      NSYID rh_nsyid = RHSID_of_IRL (irl, rhs_ix);
+      NSYID rh_nsyid = RHSID_of_NRL (nrl, rhs_ix);
       if (!NSY_is_Nulling(NSY_by_ID(rh_nsyid)))
         {
-          Last_Proper_SYMI_of_IRL(irl) = symbol_instance_of_next_rule + rhs_ix;
+          Last_Proper_SYMI_of_NRL(nrl) = symbol_instance_of_next_rule + rhs_ix;
           @<Create an AHM for a precompletion@>@;
           current_item++;
           leading_nulls = 0;
@@ -5124,15 +5124,15 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     }
   @<Create an AHM for a completion@>@;
   current_item++;
-  AHM_Count_of_IRL(irl) = (int)(current_item - first_ahm_of_irl);
+  AHM_Count_of_NRL(nrl) = (int)(current_item - first_ahm_of_nrl);
 }
 
 @ @<Count the AHMs in a rule@> =
 {
   int rhs_ix;
-  for (rhs_ix = 0; rhs_ix < Length_of_IRL(irl); rhs_ix++)
+  for (rhs_ix = 0; rhs_ix < Length_of_NRL(nrl); rhs_ix++)
     {
-      const NSYID rh_nsyid = RHSID_of_IRL (irl, rhs_ix);
+      const NSYID rh_nsyid = RHSID_of_NRL (nrl, rhs_ix);
       const NSY nsy = NSY_by_ID (rh_nsyid);
       if (!NSY_is_Nulling(nsy)) ahm_count++;
     }
@@ -5149,8 +5149,8 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
   SYMI_of_AHM (current_item)
     = AHM_is_Prediction (current_item)
       ? -1
-      : SYMI_of_IRL (irl) + Position_of_AHM (current_item - 1);
-  memoize_xrl_data_for_AHM(current_item, irl);
+      : SYMI_of_NRL (nrl) + Position_of_AHM (current_item - 1);
+  memoize_xrl_data_for_AHM(current_item, nrl);
 }
 
 @ @<Create an AHM for a completion@> =
@@ -5158,17 +5158,17 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
   @<Initializations common to all AHMs@>@;
   Postdot_NSYID_of_AHM (current_item) = -1;
   Position_of_AHM (current_item) = -1;
-  SYMI_of_AHM(current_item) = SYMI_of_IRL(irl) + Position_of_AHM(current_item-1);
-  memoize_xrl_data_for_AHM(current_item, irl);
+  SYMI_of_AHM(current_item) = SYMI_of_NRL(nrl) + Position_of_AHM(current_item-1);
+  memoize_xrl_data_for_AHM(current_item, nrl);
 }
 
 @ @<Initializations common to all AHMs@> =
 {
-  IRL_of_AHM (current_item) = irl;
+  NRL_of_AHM (current_item) = nrl;
   Null_Count_of_AHM (current_item) = leading_nulls;
-  Quasi_Position_of_AHM (current_item) = (int)(current_item - first_ahm_of_irl);
+  Quasi_Position_of_AHM (current_item) = (int)(current_item - first_ahm_of_nrl);
   if (Quasi_Position_of_AHM (current_item) == 0) {
-     if (ID_of_IRL(irl) == ID_of_IRL (g->t_start_irl))
+     if (ID_of_NRL(nrl) == ID_of_NRL (g->t_start_nrl))
      {
       AHM_was_Predicted (current_item) = 0;
       AHM_is_Initial (current_item) = 1;
@@ -5185,9 +5185,9 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
 
 @ @<Function definitions@> =
 PRIVATE void
-memoize_xrl_data_for_AHM(AHM current_item, IRL irl)
+memoize_xrl_data_for_AHM(AHM current_item, NRL nrl)
 {
-  XRL source_xrl = Source_XRL_of_IRL(irl);
+  XRL source_xrl = Source_XRL_of_NRL(nrl);
   XRL_of_AHM(current_item) = source_xrl;
   if (!source_xrl) {
     @t}\comment{@>
@@ -5196,31 +5196,31 @@ memoize_xrl_data_for_AHM(AHM current_item, IRL irl)
     return;
   }
   {
-    const int virtual_start = Virtual_Start_of_IRL (irl);
-    const int irl_position = Position_of_AHM (current_item);
+    const int virtual_start = Virtual_Start_of_NRL (nrl);
+    const int nrl_position = Position_of_AHM (current_item);
     if (XRL_is_Sequence (source_xrl))
       {
         @t}\comment{@>
         /* Note that a sequence XRL,
           because of the way it is rewritten, may have several
-         IRL's, and therefore several AHM's at position 0. */
-        XRL_Position_of_AHM(current_item) = irl_position ? -1 : 0;
+         NRL's, and therefore several AHM's at position 0. */
+        XRL_Position_of_AHM(current_item) = nrl_position ? -1 : 0;
         return;
       }
     @t}\comment{@>
     /* Completed CHAF rules are a special case */
-    if (IRL_is_CHAF (irl) &&
-        (irl_position < 0 || irl_position >= Length_of_IRL(irl)))
+    if (NRL_is_CHAF (nrl) &&
+        (nrl_position < 0 || nrl_position >= Length_of_NRL(nrl)))
     {
       XRL_Position_of_AHM(current_item) = -1;
       return;
     }
     if (virtual_start >= 0)
       {
-        XRL_Position_of_AHM(current_item) = irl_position + virtual_start;
+        XRL_Position_of_AHM(current_item) = nrl_position + virtual_start;
         return;
       }
-    XRL_Position_of_AHM(current_item) = irl_position;
+    XRL_Position_of_AHM(current_item) = nrl_position;
   }
   return;
 }
@@ -5231,7 +5231,7 @@ This is not likely since the |marpa_renew| shortened the array,
 but if you are hoping for portability,
 you want to follow the rules.
 @ Walks backwards through the |AHM|'s, setting each to the the
-first of its |IRL|.  Last setting wins, which works since
+first of its |NRL|.  Last setting wins, which works since
 we are traversing backwards.
 @<Populate the first |AHM|'s of the |RULE|'s@> =
 {
@@ -5240,8 +5240,8 @@ we are traversing backwards.
   for (item_id--; item_id >= 0; item_id--)
     {
       AHM item = items + item_id;
-      IRL irl = IRL_of_AHM (item);
-      First_AHM_of_IRL(irl) = item;
+      NRL nrl = NRL_of_AHM (item);
+      First_AHM_of_NRL(nrl) = item;
     }
 }
 
@@ -5333,7 +5333,7 @@ the bit is set if $|nsy1| = |nsy2|$.
         matrix_obs_create (obs_precompute, nsy_count, nsy_count);
     @<Initialize the |nsy_by_right_nsy_matrix| for right derivations@>@/
     transitive_closure(nsy_by_right_nsy_matrix);
-    @<Mark the right recursive IRLs@>@/
+    @<Mark the right recursive NRLs@>@/
     matrix_clear(nsy_by_right_nsy_matrix);
     @<Initialize the |nsy_by_right_nsy_matrix| for right recursions@>@/
     transitive_closure(nsy_by_right_nsy_matrix);
@@ -5341,22 +5341,22 @@ the bit is set if $|nsy1| = |nsy2|$.
 
 @ @<Initialize the |nsy_by_right_nsy_matrix| for right derivations@> =
 {
-  IRLID irl_id;
-  for (irl_id = 0; irl_id < irl_count; irl_id++)
+  NRLID nrl_id;
+  for (nrl_id = 0; nrl_id < nrl_count; nrl_id++)
     {
-      const IRL irl = IRL_by_ID(irl_id);
+      const NRL nrl = NRL_by_ID(nrl_id);
       int rhs_ix;
-      for (rhs_ix = Length_of_IRL(irl) - 1;
+      for (rhs_ix = Length_of_NRL(nrl) - 1;
           rhs_ix >= 0;
           rhs_ix-- )
         { @/@,
 /* LHS right dervies the last non-nulling symbol.  There is at least
-one non-nulling symbol in each IRL. */
-          const NSYID rh_nsyid = RHSID_of_IRL (irl, rhs_ix);
+one non-nulling symbol in each NRL. */
+          const NSYID rh_nsyid = RHSID_of_NRL (nrl, rhs_ix);
           if (!NSY_is_Nulling (NSY_by_ID (rh_nsyid)))
             {
               matrix_bit_set (nsy_by_right_nsy_matrix,
-                              LHSID_of_IRL (irl),
+                              LHSID_of_NRL (nrl),
                               rh_nsyid);
               break;
             }
@@ -5364,26 +5364,26 @@ one non-nulling symbol in each IRL. */
     }
 }
 
-@ @<Mark the right recursive IRLs@> =
+@ @<Mark the right recursive NRLs@> =
 {
-  IRLID irl_id;
-  for (irl_id = 0; irl_id < irl_count; irl_id++)
+  NRLID nrl_id;
+  for (nrl_id = 0; nrl_id < nrl_count; nrl_id++)
     {
-      const IRL irl = IRL_by_ID (irl_id);
+      const NRL nrl = NRL_by_ID (nrl_id);
       int rhs_ix;
-      for (rhs_ix = Length_of_IRL (irl) - 1; rhs_ix >= 0; rhs_ix--)
+      for (rhs_ix = Length_of_NRL (nrl) - 1; rhs_ix >= 0; rhs_ix--)
         {
-          const NSYID rh_nsyid = RHSID_of_IRL (irl, rhs_ix);
+          const NSYID rh_nsyid = RHSID_of_NRL (nrl, rhs_ix);
           if (!NSY_is_Nulling (NSY_by_ID (rh_nsyid)))
             {
 /* Does the last non-nulling symbol right derive the LHS?
 If so, the rule is right recursive.
-(There is at least one non-nulling symbol in each IRL.) */
+(There is at least one non-nulling symbol in each NRL.) */
               if (matrix_bit_test (nsy_by_right_nsy_matrix,
                                    rh_nsyid,
-                                   LHSID_of_IRL (irl)))
+                                   LHSID_of_NRL (nrl)))
                 {
-                  IRL_is_Right_Recursive (irl) = 1;
+                  NRL_is_Right_Recursive (nrl) = 1;
                 }
               break;
             }
@@ -5393,23 +5393,23 @@ If so, the rule is right recursive.
 
 @ @<Initialize the |nsy_by_right_nsy_matrix| for right recursions@> =
 {
-  IRLID irl_id;
-  for (irl_id = 0; irl_id < irl_count; irl_id++)
+  NRLID nrl_id;
+  for (nrl_id = 0; nrl_id < nrl_count; nrl_id++)
     {
       int rhs_ix;
-      const IRL irl = IRL_by_ID(irl_id);
-      if (!IRL_is_Right_Recursive(irl)) { continue; }
-      for (rhs_ix = Length_of_IRL(irl) - 1;
+      const NRL nrl = NRL_by_ID(nrl_id);
+      if (!NRL_is_Right_Recursive(nrl)) { continue; }
+      for (rhs_ix = Length_of_NRL(nrl) - 1;
           rhs_ix >= 0;
           rhs_ix-- )
         { @/@,
 /* LHS right dervies the last non-nulling symbol.  There is at least
-one non-nulling symbol in each IRL. */
-          const NSYID rh_nsyid = RHSID_of_IRL (irl, rhs_ix);
+one non-nulling symbol in each NRL. */
+          const NSYID rh_nsyid = RHSID_of_NRL (nrl, rhs_ix);
           if (!NSY_is_Nulling (NSY_by_ID (rh_nsyid)))
             {
               matrix_bit_set (nsy_by_right_nsy_matrix,
-                              LHSID_of_IRL (irl),
+                              LHSID_of_NRL (nrl),
                               rh_nsyid);
               break;
             }
@@ -5419,16 +5419,16 @@ one non-nulling symbol in each IRL. */
 
 @ @<Declare variables for the internal grammar
         memoizations@> =
-  const RULEID irl_count = IRL_Count_of_G(g);
+  const RULEID nrl_count = NRL_Count_of_G(g);
   const NSYID nsy_count = NSY_Count_of_G(g);
   Bit_Matrix nsy_by_right_nsy_matrix;
-   Bit_Matrix prediction_nsy_by_irl_matrix;
+   Bit_Matrix prediction_nsy_by_nrl_matrix;
 
 @ Initialized based on the capacity of the XRL stack, rather
 than its length, as a convenient way to deal with issues
 of minimum sizes.
-@<Initialize IRL stack@> =
-    MARPA_DSTACK_INIT(g->t_irl_stack, IRL, 2*MARPA_DSTACK_CAPACITY(g->t_xrl_stack));
+@<Initialize NRL stack@> =
+    MARPA_DSTACK_INIT(g->t_nrl_stack, NRL, 2*MARPA_DSTACK_CAPACITY(g->t_xrl_stack));
 
 @ Clones all the used symbols,
 creating nulling versions as required.
@@ -5448,34 +5448,34 @@ of minimum sizes.
    /* This matrix is large and very temporary,
    so it does not go on the obstack */
   void* matrix_buffer = my_malloc(matrix_sizeof(
-     nsy_count, irl_count));
-  Bit_Matrix irl_by_lhs_matrix =
-        matrix_buffer_create (matrix_buffer, nsy_count, irl_count);
+     nsy_count, nrl_count));
+  Bit_Matrix nrl_by_lhs_matrix =
+        matrix_buffer_create (matrix_buffer, nsy_count, nrl_count);
 
-  IRLID irl_id;
-  for (irl_id = 0; irl_id < irl_count; irl_id++)
+  NRLID nrl_id;
+  for (nrl_id = 0; nrl_id < nrl_count; nrl_id++)
     {
-      const IRL irl = IRL_by_ID (irl_id);
-      const NSYID lhs_nsyid = LHSID_of_IRL(irl);
-      matrix_bit_set (irl_by_lhs_matrix, lhs_nsyid, irl_id);
+      const NRL nrl = NRL_by_ID (nrl_id);
+      const NSYID lhs_nsyid = LHSID_of_NRL(nrl);
+      matrix_bit_set (nrl_by_lhs_matrix, lhs_nsyid, nrl_id);
     }
 
   @t}\comment{@>
-  /* for every LHS row of the IRL-by-LHS matrix, add
-  all its IRL's to the LHS CIL */
+  /* for every LHS row of the NRL-by-LHS matrix, add
+  all its NRL's to the LHS CIL */
   for (lhsid = 0; lhsid < nsy_count; lhsid++)
     {
-      IRLID irlid;
+      NRLID nrlid;
       int min, max, start;
       cil_buffer_clear (&g->t_cilar);
       for (start = 0;
            bv_scan (matrix_row
-                    (irl_by_lhs_matrix, lhsid),
+                    (nrl_by_lhs_matrix, lhsid),
                     start, &min, &max); start = max + 2)
         {
-          for (irlid = min; irlid <= max; irlid++)
+          for (nrlid = min; nrlid <= max; nrlid++)
           {
-            cil_buffer_push (&g->t_cilar, irlid);
+            cil_buffer_push (&g->t_cilar, nrlid);
           }
         }
       LHS_CIL_of_NSYID(lhsid) = cil_buffer_add (&g->t_cilar);
@@ -5503,7 +5503,7 @@ states.
 
 @ @<Initialize the |prediction_nsy_by_nsy_matrix|@> =
 {
-  IRLID irl_id;
+  NRLID nrl_id;
   NSYID nsyid;
   for (nsyid = 0; nsyid < nsy_count; nsyid++)
     {
@@ -5513,12 +5513,12 @@ states.
       matrix_bit_set (prediction_nsy_by_nsy_matrix, nsyid,
                 nsyid);
     }
-  for (irl_id = 0; irl_id < irl_count; irl_id++)
+  for (nrl_id = 0; nrl_id < nrl_count; nrl_id++)
     {
       NSYID from_nsyid, to_nsyid;
-      const IRL irl = IRL_by_ID(irl_id);
+      const NRL nrl = NRL_by_ID(nrl_id);
       /* Get the initial item for the rule */
-      const AHM item = First_AHM_of_IRL(irl);
+      const AHM item = First_AHM_of_NRL(nrl);
       to_nsyid = Postdot_NSYID_of_AHM (item);
       /* There is no symbol-to-symbol transition for a completion item */
       if (to_nsyid < 0)
@@ -5545,9 +5545,9 @@ with |S2| on its LHS.
 @ @<Populate the prediction matrix@> =
 {
   NSYID from_nsyid;
-  prediction_nsy_by_irl_matrix =
+  prediction_nsy_by_nrl_matrix =
     matrix_obs_create (obs_precompute, nsy_count,
-                       irl_count);
+                       nrl_count);
   for (from_nsyid = 0; from_nsyid < nsy_count; from_nsyid++)
     {
       @t}\comment{@>
@@ -5569,17 +5569,17 @@ with |S2| on its LHS.
               const int cil_count = Count_of_CIL (lhs_cil);
               for (cil_ix = 0; cil_ix < cil_count; cil_ix++)
               {
-                  const IRLID irlid = Item_of_CIL (lhs_cil, cil_ix);
-                  matrix_bit_set (prediction_nsy_by_irl_matrix,
-                                  from_nsyid, irlid);
+                  const NRLID nrlid = Item_of_CIL (lhs_cil, cil_ix);
+                  matrix_bit_set (prediction_nsy_by_nrl_matrix,
+                                  from_nsyid, nrlid);
               }
             }
         }
     }
 }
 
-@** Populating the predicted IRL CIL's in the AHM's.
-@ @<Populate the predicted IRL CIL's in the AHM's@> =
+@** Populating the predicted NRL CIL's in the AHM's.
+@ @<Populate the predicted NRL CIL's in the AHM's@> =
 {
   AHMID ahm_id;
   const int ahm_count = AHM_Count_of_G (g);
@@ -5589,14 +5589,14 @@ with |S2| on its LHS.
       const NSYID postdot_nsyid = Postdot_NSYID_of_AHM (ahm);
       if (postdot_nsyid < 0)
 	{
-	  Predicted_IRL_CIL_of_AHM (ahm) = cil_empty (&g->t_cilar);
+	  Predicted_NRL_CIL_of_AHM (ahm) = cil_empty (&g->t_cilar);
 	  LHS_CIL_of_AHM (ahm) = cil_empty (&g->t_cilar);
 	}
       else
 	{
-	  Predicted_IRL_CIL_of_AHM (ahm) =
+	  Predicted_NRL_CIL_of_AHM (ahm) =
 	    cil_bv_add (&g->t_cilar,
-			matrix_row (prediction_nsy_by_irl_matrix, postdot_nsyid));
+			matrix_row (prediction_nsy_by_nrl_matrix, postdot_nsyid));
 	  LHS_CIL_of_AHM (ahm) = LHS_CIL_of_NSYID(postdot_nsyid);
 	}
     }
@@ -5680,7 +5680,7 @@ with |S2| on its LHS.
     {
       const AHM ahm = AHM_by_ID (ahm_id);
       const NSYID postdot_nsyid = Postdot_NSYID_of_AHM (ahm);
-      const IRL irl = IRL_of_AHM (ahm);
+      const NRL nrl = NRL_of_AHM (ahm);
       bv_clear (bv_completion_xsyid);
       bv_clear (bv_prediction_xsyid);
       bv_clear (bv_nulled_xsyid);
@@ -5689,10 +5689,10 @@ with |S2| on its LHS.
           int raw_position = Position_of_AHM (ahm);
           if (raw_position < 0)
             {                   // Completion
-              raw_position = Length_of_IRL (irl);
-              if (!IRL_has_Virtual_LHS (irl))
+              raw_position = Length_of_NRL (nrl);
+              if (!NRL_has_Virtual_LHS (nrl))
                 {               // Completion
-                  const NSY lhs = LHS_of_IRL (irl);
+                  const NSY lhs = LHS_of_NRL (nrl);
                   const XSY xsy = Source_XSY_of_NSY (lhs);
                   if (XSY_is_Completion_Event (xsy))
                     {
@@ -5711,7 +5711,7 @@ with |S2| on its LHS.
                rhs_ix < raw_position; rhs_ix++)
             {
               int cil_ix;
-              const NSYID rhs_nsyid = RHSID_of_IRL (irl, rhs_ix);
+              const NSYID rhs_nsyid = RHSID_of_NRL (nrl, rhs_ix);
               const XSY xsy = Source_XSY_of_NSYID (rhs_nsyid);
               const CIL nulled_xsyids = Nulled_XSYIDs_of_XSY (xsy);
               const int cil_count = Count_of_CIL (nulled_xsyids);
@@ -6011,15 +6011,15 @@ the AHM itself.
       @t}\comment{@>
       /* The ``predicts ZWA'' bit was
       initialized to assume no prediction */
-      const CIL prediction_cil = Predicted_IRL_CIL_of_AHM (ahm_to_populate);
+      const CIL prediction_cil = Predicted_NRL_CIL_of_AHM (ahm_to_populate);
       const int prediction_count = Count_of_CIL (prediction_cil);
 
       int cil_ix;
       for (cil_ix = 0; cil_ix < prediction_count; cil_ix++)
         {
-          const IRLID prediction_irlid = Item_of_CIL (prediction_cil, cil_ix);
-          const AHM prediction_ahm_of_irl = First_AHM_of_IRLID(prediction_irlid);
-          const CIL zwaids_of_prediction = ZWA_CIL_of_AHM(prediction_ahm_of_irl);
+          const NRLID prediction_nrlid = Item_of_CIL (prediction_cil, cil_ix);
+          const AHM prediction_ahm_of_nrl = First_AHM_of_NRLID(prediction_nrlid);
+          const CIL zwaids_of_prediction = ZWA_CIL_of_AHM(prediction_ahm_of_nrl);
           if (Count_of_CIL (zwaids_of_prediction) > 0) {
             AHM_predicts_ZWA(ahm_to_populate) = 1;
             break;
@@ -6051,11 +6051,11 @@ Marpa_Recognizer marpa_r_new( Marpa_Grammar g )
 {
     RECCE r;
     int nsy_count;
-    int irl_count;
+    int nrl_count;
     @<Return |NULL| on failure@>@;
     @<Fail if not precomputed@>@;
     nsy_count = NSY_Count_of_G(g);
-    irl_count = IRL_Count_of_G(g);
+    nrl_count = NRL_Count_of_G(g);
     r = my_malloc(sizeof(struct marpa_r));
     @<Initialize recognizer obstack@>@;
     @<Initialize recognizer elements@>@;
@@ -6596,19 +6596,19 @@ Marpa_Recognizer r, int value)
     return r->t_use_leo_flag = value ? 1 : 0;
 }
 
-@*0 Predicted IRL boolean vector and stack.
-A boolean vector by IRL ID,
+@*0 Predicted NRL boolean vector and stack.
+A boolean vector by NRL ID,
 used while building the Earley sets.
-It is set if an IRL has already been predicted,
+It is set if an NRL has already been predicted,
 unset otherwise.
 @<Widely aligned recognizer elements@> =
-  Bit_Vector t_bv_irl_seen;
-  MARPA_DSTACK_DECLARE(t_irl_cil_stack);
+  Bit_Vector t_bv_nrl_seen;
+  MARPA_DSTACK_DECLARE(t_nrl_cil_stack);
 @ @<Initialize recognizer elements@> =
-  r->t_bv_irl_seen = bv_obs_create( r->t_obs, irl_count );
-  MARPA_DSTACK_INIT2(r->t_irl_cil_stack, CIL);
+  r->t_bv_nrl_seen = bv_obs_create( r->t_obs, nrl_count );
+  MARPA_DSTACK_INIT2(r->t_nrl_cil_stack, CIL);
 @ @<Destroy recognizer elements@> =
-  MARPA_DSTACK_DESTROY(r->t_irl_cil_stack);
+  MARPA_DSTACK_DESTROY(r->t_nrl_cil_stack);
 
 @*1 Is the parser exhausted?.
 A parser is ``exhausted" if it cannot accept any more input.
@@ -6937,8 +6937,8 @@ the Earley set.
 @d AHM_of_YIM(yim) ((yim)->t_key.t_ahm)
 @d AHMID_of_YIM(yim) ID_of_AHM(AHM_of_YIM(yim))
 @d Postdot_NSYID_of_YIM(yim) Postdot_NSYID_of_AHM(AHM_of_YIM(yim))
-@d IRL_of_YIM(yim) IRL_of_AHM(AHM_of_YIM(yim))
-@d IRLID_of_YIM(yim) ID_of_IRL(IRL_of_YIM(yim))
+@d NRL_of_YIM(yim) NRL_of_AHM(AHM_of_YIM(yim))
+@d NRLID_of_YIM(yim) ID_of_NRL(NRL_of_YIM(yim))
 @d XRL_of_YIM(yim) XRL_of_AHM(AHM_of_YIM(yim))
 @d Origin_Earleme_of_YIM(yim) (Earleme_of_YS(Origin_of_YIM(yim)))
 @d Origin_Ord_of_YIM(yim) (Ord_of_YS(Origin_of_YIM(yim)))
@@ -7700,7 +7700,7 @@ PRIVATE int alternative_insert(RECCE r, ALT new_alternative)
     YS set0;
     YIK_Object key;
 
-    IRL start_irl;
+    NRL start_nrl;
     AHM start_ahm;
 
   @<Unpack recognizer objects@>@;
@@ -7727,8 +7727,8 @@ PRIVATE int alternative_insert(RECCE r, ALT new_alternative)
     @<Allocate recognizer containers@>@;
     @<Initialize Earley item work stacks@>@;
 
-    start_irl = g->t_start_irl;
-    start_ahm = First_AHM_of_IRL(start_irl);
+    start_nrl = g->t_start_nrl;
+    start_ahm = First_AHM_of_NRL(start_nrl);
 
     @t}\comment{@>
     /* These will stay constant in every YIM added in this method */
@@ -7738,14 +7738,14 @@ PRIVATE int alternative_insert(RECCE r, ALT new_alternative)
     key.t_ahm = start_ahm;
     earley_item_create(r, key);
 
-    bv_clear (r->t_bv_irl_seen);
-    bv_bit_set (r->t_bv_irl_seen, ID_of_IRL(start_irl));
-    MARPA_DSTACK_CLEAR(r->t_irl_cil_stack);
-    *MARPA_DSTACK_PUSH(r->t_irl_cil_stack, CIL) = LHS_CIL_of_AHM(start_ahm);
+    bv_clear (r->t_bv_nrl_seen);
+    bv_bit_set (r->t_bv_nrl_seen, ID_of_NRL(start_nrl));
+    MARPA_DSTACK_CLEAR(r->t_nrl_cil_stack);
+    *MARPA_DSTACK_PUSH(r->t_nrl_cil_stack, CIL) = LHS_CIL_of_AHM(start_ahm);
 
     while (1)
       {
-        const CIL* const p_cil = MARPA_DSTACK_POP (r->t_irl_cil_stack, CIL);
+        const CIL* const p_cil = MARPA_DSTACK_POP (r->t_nrl_cil_stack, CIL);
         if (!p_cil)
           break;
         {
@@ -7754,18 +7754,18 @@ PRIVATE int alternative_insert(RECCE r, ALT new_alternative)
           const int prediction_count = Count_of_CIL (this_cil);
           for (cil_ix = 0; cil_ix < prediction_count; cil_ix++)
             {
-              const IRLID prediction_irlid = Item_of_CIL (this_cil, cil_ix);
-              if (!bv_bit_test_then_set (r->t_bv_irl_seen, prediction_irlid))
+              const NRLID prediction_nrlid = Item_of_CIL (this_cil, cil_ix);
+              if (!bv_bit_test_then_set (r->t_bv_nrl_seen, prediction_nrlid))
                 {
-                  const IRL prediction_irl = IRL_by_ID (prediction_irlid);
-                  const AHM prediction_ahm = First_AHM_of_IRL (prediction_irl);
+                  const NRL prediction_nrl = NRL_by_ID (prediction_nrlid);
+                  const AHM prediction_ahm = First_AHM_of_NRL (prediction_nrl);
                   @t}\comment{@>
                   /* If any of the assertions fail, do not add this AHM to
                   the YS, or look at anything predicted by it. */
                   if (!evaluate_zwas(r, 0, prediction_ahm)) continue;
                   key.t_ahm = prediction_ahm;
                   earley_item_create (r, key);
-                  *MARPA_DSTACK_PUSH(r->t_irl_cil_stack, CIL)
+                  *MARPA_DSTACK_PUSH(r->t_nrl_cil_stack, CIL)
                     = LHS_CIL_of_AHM(prediction_ahm);
                 }
             }
@@ -8148,7 +8148,7 @@ marpa_r_earleme_complete(Marpa_Recognizer r)
     G_EVENTS_CLEAR(g);
     psar_dealloc(Dot_PSAR_of_R(r));
     bv_clear (r->t_bv_nsyid_is_expected);
-    bv_clear (r->t_bv_irl_seen);
+    bv_clear (r->t_bv_nrl_seen);
     @<Initialize |current_earleme|@>@;
     @<Return 0 if no alternatives@>@;
     @<Initialize |current_earley_set|@>@;
@@ -8404,13 +8404,13 @@ active.
 
       int cil_ix;
       const AHM ahm = AHM_of_YIM (earley_item);
-      const CIL prediction_cil = Predicted_IRL_CIL_of_AHM (ahm);
+      const CIL prediction_cil = Predicted_NRL_CIL_of_AHM (ahm);
       const int prediction_count = Count_of_CIL (prediction_cil);
       for (cil_ix = 0; cil_ix < prediction_count; cil_ix++)
 	{
-	  const IRLID prediction_irlid = Item_of_CIL (prediction_cil, cil_ix);
-	  const IRL prediction_irl = IRL_by_ID (prediction_irlid);
-	  const AHM prediction_ahm = First_AHM_of_IRL (prediction_irl);
+	  const NRLID prediction_nrlid = Item_of_CIL (prediction_cil, cil_ix);
+	  const NRL prediction_nrl = NRL_by_ID (prediction_nrlid);
+	  const AHM prediction_ahm = First_AHM_of_NRL (prediction_nrl);
 	  earley_item_assign (r, current_earley_set, current_earley_set,
 			      prediction_ahm);
 	}
@@ -8819,9 +8819,9 @@ Leo item have not been fully populated.
 	    const YIM leo_base = YIM_of_PIM (this_pim);
 	    AHM potential_leo_penult_ahm = NULL;
 		const AHM leo_base_ahm = AHM_of_YIM (leo_base);
-		const IRL leo_base_irl = IRL_of_AHM (leo_base_ahm);
+		const NRL leo_base_nrl = NRL_of_AHM (leo_base_ahm);
 
-		if (!IRL_is_Leo (leo_base_irl))
+		if (!NRL_is_Leo (leo_base_nrl))
 		  goto NEXT_NSYID;
 		potential_leo_penult_ahm = leo_base_ahm;
             MARPA_ASSERT((int)potential_leo_penult_ahm);
@@ -9259,8 +9259,8 @@ marpa_r_clean(Marpa_Recognizer r)
 /* An obstack whose lifetime is that of the external method */
 struct marpa_obstack* const method_obstack = marpa_obs_init;
 
-YIMID *prediction_by_irl =
-  marpa_obs_new (method_obstack, YIMID, IRL_Count_of_G (g));
+YIMID *prediction_by_nrl =
+  marpa_obs_new (method_obstack, YIMID, NRL_Count_of_G (g));
 
 @ @<Destroy |marpa_r_clean| locals@> =
 {
@@ -9298,7 +9298,7 @@ will never be referred to.
     because there is always a scanned or an initial YIM.
     */
     while (YIM_was_Predicted(yim)) {
-      prediction_by_irl[IRLID_of_YIM(yim)] = yim_ix;
+      prediction_by_nrl[NRLID_of_YIM(yim)] = yim_ix;
       yim = yims_to_clean[--yim_ix];
     }
 }
@@ -9350,8 +9350,8 @@ will never be referred to.
       const int cil_count = Count_of_CIL (lhs_cil);
       for (cil_ix = 0; cil_ix < cil_count; cil_ix++)
 	{
-	  const IRLID irlid = Item_of_CIL (lhs_cil, cil_ix);
-	  const int predicted_yim_ix = prediction_by_irl[irlid];
+	  const NRLID nrlid = Item_of_CIL (lhs_cil, cil_ix);
+	  const int predicted_yim_ix = prediction_by_nrl[nrlid];
           const YIM predicted_yim = yims_to_clean[predicted_yim_ix];
           if (YIM_is_Rejected(predicted_yim)) continue;
 	  matrix_bit_set (acceptance_matrix, yim_to_clean_ix,
@@ -9789,7 +9789,7 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   /* If LHS is a brick symbol, we are done --
    insert the report item and return
    */
-  if (!IRL_has_Virtual_LHS (IRL_of_YIM (origin_yim))) {
+  if (!NRL_has_Virtual_LHS (NRL_of_YIM (origin_yim))) {
     int xrl_position = XRL_Position_of_AHM (report_ahm);
     int origin_of_xrl = Origin_Ord_of_YIM(origin_yim);
     XRLID xrl_id = ID_of_XRL (source_xrl);
@@ -9799,8 +9799,8 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
                      struct marpa_progress_item, 1);
 
     MARPA_OFF_DEBUG2("%s, === Adding report item ===", STRLOC);
-    MARPA_OFF_DEBUG3("%s, report irl = %d", STRLOC, IRLID_of_AHM(report_ahm));
-    MARPA_OFF_DEBUG3("%s, report irl position = %d", STRLOC, Position_of_AHM(report_ahm));
+    MARPA_OFF_DEBUG3("%s, report nrl = %d", STRLOC, NRLID_of_AHM(report_ahm));
+    MARPA_OFF_DEBUG3("%s, report nrl position = %d", STRLOC, Position_of_AHM(report_ahm));
 
     MARPA_OFF_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
     MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
@@ -10314,8 +10314,8 @@ Position is the dot position.
 @d OR_is_Token(or) (Type_of_OR(or) <= MAX_TOKEN_OR_NODE)
 @d Position_of_OR(or) ((or)->t_final.t_position)
 @d Type_of_OR(or) ((or)->t_final.t_position)
-@d IRL_of_OR(or) ((or)->t_final.t_irl)
-@d IRLID_of_OR(or) ID_of_IRL(IRL_of_OR(or))
+@d NRL_of_OR(or) ((or)->t_final.t_nrl)
+@d NRLID_of_OR(or) ID_of_NRL(NRL_of_OR(or))
 @d Origin_Ord_of_OR(or) ((or)->t_final.t_start_set_ordinal)
 @d ID_of_OR(or) ((or)->t_final.t_id)
 @d YS_Ord_of_OR(or) ((or)->t_draft.t_end_set_ordinal)
@@ -10332,7 +10332,7 @@ int t_position;
   int t_end_set_ordinal;
   int t_start_set_ordinal;
   ORID t_id;
-  IRL t_irl;
+  NRL t_nrl;
 
 @ @<Private structures@> =
 struct s_draft_or_node
@@ -10458,14 +10458,14 @@ MARPA_ASSERT(ahm_symbol_instance < SYMI_Count_of_G(g))@;
       or_node = PSL_Datum (or_psl, ahm_symbol_instance);
       if (!or_node || YS_Ord_of_OR(or_node) != work_earley_set_ordinal)
         {
-          const IRL irl = IRL_of_AHM(ahm);
+          const NRL nrl = NRL_of_AHM(ahm);
           or_node = last_or_node = or_node_new(b);
           PSL_Datum (or_psl, ahm_symbol_instance) = last_or_node;
           Origin_Ord_of_OR(or_node) = Origin_Ord_of_YIM(work_earley_item);
           YS_Ord_of_OR(or_node) = work_earley_set_ordinal;
-          IRL_of_OR(or_node) = irl;
+          NRL_of_OR(or_node) = nrl;
           Position_of_OR (or_node) =
-              ahm_symbol_instance - SYMI_of_IRL (irl) + 1;
+              ahm_symbol_instance - SYMI_of_NRL (nrl) + 1;
         }
         psi_or_node = or_node;
     }
@@ -10502,8 +10502,8 @@ and this is the case if |Position_of_OR(or_node) == 0|.
   const int null_count = Null_Count_of_AHM (ahm);
   if (null_count > 0)
     {
-      const IRL irl = IRL_of_AHM (ahm);
-      const int symbol_instance_of_rule = SYMI_of_IRL(irl);
+      const NRL nrl = NRL_of_AHM (ahm);
+      const int symbol_instance_of_rule = SYMI_of_NRL(nrl);
         const int first_null_symbol_instance =
           ahm_symbol_instance <
           0 ? symbol_instance_of_rule : ahm_symbol_instance + 1;
@@ -10515,12 +10515,12 @@ and this is the case if |Position_of_OR(or_node) == 0|.
           if (!or_node || YS_Ord_of_OR (or_node) != work_earley_set_ordinal) {
                 const int rhs_ix = symbol_instance - symbol_instance_of_rule;
                 const OR predecessor = rhs_ix ? last_or_node : NULL;
-                const OR cause = Nulling_OR_by_NSYID( RHSID_of_IRL (irl, rhs_ix ) );
+                const OR cause = Nulling_OR_by_NSYID( RHSID_of_NRL (nrl, rhs_ix ) );
                 or_node = PSL_Datum (or_psl, symbol_instance)
                   = last_or_node = or_node_new(b);
                 Origin_Ord_of_OR (or_node) = work_origin_ordinal;
                 YS_Ord_of_OR (or_node) = work_earley_set_ordinal;
-                IRL_of_OR (or_node) = irl;
+                NRL_of_OR (or_node) = nrl;
                 Position_of_OR (or_node) = rhs_ix + 1;
 MARPA_ASSERT(Position_of_OR(or_node) <= 1 || predecessor);
                 draft_and_node_add (bocage_setup_obs, or_node, predecessor,
@@ -10557,7 +10557,7 @@ expanded.
     {
       const int ordinal_of_set_of_this_leo_item = Ord_of_YS(YS_of_LIM(this_leo_item));
       const AHM path_ahm = Trailhead_AHM_of_LIM(previous_leo_item);
-      const IRL path_irl = IRL_of_AHM(path_ahm);
+      const NRL path_nrl = NRL_of_AHM(path_ahm);
       const int symbol_instance_of_path_ahm = SYMI_of_AHM(path_ahm);
       {
         OR last_or_node = NULL;
@@ -10585,9 +10585,9 @@ corresponds to the Leo predecessor.
               last_or_node;
           Origin_Ord_of_OR(or_node) = ordinal_of_set_of_this_leo_item;
           YS_Ord_of_OR(or_node) = work_earley_set_ordinal;
-          IRL_of_OR(or_node) = path_irl;
+          NRL_of_OR(or_node) = path_nrl;
           Position_of_OR (or_node) =
-              symbol_instance_of_path_ahm - SYMI_of_IRL (path_irl) + 1;
+              symbol_instance_of_path_ahm - SYMI_of_NRL (path_nrl) + 1;
         }
     }
 }
@@ -10607,24 +10607,24 @@ or-nodes follow a completion.
       MARPA_ASSERT (symbol_instance < SYMI_Count_of_G (g)) @;
       if (!or_node || YS_Ord_of_OR (or_node) != work_earley_set_ordinal)
         {
-          const int rhs_ix = symbol_instance - SYMI_of_IRL(path_irl);
-          MARPA_ASSERT (rhs_ix < Length_of_IRL (path_irl)) @;
+          const int rhs_ix = symbol_instance - SYMI_of_NRL(path_nrl);
+          MARPA_ASSERT (rhs_ix < Length_of_NRL (path_nrl)) @;
           const OR predecessor = rhs_ix ? last_or_node : NULL;
-          const OR cause = Nulling_OR_by_NSYID( RHSID_of_IRL (path_irl, rhs_ix ) );
-          MARPA_ASSERT (symbol_instance < Length_of_IRL (path_irl)) @;
+          const OR cause = Nulling_OR_by_NSYID( RHSID_of_NRL (path_nrl, rhs_ix ) );
+          MARPA_ASSERT (symbol_instance < Length_of_NRL (path_nrl)) @;
           MARPA_ASSERT (symbol_instance >= 0) @;
           or_node = last_or_node = or_node_new(b);
           PSL_Datum (this_earley_set_psl, symbol_instance) = or_node;
           Origin_Ord_of_OR (or_node) = ordinal_of_set_of_this_leo_item;
           YS_Ord_of_OR (or_node) = work_earley_set_ordinal;
-          IRL_of_OR (or_node) = path_irl;
+          NRL_of_OR (or_node) = path_nrl;
           Position_of_OR (or_node) = rhs_ix + 1;
 MARPA_ASSERT(Position_of_OR(or_node) <= 1 || predecessor);
           draft_and_node_add (bocage_setup_obs, or_node, predecessor, cause);
         }
       MARPA_ASSERT (Position_of_OR (or_node) <=
-                    SYMI_of_IRL (path_irl) + Length_of_IRL (path_irl)) @;
-      MARPA_ASSERT (Position_of_OR (or_node) >= SYMI_of_IRL (path_irl)) @;
+                    SYMI_of_NRL (path_nrl) + Length_of_NRL (path_nrl)) @;
+      MARPA_ASSERT (Position_of_OR (or_node) >= SYMI_of_NRL (path_nrl)) @;
     }
 }
 
@@ -10636,13 +10636,13 @@ and the completed rules.
 Note that this puts a limit on the number of symbols
 and internal rules in a grammar --- their total must fit in an
 int.
-@d WHEID_of_NSYID(nsyid) (irl_count+(nsyid))
-@d WHEID_of_IRLID(irlid) (irlid)
-@d WHEID_of_IRL(irl) WHEID_of_IRLID(ID_of_IRL(irl))
+@d WHEID_of_NSYID(nsyid) (nrl_count+(nsyid))
+@d WHEID_of_NRLID(nrlid) (nrlid)
+@d WHEID_of_NRL(nrl) WHEID_of_NRLID(ID_of_NRL(nrl))
 @d WHEID_of_OR(or) (
     wheid = OR_is_Token(or) ?
         WHEID_of_NSYID(NSYID_of_OR(or)) :
-        WHEID_of_IRL(IRL_of_OR(or))
+        WHEID_of_NRL(NRL_of_OR(or))
     )
 
 @<Private typedefs@> =
@@ -10789,9 +10789,9 @@ bit set.  At that point I can stop the ascent.
 @<Add draft and-nodes for chain starting with |leo_predecessor|@> =
 {
     /* The rule for the Leo path Earley item */
-    IRL path_irl = NULL;
+    NRL path_nrl = NULL;
     /* The rule for the previous Leo path Earley item */
-    IRL previous_path_irl;
+    NRL previous_path_nrl;
     LIM path_leo_item = leo_predecessor;
     LIM higher_path_leo_item = Predecessor_LIM_of_LIM(path_leo_item);
     OR dand_predecessor;
@@ -10800,7 +10800,7 @@ bit set.  At that point I can stop the ascent.
     dand_predecessor = set_or_from_yim(per_ys_data, base_earley_item);
     @<Set |path_or_node|@>@;
     @<Add draft and-nodes to the bottom or-node@>@;
-    previous_path_irl = path_irl;
+    previous_path_nrl = path_nrl;
     while (higher_path_leo_item) {
         path_leo_item = higher_path_leo_item;
         higher_path_leo_item = Predecessor_LIM_of_LIM(path_leo_item);
@@ -10809,7 +10809,7 @@ bit set.  At that point I can stop the ascent.
           = set_or_from_yim(per_ys_data, base_earley_item);
         @<Set |path_or_node|@>@;
         @<Add the draft and-nodes to an upper Leo path or-node@>@;
-        previous_path_irl = path_irl;
+        previous_path_nrl = path_nrl;
     }
 }
 
@@ -10860,7 +10860,7 @@ to add |DAND|'s to higher Leo path items will also duplicate.
 If so, the loop that ascends the Leo path can be ended at that point.
 @<Add the draft and-nodes to an upper Leo path or-node@> =
 {
-  const SYMI symbol_instance = SYMI_of_Completed_IRL(previous_path_irl);
+  const SYMI symbol_instance = SYMI_of_Completed_NRL(previous_path_nrl);
   const int origin = Ord_of_YS(YS_of_LIM(path_leo_item));
   const OR dand_cause = or_by_origin_and_symi(per_ys_data, origin, symbol_instance);
   if (!dand_is_duplicate(path_or_node, dand_predecessor, dand_cause)) {
@@ -10879,7 +10879,7 @@ For the predecessors, dotted rule is a function of the parent.
 For token causes, the alternative reading logic guaranteed that there would
 be no two tokens which differed only in value, so only the symbols needs to
 be compared.
-For component causes, they are always completions, so that only the IRL ID
+For component causes, they are always completions, so that only the NRL ID
 needs to be compared.
 @<Function definitions@> =
 PRIVATE
@@ -10905,9 +10905,9 @@ int dands_are_equal(OR predecessor_a, OR cause_a,
     }
   {
     /* If here, we know that both causes are rule completions. */
-    const IRLID irlid_of_a = IRLID_of_OR (cause_a);
-    const IRLID irlid_of_b = IRLID_of_OR (cause_b);
-    return irlid_of_a == irlid_of_b;
+    const NRLID nrlid_of_a = NRLID_of_OR (cause_a);
+    const NRLID nrlid_of_b = NRLID_of_OR (cause_b);
+    return nrlid_of_a == nrlid_of_b;
   }
   // Not reached
 }
@@ -10946,8 +10946,8 @@ OR set_or_from_yim ( struct s_bocage_setup_per_ys *per_ys_data,
   int symbol_instance;
   const int origin_ordinal = Origin_Ord_of_YIM (base_earley_item);
   const AHM ahm = AHM_of_YIM (base_earley_item);
-  path_irl = IRL_of_AHM (ahm);
-  symbol_instance = Last_Proper_SYMI_of_IRL (path_irl);
+  path_nrl = NRL_of_AHM (ahm);
+  symbol_instance = Last_Proper_SYMI_of_NRL (path_nrl);
   path_or_node = or_by_origin_and_symi(per_ys_data, origin_ordinal, symbol_instance);
 }
 
@@ -11009,7 +11009,7 @@ OR safe_or_from_yim(
       const int middle_ordinal = Origin_Ord_of_YIM (cause_earley_item);
       const AHM cause_ahm = AHM_of_YIM (cause_earley_item);
       const SYMI cause_symbol_instance =
-	SYMI_of_Completed_IRL (IRL_of_AHM (cause_ahm));
+	SYMI_of_Completed_NRL (NRL_of_AHM (cause_ahm));
       OR dand_predecessor = safe_or_from_yim (per_ys_data,
 					      predecessor_earley_item);
       const OR dand_cause =
@@ -11656,7 +11656,7 @@ int marpa_trv_origin(Marpa_Traverser trv)
 
 @
 @<Function definitions@> =
-Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
+Marpa_NRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
 {
   @<Return |-2| on failure@>@;
   @<Unpack traverser objects@>@;
@@ -11665,8 +11665,8 @@ Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser trv)
   {
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
-    const IRL nrl = IRL_of_AHM(ahm);
-    if (nrl) return ID_of_IRL(nrl);
+    const NRL nrl = NRL_of_AHM(ahm);
+    if (nrl) return ID_of_NRL(nrl);
   }
   return -1;
 }
@@ -12374,8 +12374,8 @@ to make sense.
 {
     int yim_ix;
     YIM* const earley_items = YIMs_of_YS(end_of_parse_earley_set);
-    const IRL start_irl = g->t_start_irl;
-    const IRLID sought_irl_id = ID_of_IRL(start_irl);
+    const NRL start_nrl = g->t_start_nrl;
+    const NRLID sought_nrl_id = ID_of_NRL(start_nrl);
     const int earley_item_count = YIM_Count_of_YS(end_of_parse_earley_set);
     for (yim_ix = 0; yim_ix < earley_item_count; yim_ix++) {
         const YIM earley_item = earley_items[yim_ix];
@@ -12383,7 +12383,7 @@ to make sense.
         if (YIM_was_Predicted(earley_item)) continue;
         {
            const AHM ahm = AHM_of_YIM(earley_item);
-           if (IRLID_of_AHM(ahm) == sought_irl_id) {
+           if (NRLID_of_AHM(ahm) == sought_nrl_id) {
                 start_yim = earley_item;
                       break;
             }
@@ -12878,7 +12878,7 @@ int marpa_o_rank( Marpa_Order o)
        const NSYID nsy_id = NSYID_of_OR(cause_or);
        and_node_rank = Rank_of_NSY(NSY_by_ID(nsy_id));
     } else {
-       and_node_rank = Rank_of_IRL(IRL_of_OR(cause_or));
+       and_node_rank = Rank_of_NRL(NRL_of_OR(cause_or));
     }
 }
 
@@ -14099,7 +14099,7 @@ for the rule.
     while (1)
       {
         OR or;
-        IRL nook_irl;
+        NRL nook_nrl;
         Token_Value_of_V (v) = -1;
         RULEID_of_V (v) = -1;
         NOOK_of_V (v)--;
@@ -14168,16 +14168,16 @@ for the rule.
                 Token_Type_of_V (v) = DUMMY_OR_NODE;
               }
           }
-        nook_irl = IRL_of_OR (or);
-        if (Position_of_OR (or) == Length_of_IRL (nook_irl))
+        nook_nrl = NRL_of_OR (or);
+        if (Position_of_OR (or) == Length_of_NRL (nook_nrl))
           {
-            int virtual_rhs = IRL_has_Virtual_RHS (nook_irl);
-            int virtual_lhs = IRL_has_Virtual_LHS (nook_irl);
+            int virtual_rhs = NRL_has_Virtual_RHS (nook_nrl);
+            int virtual_lhs = NRL_has_Virtual_LHS (nook_nrl);
             int real_symbol_count;
             const MARPA_DSTACK virtual_stack = &VStack_of_V (v);
             if (virtual_lhs)
               {
-                real_symbol_count = Real_SYM_Count_of_IRL (nook_irl);
+                real_symbol_count = Real_SYM_Count_of_NRL (nook_nrl);
                 if (virtual_rhs)
                   {
                     *(MARPA_DSTACK_TOP (*virtual_stack, int)) += real_symbol_count;
@@ -14192,17 +14192,17 @@ for the rule.
 
                 if (virtual_rhs)
                   {
-                    real_symbol_count = Real_SYM_Count_of_IRL (nook_irl);
+                    real_symbol_count = Real_SYM_Count_of_NRL (nook_nrl);
                     real_symbol_count += *MARPA_DSTACK_POP (*virtual_stack, int);
                   }
                 else
                   {
-                    real_symbol_count = Length_of_IRL (nook_irl);
+                    real_symbol_count = Length_of_NRL (nook_nrl);
                   }
                 {
                   // Currently all rules with a non-virtual LHS are
                   // "semantic" rules.
-                  XRLID original_rule_id = ID_of_XRL (Source_XRL_of_IRL (nook_irl));
+                  XRLID original_rule_id = ID_of_XRL (Source_XRL_of_NRL (nook_nrl));
                   Arg_0_of_V (v) = Arg_N_of_V (v) - real_symbol_count + 1;
                   pop_arguments = 1;
                   if (lbv_bit_test (XRL_is_Valued_BV_of_V (v), original_rule_id))
@@ -15738,8 +15738,8 @@ if (_MARPA_UNLIKELY(!NSYID_of_G_Exists(nsy_id))) {
     return -1;
 }
 
-@ @<Fail if |irl_id| is invalid@> =
-if (_MARPA_UNLIKELY(!IRLID_of_G_is_Valid(irl_id))) {
+@ @<Fail if |nrl_id| is invalid@> =
+if (_MARPA_UNLIKELY(!NRLID_of_G_is_Valid(nrl_id))) {
     MARPA_ERROR (MARPA_ERR_INVALID_NRLID);
     return failure_indicator;
 }
@@ -16838,7 +16838,7 @@ int _marpa_b_or_node_origin(Marpa_Bocage b,
 }
 
 @ @<Function definitions@> =
-Marpa_IRL_ID _marpa_b_or_node_irl(Marpa_Bocage b,
+Marpa_NRL_ID _marpa_b_or_node_nrl(Marpa_Bocage b,
   Marpa_Or_Node_ID or_node_id)
 {
   OR or_node;
@@ -16847,7 +16847,7 @@ Marpa_IRL_ID _marpa_b_or_node_irl(Marpa_Bocage b,
   @<Fail if fatal error@>@;
   @<Check |or_node_id|@>@;
   @<Set |or_node| or fail@>@;
-  return IRLID_of_OR(or_node);
+  return NRLID_of_OR(or_node);
 }
 
 @ @<Function definitions@> =
@@ -16873,7 +16873,7 @@ int _marpa_b_or_node_is_whole(Marpa_Bocage b,
   @<Fail if fatal error@>@;
   @<Check |or_node_id|@>@;
   @<Set |or_node| or fail@>@;
-  return Position_of_OR(or_node) >= Length_of_IRL(IRL_of_OR(or_node)) ? 1 : 0;
+  return Position_of_OR(or_node) >= Length_of_NRL(NRL_of_OR(or_node)) ? 1 : 0;
 }
 
 @ @<Function definitions@> =
@@ -16886,7 +16886,7 @@ int _marpa_b_or_node_is_semantic(Marpa_Bocage b,
   @<Fail if fatal error@>@;
   @<Check |or_node_id|@>@;
   @<Set |or_node| or fail@>@;
-  return ! IRL_has_Virtual_LHS(IRL_of_OR(or_node));
+  return ! NRL_has_Virtual_LHS(NRL_of_OR(or_node));
 }
 
 @ @<Function definitions@> =
@@ -17308,7 +17308,7 @@ or_tag_safe (char * buffer, OR or)
   if (OR_is_Token(or)) return "TOKEN";
   if (Type_of_OR(or) == DUMMY_OR_NODE) return "DUMMY";
   sprintf (buffer, "R%d:%d@@%d-%d",
-           IRLID_of_OR (or), Position_of_OR (or),
+           NRLID_of_OR (or), Position_of_OR (or),
            Origin_Ord_of_OR (or),
            YS_Ord_of_OR (or));
   return buffer;
@@ -17338,9 +17338,9 @@ ahm_tag_safe (char * buffer, AHM ahm)
   if (!ahm) return "NULL";
   const int ahm_position = Position_of_AHM (ahm);
   if (ahm_position >= 0) {
-      sprintf (buffer, "R%d@@%d", IRLID_of_AHM (ahm), Position_of_AHM (ahm));
+      sprintf (buffer, "R%d@@%d", NRLID_of_AHM (ahm), Position_of_AHM (ahm));
   } else {
-      sprintf (buffer, "R%d@@end", IRLID_of_AHM (ahm));
+      sprintf (buffer, "R%d@@end", NRLID_of_AHM (ahm));
   }
   return buffer;
 }

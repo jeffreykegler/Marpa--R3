@@ -8522,31 +8522,31 @@ indexed by isyid.
 
     -- A Libmarpa "IRL" is a KOLLOS "NRL"
     -- Change the method names to follow Kollos terminology
-    _M.metal._marpa_g_irl_count = _M.class_grammar._irl_count
-    _M.metal._marpa_g_irl_is_virtual_lhs = _M.class_grammar._irl_is_virtual_lhs
-    _M.metal._marpa_g_irl_is_virtual_rhs = _M.class_grammar._irl_is_virtual_rhs
-    _M.metal._marpa_g_irl_length = _M.class_grammar._irl_length
-    _M.metal._marpa_g_irl_lhs = _M.class_grammar._irl_lhs
-    _M.metal._marpa_g_irl_rank = _M.class_grammar._irl_rank
-    _M.metal._marpa_g_irl_rhs = _M.class_grammar._irl_rhs
-    _M.metal._marpa_g_irl_semantic_equivalent = _M.class_grammar._irl_semantic_equivalent
-    _M.metal._marpa_g_ahm_irl = _M.class_grammar._ahm_irl
-    _M.class_grammar._nrl_is_virtual_lhs = _M.class_grammar._irl_is_virtual_lhs
-    _M.class_grammar._nrl_is_virtual_rhs = _M.class_grammar._irl_is_virtual_rhs
-    _M.class_grammar._nrl_length = _M.class_grammar._irl_length
-    _M.class_grammar._nrl_lhs = _M.class_grammar._irl_lhs
-    _M.class_grammar._nrl_rank = _M.class_grammar._irl_rank
-    _M.class_grammar._nrl_rhs = _M.class_grammar._irl_rhs
-    _M.class_grammar._nrl_semantic_equivalent = _M.class_grammar._irl_semantic_equivalent
-    _M.class_grammar._ahm_nrl = _M.class_grammar._ahm_irl
-    _M.class_grammar._irl_is_virtual_lhs = nil
-    _M.class_grammar._irl_is_virtual_rhs = nil
-    _M.class_grammar._irl_length = nil
-    _M.class_grammar._irl_lhs = nil
-    _M.class_grammar._irl_rank = nil
-    _M.class_grammar._irl_rhs = nil
-    _M.class_grammar._irl_semantic_equivalent = nil
-    _M.class_grammar._ahm_irl = nil
+    -- _M.metal._marpa_g_irl_count = _M.class_grammar._irl_count
+    -- _M.metal._marpa_g_irl_is_virtual_lhs = _M.class_grammar._irl_is_virtual_lhs
+    -- _M.metal._marpa_g_irl_is_virtual_rhs = _M.class_grammar._irl_is_virtual_rhs
+    -- _M.metal._marpa_g_irl_length = _M.class_grammar._irl_length
+    -- _M.metal._marpa_g_irl_lhs = _M.class_grammar._irl_lhs
+    -- _M.metal._marpa_g_irl_rank = _M.class_grammar._irl_rank
+    -- _M.metal._marpa_g_irl_rhs = _M.class_grammar._irl_rhs
+    -- _M.metal._marpa_g_irl_semantic_equivalent = _M.class_grammar._irl_semantic_equivalent
+    -- _M.metal._marpa_g_ahm_irl = _M.class_grammar._ahm_irl
+    -- _M.class_grammar._nrl_is_virtual_lhs = _M.class_grammar._irl_is_virtual_lhs
+    -- _M.class_grammar._nrl_is_virtual_rhs = _M.class_grammar._irl_is_virtual_rhs
+    -- _M.class_grammar._nrl_length = _M.class_grammar._irl_length
+    -- _M.class_grammar._nrl_lhs = _M.class_grammar._irl_lhs
+    -- _M.class_grammar._nrl_rank = _M.class_grammar._irl_rank
+    -- _M.class_grammar._nrl_rhs = _M.class_grammar._irl_rhs
+    -- _M.class_grammar._nrl_semantic_equivalent = _M.class_grammar._irl_semantic_equivalent
+    -- _M.class_grammar._ahm_nrl = _M.class_grammar._ahm_irl
+    -- _M.class_grammar._irl_is_virtual_lhs = nil
+    -- _M.class_grammar._irl_is_virtual_rhs = nil
+    -- _M.class_grammar._irl_length = nil
+    -- _M.class_grammar._irl_lhs = nil
+    -- _M.class_grammar._irl_rank = nil
+    -- _M.class_grammar._irl_rhs = nil
+    -- _M.class_grammar._irl_semantic_equivalent = nil
+    -- _M.class_grammar._ahm_irl = nil
 
     -- miranda: section+ most Lua function definitions
     function _M.grammar_new(slg, name)
@@ -8948,9 +8948,9 @@ Libmarpa wrapper class.
 
 ```
     -- miranda: section+ adjust metal tables
-    _M.metal._marpa_b_or_node_irl = _M.class_bocage._or_node_irl
-    _M.class_bocage._or_node_nrl = _M.class_bocage._or_node_irl
-    _M.class_bocage._or_node_irl = nil
+    -- _M.metal._marpa_b_or_node_irl = _M.class_bocage._or_node_irl
+    -- _M.class_bocage._or_node_nrl = _M.class_bocage._or_node_irl
+    -- _M.class_bocage._or_node_irl = nil
 ```
 
 ## Libmarpa interface
@@ -8965,7 +8965,7 @@ Libmarpa wrapper class.
         if (libmarpa_type == 'Marpa_AHM_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Earley_Item_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Earley_Set_ID') then return 'int' end
-        if (libmarpa_type == 'Marpa_IRL_ID') then return 'int' end
+        if (libmarpa_type == 'Marpa_NRL_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Nook_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_NSY_ID') then return 'int' end
         if (libmarpa_type == 'Marpa_Or_Node_ID') then return 'int' end
@@ -9219,18 +9219,18 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_v_nook"},
     {"_marpa_v_trace", "int", "flag"},
     {"_marpa_g_ahm_count"},
-    {"_marpa_g_ahm_irl", "Marpa_AHM_ID", "item_id"},
+    {"_marpa_g_ahm_nrl", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_postdot", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_null_count", "Marpa_AHM_ID", "item_id"},
     {"_marpa_g_ahm_raw_position", "Marpa_AHM_ID", "item_id"},
-    {"_marpa_g_irl_count"},
-    {"_marpa_g_irl_is_virtual_lhs", "Marpa_IRL_ID", "irl_id"},
-    {"_marpa_g_irl_is_virtual_rhs", "Marpa_IRL_ID", "irl_id"},
-    {"_marpa_g_irl_length", "Marpa_IRL_ID", "irl_id"},
-    {"_marpa_g_irl_lhs", "Marpa_IRL_ID", "irl_id"},
-    {"_marpa_g_irl_rank", "Marpa_IRL_ID", "irl_id"},
-    {"_marpa_g_irl_rhs", "Marpa_IRL_ID", "irl_id", "int", "ix"},
-    {"_marpa_g_irl_semantic_equivalent", "Marpa_IRL_ID", "irl_id"},
+    {"_marpa_g_nrl_count"},
+    {"_marpa_g_nrl_is_virtual_lhs", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_nrl_is_virtual_rhs", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_nrl_length", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_nrl_lhs", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_nrl_rank", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_nrl_rhs", "Marpa_NRL_ID", "nrl_id", "int", "ix"},
+    {"_marpa_g_nrl_semantic_equivalent", "Marpa_NRL_ID", "nrl_id"},
     {"_marpa_g_nsy_count"},
     {"_marpa_g_nsy_is_lhs", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
@@ -9239,13 +9239,13 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_nsy_lhs_xrl", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_rank", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_xrl_offset", "Marpa_NSY_ID", "nsy_id"},
-    {"_marpa_g_real_symbol_count", "Marpa_IRL_ID", "irl_id"},
+    {"_marpa_g_real_symbol_count", "Marpa_NRL_ID", "nrl_id"},
     {"_marpa_g_rule_is_keep_separation", "Marpa_Rule_ID", "rule_id"},
     {"_marpa_g_rule_is_used", "Marpa_Rule_ID", "rule_id"},
-    {"_marpa_g_source_xrl", "Marpa_IRL_ID", "irl_id"},
+    {"_marpa_g_source_xrl", "Marpa_NRL_ID", "nrl_id"},
     {"_marpa_g_source_xsy", "Marpa_NSY_ID", "nsy_id"},
-    {"_marpa_g_virtual_end", "Marpa_IRL_ID", "irl_id"},
-    {"_marpa_g_virtual_start", "Marpa_IRL_ID", "irl_id"},
+    {"_marpa_g_virtual_end", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_virtual_start", "Marpa_NRL_ID", "nrl_id"},
     {"_marpa_g_xsy_nsy", "Marpa_Symbol_ID", "symid"},
     {"_marpa_g_xsy_nulling_nsy", "Marpa_Symbol_ID", "symid"},
     {"_marpa_r_earley_item_origin"},
@@ -9279,7 +9279,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_b_and_node_symbol", "Marpa_And_Node_ID", "and_node_id"},
     {"_marpa_b_or_node_and_count", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_b_or_node_first_and", "Marpa_Or_Node_ID", "ordinal"},
-    {"_marpa_b_or_node_irl", "Marpa_Or_Node_ID", "ordinal"},
+    {"_marpa_b_or_node_nrl", "Marpa_Or_Node_ID", "ordinal"},
     {"_marpa_b_or_node_is_semantic", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_b_or_node_is_whole", "Marpa_Or_Node_ID", "or_node_id"},
     {"_marpa_b_or_node_last_and", "Marpa_Or_Node_ID", "ordinal"},

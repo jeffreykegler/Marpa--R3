@@ -3451,7 +3451,7 @@ or on other failure, @minus{}2.
 
 @end deftypefun
 
-@deftypefun Marpa_IRL_ID marpa_trv_nrl_id(Marpa_Traverser @var{trv})
+@deftypefun Marpa_NRL_ID marpa_trv_nrl_id(Marpa_Traverser @var{trv})
 
 Return value on success: The ID of the NRL.
 
