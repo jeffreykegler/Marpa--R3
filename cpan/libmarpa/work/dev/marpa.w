@@ -2208,21 +2208,21 @@ and it is used in a lot of places.
 PRIVATE
   IRL irl_start (GRAMMAR g, const ISYID lhs, const ISYID * rhs, int length)
 {
-  IRL xrl;
+  IRL irl;
   const size_t sizeof_irl = offsetof (struct s_irl, t_symbols) +
-    ((size_t)length + 1) * sizeof (xrl->t_symbols[0]);
-  xrl = marpa_obs_start (g->t_irl_obs, sizeof_irl, ALIGNOF(IRL));
-  Length_of_IRL (xrl) = length;
-  xrl->t_symbols[0] = lhs;
+    ((size_t)length + 1) * sizeof (irl->t_symbols[0]);
+  irl = marpa_obs_start (g->t_irl_obs, sizeof_irl, ALIGNOF(IRL));
+  Length_of_IRL (irl) = length;
+  irl->t_symbols[0] = lhs;
   ISY_is_LHS (ISY_by_ID (lhs)) = 1;
   {
     int i;
     for (i = 0; i < length; i++)
       {
-        xrl->t_symbols[i + 1] = rhs[i];
+        irl->t_symbols[i + 1] = rhs[i];
       }
   }
-  return xrl;
+  return irl;
 }
 
 PRIVATE
@@ -2434,9 +2434,9 @@ you lose track of what you are trying to say.
 PRIVATE_NOT_INLINE int
 duplicate_rule_cmp (const void *ap, const void *bp, void *param @,@, UNUSED)
 {
-  IRL xrl1 = (IRL) ap;
-  IRL xrl2 = (IRL) bp;
-  int diff = LHS_ID_of_IRL (xrl2) - LHS_ID_of_IRL (xrl1);
+  IRL irl1 = (IRL) ap;
+  IRL irl2 = (IRL) bp;
+  int diff = LHS_ID_of_IRL (irl2) - LHS_ID_of_IRL (irl1);
   if (diff)
     return diff;
   {
@@ -2445,13 +2445,13 @@ duplicate_rule_cmp (const void *ap, const void *bp, void *param @,@, UNUSED)
       we only need to compare the RHS of
       rules of the same length */
     int ix;
-    const int length = Length_of_IRL (xrl1);
-    diff = Length_of_IRL (xrl2) - length;
+    const int length = Length_of_IRL (irl1);
+    diff = Length_of_IRL (irl2) - length;
     if (diff)
       return diff;
     for (ix = 0; ix < length; ix++)
       {
-        diff = RHS_ID_of_IRL (xrl2, ix) - RHS_ID_of_IRL (xrl1, ix);
+        diff = RHS_ID_of_IRL (irl2, ix) - RHS_ID_of_IRL (irl1, ix);
         if (diff)
           return diff;
       }
@@ -2479,7 +2479,7 @@ I believe
 by the time 64-bit machines become universal,
 nobody will have noticed this restriction.
 @d MAX_RHS_LENGTH (INT_MAX >> (2))
-@d Length_of_IRL(xrl) ((xrl)->t_rhs_length)
+@d Length_of_IRL(irl) ((irl)->t_rhs_length)
 @<Int aligned rule elements@> = int t_rhs_length;
 @ The symbols come at the end of the |marpa_rule| structure,
 so that they can be variable length.
@@ -2532,18 +2532,18 @@ int marpa_g_rule_length(Marpa_Grammar g, Marpa_Rule_ID irl_id) {
 
 @*1 Symbols of the rule.
 @d LHS_ID_of_RULE(rule) ((rule)->t_symbols[0])
-@d LHS_ID_of_IRL(xrl) ((xrl)->t_symbols[0])
+@d LHS_ID_of_IRL(irl) ((irl)->t_symbols[0])
 @d RHS_ID_of_RULE(rule, position)
     ((rule)->t_symbols[(position)+1])
-@d RHS_ID_of_IRL(xrl, position)
-    ((xrl)->t_symbols[(position)+1])
+@d RHS_ID_of_IRL(irl, position)
+    ((irl)->t_symbols[(position)+1])
 
 @*0 Rule ID.
 The {\bf rule ID} is a number which
 acts as the unique identifier for a rule.
 The rule ID is initialized when the rule is
 added to the list of rules.
-@d ID_of_IRL(xrl) ((xrl)->t_id)
+@d ID_of_IRL(irl) ((irl)->t_id)
 @d ID_of_RULE(rule) ID_of_IRL(rule)
 @<Int aligned rule elements@> = Marpa_Rule_ID t_id;
 
@@ -2557,28 +2557,28 @@ rule->t_rank = Default_Rank_of_G(g);
 int marpa_g_rule_rank(Marpa_Grammar g,
   Marpa_Rule_ID irl_id)
 {
-    IRL xrl;
+    IRL irl;
     @<Return |-2| on failure@>@;
     clear_error(g);
     @<Fail if fatal error@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Fail if |irl_id| does not exist@>@;
     clear_error(g);
-    xrl = IRL_by_ID (irl_id);
-    return Rank_of_IRL(xrl);
+    irl = IRL_by_ID (irl_id);
+    return Rank_of_IRL(irl);
 }
 @ @<Function definitions@> =
 int marpa_g_rule_rank_set(
 Marpa_Grammar g, Marpa_Rule_ID irl_id, Marpa_Rank rank)
 {
-    IRL xrl;
+    IRL irl;
     @<Return |-2| on failure@>@;
     clear_error(g);
     @<Fail if fatal error@>@;
     @<Fail if precomputed@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Fail if |irl_id| does not exist@>@;
-    xrl = IRL_by_ID (irl_id);
+    irl = IRL_by_ID (irl_id);
     if (_MARPA_UNLIKELY (rank < MINIMUM_RANK))
       {
         MARPA_ERROR (MARPA_ERR_RANK_TOO_LOW);
@@ -2589,7 +2589,7 @@ Marpa_Grammar g, Marpa_Rule_ID irl_id, Marpa_Rank rank)
         MARPA_ERROR (MARPA_ERR_RANK_TOO_HIGH);
         return failure_indicator;
       }
-    return Rank_of_IRL (xrl) = rank;
+    return Rank_of_IRL (irl) = rank;
 }
 
 @*0 Rule ranks high?.
@@ -2607,31 +2607,31 @@ rule->t_null_ranks_high = 0;
 int marpa_g_rule_null_high (Marpa_Grammar g,
   Marpa_Rule_ID irl_id)
 {
-    IRL xrl;
+    IRL irl;
     @<Return |-2| on failure@>@;
     @<Fail if fatal error@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Soft fail if |irl_id| does not exist@>@;
-    xrl = IRL_by_ID (irl_id);
-    return Null_Ranks_High_of_RULE(xrl);
+    irl = IRL_by_ID (irl_id);
+    return Null_Ranks_High_of_RULE(irl);
 }
 @ @<Function definitions@> =
 int marpa_g_rule_null_high_set(
 Marpa_Grammar g, Marpa_Rule_ID irl_id, int flag)
 {
-    IRL xrl;
+    IRL irl;
     @<Return |-2| on failure@>@;
     @<Fail if fatal error@>@;
     @<Fail if precomputed@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Soft fail if |irl_id| does not exist@>@;
-    xrl = IRL_by_ID (irl_id);
+    irl = IRL_by_ID (irl_id);
     if (_MARPA_UNLIKELY (flag < 0 || flag > 1))
       {
         MARPA_ERROR (MARPA_ERR_INVALID_BOOLEAN);
         return failure_indicator;
       }
-    return Null_Ranks_High_of_RULE(xrl) = Boolean(flag);
+    return Null_Ranks_High_of_RULE(irl) = Boolean(flag);
 }
 
 @*0 Rule is user-created BNF?.
@@ -2667,17 +2667,17 @@ int marpa_g_sequence_min(
     Marpa_Rule_ID irl_id)
 {
     @<Return |-2| on failure@>@;
-    IRL xrl;
+    IRL irl;
     @<Fail if fatal error@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Fail if |irl_id| does not exist@>@;
-    xrl = IRL_by_ID(irl_id);
-    if (!IRL_is_Sequence(xrl))
+    irl = IRL_by_ID(irl_id);
+    if (!IRL_is_Sequence(irl))
       {
         MARPA_ERROR (MARPA_ERR_NOT_A_SEQUENCE);
         return -1;
       }
-    return Minimum_of_IRL(xrl);
+    return Minimum_of_IRL(irl);
 }
 
 @*0 Sequence separator.
@@ -2693,17 +2693,17 @@ Marpa_Symbol_ID marpa_g_sequence_separator(
     Marpa_Rule_ID irl_id)
 {
     @<Return |-2| on failure@>@;
-    IRL xrl;
+    IRL irl;
     @<Fail if fatal error@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Fail if |irl_id| does not exist@>@;
-    xrl = IRL_by_ID(irl_id);
-    if (!IRL_is_Sequence(xrl))
+    irl = IRL_by_ID(irl_id);
+    if (!IRL_is_Sequence(irl))
       {
         MARPA_ERROR (MARPA_ERR_NOT_A_SEQUENCE);
         return failure_indicator;
       }
-    return Separator_of_IRL(xrl);
+    return Separator_of_IRL(irl);
 }
 
 @*0 Rule keeps separator?.
@@ -2807,13 +2807,13 @@ IRL_is_Nulling(rule) = 0;
 int marpa_g_rule_is_nulling(Marpa_Grammar g, Marpa_Rule_ID irl_id)
 {
   @<Return |-2| on failure@>@;
-  IRL xrl;
+  IRL irl;
   @<Fail if fatal error@>@;
   @<Fail if not precomputed@>@;
   @<Fail if |irl_id| is malformed@>@;
   @<Soft fail if |irl_id| does not exist@>@;
-  xrl = IRL_by_ID(irl_id);
-  return IRL_is_Nulling(xrl);
+  irl = IRL_by_ID(irl_id);
+  return IRL_is_Nulling(irl);
 }
 
 @*0 Is rule nullable?.
@@ -2826,13 +2826,13 @@ IRL_is_Nullable(rule) = 0;
 int marpa_g_rule_is_nullable(Marpa_Grammar g, Marpa_Rule_ID irl_id)
 {
   @<Return |-2| on failure@>@;
-  IRL xrl;
+  IRL irl;
   @<Fail if fatal error@>@;
   @<Fail if not precomputed@>@;
   @<Fail if |irl_id| is malformed@>@;
   @<Soft fail if |irl_id| does not exist@>@;
-  xrl = IRL_by_ID(irl_id);
-  return IRL_is_Nullable(xrl);
+  irl = IRL_by_ID(irl_id);
+  return IRL_is_Nullable(irl);
 }
 
 @*0 Is rule accessible?.
@@ -2845,13 +2845,13 @@ IRL_is_Accessible(rule) = 1;
 int marpa_g_rule_is_accessible(Marpa_Grammar g, Marpa_Rule_ID irl_id)
 {
   @<Return |-2| on failure@>@;
-  IRL xrl;
+  IRL irl;
   @<Fail if fatal error@>@;
   @<Fail if not precomputed@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Soft fail if |irl_id| does not exist@>@;
-  xrl = IRL_by_ID(irl_id);
-  return IRL_is_Accessible(xrl);
+  irl = IRL_by_ID(irl_id);
+  return IRL_is_Accessible(irl);
 }
 
 @*0 Is rule productive?.
@@ -2864,13 +2864,13 @@ IRL_is_Productive(rule) = 1;
 int marpa_g_rule_is_productive(Marpa_Grammar g, Marpa_Rule_ID irl_id)
 {
   @<Return |-2| on failure@>@;
-  IRL xrl;
+  IRL irl;
   @<Fail if fatal error@>@;
   @<Fail if not precomputed@>@;
     @<Fail if |irl_id| is malformed@>@;
     @<Soft fail if |irl_id| does not exist@>@;
-  xrl = IRL_by_ID(irl_id);
-  return IRL_is_Productive(xrl);
+  irl = IRL_by_ID(irl_id);
+  return IRL_is_Productive(irl);
 }
 
 @*0 Is IRL used?.
@@ -3139,12 +3139,12 @@ The rank of the internal rule.
 assume that |t_source_irl| is not |NULL|.
 @d EXTERNAL_RANK_FACTOR 4
 @d MAXIMUM_CHAF_RANK 3
-@d NRL_CHAF_Rank_by_IRL( xrl, chaf_rank) (
-  ((xrl)->t_rank * EXTERNAL_RANK_FACTOR) +
-    (((xrl)->t_null_ranks_high) ? (MAXIMUM_CHAF_RANK -
+@d NRL_CHAF_Rank_by_IRL( irl, chaf_rank) (
+  ((irl)->t_rank * EXTERNAL_RANK_FACTOR) +
+    (((irl)->t_null_ranks_high) ? (MAXIMUM_CHAF_RANK -
                                    (chaf_rank)) : (chaf_rank))
 )
-@d NRL_Rank_by_IRL(xrl) NRL_CHAF_Rank_by_IRL((xrl), MAXIMUM_CHAF_RANK)
+@d NRL_Rank_by_IRL(irl) NRL_CHAF_Rank_by_IRL((irl), MAXIMUM_CHAF_RANK)
 @d Rank_of_NRL(nrl) ((nrl)->t_rank)
 @<Int aligned NRL elements@> = Marpa_Rank t_rank;
 @ @<Initialize NRL elements@> =
@@ -3724,11 +3724,11 @@ and productive.
   IRLID irl_id;
   for (irl_id = 0; irl_id < irl_count; irl_id++)
     {
-      const IRL xrl = IRL_by_ID (irl_id);
-      const ISYID lhs_id = LHS_ID_of_IRL (xrl);
+      const IRL irl = IRL_by_ID (irl_id);
+      const ISYID lhs_id = LHS_ID_of_IRL (irl);
       const ISY lhs = ISY_by_ID (lhs_id);
-      IRL_is_Accessible (xrl) = ISY_is_Accessible (lhs);
-      if (IRL_is_Sequence (xrl))
+      IRL_is_Accessible (irl) = ISY_is_Accessible (lhs);
+      if (IRL_is_Sequence (irl))
         {
           @<Classify sequence rule@>@;
           continue;
@@ -3745,9 +3745,9 @@ Classify as nulling, nullable or productive.
   int is_nulling = 1;
   int is_nullable = 1;
   int is_productive = 1;
-  for (rh_ix = 0; rh_ix < Length_of_IRL (xrl); rh_ix++)
+  for (rh_ix = 0; rh_ix < Length_of_IRL (irl); rh_ix++)
     {
-      const ISYID rhs_id = RHS_ID_of_IRL (xrl, rh_ix);
+      const ISYID rhs_id = RHS_ID_of_IRL (irl, rh_ix);
       const ISY rh_isy = ISY_by_ID (rhs_id);
       if (_MARPA_LIKELY (!ISY_is_Nulling (rh_isy)))
         is_nulling = 0;
@@ -3756,11 +3756,11 @@ Classify as nulling, nullable or productive.
       if (_MARPA_UNLIKELY (!ISY_is_Productive (rh_isy)))
         is_productive = 0;
     }
-  IRL_is_Nulling (xrl) = Boolean(is_nulling);
-  IRL_is_Nullable (xrl) = Boolean(is_nullable);
-  IRL_is_Productive (xrl) = Boolean(is_productive);
-  IRL_is_Used (xrl) = IRL_is_Accessible (xrl) && IRL_is_Productive (xrl)
-    && !IRL_is_Nulling (xrl);
+  IRL_is_Nulling (irl) = Boolean(is_nulling);
+  IRL_is_Nullable (irl) = Boolean(is_nullable);
+  IRL_is_Productive (irl) = Boolean(is_productive);
+  IRL_is_Used (irl) = IRL_is_Accessible (irl) && IRL_is_Productive (irl)
+    && !IRL_is_Nulling (irl);
 }
 
 @ Accessibility was determined in outer loop.
@@ -3772,28 +3772,28 @@ sequence which don't require separators.
 But currently we don't both -- we just mark the rule unproductive.
 @<Classify sequence rule@> =
 {
-  const ISYID rhs_id = RHS_ID_of_IRL (xrl, 0);
+  const ISYID rhs_id = RHS_ID_of_IRL (irl, 0);
   const ISY rh_isy = ISY_by_ID (rhs_id);
-  const ISYID separator_id = Separator_of_IRL (xrl);
+  const ISYID separator_id = Separator_of_IRL (irl);
 
     @t}\comment{@>
      /* A sequence rule is nullable if it can be zero length or
     if its RHS is nullable */
-  IRL_is_Nullable (xrl) = Minimum_of_IRL (xrl) <= 0
+  IRL_is_Nullable (irl) = Minimum_of_IRL (irl) <= 0
     || ISY_is_Nullable (rh_isy);@;
 
     @t}\comment{@>
      /* A sequence rule is nulling if its RHS is nulling */
-  IRL_is_Nulling (xrl) = ISY_is_Nulling (rh_isy);
+  IRL_is_Nulling (irl) = ISY_is_Nulling (rh_isy);
 
     @t}\comment{@>
      /* A sequence rule is productive
      if it is nulling or if its RHS is productive */
-  IRL_is_Productive (xrl) = IRL_is_Nullable (xrl) || ISY_is_Productive (rh_isy);
+  IRL_is_Productive (irl) = IRL_is_Nullable (irl) || ISY_is_Productive (rh_isy);
 
     @t}\comment{@>
   // Initialize to used if accessible and RHS is productive
-  IRL_is_Used (xrl) = IRL_is_Accessible (xrl) && ISY_is_Productive (rh_isy);
+  IRL_is_Used (irl) = IRL_is_Accessible (irl) && ISY_is_Productive (rh_isy);
 
     @t}\comment{@>
   // Touch-ups to account for the separator
@@ -3805,7 +3805,7 @@ But currently we don't both -- we just mark the rule unproductive.
         /* A non-nulling separator means a non-nulling rule */
       if (!ISY_is_Nulling (separator_isy))
         {
-          IRL_is_Nulling (xrl) = 0;
+          IRL_is_Nulling (irl) = 0;
         }
 
     @t}\comment{@>
@@ -3813,17 +3813,17 @@ But currently we don't both -- we just mark the rule unproductive.
           unless it is nullable.  */
       if (_MARPA_UNLIKELY(!ISY_is_Productive (separator_isy)))
         {
-          IRL_is_Productive (xrl) = IRL_is_Nullable(xrl);
+          IRL_is_Productive (irl) = IRL_is_Nullable(irl);
 
     @t}\comment{@>
           // Do not use a sequence rule with an unproductive separator
-          IRL_is_Used(xrl) = 0;
+          IRL_is_Used(irl) = 0;
         }
   }
 
     @t}\comment{@>
   // Do not use if nulling
-  if (IRL_is_Nulling (xrl)) IRL_is_Used (xrl) = 0;
+  if (IRL_is_Nulling (irl)) IRL_is_Used (irl) = 0;
 }
 
 @ Those LHS terminals that have not been explicitly marked
@@ -3867,7 +3867,7 @@ Change so that this runs only if there are prediction events.
 @<Populate nullification CILs@> =
 {
   ISYID isyid;
-  IRLID xrlid;
+  IRLID irlid;
     @t}\comment{@>
   /* Use this to make sure we have enough CILAR buffer space */
   int nullable_isy_count = 0;
@@ -3890,16 +3890,16 @@ Change so that this runs only if there are prediction events.
       matrix_bit_set (nullification_matrix, isyid,
                       isyid);
     }
-  for (xrlid = 0; xrlid < irl_count; xrlid++)
+  for (irlid = 0; irlid < irl_count; irlid++)
     {
       int rh_ix;
-      IRL xrl = IRL_by_ID (xrlid);
-      const ISYID lhs_id = LHS_ID_of_IRL (xrl);
-      if (IRL_is_Nullable (xrl))
+      IRL irl = IRL_by_ID (irlid);
+      const ISYID lhs_id = LHS_ID_of_IRL (irl);
+      if (IRL_is_Nullable (irl))
         {
-          for (rh_ix = 0; rh_ix < Length_of_IRL (xrl); rh_ix++)
+          for (rh_ix = 0; rh_ix < Length_of_IRL (irl); rh_ix++)
             {
-              const ISYID rhs_id = RHS_ID_of_IRL (xrl, rh_ix);
+              const ISYID rhs_id = RHS_ID_of_IRL (irl, rh_ix);
               matrix_bit_set (nullification_matrix, lhs_id,
                               rhs_id);
             }
@@ -5923,7 +5923,7 @@ marpa_g_zwa_place(Marpa_Grammar g,
   @<Return |-2| on failure@>@;
   void* avl_insert_result;
   ZWP zwp;
-  IRL xrl;
+  IRL irl;
   int irl_length;
   @<Fail if fatal error@>@;
   @<Fail if precomputed@>@;
@@ -5931,18 +5931,18 @@ marpa_g_zwa_place(Marpa_Grammar g,
   @<Soft fail if |irl_id| does not exist@>@;
   @<Fail if |zwaid| is malformed@>@;
   @<Fail if |zwaid| does not exist@>@;
-  xrl = IRL_by_ID(irl_id);
+  irl = IRL_by_ID(irl_id);
   if (rhs_ix < -1) {
     MARPA_ERROR(MARPA_ERR_RHS_IX_NEGATIVE);
     return failure_indicator;
   }
-  irl_length = Length_of_IRL(xrl);
+  irl_length = Length_of_IRL(irl);
   if (irl_length <= rhs_ix) {
     MARPA_ERROR(MARPA_ERR_RHS_IX_OOB);
     return failure_indicator;
   }
   if (rhs_ix == -1) {
-     rhs_ix = IRL_is_Sequence(xrl) ? 1 : irl_length;
+     rhs_ix = IRL_is_Sequence(irl) ? 1 : irl_length;
   }
   zwp = marpa_obs_new(g->t_obs, ZWP_Object, 1);
   IRLID_of_ZWP(zwp) = irl_id;
@@ -9802,8 +9802,8 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
     MARPA_OFF_DEBUG3("%s, report nrl = %d", STRLOC, NRLID_of_AHM(report_ahm));
     MARPA_OFF_DEBUG3("%s, report nrl position = %d", STRLOC, Position_of_AHM(report_ahm));
 
-    MARPA_OFF_DEBUG3("%s, xrl = %d", STRLOC, ID_of_IRL (source_irl));
-    MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, IRL_Position_of_AHM (report_ahm));
+    MARPA_OFF_DEBUG3("%s, irl = %d", STRLOC, ID_of_IRL (source_irl));
+    MARPA_OFF_DEBUG3("%s, irl dot = %d", STRLOC, IRL_Position_of_AHM (report_ahm));
     MARPA_OFF_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
 
     Position_of_PROGRESS (new_report_item) = irl_position;
@@ -11600,8 +11600,8 @@ Marpa_Rule_ID marpa_trv_rule_id(Marpa_Traverser trv)
   {
     const YIM yim = YIM_of_TRV(trv);
     const AHM ahm = AHM_of_YIM(yim);
-    const IRL xrl = IRL_of_AHM(ahm);
-    if (xrl) return ID_of_IRL(xrl);
+    const IRL irl = IRL_of_AHM(ahm);
+    if (irl) return ID_of_IRL(irl);
   }
   return -1;
 }
@@ -11783,13 +11783,13 @@ marpa_ltrv_trailhead_eim (Marpa_LTraverser ltrv, int*p_dot, Marpa_Earley_Set_ID*
       const LIM lim = LIM_of_LTRV (ltrv);
       const AHM ahm = Trailhead_AHM_of_LIM (lim);
       const YIM yim = Trailhead_YIM_of_LIM (lim);
-      const IRL xrl = IRL_of_AHM (ahm);
-      if (xrl) {
+      const IRL irl = IRL_of_AHM (ahm);
+      if (irl) {
           if (p_dot)
               *p_dot = IRL_Position_of_AHM (ahm);
           if (p_origin)
               *p_origin = Origin_Ord_of_YIM (yim);
-          return ID_of_IRL (xrl);
+          return ID_of_IRL (irl);
       }
   }
   return -1;
@@ -13935,8 +13935,8 @@ int marpa_v_rule_is_valued_set (
     @<Fail if |irl_id| is malformed@>@;
     @<Soft fail if |irl_id| does not exist@>@;
     {
-      const IRL xrl = IRL_by_ID (irl_id);
-      const ISYID isy_id = LHS_ID_of_IRL (xrl);
+      const IRL irl = IRL_by_ID (irl_id);
+      const ISYID isy_id = LHS_ID_of_IRL (irl);
       return symbol_is_valued_set (v, isy_id, value);
     }
 }
@@ -13953,8 +13953,8 @@ int marpa_v_rule_is_valued (
     @<Fail if |irl_id| is malformed@>@;
     @<Soft fail if |irl_id| does not exist@>@;
     {
-      const IRL xrl = IRL_by_ID (irl_id);
-      const ISYID isy_id = LHS_ID_of_IRL (xrl);
+      const IRL irl = IRL_by_ID (irl_id);
+      const ISYID isy_id = LHS_ID_of_IRL (irl);
       return symbol_is_valued (v, isy_id);
     }
 }
@@ -14044,13 +14044,13 @@ for the rule.
   const LBV isy_bv = ISY_is_Valued_BV_of_V(v);
   const IRLID irl_count = IRL_Count_of_G(g);
   const LBV irl_bv = lbv_obs_new0(v->t_obs, irl_count);
-  IRLID xrlid ;
+  IRLID irlid ;
   IRL_is_Valued_BV_of_V(v) = irl_bv;
-  for (xrlid = 0; xrlid < irl_count; xrlid++) {
-      const IRL xrl = IRL_by_ID(xrlid);
-      const ISYID lhs_isy_id = LHS_ID_of_IRL(xrl);
+  for (irlid = 0; irlid < irl_count; irlid++) {
+      const IRL irl = IRL_by_ID(irlid);
+      const ISYID lhs_isy_id = LHS_ID_of_IRL(irl);
       if (lbv_bit_test(isy_bv, lhs_isy_id)) {
-          lbv_bit_set(irl_bv, xrlid);
+          lbv_bit_set(irl_bv, irlid);
       }
   }
 }

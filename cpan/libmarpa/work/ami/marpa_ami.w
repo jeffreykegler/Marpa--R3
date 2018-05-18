@@ -124,7 +124,7 @@
 @s PSL int
 @s RULE int
 @s RULEID int
-@s XRL int
+@s IRL int
 
 @** License.
 \bigskip\noindent
