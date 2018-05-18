@@ -1831,7 +1831,7 @@ it is the non-nullable NSY.
 @<Widely aligned XSY elements@> = NSY t_nsy_equivalent;
 @ @<Initialize XSY elements@> = NSY_of_XSY(xsy) = NULL;
 @ @<Function definitions@> =
-Marpa_NSY_ID _marpa_g_xsy_nsy(
+Marpa_NSY_ID _marpa_g_isy_nsy(
     Marpa_Grammar g,
     Marpa_Symbol_ID xsy_id)
 {
@@ -1863,7 +1863,7 @@ there is no nulling internal equivalent.
 @<Widely aligned XSY elements@> = NSY t_nulling_nsy;
 @ @<Initialize XSY elements@> = Nulling_NSY_of_XSY(xsy) = NULL;
 @ @<Function definitions@> =
-Marpa_NSY_ID _marpa_g_xsy_nulling_nsy(
+Marpa_NSY_ID _marpa_g_isy_nulling_nsy(
     Marpa_Grammar g,
     Marpa_Symbol_ID xsy_id)
 {
@@ -2080,22 +2080,22 @@ the external symbol that it is derived from.
 There is always a non-null source XSY.
 It is used in ranking, and is also convenient
 for tracing and debugging.
-@d Source_XSY_of_NSY(nsy) ((nsy)->t_source_xsy)
+@d Source_XSY_of_NSY(nsy) ((nsy)->t_source_isy)
 @d Source_XSY_of_NSYID(nsyid) (Source_XSY_of_NSY(NSY_by_ID(nsyid)))
 @d Source_XSYID_of_NSYID(nsyid)
   ID_of_XSY(Source_XSY_of_NSYID(nsyid))
-@<Widely aligned NSY elements@> = XSY t_source_xsy;
+@<Widely aligned NSY elements@> = XSY t_source_isy;
 @ @<Initialize NSY elements@> = Source_XSY_of_NSY(nsy) = NULL;
 @ @<Function definitions@> =
-Marpa_Rule_ID _marpa_g_source_xsy(
+Marpa_Rule_ID _marpa_g_source_isy(
     Marpa_Grammar g,
     Marpa_NRL_ID nsy_id)
 {
-    XSY source_xsy;
+    XSY source_isy;
     @<Return |-2| on failure@>@;
     @<Fail if |nsy_id| is invalid@>@;
-    source_xsy = Source_XSY_of_NSYID(nsy_id);
-    return ID_of_XSY(source_xsy);
+    source_isy = Source_XSY_of_NSYID(nsy_id);
+    return ID_of_XSY(source_isy);
 }
 
 @*0 Source rule and offset.
@@ -2122,7 +2122,7 @@ returns the XRLID.
 If there is no such external rule, returns |-1|.
 On other failures, returns |-2|.
 @ @<Function definitions@> =
-Marpa_Rule_ID _marpa_g_nsy_lhs_xrl(Marpa_Grammar g, Marpa_NSY_ID nsy_id)
+Marpa_Rule_ID _marpa_g_nsy_lhs_irl(Marpa_Grammar g, Marpa_NSY_ID nsy_id)
 {
   @<Return |-2| on failure@>@;
   @<Fail if |nsy_id| is invalid@>@;
@@ -2146,7 +2146,7 @@ used in the CHAF rewrite.
 Otherwise, -1 is returned.
 On other failures, returns |-2|.
 @<Function definitions@> =
-int _marpa_g_nsy_xrl_offset(Marpa_Grammar g, Marpa_NSY_ID nsy_id)
+int _marpa_g_nsy_irl_offset(Marpa_Grammar g, Marpa_NSY_ID nsy_id)
 {
   @<Return |-2| on failure@>@;
   NSY nsy;
@@ -3118,25 +3118,25 @@ the XRL that it is derived from.
 Currently, there is no dedicated flag for determining
 whether this rule also provides the semantics,
 because the ``virtual LHS'' flag serves that purpose.
-@d Source_XRL_of_NRL(nrl) ((nrl)->t_source_xrl)
-@<Widely aligned NRL elements@> = XRL t_source_xrl;
+@d Source_XRL_of_NRL(nrl) ((nrl)->t_source_irl)
+@<Widely aligned NRL elements@> = XRL t_source_irl;
 @ @<Initialize NRL elements@> = Source_XRL_of_NRL(nrl) = NULL;
 @ @<Function definitions@> =
-Marpa_Rule_ID _marpa_g_source_xrl(
+Marpa_Rule_ID _marpa_g_source_irl(
     Marpa_Grammar g,
     Marpa_NRL_ID nrl_id)
 {
-    XRL source_xrl;
+    XRL source_irl;
     @<Return |-2| on failure@>@;
     @<Fail if |nrl_id| is invalid@>@;
-    source_xrl = Source_XRL_of_NRL(NRL_by_ID(nrl_id));
-    return source_xrl ? ID_of_XRL(source_xrl) : -1;
+    source_irl = Source_XRL_of_NRL(NRL_by_ID(nrl_id));
+    return source_irl ? ID_of_XRL(source_irl) : -1;
 }
 
 @*0 Rank.
 The rank of the internal rule.
 |NRL_Rank_by_XRL| and |NRL_CHAF_Rank_by_XRL|
-assume that |t_source_xrl| is not |NULL|.
+assume that |t_source_irl| is not |NULL|.
 @d EXTERNAL_RANK_FACTOR 4
 @d MAXIMUM_CHAF_RANK 3
 @d NRL_CHAF_Rank_by_XRL( xrl, chaf_rank) (
@@ -5187,18 +5187,18 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
 PRIVATE void
 memoize_xrl_data_for_AHM(AHM current_item, NRL nrl)
 {
-  XRL source_xrl = Source_XRL_of_NRL(nrl);
-  XRL_of_AHM(current_item) = source_xrl;
-  if (!source_xrl) {
+  XRL source_irl = Source_XRL_of_NRL(nrl);
+  XRL_of_AHM(current_item) = source_irl;
+  if (!source_irl) {
     @t}\comment{@>
-    /* |source_xrl = NULL|, which is the case only for the start rule */
+    /* |source_irl = NULL|, which is the case only for the start rule */
     XRL_Position_of_AHM(current_item) = -2;
     return;
   }
   {
     const int virtual_start = Virtual_Start_of_NRL (nrl);
     const int nrl_position = Position_of_AHM (current_item);
-    if (XRL_is_Sequence (source_xrl))
+    if (XRL_is_Sequence (source_irl))
       {
         @t}\comment{@>
         /* Note that a sequence XRL,
@@ -9777,13 +9777,13 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   AHM report_ahm,
     YIM origin_yim)
 {
-  const XRL source_xrl = XRL_of_AHM (report_ahm);
+  const XRL source_irl = XRL_of_AHM (report_ahm);
 
   MARPA_OFF_DEBUG5(
      "%s Calling progress_report_items_insert(%p, %p, %p)",
      STRLOC, report_tree, report_ahm, origin_yim);
 
-  if (!source_xrl) return;
+  if (!source_irl) return;
 
   @t}\comment{@>
   /* If LHS is a brick symbol, we are done --
@@ -9792,7 +9792,7 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
   if (!NRL_has_Virtual_LHS (NRL_of_YIM (origin_yim))) {
     int xrl_position = XRL_Position_of_AHM (report_ahm);
     int origin_of_xrl = Origin_Ord_of_YIM(origin_yim);
-    XRLID xrl_id = ID_of_XRL (source_xrl);
+    XRLID xrl_id = ID_of_XRL (source_irl);
 
     PROGRESS new_report_item =
       marpa_obs_new (MARPA_AVL_OBSTACK (report_tree),
@@ -9802,7 +9802,7 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
     MARPA_OFF_DEBUG3("%s, report nrl = %d", STRLOC, NRLID_of_AHM(report_ahm));
     MARPA_OFF_DEBUG3("%s, report nrl position = %d", STRLOC, Position_of_AHM(report_ahm));
 
-    MARPA_OFF_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_xrl));
+    MARPA_OFF_DEBUG3("%s, xrl = %d", STRLOC, ID_of_XRL (source_irl));
     MARPA_OFF_DEBUG3("%s, xrl dot = %d", STRLOC, XRL_Position_of_AHM (report_ahm));
     MARPA_OFF_DEBUG3("%s, origin ord = %d", STRLOC, Origin_Ord_of_YIM(origin_yim));
 
@@ -9820,7 +9820,7 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
    we only need to look at the top rules, which
    have brick LHS's
    */
-  if (XRL_is_Sequence(source_xrl)) return;
+  if (XRL_is_Sequence(source_irl)) return;
 
   @t}\comment{@>
   /* Look at the predecessor items for
@@ -14147,12 +14147,12 @@ for the rule.
                 Token_Type_of_V (v) = cause_or_node_type;
                 Arg_0_of_V (v) = ++Arg_N_of_V (v);
                 {
-                  const XSY source_xsy =
+                  const XSY source_isy =
                     Source_XSY_of_NSYID (NSYID_of_OR (cause_or_node));
-                  const XSYID source_xsy_id = ID_of_XSY (source_xsy);
-                  if (bv_bit_test (XSY_is_Valued_BV_of_V (v), source_xsy_id))
+                  const XSYID source_isy_id = ID_of_XSY (source_isy);
+                  if (bv_bit_test (XSY_is_Valued_BV_of_V (v), source_isy_id))
                     {
-                      XSYID_of_V (v) = source_xsy_id;
+                      XSYID_of_V (v) = source_isy_id;
                       Token_Start_of_V (v) = YS_ID_of_V (v);
                     }
                   else

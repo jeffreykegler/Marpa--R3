@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Fri May 18 15:44:00 2018
+; Fri May 18 16:26:20 2018
 EXPORTS
    marpa_check_version
    marpa_version
@@ -161,12 +161,12 @@ EXPORTS
    _marpa_g_nsy_is_start
    _marpa_g_nsy_is_nulling
    _marpa_g_nsy_is_lhs
-   _marpa_g_xsy_nulling_nsy
-   _marpa_g_xsy_nsy
+   _marpa_g_isy_nulling_nsy
+   _marpa_g_isy_nsy
    _marpa_g_nsy_is_semantic
-   _marpa_g_source_xsy
-   _marpa_g_nsy_lhs_xrl
-   _marpa_g_nsy_xrl_offset
+   _marpa_g_source_isy
+   _marpa_g_nsy_lhs_irl
+   _marpa_g_nsy_irl_offset
    _marpa_g_rule_is_keep_separation
    _marpa_g_nsy_count
    _marpa_g_nrl_count
@@ -178,7 +178,7 @@ EXPORTS
    _marpa_g_nrl_is_virtual_rhs
    _marpa_g_virtual_start
    _marpa_g_virtual_end
-   _marpa_g_source_xrl
+   _marpa_g_source_irl
    _marpa_g_real_symbol_count
    _marpa_g_nrl_semantic_equivalent
    _marpa_g_nrl_rank

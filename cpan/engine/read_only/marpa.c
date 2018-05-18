@@ -124,7 +124,7 @@ Nulled_XSYIDs_of_XSY(XSY_by_ID(xsyid) )
 #define LHS_CIL_of_NSYID(nsyid) LHS_CIL_of_NSY(NSY_by_ID(nsyid) ) 
 #define NSY_is_Semantic(nsy) ((nsy) ->t_is_semantic) 
 #define NSYID_is_Semantic(nsyid) (NSY_is_Semantic(NSY_by_ID(nsyid) ) ) 
-#define Source_XSY_of_NSY(nsy) ((nsy) ->t_source_xsy) 
+#define Source_XSY_of_NSY(nsy) ((nsy) ->t_source_isy) 
 #define Source_XSY_of_NSYID(nsyid) (Source_XSY_of_NSY(NSY_by_ID(nsyid) ) ) 
 #define Source_XSYID_of_NSYID(nsyid)  \
 ID_of_XSY(Source_XSY_of_NSYID(nsyid) ) 
@@ -172,7 +172,7 @@ ID_of_XSY(Source_XSY_of_NSYID(nsyid) )
 #define Real_SYM_Count_of_NRL(nrl) ((nrl) ->t_real_symbol_count) 
 #define Virtual_Start_of_NRL(nrl) ((nrl) ->t_virtual_start) 
 #define Virtual_End_of_NRL(nrl) ((nrl) ->t_virtual_end) 
-#define Source_XRL_of_NRL(nrl) ((nrl) ->t_source_xrl) 
+#define Source_XRL_of_NRL(nrl) ((nrl) ->t_source_irl) 
 #define EXTERNAL_RANK_FACTOR 4
 #define MAXIMUM_CHAF_RANK 3
 #define NRL_CHAF_Rank_by_XRL(xrl,chaf_rank) ( \
@@ -1094,7 +1094,7 @@ struct s_nsy{
 CIL t_lhs_cil;
 /*:236*//*241:*/
 #line 2087 "./marpa.w"
-XSY t_source_xsy;
+XSY t_source_isy;
 /*:241*//*245:*/
 #line 2110 "./marpa.w"
 
@@ -1203,7 +1203,7 @@ Marpa_Symbol_ID t_symbols[1];
 struct s_nrl{
 /*359:*/
 #line 3122 "./marpa.w"
-XRL t_source_xrl;
+XRL t_source_irl;
 /*:359*//*365:*/
 #line 3171 "./marpa.w"
 AHM t_first_ahm;
@@ -4868,7 +4868,7 @@ return failure_indicator;
 /*:201*//*207:*/
 #line 1833 "./marpa.w"
 
-Marpa_NSY_ID _marpa_g_xsy_nsy(
+Marpa_NSY_ID _marpa_g_isy_nsy(
 Marpa_Grammar g,
 Marpa_Symbol_ID xsy_id)
 {
@@ -4909,7 +4909,7 @@ return nsy?ID_of_NSY(nsy):-1;
 /*:207*//*211:*/
 #line 1865 "./marpa.w"
 
-Marpa_NSY_ID _marpa_g_xsy_nulling_nsy(
+Marpa_NSY_ID _marpa_g_isy_nulling_nsy(
 Marpa_Grammar g,
 Marpa_Symbol_ID xsy_id)
 {
@@ -5258,11 +5258,11 @@ return NSYID_is_Semantic(nsy_id);
 /*:240*//*243:*/
 #line 2089 "./marpa.w"
 
-Marpa_Rule_ID _marpa_g_source_xsy(
+Marpa_Rule_ID _marpa_g_source_isy(
 Marpa_Grammar g,
 Marpa_NRL_ID nsy_id)
 {
-XSY source_xsy;
+XSY source_isy;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -5280,14 +5280,14 @@ return failure_indicator;
 /*:1322*/
 #line 2096 "./marpa.w"
 
-source_xsy= Source_XSY_of_NSYID(nsy_id);
-return ID_of_XSY(source_xsy);
+source_isy= Source_XSY_of_NSYID(nsy_id);
+return ID_of_XSY(source_isy);
 }
 
 /*:243*//*248:*/
 #line 2124 "./marpa.w"
 
-Marpa_Rule_ID _marpa_g_nsy_lhs_xrl(Marpa_Grammar g,Marpa_NSY_ID nsy_id)
+Marpa_Rule_ID _marpa_g_nsy_lhs_irl(Marpa_Grammar g,Marpa_NSY_ID nsy_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -5318,7 +5318,7 @@ return-1;
 /*:248*//*249:*/
 #line 2148 "./marpa.w"
 
-int _marpa_g_nsy_xrl_offset(Marpa_Grammar g,Marpa_NSY_ID nsy_id)
+int _marpa_g_nsy_irl_offset(Marpa_Grammar g,Marpa_NSY_ID nsy_id)
 {
 /*1316:*/
 #line 15689 "./marpa.w"
@@ -7165,11 +7165,11 @@ return Virtual_End_of_NRL(nrl);
 /*:358*//*361:*/
 #line 3124 "./marpa.w"
 
-Marpa_Rule_ID _marpa_g_source_xrl(
+Marpa_Rule_ID _marpa_g_source_irl(
 Marpa_Grammar g,
 Marpa_NRL_ID nrl_id)
 {
-XRL source_xrl;
+XRL source_irl;
 /*1316:*/
 #line 15689 "./marpa.w"
 const int failure_indicator= -2;
@@ -7187,8 +7187,8 @@ return failure_indicator;
 /*:1325*/
 #line 3131 "./marpa.w"
 
-source_xrl= Source_XRL_of_NRL(NRL_by_ID(nrl_id));
-return source_xrl?ID_of_XRL(source_xrl):-1;
+source_irl= Source_XRL_of_NRL(NRL_by_ID(nrl_id));
+return source_irl?ID_of_XRL(source_irl):-1;
 }
 
 /*:361*//*364:*/
@@ -10225,9 +10225,9 @@ return Postdot_NSYID_of_AHM(AHM_by_ID(item_id));
 PRIVATE void
 memoize_xrl_data_for_AHM(AHM current_item,NRL nrl)
 {
-XRL source_xrl= Source_XRL_of_NRL(nrl);
-XRL_of_AHM(current_item)= source_xrl;
-if(!source_xrl){
+XRL source_irl= Source_XRL_of_NRL(nrl);
+XRL_of_AHM(current_item)= source_irl;
+if(!source_irl){
 
 
 XRL_Position_of_AHM(current_item)= -2;
@@ -10236,7 +10236,7 @@ return;
 {
 const int virtual_start= Virtual_Start_of_NRL(nrl);
 const int nrl_position= Position_of_AHM(current_item);
-if(XRL_is_Sequence(source_xrl))
+if(XRL_is_Sequence(source_irl))
 {
 
 
@@ -14304,13 +14304,13 @@ progress_report_items_insert(MARPA_AVL_TREE report_tree,
 AHM report_ahm,
 YIM origin_yim)
 {
-const XRL source_xrl= XRL_of_AHM(report_ahm);
+const XRL source_irl= XRL_of_AHM(report_ahm);
 
 MARPA_OFF_DEBUG5(
 "%s Calling progress_report_items_insert(%p, %p, %p)",
 STRLOC,report_tree,report_ahm,origin_yim);
 
-if(!source_xrl)return;
+if(!source_irl)return;
 
 
 
@@ -14319,7 +14319,7 @@ if(!source_xrl)return;
 if(!NRL_has_Virtual_LHS(NRL_of_YIM(origin_yim))){
 int xrl_position= XRL_Position_of_AHM(report_ahm);
 int origin_of_xrl= Origin_Ord_of_YIM(origin_yim);
-XRLID xrl_id= ID_of_XRL(source_xrl);
+XRLID xrl_id= ID_of_XRL(source_irl);
 
 PROGRESS new_report_item= 
 marpa_obs_new(MARPA_AVL_OBSTACK(report_tree),
@@ -14329,7 +14329,7 @@ MARPA_OFF_DEBUG2("%s, === Adding report item ===",STRLOC);
 MARPA_OFF_DEBUG3("%s, report nrl = %d",STRLOC,NRLID_of_AHM(report_ahm));
 MARPA_OFF_DEBUG3("%s, report nrl position = %d",STRLOC,Position_of_AHM(report_ahm));
 
-MARPA_OFF_DEBUG3("%s, xrl = %d",STRLOC,ID_of_XRL(source_xrl));
+MARPA_OFF_DEBUG3("%s, xrl = %d",STRLOC,ID_of_XRL(source_irl));
 MARPA_OFF_DEBUG3("%s, xrl dot = %d",STRLOC,XRL_Position_of_AHM(report_ahm));
 MARPA_OFF_DEBUG3("%s, origin ord = %d",STRLOC,Origin_Ord_of_YIM(origin_yim));
 
@@ -14347,7 +14347,7 @@ return;
 
 
 
-if(XRL_is_Sequence(source_xrl))return;
+if(XRL_is_Sequence(source_irl))return;
 
 
 
@@ -20042,12 +20042,12 @@ case NULLING_TOKEN_OR_NODE:
 Token_Type_of_V(v)= cause_or_node_type;
 Arg_0_of_V(v)= ++Arg_N_of_V(v);
 {
-const XSY source_xsy= 
+const XSY source_isy= 
 Source_XSY_of_NSYID(NSYID_of_OR(cause_or_node));
-const XSYID source_xsy_id= ID_of_XSY(source_xsy);
-if(bv_bit_test(XSY_is_Valued_BV_of_V(v),source_xsy_id))
+const XSYID source_isy_id= ID_of_XSY(source_isy);
+if(bv_bit_test(XSY_is_Valued_BV_of_V(v),source_isy_id))
 {
-XSYID_of_V(v)= source_xsy_id;
+XSYID_of_V(v)= source_isy_id;
 Token_Start_of_V(v)= YS_ID_of_V(v);
 }
 else

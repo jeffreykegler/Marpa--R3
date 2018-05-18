@@ -480,7 +480,7 @@ sub nid_sort_ix {
         local asf, nid = ...
         local slr = asf.slr
         local irl_id = asf.lmw_b:_or_node_nrl(nid)
-        return slr.slg.g1:_source_xrl(irl_id)
+        return slr.slg.g1:_source_irl(irl_id)
 END_OF_LUA
         return $result;
     }
@@ -493,7 +493,7 @@ END_OF_LUA
     local asf, and_node_id = ...
     local slr = asf.slr
     local token_nsy_id = asf.lmw_b:_and_node_symbol(and_node_id)
-    local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
+    local token_id = slr.slg.g1:_source_isy(token_nsy_id)
     -- -2 is reserved for 'end of data'
     return -token_id - 3
 END_OF_LUA
@@ -518,16 +518,16 @@ sub nid_rule_id {
     my ( $asf, $nid ) = @_;
     return if $nid < 0;
 
-    my ($xrl_id) = $asf->call_by_tag(
+    my ($irl_id) = $asf->call_by_tag(
         ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', 'i', $nid);
     local asf, nid = ...
     local slr = asf.slr
     local irl_id = asf.lmw_b:_or_node_nrl(nid)
-    local xrl_id = slr.slg.g1:_source_xrl(irl_id)
-    return xrl_id
+    local irl_id = slr.slg.g1:_source_irl(irl_id)
+    return irl_id
 END_OF_LUA
-    return $xrl_id;
+    return $irl_id;
 }
 
 sub or_node_es_span {
@@ -622,7 +622,7 @@ sub nid_token_id {
         local asf, and_node_id = ...
         local slr = asf.slr
         local token_nsy_id = asf.lmw_b:_and_node_symbol(and_node_id)
-        local token_id = slr.slg.g1:_source_xsy(token_nsy_id)
+        local token_id = slr.slg.g1:_source_isy(token_nsy_id)
         return token_id
 END_OF_LUA
         'i', $and_node_id);
@@ -644,8 +644,8 @@ sub nid_symbol_id {
         local slr = asf.slr
         local irl_id = asf.lmw_b:_or_node_nrl(nid)
         local g1g = slr.slg.g1
-        local xrl_id = g1g:_source_xrl(irl_id)
-        local lhs_id = g1g:rule_lhs(xrl_id)
+        local irl_id = g1g:_source_irl(irl_id)
+        local lhs_id = g1g:rule_lhs(irl_id)
         return lhs_id
 END_OF_LUA
         'i', $nid);

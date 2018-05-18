@@ -138,11 +138,11 @@ should treat these methods as ``undocumented''.
   Marpa_Grammar @var{g}, @
   Marpa_NSY_ID @var{nsy_id})
 @end deftypefun
-@deftypefun Marpa_NSY_ID _marpa_g_xsy_nulling_nsy ( @
+@deftypefun Marpa_NSY_ID _marpa_g_isy_nulling_nsy ( @
     Marpa_Grammar @var{g}, @
     Marpa_Symbol_ID @var{symid})
 @end deftypefun
-@deftypefun Marpa_NSY_ID _marpa_g_xsy_nsy ( @
+@deftypefun Marpa_NSY_ID _marpa_g_isy_nsy ( @
     Marpa_Grammar @var{g}, @
     Marpa_Symbol_ID @var{symid})
 @end deftypefun
@@ -150,15 +150,15 @@ should treat these methods as ``undocumented''.
   Marpa_Grammar @var{g}, @
   Marpa_NSY_ID @var{nsy_id})
 @end deftypefun
-@deftypefun Marpa_Rule_ID _marpa_g_source_xsy ( @
+@deftypefun Marpa_Rule_ID _marpa_g_source_isy ( @
   Marpa_Grammar @var{g}, @
   Marpa_NSY_ID @var{nsy_id})
 @end deftypefun
-@deftypefun Marpa_Rule_ID _marpa_g_nsy_lhs_xrl ( @
+@deftypefun Marpa_Rule_ID _marpa_g_nsy_lhs_irl ( @
   Marpa_Grammar @var{g}, @
   Marpa_NSY_ID @var{nsy_id})
 @end deftypefun
-@deftypefun int _marpa_g_nsy_xrl_offset ( @
+@deftypefun int _marpa_g_nsy_irl_offset ( @
   Marpa_Grammar @var{g}, @
   Marpa_NSY_ID @var{nsy_id} )
 @end deftypefun
@@ -237,7 +237,7 @@ On other failures, -2.
 @deftypefun @code{int} _marpa_g_virtual_end (Marpa_Grammar @var{g}, @
     Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
-@deftypefun Marpa_Rule_ID _marpa_g_source_xrl (Marpa_Grammar @var{g}, @
+@deftypefun Marpa_Rule_ID _marpa_g_source_irl (Marpa_Grammar @var{g}, @
     Marpa_NRL_ID @var{nrl_id})
 @end deftypefun
 @deftypefun int _marpa_g_real_symbol_count (Marpa_Grammar @var{g}, @

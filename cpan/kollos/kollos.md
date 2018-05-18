@@ -8652,7 +8652,7 @@ indexed by isyid.
         -- end
 
         -- sequence LHS
-        local lhs_xrl = grammar:_nsy_lhs_xrl(nsy_id)
+        local lhs_xrl = grammar:_nsy_lhs_irl(nsy_id)
         if lhs_xrl and grammar:sequence_min(lhs_xrl) then
             local original_lhs_id = grammar:rule_lhs(lhs_xrl)
             local lhs_name = grammar:symbol_name(original_lhs_id)
@@ -8660,7 +8660,7 @@ indexed by isyid.
         end
 
         -- virtual symbol
-        local xrl_offset = grammar:_nsy_xrl_offset(nsy_id)
+        local xrl_offset = grammar:_nsy_irl_offset(nsy_id)
         if xrl_offset and xrl_offset > 0 then
             local original_lhs_id = grammar:rule_lhs(lhs_xrl)
             local lhs_name = grammar:symbol_name(original_lhs_id)
@@ -8674,7 +8674,7 @@ indexed by isyid.
         local is_nulling = grammar:_nsy_is_nulling(nsy_id)
         if is_nulling then suffix = suffix .. "[]" end
 
-        local isy_id = grammar:_source_xsy(nsy_id)
+        local isy_id = grammar:_source_isy(nsy_id)
         if not isy_id then
             return string.format("[NO_ISYID:nsy=%d]%s", nsy_id, suffix)
         end
@@ -8786,9 +8786,7 @@ TODO: Perhaps `isy_key` should also allow isy tables.
         return xsy.id
     end
     function _M.class_grammar.xsyid_by_nsy(grammar, nsy_id)
-        -- TODO: `source_xsy()` name is relic -- will be fixed
-        -- when nsy's are eliminated.
-        local isy_id = grammar:_source_xsy(nsy_id)
+        local isy_id = grammar:_source_isy(nsy_id)
         -- print(string.format("isy_id=%d nsy_id=%d", isy_id, nsy_id))
         if not isy_id then return end
         return grammar:xsyid(isy_id)
@@ -9174,7 +9172,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_g_symbol_rank", "Marpa_Symbol_ID", "symbol_id" },
     {"marpa_g_symbol_rank_set", "Marpa_Symbol_ID", "symbol_id", "Marpa_Rank", "rank" },
     {"marpa_g_zwa_new", "int", "default_value"},
-    {"marpa_g_zwa_place", "Marpa_Assertion_ID", "zwaid", "Marpa_Rule_ID", "xrl_id", "int", "rhs_ix"},
+    {"marpa_g_zwa_place", "Marpa_Assertion_ID", "zwaid", "Marpa_Rule_ID", "irl_id", "int", "rhs_ix"},
     {"marpa_r_completion_symbol_activate", "Marpa_Symbol_ID", "sym_id", "int", "reactivate"},
     {"marpa_r_alternative", "Marpa_Symbol_ID", "token", "int", "value", "int", "length"}, -- See above,
     {"marpa_r_current_earleme"},
@@ -9183,7 +9181,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_r_earley_item_warning_threshold"},
     {"marpa_r_earley_item_warning_threshold_set", "int", "too_many_earley_items"},
     {"marpa_r_earley_set_value", "Marpa_Earley_Set_ID", "ordinal"},
-    {"marpa_r_expected_symbol_event_set", "Marpa_Symbol_ID", "xsyid", "int", "value"},
+    {"marpa_r_expected_symbol_event_set", "Marpa_Symbol_ID", "isyid", "int", "value"},
     {"marpa_r_furthest_earleme"},
     {"marpa_r_is_exhausted"},
     {"marpa_r_latest_earley_set"},
@@ -9193,7 +9191,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_r_progress_report_finish"},
     {"marpa_r_progress_report_start", "Marpa_Earley_Set_ID", "ordinal"},
     {"marpa_r_start_input"},
-    {"marpa_r_terminal_is_expected", "Marpa_Symbol_ID", "xsyid"},
+    {"marpa_r_terminal_is_expected", "Marpa_Symbol_ID", "isyid"},
     {"marpa_r_zwa_default", "Marpa_Assertion_ID", "zwaid"},
     {"marpa_r_zwa_default_set", "Marpa_Assertion_ID", "zwaid", "int", "default_value"},
     {"marpa_b_ambiguity_metric"},
@@ -9236,18 +9234,18 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_is_semantic", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_is_start", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
-    {"_marpa_g_nsy_lhs_xrl", "Marpa_NSY_ID", "nsy_id"},
+    {"_marpa_g_nsy_lhs_irl", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_rank", "Marpa_NSY_ID", "nsy_id"},
-    {"_marpa_g_nsy_xrl_offset", "Marpa_NSY_ID", "nsy_id"},
+    {"_marpa_g_nsy_irl_offset", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_real_symbol_count", "Marpa_NRL_ID", "nrl_id"},
     {"_marpa_g_rule_is_keep_separation", "Marpa_Rule_ID", "rule_id"},
     {"_marpa_g_rule_is_used", "Marpa_Rule_ID", "rule_id"},
-    {"_marpa_g_source_xrl", "Marpa_NRL_ID", "nrl_id"},
-    {"_marpa_g_source_xsy", "Marpa_NSY_ID", "nsy_id"},
+    {"_marpa_g_source_irl", "Marpa_NRL_ID", "nrl_id"},
+    {"_marpa_g_source_isy", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_virtual_end", "Marpa_NRL_ID", "nrl_id"},
     {"_marpa_g_virtual_start", "Marpa_NRL_ID", "nrl_id"},
-    {"_marpa_g_xsy_nsy", "Marpa_Symbol_ID", "symid"},
-    {"_marpa_g_xsy_nulling_nsy", "Marpa_Symbol_ID", "symid"},
+    {"_marpa_g_isy_nsy", "Marpa_Symbol_ID", "symid"},
+    {"_marpa_g_isy_nulling_nsy", "Marpa_Symbol_ID", "symid"},
     {"_marpa_r_earley_item_origin"},
     {"_marpa_r_earley_item_trace", "Marpa_Earley_Item_ID", "item_id"},
     {"_marpa_r_earley_set_size", "Marpa_Earley_Set_ID", "set_id"},

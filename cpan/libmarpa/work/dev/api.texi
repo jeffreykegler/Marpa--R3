@@ -6108,7 +6108,7 @@ The error code can be determined by using the
 @deftypefun int marpa_g_zwa_place ( @
     Marpa_Grammar @var{g}, @
     Marpa_Assertion_ID @var{zwaid}, @
-    Marpa_Rule_ID @var{xrl_id}, @
+    Marpa_Rule_ID @var{irl_id}, @
     int @var{rhs_ix})
 @end deftypefun
 
