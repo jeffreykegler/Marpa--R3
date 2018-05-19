@@ -1,7 +1,7 @@
 ; DO NOT EDIT DIRECTLY.
 ; This file was automatically generated.
 ; This file is for the Microsoft linker.
-; Sat May 19 15:58:40 2018
+; Sat May 19 18:36:41 2018
 EXPORTS
    marpa_check_version
    marpa_version
@@ -159,7 +159,6 @@ EXPORTS
    marpa_v_rule_is_valued
    marpa_v_valued_force
    _marpa_g_start_nsy
-   _marpa_g_nsy_is_start
    _marpa_g_nsy_is_nulling
    _marpa_g_nsy_is_lhs
    _marpa_g_isy_nulling_nsy

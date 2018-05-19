@@ -2009,17 +2009,6 @@ int _marpa_g_nsy_count(Marpa_Grammar g) {
     return NSY_Count_of_G(g);
 }
 
-@ Is Start?.
-@ @<Function definitions@> =
-int _marpa_g_nsy_is_start( Marpa_Grammar g, Marpa_NSY_ID nsy_id)
-{
-    @<Return |-2| on failure@>@;
-    @<Fail if fatal error@>@;
-    @<Fail if not precomputed@>@;
-    @<Fail if |nsy_id| is invalid@>@;
-    return g->t_start_nsyid == nsy_id;
-}
-
 @ Start NSY
 @ @<Function definitions@> =
 Marpa_NSY_ID _marpa_g_start_nsy( Marpa_Grammar g)
