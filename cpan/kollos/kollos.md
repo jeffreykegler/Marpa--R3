@@ -1101,7 +1101,7 @@ in `lmw_g`.
             -- Add the null ur-glades
             for null_ix = 1, null_count do
                 local nsy_id = g1g:_nrl_rhs(nrl_id, rhs_ix1 + null_ix)
-                if g1g:_nsy_is_semantic(nsy_id) or g1g:_nsy_is_start(nsy_id) then
+                if g1g:_nsy_is_semantic(nsy_id) or g1g:_start_nsy() == nsy_id then
                     local xsy_id = g1g:xsyid_by_nsy(nsy_id)
                     if xsy_id then
                         preglades[#preglades+1] = { 'null', xsy_id }
@@ -2027,23 +2027,26 @@ Lowest ISYID is 0.
     function _M.class_slg.lmg_symbols_show(slg, subg_name, verbose)
         local pieces = { }
         local lmw_g = slg[subg_name]
-        for symbol_id = 0, lmw_g:highest_symbol_id() do
+        verbose = verbose or 0
+        for isyid = 0, lmw_g:highest_symbol_id() do
             pieces[#pieces+1] = table.concat (
-                { subg_name, 'S' .. symbol_id, lmw_g:symbol_display_form( symbol_id ) },
+                { subg_name, 'S' .. isyid, lmw_g:symbol_display_form( isyid ) },
                 " ")
             pieces[#pieces+1] = "\n"
             if verbose >= 2 then
                 local tags = { ' /*' }
-                if lmw_g:symbol_is_productive(symbol_id) == 0 then
+                local nsyid = lmw_g:_isy_nsy(isyid)
+                tags[#tags+1] = 'nsyid=' .. inspect(nsyid)
+                if lmw_g:symbol_is_productive(isyid) == 0 then
                     tags[#tags+1] = 'unproductive'
                 end
-                if lmw_g:symbol_is_accessible(symbol_id) == 0 then
+                if lmw_g:symbol_is_accessible(isyid) == 0 then
                     tags[#tags+1] = 'inaccessible'
                 end
-                if lmw_g:symbol_is_nulling(symbol_id) ~= 0 then
+                if lmw_g:symbol_is_nulling(isyid) ~= 0 then
                     tags[#tags+1] = 'nulling'
                 end
-                if lmw_g:symbol_is_terminal(symbol_id) ~= 0 then
+                if lmw_g:symbol_is_terminal(isyid) ~= 0 then
                     tags[#tags+1] = 'terminal'
                 end
                 if #tags >= 2 then
@@ -2053,11 +2056,11 @@ Lowest ISYID is 0.
                     pieces[#pieces+1] =  '\n'
                 end
                 pieces[#pieces+1] =  "  Canonical name: "
-                pieces[#pieces+1] =  lmw_g:symbol_diag_form(symbol_id)
+                pieces[#pieces+1] =  lmw_g:symbol_diag_form(isyid)
                 pieces[#pieces+1] =  "\n"
             end
             if verbose >= 3 then
-                local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, symbol_id )
+                local dsl_form =  slg:lmg_symbol_dsl_form( subg_name, isyid )
                 if dsl_form then
                     pieces[#pieces+1] =  '  DSL name: '
                     pieces[#pieces+1] =  dsl_form
@@ -2344,14 +2347,19 @@ Lowest ISYID is 0.
             local xsy = slg.xsys[xsyid]
             g1g.xsys[isyid] = xsy
             -- G1 ISY of XSY set only to unprecedenced ISY
+            -- print('xsy:', inspect(xsy, {depth=3}))
             if not precedence then
-                if xsy.g1_isy then
+                if xsy.g1_nsyid then
                     print('xsy:', inspect(xsy, {depth=3}))
-                    error(string.format('ISY is already set for symbol %q',
+                    error(string.format('NSY is already set for symbol %q',
                         symbol_name
                     ))
                 end
-                xsy.g1_isy = isy
+                local nsyid = g1g:_isy_nsy(isyid)
+                if not nsyid then
+                -- print('setting xsy nsyid:', inspect(nsyid))
+                end
+                xsy.g1_nsyid = nsyid
             end
             options.xsy = nil
         end
@@ -2396,12 +2404,13 @@ Lowest ISYID is 0.
                 local xsy = slg.xsys[value]
                 l0g.xsys[isyid] = xsy
                 -- TODO remove this check after development
-                if xsy.l0_isy then
+                if xsy.l0_nsyid then
                     error(string.format('ISY is already set for symbol %q has unknown property %q',
                         symbol_name
                     ))
                 end
-                xsy.l0_isy = isy
+                local nsyid = l0g:_isy_nsy(isyid)
+                xsy.l0_nsyid = nsyid
                 goto NEXT_PROPERTY
             end
             if property == 'terminal' then
@@ -6165,7 +6174,7 @@ This is a registry object.
     class_asf_fields.regix = true
 
     class_asf_fields.top_xsyid = true
-    class_asf_fields.top_isyid = true
+    class_asf_fields.top_nsyid = true
     class_asf_fields.g1_start = true
     class_asf_fields.g1_length = true
 
@@ -6316,7 +6325,7 @@ which is not kept in the registry.
         end
 
         -- 'top' named argument --
-        local top_xsyid
+        local top_nsyid
         local top_xsyid_arg = flat_args["top"]
         if top_xsyid_arg then
             local value = math.tointeger(top_xsyid_arg)
@@ -6326,22 +6335,27 @@ which is not kept in the registry.
                    inspect(top_xsyid_arg)))
             end
             top_xsyid = value
+            asf.top_xsyid = top_xsyid
+            local top_xsy = slg.xsys[top_xsyid]
+            top_nsyid = top_xsy.g1_nsyid
         else
-            top_xsyid = slg:start_symbol_id()
+            top_nsyid = g1g:_start_nsy()
         end
         flat_args.top = nil
-        asf.top_xsyid = top_xsyid
+        asf.top_nsyid = top_nsyid
+
         -- There is at most one non-nullable G1 ISY for
         -- an XSY.
-        local top_xsy = slg.xsys[top_xsyid]
-        local top_isy = top_xsy.g1_isy
-        local top_isyid = top_isy.id
-        asf.top_isyid = top_isyid
 
         asf:common_set(flat_args, {})
 
         asf.glades = {}
-        local peak = glade_from_instance(asf, top_isyid, g1_start, g1_length)
+
+            -- print('peak cause_nsyid', inspect(top_nsyid))
+            -- print(g1g:nsys_show())
+            -- print(slg:g1_symbols_show(3))
+
+        local peak = glade_from_instance(asf, top_nsyid, g1_start, g1_length)
         if not peak then
             _M.userX("No parse at G1 location %d", g1_end)
         end
@@ -6414,17 +6428,17 @@ illegal named arguments.
             if type(dumpee) ~= 'table' then
                 return table.insert(lines, string.rep(' ', indent) .. tostring(dumpee))
             end
-            if dumpee.type == 'iglade' then
+            if dumpee.type == 'nglade' then
                 local symch_count = #dumpee
                 local glade = dumpee.glade
                 local id = glade:id()
                 local header = string.format("Glade %s; %s @%d-%d: %d symches", id,
-                    g1g:symbol_angled_form(glade.isyid), glade.g1_start,
+                    g1g:symbol_angled_form(glade.nsyid), glade.g1_start,
                     glade.g1_start + glade.g1_length,
                     symch_count)
                 table.insert(lines, string.rep(' ', indent) .. header)
                 if symch_count < 1 then
-                   error(string.format("Bad symch count (%d) in iglade %s",
+                   error(string.format("Bad symch count (%d) in nglade %s",
                       symch_count, inspect(dumpee, { depth = 3 } )))
                 end
                 for ix = 1, #dumpee do
@@ -6437,7 +6451,7 @@ illegal named arguments.
                 end
                 return
             end
-            if dumpee.type == 'isymch' then
+            if dumpee.type == 'nsymch' then
                 local partition_count = #dumpee
                 local glade = dumpee.glade
                 local id = glade:id()
@@ -6448,7 +6462,7 @@ illegal named arguments.
                    id, ix, slg:g1_rule_show(irlid), partition_count)
                 table.insert(lines, string.rep(' ', indent) .. header)
                 if partition_count < 1 then
-                   error(string.format("Bad partition count (%d) in isymch %s",
+                   error(string.format("Bad partition count (%d) in nsymch %s",
                       partition_count, inspect(dumpee, { depth = 3 } )))
                 end
                 for ix = 1, #dumpee do
@@ -6468,7 +6482,7 @@ illegal named arguments.
         end
 
         local lines = {}
-        local top_cmd = { type = 'iglade', glade = peak }
+        local top_cmd = { type = 'nglade', glade = peak }
 
         for v in glade_values(peak, {}) do
             table.insert(top_cmd, v)
@@ -6899,7 +6913,7 @@ than one can be active at once.
 
 ```
     -- miranda: section+ class_glade field declarations
-    class_glade_fields.isyid = true
+    class_glade_fields.nsyid = true
     class_glade_fields.g1_start = true
     class_glade_fields.g1_length = true
 ```
@@ -6937,7 +6951,7 @@ and "leo" for a Leo glade.
     function _M.class_glade.id(glade)
         return glade.g1_start
             .. '.' .. glade.g1_length
-            .. '.' .. glade.isyid
+            .. '.' .. glade.nsyid
     end
 ```
 
@@ -6962,7 +6976,7 @@ glade has already been dumped.
         local slr = asf.slr
         local slg = slr.slg
         local g1g = slg.g1
-        local isyid = glade.isyid
+        local nsyid = glade.nsyid
         local id = glade:id()
         local g1_start = glade.g1_start
         local g1_length = glade.g1_length
@@ -6989,19 +7003,19 @@ glade has already been dumped.
                 -- TODO optimize by memoization?  Special C call?
                 --   look at this after NRLs are eliminated
                 local cause_trv = symch:completion_cause()
-                local cause_irlid = cause_trv:rule_id()
+                local cause_nrlid = cause_trv:_nrl_id()
                 local cause_origin = cause_trv:origin()
-                local eims_by_irlid = cause_eim_db[cause_origin]
-                if not eims_by_irlid then
-                    eims_by_irlid = {}
-                    cause_eim_db[cause_origin] = eims_by_irlid
+                local eims_by_nrlid = cause_eim_db[cause_origin]
+                if not eims_by_nrlid then
+                    eims_by_nrlid = {}
+                    cause_eim_db[cause_origin] = eims_by_nrlid
                     -- predecessor is determined by AHM, origin and "middle"
                     -- so there is only one
                     predecessor_eim_db[cause_origin] = predecessor_trv
                 end
-                local cause_eim = eims_by_irlid[cause_irlid]
+                local cause_eim = eims_by_nrlid[cause_nrlid]
                 if cause_eim then goto NEXT_COMPLETION end
-                eims_by_irlid[cause_irlid] = cause_trv
+                eims_by_nrlid[cause_nrlid] = cause_trv
             end
             ::NEXT_COMPLETION::
             at_completion = symch:completion_next()
@@ -7009,27 +7023,28 @@ glade has already been dumped.
 
         -- create down glades
         local downglades = {}
-        for origin, eims_by_irlid in pairs(cause_eim_db) do
+        for origin, eims_by_nrlid in pairs(cause_eim_db) do
             local symch = {}
-            local cause_isyid
-            for cause_irlid, eim_trv in pairs(eims_by_irlid) do
-                if not cause_isyid then cause_isyid = g1g:rule_lhs(cause_irlid) end
+            local cause_nsyid
+            for cause_nrlid, eim_trv in pairs(eims_by_nrlid) do
+                if not cause_nsyid then cause_nsyid = g1g:_nrl_lhs(cause_nrlid) end
                 symch[#symch+1] = eim_trv
             end
             local g1_length = g1_end - origin
             local predecessor_eim = predecessor_eim_db[origin]
-            local glade = glade_from_instance(asf, cause_isyid, origin, g1_length, symch)
+            print('downglade cause_nsyid', inspect(cause_nsyid))
+            local glade = glade_from_instance(asf, cause_nsyid, origin, g1_length, symch)
             local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
         end
 
         for ix = 1,#downglades do
            local predecessor_eim, glade = table.unpack(downglades[ix])
-           local iglade = { type = 'iglade', glade = glade }
+           local nglade = { type = 'nglade', glade = glade }
            for v in glade_values(glade, seen) do
-               table.insert(iglade, v)
+               table.insert(nglade, v)
            end
-           coroutine.yield(iglade)
+           coroutine.yield(nglade)
         end
 
         -- will I need to mix Leo and completion causes in the same
@@ -7101,12 +7116,12 @@ glade has already been dumped.
                    goto NEXT_RULE_SYMCH
                end
 
-               local isymch = { type = 'isymch', glade = glade, symch = symch, ix = ix }
+               local nsymch = { type = 'nsymch', glade = glade, symch = symch, ix = ix }
 
                for partition in glade_symch_values(glade, symch, seen) do
-                   table.insert(isymch, partition)
+                   table.insert(nsymch, partition)
                end
-               coroutine.yield(isymch)
+               coroutine.yield(nsymch)
                ::NEXT_RULE_SYMCH::
             end
            seen[id] = true
@@ -7126,7 +7141,7 @@ arguments are correct.
     -- miranda: section+ forward declarations
     local glade_from_token
     -- miranda: section+ most Lua function definitions
-    function glade_from_token(asf, isyid, g1_start, g1_length)
+    function glade_from_token(asf, nsyid, g1_start, g1_length)
         -- TODO hash glades per asf
 
         local id = g1_start
@@ -7141,7 +7156,7 @@ arguments are correct.
         glade = setmetatable({}, _M.class_glade)
         local isy = g1g.isys[isyid]
         glade.asf = asf
-        glade.isyid = isyid
+        glade.nsyid = nsyid
         glade.g1_start = g1_start
         glade.g1_length = g1_length
         glade.type = 'token'
@@ -7158,7 +7173,7 @@ arguments are correct.
     -- miranda: section+ forward declarations
     local glade_from_instance
     -- miranda: section+ most Lua function definitions
-    local function eimset_from_instance(asf, isyid, g1_start, g1_length)
+    local function eimset_from_instance(asf, nsyid, g1_start, g1_length)
         local slr = asf.slr
         local slg = slr.slg
         local g1r = slr.g1
@@ -7182,14 +7197,14 @@ arguments are correct.
         return eimset
     end
 
-    function glade_from_instance(asf, isyid, g1_start, g1_length, eimset)
+    function glade_from_instance(asf, nsyid, g1_start, g1_length, eimset)
         -- TODO what if xsyid is token?
         -- TODO what if g1_start, g1_length invalid?
         -- TODO hash glades per asf
 
         local id = g1_start
             .. '.' .. g1_length
-            .. '.' .. isyid
+            .. '.' .. nsyid
         local glade = asf.glades[id]
         if glade then return glade end
         glade = setmetatable({}, _M.class_glade)
@@ -7198,14 +7213,14 @@ arguments are correct.
         local slr = asf.slr
         local slg = slr.slg
         local g1g = slg.g1
-        local g1r = slr.g1
+        local isyid = g1g:_source_isy(nsyid)
         local isy = g1g.isys[isyid]
         local is_terminal = isy.lexeme
         if is_terminal then
-            return glade_from_token(asf, isyid, g1_start, g1_length)
+            return glade_from_token(asf, nsyid, g1_start, g1_length)
         end
         if not eimset then
-            eimset = eimset_from_instance(asf, isyid, g1_start, g1_length)
+            eimset = eimset_from_instance(asf, nsyid, g1_start, g1_length)
         end
         -- soft failure if no match
         if #eimset < 0 then return end
@@ -7215,7 +7230,7 @@ arguments are correct.
            end
         )
         glade.asf = asf
-        glade.isyid = isyid
+        glade.nsyid = nsyid
         glade.g1_start = g1_start
         glade.g1_length = g1_length
         glade.rule_symches = eimset
@@ -8376,10 +8391,10 @@ here.
 
 ```
     -- miranda: section+ class_xsy field declarations
-    class_xsy_fields.g1_isy = true
-    class_xsy_fields.g1_null_isy = true
-    class_xsy_fields.l0_isy = true
-    class_xsy_fields.l0_null_isy = true
+    class_xsy_fields.g1_nsyid = true
+    class_xsy_fields.g1_null_nsyid = true
+    class_xsy_fields.l0_nsyid = true
+    class_xsy_fields.l0_null_nsyid = true
 ```
 
 The "blessing" facility exists to provide strings
@@ -8643,14 +8658,6 @@ indexed by isyid.
         -- print('nsy_id_arg =', inspect(nsy_id_arg))
         if not nsy_id then error('Bad nsy_name() symbol ID arg: ' .. inspect(nsy_id_arg)) end
 
-
-        -- local nsy_is_start = grammar:_nsy_is_start(nsy_id)
-        -- if nsy_is_start then
-            -- local xsy_id = grammar:xsyid_by_nsy(nsy_id)
-            -- local xsy_name = grammar:symbol_name(xsy_id)
-            -- return xsy_name .. "[']"
-        -- end
-
         -- sequence LHS
         local lhs_xrl = grammar:_nsy_lhs_irl(nsy_id)
         if lhs_xrl and grammar:sequence_min(lhs_xrl) then
@@ -8669,8 +8676,11 @@ indexed by isyid.
         end
 
         local suffix = ''
-        local is_start = grammar:_nsy_is_start(nsy_id)
-        if is_start then suffix = suffix .. "[']" end
+        print('1: nsy_id', inspect(nsy_id))
+        if nsy_id == grammar:_start_nsy() then
+            suffix = suffix .. "[']"
+        end
+        print('2: nsy_id', inspect(nsy_id))
         local is_nulling = grammar:_nsy_is_nulling(nsy_id)
         if is_nulling then suffix = suffix .. "[]" end
 
@@ -8744,6 +8754,15 @@ indexed by isyid.
             pieces[#pieces+1] = ', ' .. table.concat(tags, ' ')
         end
         pieces[#pieces+1] = '\n'
+        return table.concat(pieces)
+    end
+
+    function _M.class_grammar.nsys_show(lmw_g)
+        local nsy_count = lmw_g:_nsy_count()
+        local pieces = {}
+        for nsy_id = 0, nsy_count - 1 do
+            pieces[#pieces+1] = lmw_g:nsy_show(nsy_id)
+        end
         return table.concat(pieces)
     end
 
@@ -9233,7 +9252,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"_marpa_g_nsy_is_lhs", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_is_nulling", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
     {"_marpa_g_nsy_is_semantic", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
-    {"_marpa_g_nsy_is_start", "Marpa_NSY_ID", "nsy_id", return_type='boolean'},
+    {"_marpa_g_start_nsy" },
     {"_marpa_g_nsy_lhs_irl", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_rank", "Marpa_NSY_ID", "nsy_id"},
     {"_marpa_g_nsy_irl_offset", "Marpa_NSY_ID", "nsy_id"},

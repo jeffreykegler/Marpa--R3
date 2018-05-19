@@ -838,12 +838,7 @@ sub Marpa::R3::Grammar::nsys_show {
         <<'END_OF_LUA', '' );
     local grammar = ...
     local g1g = grammar.g1
-    local nsy_count = g1g:_nsy_count()
-    local pieces = {}
-    for nsy_id = 0, nsy_count - 1 do
-        pieces[#pieces+1] = g1g:nsy_show(nsy_id)
-    end
-    return table.concat(pieces)
+    return g1g:nsys_show()
 END_OF_LUA
     return $result;
 }

@@ -127,6 +127,8 @@ should treat these methods as ``undocumented''.
 @node Symbol internal methods, Rule internals, Internal Interface, Internal Interface
 @section Symbol internal methods
 
+@deftypefun Marpa_NSY_ID _marpa_g_start_nsy ( Marpa_Grammar @var{g} )
+@end deftypefun
 @deftypefun int _marpa_g_nsy_is_start ( Marpa_Grammar @var{g}, @
     Marpa_NSY_ID @var{nsy_id})
 @end deftypefun

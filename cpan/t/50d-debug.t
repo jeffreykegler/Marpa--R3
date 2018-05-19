@@ -1256,86 +1256,99 @@ Marpa::R3::Test::is( $symbols_show_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'g1_symbols_show()' );
 G1 Symbols:
 g1 S0 [:start:]
+  /* nsyid=0 */
   Canonical name: [:start:]
   DSL name: [:start:]
 g1 S1 'set'
-  /* terminal */
+  /* nsyid=2 terminal */
   Canonical name: [Lex-0]
   DSL name: 'set'
 g1 S2 'to'
-  /* terminal */
+  /* nsyid=3 terminal */
   Canonical name: [Lex-1]
   DSL name: 'to'
 g1 S3 '='
-  /* terminal */
+  /* nsyid=4 terminal */
   Canonical name: [Lex-2]
   DSL name: '='
 g1 S4 'string'
-  /* terminal */
+  /* nsyid=5 terminal */
   Canonical name: [Lex-3]
   DSL name: 'string'
 g1 S5 '('
-  /* terminal */
+  /* nsyid=6 terminal */
   Canonical name: [Lex-4]
   DSL name: '('
 g1 S6 ')'
-  /* terminal */
+  /* nsyid=7 terminal */
   Canonical name: [Lex-5]
   DSL name: ')'
 g1 S7 '+'
-  /* terminal */
+  /* nsyid=8 terminal */
   Canonical name: [Lex-6]
   DSL name: '+'
 g1 S8 '*'
-  /* terminal */
+  /* nsyid=9 terminal */
   Canonical name: [Lex-7]
   DSL name: '*'
 g1 S9 assignment
+  /* nsyid=10 */
   Canonical name: assignment
   DSL name: assignment
 g1 S10 expression
+  /* nsyid=11 */
   Canonical name: expression
   DSL name: expression
 g1 S11 expression
+  /* nsyid=12 */
   Canonical name: <expression[0]>
   DSL name: expression
 g1 S12 expression
+  /* nsyid=13 */
   Canonical name: <expression[1]>
   DSL name: expression
 g1 S13 expression
+  /* nsyid=14 */
   Canonical name: <expression[2]>
   DSL name: expression
 g1 S14 number
-  /* terminal */
+  /* nsyid=15 terminal */
   Canonical name: number
   DSL name: number
 g1 S15 <numeric assignment>
+  /* nsyid=16 */
   Canonical name: <numeric assignment>
   DSL name: numeric assignment
 g1 S16 <numeric expression>
+  /* nsyid=17 */
   Canonical name: <numeric expression>
   DSL name: numeric expression
 g1 S17 <numeric expression>
+  /* nsyid=18 */
   Canonical name: <numeric expression[0]>
   DSL name: numeric expression
 g1 S18 <numeric expression>
+  /* nsyid=19 */
   Canonical name: <numeric expression[1]>
   DSL name: numeric expression
 g1 S19 <numeric expression>
+  /* nsyid=20 */
   Canonical name: <numeric expression[2]>
   DSL name: numeric expression
 g1 S20 statement
+  /* nsyid=21 */
   Canonical name: statement
   DSL name: statement
 g1 S21 statements
+  /* nsyid=22 */
   Canonical name: statements
   DSL name: statements
 g1 S22 string
-  /* terminal */
+  /* nsyid=24 terminal */
   Canonical name: string
   DSL name: string
 g1 S23 variable
-  /* terminal */
+  /* nsyid=25 terminal */
   Canonical name: variable
   DSL name: variable
 END_OF_SHOW_SYMBOLS_OUTPUT
@@ -1347,120 +1360,135 @@ Marpa::R3::Test::is( $symbols_show_output,
     <<'END_OF_SHOW_SYMBOLS_OUTPUT', 'l0_symbols_show()' );
 L0 Symbols:
 l0 S0 [:discard:]
+  /* nsyid=0 */
   Canonical name: [:discard:]
   DSL name: [:discard:]
 l0 S1 [:lex_start:]
+  /* nsyid=1 */
   Canonical name: [:lex_start:]
   DSL name: [:lex_start:]
 l0 S2 'set'
+  /* nsyid=2 */
   Canonical name: [Lex-0]
   DSL name: 'set'
 l0 S3 'to'
+  /* nsyid=3 */
   Canonical name: [Lex-1]
   DSL name: 'to'
 l0 S4 '='
+  /* nsyid=4 */
   Canonical name: [Lex-2]
   DSL name: '='
 l0 S5 'string'
+  /* nsyid=5 */
   Canonical name: [Lex-3]
   DSL name: 'string'
 l0 S6 '('
+  /* nsyid=6 */
   Canonical name: [Lex-4]
   DSL name: '('
 l0 S7 ')'
+  /* nsyid=7 */
   Canonical name: [Lex-5]
   DSL name: ')'
 l0 S8 '+'
+  /* nsyid=8 */
   Canonical name: [Lex-6]
   DSL name: '+'
 l0 S9 '*'
+  /* nsyid=9 */
   Canonical name: [Lex-7]
   DSL name: '*'
 l0 S10 [']
-  /* terminal */
+  /* nsyid=10 terminal */
   Canonical name: [[']]
   DSL name: [']
 l0 S11 [\(]
-  /* terminal */
+  /* nsyid=11 terminal */
   Canonical name: [[\(]]
   DSL name: [\(]
 l0 S12 [\)]
-  /* terminal */
+  /* nsyid=12 terminal */
   Canonical name: [[\)]]
   DSL name: [\)]
 l0 S13 [\*]
-  /* terminal */
+  /* nsyid=13 terminal */
   Canonical name: [[\*]]
   DSL name: [\*]
 l0 S14 [\+]
-  /* terminal */
+  /* nsyid=14 terminal */
   Canonical name: [[\+]]
   DSL name: [\+]
 l0 S15 [\=]
-  /* terminal */
+  /* nsyid=15 terminal */
   Canonical name: [[\=]]
   DSL name: [\=]
 l0 S16 [\d]
-  /* terminal */
+  /* nsyid=16 terminal */
   Canonical name: [[\d]]
   DSL name: [\d]
 l0 S17 [\s]
-  /* terminal */
+  /* nsyid=17 terminal */
   Canonical name: [[\s]]
   DSL name: [\s]
 l0 S18 [\w]
-  /* terminal */
+  /* nsyid=18 terminal */
   Canonical name: [[\w]]
   DSL name: [\w]
 l0 S19 [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
-  /* terminal */
+  /* nsyid=19 terminal */
   Canonical name: [[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]]
   DSL name: [^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]
 l0 S20 [e]
-  /* terminal */
+  /* nsyid=20 terminal */
   Canonical name: [[e]]
   DSL name: [e]
 l0 S21 [g]
-  /* terminal */
+  /* nsyid=21 terminal */
   Canonical name: [[g]]
   DSL name: [g]
 l0 S22 [i]
-  /* terminal */
+  /* nsyid=22 terminal */
   Canonical name: [[i]]
   DSL name: [i]
 l0 S23 [n]
-  /* terminal */
+  /* nsyid=23 terminal */
   Canonical name: [[n]]
   DSL name: [n]
 l0 S24 [o]
-  /* terminal */
+  /* nsyid=24 terminal */
   Canonical name: [[o]]
   DSL name: [o]
 l0 S25 [r]
-  /* terminal */
+  /* nsyid=25 terminal */
   Canonical name: [[r]]
   DSL name: [r]
 l0 S26 [s]
-  /* terminal */
+  /* nsyid=26 terminal */
   Canonical name: [[s]]
   DSL name: [s]
 l0 S27 [t]
-  /* terminal */
+  /* nsyid=27 terminal */
   Canonical name: [[t]]
   DSL name: [t]
 l0 S28 number
+  /* nsyid=28 */
   Canonical name: number
   DSL name: number
 l0 S29 string
+  /* nsyid=29 */
   Canonical name: string
   DSL name: string
 l0 S30 <string contents>
+  /* nsyid=30 */
   Canonical name: <string contents>
   DSL name: string contents
 l0 S31 variable
+  /* nsyid=31 */
   Canonical name: variable
   DSL name: variable
 l0 S32 whitespace
+  /* nsyid=32 */
   Canonical name: whitespace
   DSL name: whitespace
 END_OF_SHOW_SYMBOLS_OUTPUT

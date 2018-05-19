@@ -858,6 +858,9 @@ rule_add (GRAMMAR g, RULE rule)
 @<Int aligned grammar elements@> = ISYID t_start_isy_id;
 @ @<Initialize grammar elements@> =
 g->t_start_isy_id = -1;
+@ @<Int aligned grammar elements@> = NSYID t_start_nsyid;
+@ @<Initialize grammar elements@> =
+g->t_start_nsyid = -1;
 @ @<Function definitions@> =
 Marpa_Symbol_ID marpa_g_start_symbol(Marpa_Grammar g)
 {
@@ -2007,9 +2010,6 @@ int _marpa_g_nsy_count(Marpa_Grammar g) {
 }
 
 @ Is Start?.
-@d NSY_is_Start(nsy) ((nsy)->t_is_start)
-@<Bit aligned NSY elements@> = BITFIELD t_is_start:1;
-@ @<Initialize NSY elements@> = NSY_is_Start(nsy) = 0;
 @ @<Function definitions@> =
 int _marpa_g_nsy_is_start( Marpa_Grammar g, Marpa_NSY_ID nsy_id)
 {
@@ -2017,7 +2017,17 @@ int _marpa_g_nsy_is_start( Marpa_Grammar g, Marpa_NSY_ID nsy_id)
     @<Fail if fatal error@>@;
     @<Fail if not precomputed@>@;
     @<Fail if |nsy_id| is invalid@>@;
-   return NSY_is_Start(NSY_by_ID(nsy_id));
+    return g->t_start_nsyid == nsy_id;
+}
+
+@ Start NSY
+@ @<Function definitions@> =
+Marpa_NSY_ID _marpa_g_start_nsy( Marpa_Grammar g)
+{
+    @<Return |-2| on failure@>@;
+    @<Fail if fatal error@>@;
+    @<Fail if not precomputed@>@;
+    return g->t_start_nsyid;
 }
 
 @ Is LHS?.
@@ -4678,10 +4688,11 @@ in the literature --- it is called ``augmenting the grammar".
   NRL new_start_nrl;
 
   const NSY new_start_nsy = nsy_new(g, start_isy);
-  NSY_is_Start(new_start_nsy) = 1;
+  const NSYID new_start_nsyid = ID_of_NSY(new_start_nsy);
+  g->t_start_nsyid = new_start_nsyid;
 
   new_start_nrl = nrl_start(g, 1);
-  LHSID_of_NRL(new_start_nrl) = ID_of_NSY(new_start_nsy);
+  LHSID_of_NRL(new_start_nrl) = new_start_nsyid;
   RHSID_of_NRL(new_start_nrl, 0) = NSYID_of_ISY(start_isy);
   nrl_finish(g, new_start_nrl);
   NRL_has_Virtual_LHS (new_start_nrl) = 1;
