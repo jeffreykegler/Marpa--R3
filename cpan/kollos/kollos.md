@@ -742,7 +742,10 @@ in `lmw_g`.
     local do_precompute_errors
     -- miranda: section+ most Lua function definitions
     function do_precompute_errors(slg, lmw_g)
-        local error_code = lmw_g:error_code()
+        local error_code, error_message = lmw_g:error_code()
+        if error_code == _M.err.INTERNAL then
+            error( 'Libmarpa internal error: ' .. error_message )
+        end
 
         -- We do not handle cycles here -- we catch the
         -- events later and process them
@@ -789,8 +792,8 @@ in `lmw_g`.
         if error_code == _M.err.NO_START_SYMBOL then
                 _M.userX('No start symbol')
         end
-        if error_code ~= _M.err.UNPRODUCTIVE_START then
-                _M.userX( '%s', lmw_g:error_description() )
+        if error_code == _M.err.UNPRODUCTIVE_START then
+                _M.userX( 'Unproductive start symbol' )
         end
         _M.userX( '%s', lmw_g:error_description() )
     end
@@ -2164,6 +2167,7 @@ Lowest ISYID is 0.
     end
 
     function _M.class_slg.lmg_rules_show(slg, subg_name, options)
+        local options = options or {}
         local verbose = options.verbose or 0
         local lmw_g = slg[subg_name]
         local pcs = {}
@@ -2238,11 +2242,11 @@ Lowest ISYID is 0.
         end
         return table.concat(pcs)
     end
-    function _M.class_slg.g1_rules_show(slg, verbose)
-        return slg:lmg_rules_show('g1', verbose)
+    function _M.class_slg.g1_rules_show(slg, options)
+        return slg:lmg_rules_show('g1', options)
     end
-    function _M.class_slg.l0_rules_show(slg, verbose)
-        return slg:lmg_rules_show('l0', verbose)
+    function _M.class_slg.l0_rules_show(slg, options)
+        return slg:lmg_rules_show('l0', options)
     end
 ```
 
@@ -8640,6 +8644,27 @@ indexed by isyid.
 
 ```
     -- miranda: section+ grammar Libmarpa wrapper Lua functions
+    function _M.class_slg.lmg_nrls_show(slg, subg_name)
+        local lmw_g = slg[subg_name]
+        local nrl_count = lmw_g:_nrl_count()
+        local pieces = {}
+        for nrlid = 0, nrl_count-1 do
+            table.insert(pieces,
+                nrlid .. ': ' .. slg:lmg_nrl_show(subg_name, nrlid))
+        end
+        return table.concat(pieces, '\n')
+    end
+    function _M.class_slg.g1_nrls_show(slg)
+        return slg:lmg_nrls_show('g1')
+    end
+    function _M.class_slg.l0_nrls_show(slg)
+        return slg:lmg_nrls_show('l0')
+    end
+
+```
+
+```
+    -- miranda: section+ grammar Libmarpa wrapper Lua functions
 
     function _M.class_grammar.nsy_name(grammar, nsy_id_arg)
         -- start symbol
@@ -10545,7 +10570,9 @@ Luacheck declarations
     /* Leaves the stack as before,
        except with the error object on top */
     static inline void push_error_object(lua_State* L,
-        lua_Integer code, const char* details)
+        lua_Integer code,
+        const char* message,
+        const char* details)
     {
        const int error_object_stack_ix = marpa_lua_gettop(L)+1;
        marpa_lua_newtable(L);
@@ -10562,6 +10589,11 @@ Luacheck declarations
 
        marpa_luaL_traceback(L, L, NULL, 1);
        marpa_lua_setfield(L, error_object_stack_ix, "where");
+
+       if (message) {
+           marpa_lua_pushstring(L, message);
+           marpa_lua_setfield(L, error_object_stack_ix, "message" );
+       }
 
        marpa_lua_pushstring(L, details);
        marpa_lua_setfield(L, error_object_stack_ix, "details" );
@@ -10590,7 +10622,7 @@ Luacheck declarations
         marpa_lua_settop (L, base_of_stack);
         return result;
       FAILURE:
-        push_error_object (L, MARPA_ERR_DEVELOPMENT, "Bad throw flag");
+        push_error_object (L, MARPA_ERR_DEVELOPMENT, 0, "Bad throw flag");
         return marpa_lua_error (L);
     }
 
@@ -10600,7 +10632,7 @@ Luacheck declarations
     development_error_handle (lua_State * L,
                             const char *details)
     {
-      push_error_object(L, MARPA_ERR_DEVELOPMENT, details);
+      push_error_object(L, MARPA_ERR_DEVELOPMENT, 0, details);
       marpa_lua_pushvalue(L, -1);
       marpa_lua_setfield(L, marpa_lua_upvalueindex(1), "error_object");
       marpa_lua_error(L);
@@ -10627,7 +10659,7 @@ The "throw" flag is ignored.
                             )
     {
       int error_object_ix;
-      push_error_object(L, MARPA_ERR_INTERNAL, details);
+      push_error_object(L, MARPA_ERR_INTERNAL, 0, details);
       error_object_ix = marpa_lua_gettop(L);
       marpa_lua_pushstring(L, function);
       marpa_lua_setfield(L, error_object_ix, "function");
@@ -10652,14 +10684,15 @@ The "throw" flag is ignored.
     static int
     libmarpa_error_code_handle (lua_State * L,
                             int lmw_stack_ix,
-                            int error_code, const char *details)
+                            int error_code,
+                            const char *message,
+                            const char *details)
     {
       int throw_flag = get_throw_flag(L, lmw_stack_ix);
       if (!throw_flag) {
           marpa_lua_pushnil(L);
       }
-      if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-      push_error_object(L, error_code, details);
+      push_error_object(L, error_code, message, details);
       if (0) fprintf (stderr, "%s %s %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
       /* [ ..., nil, error_object ] */
       marpa_lua_pushvalue(L, -1);
@@ -10678,19 +10711,22 @@ The "throw" flag is ignored.
     */
     static int
     libmarpa_error_handle (lua_State * L,
-                            int stack_ix, const char *details)
+                            int stack_ix,
+                            const char *details)
     {
       Marpa_Error_Code error_code;
       Marpa_Grammar *grammar_ud;
       const int base_of_stack = marpa_lua_gettop(L);
+      const char* p_message;
 
       marpa_lua_getfield (L, stack_ix, "lmw_g");
       marpa_lua_getfield (L, -1, "_libmarpa");
       /* [ ..., grammar_ud ] */
       grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
       marpa_lua_settop(L, base_of_stack);
-      error_code = marpa_g_error (*grammar_ud, NULL);
-      return libmarpa_error_code_handle(L, stack_ix, error_code, details);
+      error_code = marpa_g_error (*grammar_ud, &p_message);
+      return libmarpa_error_code_handle(L,
+          stack_ix, error_code, p_message, details);
     }
 
     /* A wrapper for libmarpa_error_handle to conform with the
@@ -10752,13 +10788,19 @@ All such objects define the `lmw_g` field.
         Marpa_Error_Code error_code;
         Marpa_Grammar *grammar_ud;
         const int lmw_stack_ix = 1;
+        const char *message;
 
         marpa_lua_getfield (L, lmw_stack_ix, "lmw_g");
         marpa_lua_getfield (L, -1, "_libmarpa");
         grammar_ud = (Marpa_Grammar *) marpa_lua_touserdata (L, -1);
-        error_code = marpa_g_error (*grammar_ud, NULL);
+        error_code = marpa_g_error (*grammar_ud, &message);
         marpa_lua_pushinteger (L, error_code);
-        return 1;
+        if (message) {
+            marpa_lua_pushstring (L, message);
+        } else {
+            marpa_lua_pushnil (L);
+        }
+        return 2;
     }
 
     -- miranda: section+ non-standard wrappers
@@ -12342,19 +12384,22 @@ inspect package to dump it.
          local error_code = self.code
          if error_code then
               local description = _M.error_description(error_code)
+              local fields = {}
               local details = self.details
-              local pieces = {}
               if details then
-                  pieces[#pieces+1] = details
-                  pieces[#pieces+1] = ': '
+                  table.insert(fields, details .. ':')
               end
-              pieces[#pieces+1] = description
+              table.insert(fields, description)
+              local message = self.message
+              if message then
+                  table.insert(fields, '("' .. message .. '")')
+              end
+              local pieces = { table.concat(fields, " ") }
               local where = self.where
               if where then
-                  pieces[#pieces+1] = '\n'
-                  pieces[#pieces+1] = where
+                  table.insert(pieces, where)
               end
-              return table.concat(pieces)
+              return table.concat(pieces, "\n")
          end
 
          -- no `msg` or `code` so we fall back

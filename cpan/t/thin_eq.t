@@ -229,10 +229,12 @@ $marpa_lua->exec(<<'END_OF_LUA');
      local error_description = kollos.error_description(error_code)
      Test.More.is(error_description, 'No error', 'Grammar error description' )
      local S = grammar:symbol_new("S").id
+     local Seq = grammar:symbol_new("Seq").id
      local a = grammar:symbol_new("a").id
      local sep = grammar:symbol_new("sep").id
      grammar:start_symbol_set(S)
-     grammar:sequence_new{lhs = S, rhs = a, separator = sep, proper = 0, min = 1}
+     local start_rule_id = grammar:rule_new{S, Seq}
+     grammar:sequence_new{lhs = Seq, rhs = a, separator = sep, proper = 0, min = 1}
      grammar:precompute()
      local recce = kollos.recce_new(grammar)
      recce:start_input()
@@ -256,7 +258,7 @@ $marpa_lua->exec(<<'END_OF_LUA');
          end
      end
      local report_string = table.concat(report, ' ')
-     Test.More.is(report_string, '0:0@0 0:-1@0', 'progress report' )
+     Test.More.is(report_string, '0:0@0 1:0@0 0:-1@0 1:-1@0', 'progress report' )
 
      recce:alternative(sep, 1, 1)
      recce:earleme_complete()
@@ -293,11 +295,12 @@ $marpa_lua->exec(<<'END_OF_LUA');
     end
     local result_string = table.concat(result)
     Test.More.is(result_string, [[
-Token 1 is from 0 to 1
-Token 2 is from 1 to 2
-Token 1 is from 2 to 3
-Token 2 is from 3 to 4
-Token 1 is from 4 to 5
+Token 2 is from 0 to 1
+Token 3 is from 1 to 2
+Token 2 is from 2 to 3
+Token 3 is from 3 to 4
+Token 2 is from 4 to 5
+Rule 1 is from 0 to 5
 Rule 0 is from 0 to 5
 ]], 'Step locations' )
 END_OF_LUA
