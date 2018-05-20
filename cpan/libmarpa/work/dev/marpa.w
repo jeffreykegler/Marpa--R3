@@ -3668,19 +3668,24 @@ and that the start symbol only appears
 on the LHS of the start rule.
 @<Check that grammar is augmented@> =
 {
-  const ISY start_isy = ISY_by_ID(start_isy_id);
   {
-    const RULEID *p_start_irl = irl_list_x_lh_sym[start_isy_id];
-    const RULEID *p_next_irl = irl_list_x_lh_sym[start_isy_id+1];
-    const int rules_with_this_lhs = p_next_irl - p_start_irl;
-    if (rules_with_this_lhs != 1) {
-       MARPA_INTERNAL_ERROR("Start symbol on more than one RHS");
+    const RULEID *p_start_irlid = irl_list_x_lh_sym[start_isy_id];
+    const IRL irl = IRL_by_ID(*p_start_irlid);
+    if (Length_of_IRL(irl) != 1) {
+       MARPA_INTERNAL_ERROR("Length of start rule is not 1");
+    }
+    {
+      const RULEID *p_next_irlid = irl_list_x_lh_sym[start_isy_id+1];
+      const ptrdiff_t rules_with_this_lhs = p_next_irlid - p_start_irlid;
+      if (rules_with_this_lhs != 1) {
+         MARPA_INTERNAL_ERROR("Start symbol on more than one RHS");
+      }
     }
   }
   {
-    const RULEID *p_start_irl = irl_list_x_rh_sym[start_isy_id];
-    const RULEID *p_next_irl = irl_list_x_rh_sym[start_isy_id+1];
-    const int rules_with_this_rhs = p_next_irl - p_start_irl;
+    const RULEID *p_start_irlid = irl_list_x_rh_sym[start_isy_id];
+    const RULEID *p_next_irlid = irl_list_x_rh_sym[start_isy_id+1];
+    const ptrdiff_t rules_with_this_rhs = p_next_irlid - p_start_irlid;
     if (rules_with_this_rhs != 0) {
        MARPA_INTERNAL_ERROR("Start symbol is on a RHS");
     }
