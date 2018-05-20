@@ -1791,30 +1791,6 @@ TODO: Do I need xpr_top?
     end
 ```
 
-Return the `xpr` if the traverser is at the completion
-of an xpr top.
-Otherwise, return `nil`.
-
-```
-    -- miranda: section+ forward declarations
-    local g1_xpr_top_from_trv
-    -- miranda: section+ most Lua function definitions
-    function g1_xpr_top_from_trv(slg, trv)
-        local irl_id = trv:rule_id()
-        if not irl_id then return end
-        -- io.stderr:write('irl_id is a match: ', irl_id, "\n")
-        local dot = trv:dot()
-        if dot >= 0 then return end
-        -- io.stderr:write('dot is a match: ', dot, "\n")
-        if not slg:g1_rule_is_xpr_top(irl_id) then
-            return
-        end
-        local xpr_id = slg:g1_rule_to_xprid(irl_id)
-        local xpr = slg.xprs[xpr_id]
-        return xpr
-    end
-```
-
 TODO -- Turn lmg_*() forms into local functions?
 
 TODO -- Census all Lua and perl symbol name functions, including
@@ -6456,10 +6432,10 @@ illegal named arguments.
                 local glade = dumpee.glade
                 local id = glade:id()
                 local symch = dumpee.symch
-                local irlid = symch:rule_id()
+                local nrlid = symch:nrl_id()
                 local ix = dumpee.ix
                 local header = string.format("Symch %s.%d: %s; %d partitions",
-                   id, ix, slg:g1_rule_show(irlid), partition_count)
+                   id, ix, slg:g1_nrl_show(nrlid), partition_count)
                 table.insert(lines, string.rep(' ', indent) .. header)
                 if partition_count < 1 then
                    error(string.format("Bad partition count (%d) in nsymch %s",
@@ -6986,7 +6962,7 @@ glade has already been dumped.
         while at_token do
             local literal = slr:g1_literal(g1_start, g1_length)
             local body = string.format('Token %s: "%s"',
-                slg:g1_symbol_angled_form(isyid),
+                g1g:nsy_name(nsyid),
                 literal)
             coroutine.yield{ body }
             at_token = symch:token_next()
@@ -7003,7 +6979,7 @@ glade has already been dumped.
                 -- TODO optimize by memoization?  Special C call?
                 --   look at this after NRLs are eliminated
                 local cause_trv = symch:completion_cause()
-                local cause_nrlid = cause_trv:_nrl_id()
+                local cause_nrlid = cause_trv:nrl_id()
                 local cause_origin = cause_trv:origin()
                 local eims_by_nrlid = cause_eim_db[cause_origin]
                 if not eims_by_nrlid then
@@ -7108,16 +7084,7 @@ glade has already been dumped.
         if rule_symches then
             for ix = 1, #rule_symches do
                local symch = rule_symches[ix]
-               local irlid = symch:rule_id()
-               local body
-               if g1g:sequence_min(irlid) then
-                   body = string.format("Sequence rules NOT YET IMPLEMENTED: %s", slg:g1_rule_show(irlid))
-                   coroutine.yield{ body }
-                   goto NEXT_RULE_SYMCH
-               end
-
                local nsymch = { type = 'nsymch', glade = glade, symch = symch, ix = ix }
-
                for partition in glade_symch_values(glade, symch, seen) do
                    table.insert(nsymch, partition)
                end
@@ -7174,26 +7141,33 @@ arguments are correct.
     local glade_from_instance
     -- miranda: section+ most Lua function definitions
     local function eimset_from_instance(asf, nsyid, g1_start, g1_length)
+        print('eimset_from_instance 1')
         local slr = asf.slr
-        local slg = slr.slg
         local g1r = slr.g1
+        local slg = slr.slg
+        local g1g = slg.g1
         local g1_end = g1_start + g1_length
         local max_eim = g1r:_earley_set_size(g1_end) - 1
-        local top_xsyid = asf.top_xsyid
         local eimset = {}
 
         for eim_id = 0, max_eim do
+            print('eimset_from_instance loop 1', inspect(eim_id))
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
+            print('eimset_from_instance loop trv', inspect(trv))
             local origin = trv:origin()
+            print('eimset_from_instance loop origin', inspect(origin))
             if origin ~= g1_start then goto NEXT_EIM end
-            local xpr = g1_xpr_top_from_trv(slg, trv)
-            if not xpr then goto NEXT_EIM end
-            local xsy_id = xpr.lhs.id
-            if xsy_id ~= top_xsyid then goto NEXT_EIM end
+            local dot = trv:nrl_dot()
+            if dot >= 0 then return end
+            local nrlid = trv:nrl_id()
+            local lh_nsyid = g1g:_nrl_lhs(nrlid)
+            if lh_nsyid ~= nsyid then goto NEXT_EIM end
             eimset[#eimset+1] = trv
+            print('eimset_from_instance loop end', inspect(eim_id))
             ::NEXT_EIM::
         end
+        print('eimset_from_instance -- end')
         return eimset
     end
 
@@ -8645,6 +8619,29 @@ indexed by isyid.
             pieces[#pieces+1] = '.'
         end
         return table.concat(pieces, ' ')
+    end
+```
+
+```
+    -- miranda: section+ grammar Libmarpa wrapper Lua functions
+    function _M.class_slg.lmg_nrl_show(slg, subg_name, nrl_id)
+        local lmw_g = slg[subg_name]
+        local lhs_id = lmw_g:_nrl_lhs(nrl_id)
+        local nrl_length = lmw_g:_nrl_length(nrl_id)
+        local lhs_name = lmw_g:nsy_name(lhs_id)
+        local pieces = { lhs_name, '::=' }
+        for ix = 0, nrl_length - 1 do
+            local rhs_nsy_id = lmw_g:_nrl_rhs(nrl_id, ix)
+            local rhs_nsy_name = lmw_g:nsy_name(rhs_nsy_id)
+            pieces[#pieces+1] = rhs_nsy_name
+        end
+        return table.concat(pieces, ' ')
+    end
+    function _M.class_slg.g1_nrl_show(slg, nrlid)
+        return slg:lmg_nrl_show('g1', nrlid)
+    end
+    function _M.class_slg.l0_nrl_show(slg, nrlid)
+        return slg:lmg_nrl_show('l0', nrlid)
     end
 
 ```
