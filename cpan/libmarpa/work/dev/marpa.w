@@ -2284,6 +2284,20 @@ nrl_finish( GRAMMAR g, NRL nrl)
   nrl_finish(g, new_nrl);
 }
 
+@ @<Clone a new start NRL from |rule|@> =
+{
+  int symbol_ix;
+  const NRL new_nrl = nrl_start (g, rewrite_irl_length);
+  Source_IRL_of_NRL (new_nrl) = rule;
+  Rank_of_NRL(new_nrl) = NRL_Rank_by_IRL(rule);
+  for (symbol_ix = 0; symbol_ix <= rewrite_irl_length; symbol_ix++)
+    {
+      new_nrl->t_nsyid_array[symbol_ix] =
+        NSYID_by_ISYID(rule->t_symbols[symbol_ix]);
+    }
+  nrl_finish(g, new_nrl);
+}
+
 @ @<Function definitions@> =
 Marpa_Rule_ID
 marpa_g_rule_new (Marpa_Grammar g,
@@ -4147,6 +4161,10 @@ int _marpa_g_nrl_is_chaf(
           @<Factor the rule into CHAF rules@>@;
           continue;
         }
+      if (g->t_start_isy_id == rule_id) {
+        @<Clone a new start NRL from |rule|@>@;
+        continue;
+      }
       @<Clone a new NRL from |rule|@>@;
     }
 }
