@@ -4708,7 +4708,9 @@ in the literature --- it is called ``augmenting the grammar".
     }
 }
 
-@ @<Set up a new proper start rule@> = {
+@ The start rule is accessible, so there must be
+an NSY for its LHS.
+@<Set up a new proper start rule@> = {
   NRL new_start_nrl;
 
   const NSY new_start_nsy = nsy_new(g, start_isy);
