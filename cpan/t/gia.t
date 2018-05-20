@@ -663,7 +663,7 @@ my $start_id;
 
     $start_id = $grammar->start_symbol_id();
 
-    Test::More::is( $start_id, 4, q{Test of $grammar->start_symbol_id()} );
+    Test::More::is( $start_id, 3, q{Test of $grammar->start_symbol_id()} );
 
     $start_id = $grammar->g1_start_symbol_id();
 
@@ -686,7 +686,7 @@ my $start_id;
             qw([:start:] start1 start2),
             'first start rule',
             'second start rule',
-            qw([:lex_start:] [:lex_start:] X Y)
+            qw([:target:] [:target:] X Y)
         ),
         q{Test of $grammar->production_name()}
     );

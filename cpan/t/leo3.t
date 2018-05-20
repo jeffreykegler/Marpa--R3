@@ -61,8 +61,8 @@ S1 A
 S2 B
 S3 C
 S4 S
-S5 [:lex_start:]
-S6 [:start:]
+S5 [:start:]
+S6 [:target:]
 S7 [a]
 S8 a
 END_OF_STRING
@@ -75,7 +75,7 @@ R3 A ::= B
 R4 B ::= C
 R5 C ::= S
 R6 S ::=
-R7 [:lex_start:] ~ a
+R7 [:target:] ~ a
 R8 a ~ [a]
 END_OF_STRING
 

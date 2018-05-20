@@ -59,7 +59,7 @@ R3 A ::= 'a'
 R4 B ::= 'a'
 R5 B ::=
 R6 C ::=
-R7 [:lex_start:] ~ 'a'
+R7 [:target:] ~ 'a'
 R8 'a' ~ [a]
 EOS
 

@@ -64,7 +64,7 @@ R2 S ::= p p p n
 R3 p ::= a
 R4 p ::=
 R5 n ::= a
-R6 [:lex_start:] ~ a
+R6 [:target:] ~ a
 R7 a ~ [\d\D]
 END_OF_STRING
 

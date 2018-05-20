@@ -98,8 +98,8 @@ S5 MinusAssignOp
 S6 MultiplyAssignOp
 S7 Statement
 S8 Variable
-S9 [:lex_start:]
-S10 [:start:]
+S9 [:start:]
+S10 [:target:]
 S11 [=]
 S12 [\*]
 S13 [\+]
@@ -119,11 +119,11 @@ R5 Statement ::= Expression
 R6 Expression ::= Variable
 R7 Lvalue ::= Variable
 R8 Expression ::= Lvalue AssignOp Expression
-R9 [:lex_start:] ~ AddAssignOp
-R10 [:lex_start:] ~ AssignOp
-R11 [:lex_start:] ~ MinusAssignOp
-R12 [:lex_start:] ~ MultiplyAssignOp
-R13 [:lex_start:] ~ Variable
+R9 [:target:] ~ AddAssignOp
+R10 [:target:] ~ AssignOp
+R11 [:target:] ~ MinusAssignOp
+R12 [:target:] ~ MultiplyAssignOp
+R13 [:target:] ~ Variable
 R14 Variable ~ [a-z] +
 R15 AssignOp ~ [=]
 R16 AddAssignOp ~ [\+] [\=]

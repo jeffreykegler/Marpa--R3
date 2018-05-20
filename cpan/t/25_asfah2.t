@@ -59,7 +59,7 @@ R1 [:start:] ::= S
 R2 S ::= A A A A
 R3 A ::=
 R4 A ::= 'a'
-R5 [:lex_start:] ~ 'a'
+R5 [:target:] ~ 'a'
 R6 'a' ~ [a]
 EOS
 
@@ -74,8 +74,8 @@ Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
 S1 A
 S2 S
-S3 [:lex_start:]
-S4 [:start:]
+S3 [:start:]
+S4 [:target:]
 S5 'a'
 S6 [a]
 EOS
@@ -257,7 +257,7 @@ AHM 25: dot=0; nulls=0
 AHM 26: completion; dot=1; nulls=0
     [:start:]['] ::= [:start:] .
     {
-        brick = { 4 }
+        brick = { 3 }
     }
 EOS
 

@@ -236,22 +236,22 @@ sub ast_to_hash {
         }
 
         {
-            my $lex_start_lhs = '[:lex_start:]';
+            my $target_lhs = '[:target:]';
             my $symbol_data = {
-                dsl_form    => $lex_start_lhs,
+                dsl_form    => $target_lhs,
                 name_source => 'internal',
             };
-            $hashed_ast->xsy_assign( $lex_start_lhs, $symbol_data );
-            $hashed_ast->symbol_names_set( $lex_start_lhs, 'l0',
-                { xsy => $lex_start_lhs } );
+            $hashed_ast->xsy_assign( $target_lhs, $symbol_data );
+            $hashed_ast->symbol_names_set( $target_lhs, 'l0',
+                { xsy => $target_lhs } );
 
             my $rule_data = {
                 start  => 0,
                 length => 0,
-                lhs    => $lex_start_lhs,
+                lhs    => $target_lhs,
                 rhs    => [$lexeme],
             };
-            $hashed_ast->symbol_assign_ordinary( $lex_start_lhs, 'l0' );
+            $hashed_ast->symbol_assign_ordinary( $target_lhs, 'l0' );
             my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );
             push @{ $hashed_ast->{rules}->{l0} }, $wrl;
         }

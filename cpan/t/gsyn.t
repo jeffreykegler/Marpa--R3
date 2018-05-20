@@ -88,16 +88,16 @@ R10 Expression ::= Expression '/' Expression; prec=1
 R11 Expression ::= Expression '+' Expression; prec=0
 R12 Expression ::= Expression '-' Expression; prec=0
 R13 Script ::= Expression +
-R14 [:lex_start:] ~ Number
-R15 [:lex_start:] ~ [:discard:]
-R16 [:lex_start:] ~ '('
-R17 [:lex_start:] ~ ')'
-R18 [:lex_start:] ~ '**'
-R19 [:lex_start:] ~ '*'
-R20 [:lex_start:] ~ '/'
-R21 [:lex_start:] ~ '+'
-R22 [:lex_start:] ~ '-'
-R23 [:lex_start:] ~ comma
+R14 [:target:] ~ Number
+R15 [:target:] ~ [:discard:]
+R16 [:target:] ~ '('
+R17 [:target:] ~ ')'
+R18 [:target:] ~ '**'
+R19 [:target:] ~ '*'
+R20 [:target:] ~ '/'
+R21 [:target:] ~ '+'
+R22 [:target:] ~ '-'
+R23 [:target:] ~ comma
 R24 comma ~ [,]
 R25 '(' ~ [\(]
 R26 ')' ~ [\)]
@@ -162,16 +162,16 @@ R15 <unterminated final hash comment> ~ [\#] <hash comment body>
 R16 <hash comment body> ~ <hash comment char> *
 R17 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 R18 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-R19 [:lex_start:] ~ Number
-R20 [:lex_start:] ~ [:discard:]
-R21 [:lex_start:] ~ '('
-R22 [:lex_start:] ~ ')'
-R23 [:lex_start:] ~ '**'
-R24 [:lex_start:] ~ '*'
-R25 [:lex_start:] ~ '/'
-R26 [:lex_start:] ~ '+'
-R27 [:lex_start:] ~ '-'
-R28 [:lex_start:] ~ comma
+R19 [:target:] ~ Number
+R20 [:target:] ~ [:discard:]
+R21 [:target:] ~ '('
+R22 [:target:] ~ ')'
+R23 [:target:] ~ '**'
+R24 [:target:] ~ '*'
+R25 [:target:] ~ '/'
+R26 [:target:] ~ '+'
+R27 [:target:] ~ '-'
+R28 [:target:] ~ comma
 END_OF_SHOW_RULES_OUTPUT
 
 sub my_parser {

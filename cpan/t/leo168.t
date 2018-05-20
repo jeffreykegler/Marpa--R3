@@ -66,8 +66,8 @@ Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo168 Symbols' );
 S1 C
 S2 S
-S3 [:lex_start:]
-S4 [:start:]
+S3 [:start:]
+S4 [:target:]
 S5 [a]
 S6 [b]
 S7 a
@@ -81,8 +81,8 @@ R2 C ::= a C b
 R3 C ::=
 R4 S ::= a S
 R5 S ::= C
-R6 [:lex_start:] ~ a
-R7 [:lex_start:] ~ b
+R6 [:target:] ~ a
+R7 [:target:] ~ b
 R8 a ~ [a]
 R9 b ~ [b]
 END_OF_STRING

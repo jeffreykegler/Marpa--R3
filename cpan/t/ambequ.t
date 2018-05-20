@@ -108,8 +108,8 @@ Marpa::R3::Test::is( ${$actual_ref},
 S1 E
 S2 Number
 S3 Op
-S4 [:lex_start:]
-S5 [:start:]
+S4 [:start:]
+S5 [:target:]
 S6 [-+*]
 S7 [\d]
 END_SYMBOLS
@@ -126,8 +126,8 @@ Marpa::R3::Test::is( ${$actual_ref},
 R1 [:start:] ::= E
 R2 E ::= E Op E
 R3 E ::= Number
-R4 [:lex_start:] ~ Number
-R5 [:lex_start:] ~ Op
+R4 [:target:] ~ Number
+R5 [:target:] ~ Op
 R6 Number ~ [\d] +
 R7 Op ~ [-+*]
 END_RULES

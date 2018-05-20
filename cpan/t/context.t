@@ -86,18 +86,18 @@ S2 B
 S3 C
 S4 D
 S5 S
-S6 [:lex_start:]
-S7 [:start:]
+S6 [:start:]
+S7 [:target:]
 S8 [\d\D]
 EO_TEXT
     Marpa::R3::Test::is( $grammar->productions_show(),
     <<'EO_TEXT', 'Productions');
 R1 [:start:] ::= S
 R2 S ::= A B C D
-R3 [:lex_start:] ~ A
-R4 [:lex_start:] ~ B
-R5 [:lex_start:] ~ C
-R6 [:lex_start:] ~ D
+R3 [:target:] ~ A
+R4 [:target:] ~ B
+R5 [:target:] ~ C
+R6 [:target:] ~ D
 R7 A ~ [\d\D]
 R8 B ~ [\d\D]
 R9 C ~ [\d\D]

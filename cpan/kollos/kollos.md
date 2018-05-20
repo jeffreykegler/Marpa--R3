@@ -939,7 +939,7 @@ in `lmw_g`.
     function precompute_l0(slg, source_hash)
         local l0g = _M.grammar_new(slg, 'l0')
         slg.l0 = l0g
-        l0g.start_name = '[:lex_start:]'
+        l0g.start_name = '[:target:]'
 
         local g1g = slg.g1
 
@@ -1030,7 +1030,7 @@ in `lmw_g`.
             -- a lexeme rule
             local l0_rhs_id = l0g:rule_rhs(l0_irlid, 0)
 
-            -- the rule '[:lex_start:] ::= [:discard:]'
+            -- the rule '[:target:] ::= [:discard:]'
             if l0_rhs_id == slg.l0_discard_isyid then
                 irl.g1_lexeme = -1
                 goto NEXT_L0_IRL

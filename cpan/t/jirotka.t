@@ -111,8 +111,8 @@ S22 WHERE
 S23 WITH
 S24 WithPf
 S25 [:discard:]
-S26 [:lex_start:]
-S27 [:start:]
+S26 [:start:]
+S27 [:target:]
 S28 [1]
 S29 [A]
 S30 [B]
@@ -161,21 +161,21 @@ R13 FilterExpr ::= FALSE
 R14 WithPf ::=
 R15 WithPf ::= WITH PF
 R16 Statement ::= CREATE TypeDef
-R17 [:lex_start:] ~ AS
-R18 [:lex_start:] ~ BY
-R19 [:lex_start:] ~ CREATE
-R20 [:lex_start:] ~ FALSE
-R21 [:lex_start:] ~ FOR
-R22 [:lex_start:] ~ ID_METRIC
-R23 [:lex_start:] ~ METRIC
-R24 [:lex_start:] ~ NUMBER
-R25 [:lex_start:] ~ PF
-R26 [:lex_start:] ~ SELECT
-R27 [:lex_start:] ~ SEPARATOR
-R28 [:lex_start:] ~ TRUE
-R29 [:lex_start:] ~ WHERE
-R30 [:lex_start:] ~ WITH
-R31 [:lex_start:] ~ [:discard:]
+R17 [:target:] ~ AS
+R18 [:target:] ~ BY
+R19 [:target:] ~ CREATE
+R20 [:target:] ~ FALSE
+R21 [:target:] ~ FOR
+R22 [:target:] ~ ID_METRIC
+R23 [:target:] ~ METRIC
+R24 [:target:] ~ NUMBER
+R25 [:target:] ~ PF
+R26 [:target:] ~ SELECT
+R27 [:target:] ~ SEPARATOR
+R28 [:target:] ~ TRUE
+R29 [:target:] ~ WHERE
+R30 [:target:] ~ WITH
+R31 [:target:] ~ [:discard:]
 R32 TRUE ~ [T] [r] [u] [e]
 R33 BY ~ [B] [y]
 R34 FALSE ~ [F] [a] [l] [s] [e]

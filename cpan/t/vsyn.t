@@ -120,8 +120,8 @@ S3 Factor
 S4 Number
 S5 Term
 S6 [:discard:]
-S7 [:lex_start:]
-S8 [:start:]
+S7 [:start:]
+S8 [:target:]
 S9 '*'
 S10 '+'
 S11 [\*]
@@ -143,10 +143,10 @@ R4 Expression ::= Expression '+' Term
 R5 Expression ::= Term
 R6 Factor ::= Number
 R7 Term ::= Term '*' Factor
-R8 [:lex_start:] ~ Number
-R9 [:lex_start:] ~ [:discard:]
-R10 [:lex_start:] ~ '*'
-R11 [:lex_start:] ~ '+'
+R8 [:target:] ~ Number
+R9 [:target:] ~ [:discard:]
+R10 [:target:] ~ '*'
+R11 [:target:] ~ '+'
 R12 '*' ~ [\*]
 R13 '+' ~ [\+]
 R14 Number ~ digits
