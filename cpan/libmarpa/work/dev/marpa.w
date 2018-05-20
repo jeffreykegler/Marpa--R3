@@ -2288,6 +2288,7 @@ nrl_finish( GRAMMAR g, NRL nrl)
 {
   int symbol_ix;
   const NRL new_nrl = nrl_start (g, rewrite_irl_length);
+  if (0) { g->t_start_nrl = new_nrl; }
   Source_IRL_of_NRL (new_nrl) = rule;
   Rank_of_NRL(new_nrl) = NRL_Rank_by_IRL(rule);
   for (symbol_ix = 0; symbol_ix <= rewrite_irl_length; symbol_ix++)
@@ -2295,6 +2296,7 @@ nrl_finish( GRAMMAR g, NRL nrl)
       new_nrl->t_nsyid_array[symbol_ix] =
         NSYID_by_ISYID(rule->t_symbols[symbol_ix]);
     }
+  if (0) { g->t_start_nsyid = LHSID_of_NRL(new_nrl); }
   nrl_finish(g, new_nrl);
 }
 
@@ -3237,7 +3239,6 @@ int marpa_g_precompute(Marpa_Grammar g)
     @<Initialize NRL stack@>@;
     @<Initialize NSY stack@>@;
     @<Rewrite grammar |g| into CHAF form@>@;
-    @<Augment grammar |g|@>@;
     post_census_isy_count = ISY_Count_of_G(g);
     @<Populate the event boolean vectors@>@;
 
@@ -3685,14 +3686,20 @@ on the LHS of the start rule.
   {
     const RULEID *p_start_irlid = irl_list_x_lh_sym[start_isy_id];
     const IRL irl = IRL_by_ID(*p_start_irlid);
+    if (IRL_is_Sequence (irl)) {
+       MARPA_INTERNAL_ERROR("Start rule is sequence");
+       goto FAILURE;
+    }
     if (Length_of_IRL(irl) != 1) {
        MARPA_INTERNAL_ERROR("Length of start rule is not 1");
+       goto FAILURE;
     }
-    {
+    if (0) {
       const RULEID *p_next_irlid = irl_list_x_lh_sym[start_isy_id+1];
       const ptrdiff_t rules_with_this_lhs = p_next_irlid - p_start_irlid;
       if (rules_with_this_lhs != 1) {
-         MARPA_INTERNAL_ERROR("Start symbol on more than one RHS");
+         MARPA_INTERNAL_ERROR("Start symbol on more than one LHS");
+       goto FAILURE;
       }
     }
   }
@@ -4713,36 +4720,6 @@ rule structure, and performing the call back.
   Real_SYM_Count_of_NRL (chaf_nrl) = real_symbol_count;
   LHS_IRL_of_NSY (current_lhs_nsy) = chaf_irl;
   IRL_Offset_of_NSY (current_lhs_nsy) = piece_start;
-}
-
-@** Adding a new start symbol.
-This is such a common rewrite that it has a special name
-in the literature --- it is called ``augmenting the grammar".
-@ @<Augment grammar |g|@> =
-{
-    const ISY start_isy = ISY_by_ID(start_isy_id);
-    if (_MARPA_LIKELY(!ISY_is_Nulling(start_isy))) {
-        @<Set up a new proper start rule@>@;
-    }
-}
-
-@ The start rule is accessible, so there must be
-an NSY for its LHS.
-@<Set up a new proper start rule@> = {
-  NRL new_start_nrl;
-
-  const NSY new_start_nsy = nsy_new(g, start_isy);
-  const NSYID new_start_nsyid = ID_of_NSY(new_start_nsy);
-  g->t_start_nsyid = new_start_nsyid;
-
-  new_start_nrl = nrl_start(g, 1);
-  LHSID_of_NRL(new_start_nrl) = new_start_nsyid;
-  RHSID_of_NRL(new_start_nrl, 0) = NSYID_of_ISY(start_isy);
-  nrl_finish(g, new_start_nrl);
-  NRL_has_Virtual_LHS (new_start_nrl) = 1;
-  Real_SYM_Count_of_NRL (new_start_nrl) = 1;
-  g->t_start_nrl = new_start_nrl;
-
 }
 
 @** Loops.
@@ -15913,8 +15890,8 @@ than specifying the flags.
 Not being error-prone
 is important since there are many calls to |r_error|
 in the code.
-@d MARPA_DEV_ERROR(message) (set_error(g, MARPA_ERR_DEVELOPMENT, (message), 0u))
-@d MARPA_INTERNAL_ERROR(message) (set_error(g, MARPA_ERR_INTERNAL, (message), 0u))
+@d MARPA_DEV_ERROR(message) (set_error(g, MARPA_ERR_DEVELOPMENT, (message), FATAL_FLAG))
+@d MARPA_INTERNAL_ERROR(message) (set_error(g, MARPA_ERR_INTERNAL, (message), FATAL_FLAG))
 @d MARPA_ERROR(code) (set_error(g, (code), NULL, 0u))
 @d MARPA_FATAL(code) (set_error(g, (code), NULL, FATAL_FLAG))
 @ Not inlined.  |r_error|
