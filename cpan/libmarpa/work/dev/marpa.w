@@ -3239,6 +3239,7 @@ int marpa_g_precompute(Marpa_Grammar g)
     @<Initialize NRL stack@>@;
     @<Initialize NSY stack@>@;
     @<Rewrite grammar |g| into CHAF form@>@;
+    @<Augment grammar |g|@>@;
     post_census_isy_count = ISY_Count_of_G(g);
     @<Populate the event boolean vectors@>@;
 
@@ -4720,6 +4721,34 @@ rule structure, and performing the call back.
   Real_SYM_Count_of_NRL (chaf_nrl) = real_symbol_count;
   LHS_IRL_of_NSY (current_lhs_nsy) = chaf_irl;
   IRL_Offset_of_NSY (current_lhs_nsy) = piece_start;
+}
+
+@** Adding a new start symbol.
+This is such a common rewrite that it has a special name
+in the literature --- it is called ``augmenting the grammar".
+@ @<Augment grammar |g|@> =
+{
+    const ISY start_isy = ISY_by_ID(start_isy_id);
+    if (_MARPA_LIKELY(!ISY_is_Nulling(start_isy))) {
+        @<Set up a new proper start rule@>@;
+    }
+}
+
+@ @<Set up a new proper start rule@> = {
+  NRL new_start_nrl;
+
+  const NSY new_start_nsy = nsy_new(g, start_isy);
+  const NSYID new_start_nsyid = ID_of_NSY(new_start_nsy);
+  g->t_start_nsyid = new_start_nsyid;
+
+  new_start_nrl = nrl_start(g, 1);
+  LHSID_of_NRL(new_start_nrl) = new_start_nsyid;
+  RHSID_of_NRL(new_start_nrl, 0) = NSYID_of_ISY(start_isy);
+  nrl_finish(g, new_start_nrl);
+  NRL_has_Virtual_LHS (new_start_nrl) = 1;
+  Real_SYM_Count_of_NRL (new_start_nrl) = 1;
+  g->t_start_nrl = new_start_nrl;
+
 }
 
 @** Loops.
