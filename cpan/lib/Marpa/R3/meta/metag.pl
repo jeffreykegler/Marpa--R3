@@ -2010,7 +2010,7 @@ $hashed_metag = {
                                            'xprid' => 'l0,[:discard:],whitespace'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'Perl name'
                                                     ],
@@ -2020,10 +2020,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],Perl name'
+                                           'xprid' => 'l0,[:target:],Perl name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[:discard:]'
                                                     ],
@@ -2033,10 +2033,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[:discard:]'
+                                           'xprid' => 'l0,[:target:],[:discard:]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-0]'
                                                     ],
@@ -2046,10 +2046,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-0]'
+                                           'xprid' => 'l0,[:target:],[Lex-0]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-10]'
                                                     ],
@@ -2059,10 +2059,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-10]'
+                                           'xprid' => 'l0,[:target:],[Lex-10]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-11]'
                                                     ],
@@ -2072,10 +2072,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-11]'
+                                           'xprid' => 'l0,[:target:],[Lex-11]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-12]'
                                                     ],
@@ -2085,10 +2085,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-12]'
+                                           'xprid' => 'l0,[:target:],[Lex-12]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-13]'
                                                     ],
@@ -2098,10 +2098,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-13]'
+                                           'xprid' => 'l0,[:target:],[Lex-13]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-14]'
                                                     ],
@@ -2111,10 +2111,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-14]'
+                                           'xprid' => 'l0,[:target:],[Lex-14]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-15]'
                                                     ],
@@ -2124,10 +2124,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-15]'
+                                           'xprid' => 'l0,[:target:],[Lex-15]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-16]'
                                                     ],
@@ -2137,10 +2137,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-16]'
+                                           'xprid' => 'l0,[:target:],[Lex-16]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-17]'
                                                     ],
@@ -2150,10 +2150,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-17]'
+                                           'xprid' => 'l0,[:target:],[Lex-17]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-18]'
                                                     ],
@@ -2163,10 +2163,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-18]'
+                                           'xprid' => 'l0,[:target:],[Lex-18]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-19]'
                                                     ],
@@ -2176,10 +2176,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-19]'
+                                           'xprid' => 'l0,[:target:],[Lex-19]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-1]'
                                                     ],
@@ -2189,10 +2189,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-1]'
+                                           'xprid' => 'l0,[:target:],[Lex-1]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-20]'
                                                     ],
@@ -2202,10 +2202,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-20]'
+                                           'xprid' => 'l0,[:target:],[Lex-20]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-21]'
                                                     ],
@@ -2215,10 +2215,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-21]'
+                                           'xprid' => 'l0,[:target:],[Lex-21]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-22]'
                                                     ],
@@ -2228,10 +2228,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-22]'
+                                           'xprid' => 'l0,[:target:],[Lex-22]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-23]'
                                                     ],
@@ -2241,10 +2241,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-23]'
+                                           'xprid' => 'l0,[:target:],[Lex-23]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-24]'
                                                     ],
@@ -2254,10 +2254,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-24]'
+                                           'xprid' => 'l0,[:target:],[Lex-24]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-25]'
                                                     ],
@@ -2267,10 +2267,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-25]'
+                                           'xprid' => 'l0,[:target:],[Lex-25]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-26]'
                                                     ],
@@ -2280,10 +2280,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-26]'
+                                           'xprid' => 'l0,[:target:],[Lex-26]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-27]'
                                                     ],
@@ -2293,10 +2293,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-27]'
+                                           'xprid' => 'l0,[:target:],[Lex-27]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-28]'
                                                     ],
@@ -2306,10 +2306,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-28]'
+                                           'xprid' => 'l0,[:target:],[Lex-28]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-29]'
                                                     ],
@@ -2319,10 +2319,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-29]'
+                                           'xprid' => 'l0,[:target:],[Lex-29]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-2]'
                                                     ],
@@ -2332,10 +2332,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-2]'
+                                           'xprid' => 'l0,[:target:],[Lex-2]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-30]'
                                                     ],
@@ -2345,10 +2345,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-30]'
+                                           'xprid' => 'l0,[:target:],[Lex-30]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-31]'
                                                     ],
@@ -2358,10 +2358,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-31]'
+                                           'xprid' => 'l0,[:target:],[Lex-31]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-32]'
                                                     ],
@@ -2371,10 +2371,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-32]'
+                                           'xprid' => 'l0,[:target:],[Lex-32]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-33]'
                                                     ],
@@ -2384,10 +2384,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-33]'
+                                           'xprid' => 'l0,[:target:],[Lex-33]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-34]'
                                                     ],
@@ -2397,10 +2397,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-34]'
+                                           'xprid' => 'l0,[:target:],[Lex-34]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-35]'
                                                     ],
@@ -2410,10 +2410,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-35]'
+                                           'xprid' => 'l0,[:target:],[Lex-35]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-36]'
                                                     ],
@@ -2423,10 +2423,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-36]'
+                                           'xprid' => 'l0,[:target:],[Lex-36]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-37]'
                                                     ],
@@ -2436,10 +2436,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-37]'
+                                           'xprid' => 'l0,[:target:],[Lex-37]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-38]'
                                                     ],
@@ -2449,10 +2449,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-38]'
+                                           'xprid' => 'l0,[:target:],[Lex-38]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-39]'
                                                     ],
@@ -2462,10 +2462,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-39]'
+                                           'xprid' => 'l0,[:target:],[Lex-39]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-3]'
                                                     ],
@@ -2475,10 +2475,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-3]'
+                                           'xprid' => 'l0,[:target:],[Lex-3]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-40]'
                                                     ],
@@ -2488,10 +2488,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-40]'
+                                           'xprid' => 'l0,[:target:],[Lex-40]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-41]'
                                                     ],
@@ -2501,10 +2501,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-41]'
+                                           'xprid' => 'l0,[:target:],[Lex-41]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-42]'
                                                     ],
@@ -2514,10 +2514,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-42]'
+                                           'xprid' => 'l0,[:target:],[Lex-42]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-43]'
                                                     ],
@@ -2527,10 +2527,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-43]'
+                                           'xprid' => 'l0,[:target:],[Lex-43]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-44]'
                                                     ],
@@ -2540,10 +2540,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-44]'
+                                           'xprid' => 'l0,[:target:],[Lex-44]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-45]'
                                                     ],
@@ -2553,10 +2553,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-45]'
+                                           'xprid' => 'l0,[:target:],[Lex-45]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-46]'
                                                     ],
@@ -2566,10 +2566,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-46]'
+                                           'xprid' => 'l0,[:target:],[Lex-46]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-47]'
                                                     ],
@@ -2579,10 +2579,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-47]'
+                                           'xprid' => 'l0,[:target:],[Lex-47]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-4]'
                                                     ],
@@ -2592,10 +2592,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-4]'
+                                           'xprid' => 'l0,[:target:],[Lex-4]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-5]'
                                                     ],
@@ -2605,10 +2605,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-5]'
+                                           'xprid' => 'l0,[:target:],[Lex-5]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-6]'
                                                     ],
@@ -2618,10 +2618,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-6]'
+                                           'xprid' => 'l0,[:target:],[Lex-6]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-7]'
                                                     ],
@@ -2631,10 +2631,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-7]'
+                                           'xprid' => 'l0,[:target:],[Lex-7]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-8]'
                                                     ],
@@ -2644,10 +2644,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-8]'
+                                           'xprid' => 'l0,[:target:],[Lex-8]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       '[Lex-9]'
                                                     ],
@@ -2657,10 +2657,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],[Lex-9]'
+                                           'xprid' => 'l0,[:target:],[Lex-9]'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'array descriptor'
                                                     ],
@@ -2670,10 +2670,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],array descriptor'
+                                           'xprid' => 'l0,[:target:],array descriptor'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'bare name'
                                                     ],
@@ -2683,10 +2683,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],bare name'
+                                           'xprid' => 'l0,[:target:],bare name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'before or after'
                                                     ],
@@ -2696,10 +2696,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],before or after'
+                                           'xprid' => 'l0,[:target:],before or after'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'boolean'
                                                     ],
@@ -2709,10 +2709,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],boolean'
+                                           'xprid' => 'l0,[:target:],boolean'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'bracketed name'
                                                     ],
@@ -2722,10 +2722,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],bracketed name'
+                                           'xprid' => 'l0,[:target:],bracketed name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'character class'
                                                     ],
@@ -2735,10 +2735,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],character class'
+                                           'xprid' => 'l0,[:target:],character class'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'op declare bnf'
                                                     ],
@@ -2748,10 +2748,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],op declare bnf'
+                                           'xprid' => 'l0,[:target:],op declare bnf'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'op declare match'
                                                     ],
@@ -2761,10 +2761,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],op declare match'
+                                           'xprid' => 'l0,[:target:],op declare match'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'op equal priority'
                                                     ],
@@ -2774,10 +2774,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],op equal priority'
+                                           'xprid' => 'l0,[:target:],op equal priority'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'op loosen'
                                                     ],
@@ -2787,10 +2787,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],op loosen'
+                                           'xprid' => 'l0,[:target:],op loosen'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'reserved action name'
                                                     ],
@@ -2800,10 +2800,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],reserved action name'
+                                           'xprid' => 'l0,[:target:],reserved action name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'reserved blessing name'
                                                     ],
@@ -2813,10 +2813,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],reserved blessing name'
+                                           'xprid' => 'l0,[:target:],reserved blessing name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'reserved event name'
                                                     ],
@@ -2826,10 +2826,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],reserved event name'
+                                           'xprid' => 'l0,[:target:],reserved event name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'signed integer'
                                                     ],
@@ -2839,10 +2839,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],signed integer'
+                                           'xprid' => 'l0,[:target:],signed integer'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'single quoted name'
                                                     ],
@@ -2852,10 +2852,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],single quoted name'
+                                           'xprid' => 'l0,[:target:],single quoted name'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'single quoted string'
                                                     ],
@@ -2865,10 +2865,10 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],single quoted string'
+                                           'xprid' => 'l0,[:target:],single quoted string'
                                          },
                                          {
-                                           'lhs' => '[:lex_start:]',
+                                           'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'standard name'
                                                     ],
@@ -2878,7 +2878,7 @@ $hashed_metag = {
                                                           1
                                                         ],
                                            'xpr_top' => 1,
-                                           'xprid' => 'l0,[:lex_start:],standard name'
+                                           'xprid' => 'l0,[:target:],standard name'
                                          },
                                          {
                                            'lhs' => '[Lex-0]',
@@ -5433,10 +5433,10 @@ $hashed_metag = {
                                                               'wsyid' => 480,
                                                               'xsy' => '[:discard:]'
                                                             },
-                                           '[:lex_start:]' => {
-                                                                'wsyid' => 724,
-                                                                'xsy' => '[:lex_start:]'
-                                                              },
+                                           '[:target:]' => {
+                                                             'wsyid' => 724,
+                                                             'xsy' => '[:target:]'
+                                                           },
                                            '[Lex-0]' => {
                                                           'wsyid' => 19,
                                                           'xsy' => '[Lex-0]'
@@ -8029,676 +8029,676 @@ $hashed_metag = {
                                                                         'subkey' => 0,
                                                                         'symbol_as_event' => 'whitespace'
                                                                       },
-                                       'l0,[:lex_start:],Perl name' => {
-                                                                         'length' => 0,
-                                                                         'lhs' => '[:lex_start:]',
-                                                                         'rhs' => [
-                                                                                    'Perl name'
-                                                                                  ],
-                                                                         'start' => 0,
-                                                                         'subgrammar' => 'l0',
-                                                                         'subkey' => 0
-                                                                       },
-                                       'l0,[:lex_start:],[:discard:]' => {
-                                                                           'length' => 0,
-                                                                           'lhs' => '[:lex_start:]',
-                                                                           'rhs' => [
-                                                                                      '[:discard:]'
-                                                                                    ],
-                                                                           'start' => 0,
-                                                                           'subgrammar' => 'l0',
-                                                                           'subkey' => 0
-                                                                         },
-                                       'l0,[:lex_start:],[Lex-0]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-0]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-10]' => {
+                                       'l0,[:target:],Perl name' => {
+                                                                      'length' => 0,
+                                                                      'lhs' => '[:target:]',
+                                                                      'rhs' => [
+                                                                                 'Perl name'
+                                                                               ],
+                                                                      'start' => 0,
+                                                                      'subgrammar' => 'l0',
+                                                                      'subkey' => 0
+                                                                    },
+                                       'l0,[:target:],[:discard:]' => {
                                                                         'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
+                                                                        'lhs' => '[:target:]',
                                                                         'rhs' => [
-                                                                                   '[Lex-10]'
+                                                                                   '[:discard:]'
                                                                                  ],
                                                                         'start' => 0,
                                                                         'subgrammar' => 'l0',
                                                                         'subkey' => 0
                                                                       },
-                                       'l0,[:lex_start:],[Lex-11]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-11]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-12]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-12]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-13]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-13]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-14]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-14]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-15]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-15]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-16]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-16]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-17]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-17]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-18]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-18]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-19]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-19]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-1]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-1]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-20]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-20]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-21]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-21]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-22]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-22]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-23]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-23]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-24]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-24]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-25]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-25]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-26]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-26]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-27]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-27]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-28]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-28]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-29]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-29]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-2]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-2]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-30]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-30]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-31]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-31]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-32]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-32]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-33]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-33]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-34]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-34]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-35]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-35]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-36]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-36]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-37]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-37]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-38]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-38]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-39]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-39]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-3]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-3]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-40]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-40]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-41]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-41]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-42]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-42]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-43]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-43]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-44]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-44]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-45]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-45]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-46]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-46]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-47]' => {
-                                                                        'length' => 0,
-                                                                        'lhs' => '[:lex_start:]',
-                                                                        'rhs' => [
-                                                                                   '[Lex-47]'
-                                                                                 ],
-                                                                        'start' => 0,
-                                                                        'subgrammar' => 'l0',
-                                                                        'subkey' => 0
-                                                                      },
-                                       'l0,[:lex_start:],[Lex-4]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-4]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-5]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-5]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-6]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-6]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-7]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-7]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-8]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-8]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],[Lex-9]' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  '[Lex-9]'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],array descriptor' => {
-                                                                                'length' => 0,
-                                                                                'lhs' => '[:lex_start:]',
-                                                                                'rhs' => [
-                                                                                           'array descriptor'
-                                                                                         ],
-                                                                                'start' => 0,
-                                                                                'subgrammar' => 'l0',
-                                                                                'subkey' => 0
-                                                                              },
-                                       'l0,[:lex_start:],bare name' => {
-                                                                         'length' => 0,
-                                                                         'lhs' => '[:lex_start:]',
-                                                                         'rhs' => [
-                                                                                    'bare name'
-                                                                                  ],
-                                                                         'start' => 0,
-                                                                         'subgrammar' => 'l0',
-                                                                         'subkey' => 0
-                                                                       },
-                                       'l0,[:lex_start:],before or after' => {
-                                                                               'length' => 0,
-                                                                               'lhs' => '[:lex_start:]',
-                                                                               'rhs' => [
-                                                                                          'before or after'
-                                                                                        ],
-                                                                               'start' => 0,
-                                                                               'subgrammar' => 'l0',
-                                                                               'subkey' => 0
-                                                                             },
-                                       'l0,[:lex_start:],boolean' => {
-                                                                       'length' => 0,
-                                                                       'lhs' => '[:lex_start:]',
-                                                                       'rhs' => [
-                                                                                  'boolean'
-                                                                                ],
-                                                                       'start' => 0,
-                                                                       'subgrammar' => 'l0',
-                                                                       'subkey' => 0
-                                                                     },
-                                       'l0,[:lex_start:],bracketed name' => {
-                                                                              'length' => 0,
-                                                                              'lhs' => '[:lex_start:]',
-                                                                              'rhs' => [
-                                                                                         'bracketed name'
-                                                                                       ],
-                                                                              'start' => 0,
-                                                                              'subgrammar' => 'l0',
-                                                                              'subkey' => 0
-                                                                            },
-                                       'l0,[:lex_start:],character class' => {
-                                                                               'length' => 0,
-                                                                               'lhs' => '[:lex_start:]',
-                                                                               'rhs' => [
-                                                                                          'character class'
-                                                                                        ],
-                                                                               'start' => 0,
-                                                                               'subgrammar' => 'l0',
-                                                                               'subkey' => 0
-                                                                             },
-                                       'l0,[:lex_start:],op declare bnf' => {
-                                                                              'length' => 0,
-                                                                              'lhs' => '[:lex_start:]',
-                                                                              'rhs' => [
-                                                                                         'op declare bnf'
-                                                                                       ],
-                                                                              'start' => 0,
-                                                                              'subgrammar' => 'l0',
-                                                                              'subkey' => 0
-                                                                            },
-                                       'l0,[:lex_start:],op declare match' => {
-                                                                                'length' => 0,
-                                                                                'lhs' => '[:lex_start:]',
-                                                                                'rhs' => [
-                                                                                           'op declare match'
-                                                                                         ],
-                                                                                'start' => 0,
-                                                                                'subgrammar' => 'l0',
-                                                                                'subkey' => 0
-                                                                              },
-                                       'l0,[:lex_start:],op equal priority' => {
-                                                                                 'length' => 0,
-                                                                                 'lhs' => '[:lex_start:]',
-                                                                                 'rhs' => [
-                                                                                            'op equal priority'
-                                                                                          ],
-                                                                                 'start' => 0,
-                                                                                 'subgrammar' => 'l0',
-                                                                                 'subkey' => 0
-                                                                               },
-                                       'l0,[:lex_start:],op loosen' => {
-                                                                         'length' => 0,
-                                                                         'lhs' => '[:lex_start:]',
-                                                                         'rhs' => [
-                                                                                    'op loosen'
-                                                                                  ],
-                                                                         'start' => 0,
-                                                                         'subgrammar' => 'l0',
-                                                                         'subkey' => 0
-                                                                       },
-                                       'l0,[:lex_start:],reserved action name' => {
-                                                                                    'length' => 0,
-                                                                                    'lhs' => '[:lex_start:]',
-                                                                                    'rhs' => [
-                                                                                               'reserved action name'
-                                                                                             ],
-                                                                                    'start' => 0,
-                                                                                    'subgrammar' => 'l0',
-                                                                                    'subkey' => 0
-                                                                                  },
-                                       'l0,[:lex_start:],reserved blessing name' => {
-                                                                                      'length' => 0,
-                                                                                      'lhs' => '[:lex_start:]',
-                                                                                      'rhs' => [
-                                                                                                 'reserved blessing name'
-                                                                                               ],
-                                                                                      'start' => 0,
-                                                                                      'subgrammar' => 'l0',
-                                                                                      'subkey' => 0
-                                                                                    },
-                                       'l0,[:lex_start:],reserved event name' => {
-                                                                                   'length' => 0,
-                                                                                   'lhs' => '[:lex_start:]',
-                                                                                   'rhs' => [
-                                                                                              'reserved event name'
-                                                                                            ],
-                                                                                   'start' => 0,
-                                                                                   'subgrammar' => 'l0',
-                                                                                   'subkey' => 0
-                                                                                 },
-                                       'l0,[:lex_start:],signed integer' => {
-                                                                              'length' => 0,
-                                                                              'lhs' => '[:lex_start:]',
-                                                                              'rhs' => [
-                                                                                         'signed integer'
-                                                                                       ],
-                                                                              'start' => 0,
-                                                                              'subgrammar' => 'l0',
-                                                                              'subkey' => 0
-                                                                            },
-                                       'l0,[:lex_start:],single quoted name' => {
-                                                                                  'length' => 0,
-                                                                                  'lhs' => '[:lex_start:]',
-                                                                                  'rhs' => [
-                                                                                             'single quoted name'
-                                                                                           ],
-                                                                                  'start' => 0,
-                                                                                  'subgrammar' => 'l0',
-                                                                                  'subkey' => 0
-                                                                                },
-                                       'l0,[:lex_start:],single quoted string' => {
-                                                                                    'length' => 0,
-                                                                                    'lhs' => '[:lex_start:]',
-                                                                                    'rhs' => [
-                                                                                               'single quoted string'
-                                                                                             ],
-                                                                                    'start' => 0,
-                                                                                    'subgrammar' => 'l0',
-                                                                                    'subkey' => 0
-                                                                                  },
-                                       'l0,[:lex_start:],standard name' => {
+                                       'l0,[:target:],[Lex-0]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-0]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-10]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-10]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-11]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-11]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-12]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-12]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-13]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-13]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-14]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-14]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-15]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-15]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-16]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-16]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-17]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-17]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-18]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-18]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-19]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-19]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-1]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-1]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-20]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-20]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-21]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-21]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-22]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-22]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-23]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-23]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-24]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-24]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-25]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-25]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-26]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-26]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-27]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-27]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-28]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-28]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-29]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-29]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-2]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-2]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-30]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-30]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-31]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-31]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-32]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-32]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-33]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-33]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-34]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-34]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-35]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-35]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-36]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-36]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-37]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-37]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-38]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-38]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-39]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-39]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-3]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-3]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-40]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-40]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-41]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-41]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-42]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-42]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-43]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-43]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-44]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-44]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-45]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-45]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-46]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-46]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-47]' => {
+                                                                     'length' => 0,
+                                                                     'lhs' => '[:target:]',
+                                                                     'rhs' => [
+                                                                                '[Lex-47]'
+                                                                              ],
+                                                                     'start' => 0,
+                                                                     'subgrammar' => 'l0',
+                                                                     'subkey' => 0
+                                                                   },
+                                       'l0,[:target:],[Lex-4]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-4]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-5]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-5]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-6]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-6]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-7]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-7]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-8]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-8]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],[Lex-9]' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               '[Lex-9]'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],array descriptor' => {
                                                                              'length' => 0,
-                                                                             'lhs' => '[:lex_start:]',
+                                                                             'lhs' => '[:target:]',
                                                                              'rhs' => [
-                                                                                        'standard name'
+                                                                                        'array descriptor'
                                                                                       ],
                                                                              'start' => 0,
                                                                              'subgrammar' => 'l0',
                                                                              'subkey' => 0
                                                                            },
+                                       'l0,[:target:],bare name' => {
+                                                                      'length' => 0,
+                                                                      'lhs' => '[:target:]',
+                                                                      'rhs' => [
+                                                                                 'bare name'
+                                                                               ],
+                                                                      'start' => 0,
+                                                                      'subgrammar' => 'l0',
+                                                                      'subkey' => 0
+                                                                    },
+                                       'l0,[:target:],before or after' => {
+                                                                            'length' => 0,
+                                                                            'lhs' => '[:target:]',
+                                                                            'rhs' => [
+                                                                                       'before or after'
+                                                                                     ],
+                                                                            'start' => 0,
+                                                                            'subgrammar' => 'l0',
+                                                                            'subkey' => 0
+                                                                          },
+                                       'l0,[:target:],boolean' => {
+                                                                    'length' => 0,
+                                                                    'lhs' => '[:target:]',
+                                                                    'rhs' => [
+                                                                               'boolean'
+                                                                             ],
+                                                                    'start' => 0,
+                                                                    'subgrammar' => 'l0',
+                                                                    'subkey' => 0
+                                                                  },
+                                       'l0,[:target:],bracketed name' => {
+                                                                           'length' => 0,
+                                                                           'lhs' => '[:target:]',
+                                                                           'rhs' => [
+                                                                                      'bracketed name'
+                                                                                    ],
+                                                                           'start' => 0,
+                                                                           'subgrammar' => 'l0',
+                                                                           'subkey' => 0
+                                                                         },
+                                       'l0,[:target:],character class' => {
+                                                                            'length' => 0,
+                                                                            'lhs' => '[:target:]',
+                                                                            'rhs' => [
+                                                                                       'character class'
+                                                                                     ],
+                                                                            'start' => 0,
+                                                                            'subgrammar' => 'l0',
+                                                                            'subkey' => 0
+                                                                          },
+                                       'l0,[:target:],op declare bnf' => {
+                                                                           'length' => 0,
+                                                                           'lhs' => '[:target:]',
+                                                                           'rhs' => [
+                                                                                      'op declare bnf'
+                                                                                    ],
+                                                                           'start' => 0,
+                                                                           'subgrammar' => 'l0',
+                                                                           'subkey' => 0
+                                                                         },
+                                       'l0,[:target:],op declare match' => {
+                                                                             'length' => 0,
+                                                                             'lhs' => '[:target:]',
+                                                                             'rhs' => [
+                                                                                        'op declare match'
+                                                                                      ],
+                                                                             'start' => 0,
+                                                                             'subgrammar' => 'l0',
+                                                                             'subkey' => 0
+                                                                           },
+                                       'l0,[:target:],op equal priority' => {
+                                                                              'length' => 0,
+                                                                              'lhs' => '[:target:]',
+                                                                              'rhs' => [
+                                                                                         'op equal priority'
+                                                                                       ],
+                                                                              'start' => 0,
+                                                                              'subgrammar' => 'l0',
+                                                                              'subkey' => 0
+                                                                            },
+                                       'l0,[:target:],op loosen' => {
+                                                                      'length' => 0,
+                                                                      'lhs' => '[:target:]',
+                                                                      'rhs' => [
+                                                                                 'op loosen'
+                                                                               ],
+                                                                      'start' => 0,
+                                                                      'subgrammar' => 'l0',
+                                                                      'subkey' => 0
+                                                                    },
+                                       'l0,[:target:],reserved action name' => {
+                                                                                 'length' => 0,
+                                                                                 'lhs' => '[:target:]',
+                                                                                 'rhs' => [
+                                                                                            'reserved action name'
+                                                                                          ],
+                                                                                 'start' => 0,
+                                                                                 'subgrammar' => 'l0',
+                                                                                 'subkey' => 0
+                                                                               },
+                                       'l0,[:target:],reserved blessing name' => {
+                                                                                   'length' => 0,
+                                                                                   'lhs' => '[:target:]',
+                                                                                   'rhs' => [
+                                                                                              'reserved blessing name'
+                                                                                            ],
+                                                                                   'start' => 0,
+                                                                                   'subgrammar' => 'l0',
+                                                                                   'subkey' => 0
+                                                                                 },
+                                       'l0,[:target:],reserved event name' => {
+                                                                                'length' => 0,
+                                                                                'lhs' => '[:target:]',
+                                                                                'rhs' => [
+                                                                                           'reserved event name'
+                                                                                         ],
+                                                                                'start' => 0,
+                                                                                'subgrammar' => 'l0',
+                                                                                'subkey' => 0
+                                                                              },
+                                       'l0,[:target:],signed integer' => {
+                                                                           'length' => 0,
+                                                                           'lhs' => '[:target:]',
+                                                                           'rhs' => [
+                                                                                      'signed integer'
+                                                                                    ],
+                                                                           'start' => 0,
+                                                                           'subgrammar' => 'l0',
+                                                                           'subkey' => 0
+                                                                         },
+                                       'l0,[:target:],single quoted name' => {
+                                                                               'length' => 0,
+                                                                               'lhs' => '[:target:]',
+                                                                               'rhs' => [
+                                                                                          'single quoted name'
+                                                                                        ],
+                                                                               'start' => 0,
+                                                                               'subgrammar' => 'l0',
+                                                                               'subkey' => 0
+                                                                             },
+                                       'l0,[:target:],single quoted string' => {
+                                                                                 'length' => 0,
+                                                                                 'lhs' => '[:target:]',
+                                                                                 'rhs' => [
+                                                                                            'single quoted string'
+                                                                                          ],
+                                                                                 'start' => 0,
+                                                                                 'subgrammar' => 'l0',
+                                                                                 'subkey' => 0
+                                                                               },
+                                       'l0,[:target:],standard name' => {
+                                                                          'length' => 0,
+                                                                          'lhs' => '[:target:]',
+                                                                          'rhs' => [
+                                                                                     'standard name'
+                                                                                   ],
+                                                                          'start' => 0,
+                                                                          'subgrammar' => 'l0',
+                                                                          'subkey' => 0
+                                                                        },
                                        'l0,[Lex-0],[[\\;]]' => {
                                                                  'length' => 3,
                                                                  'lhs' => '[Lex-0]',
@@ -11574,14 +11574,14 @@ $hashed_metag = {
                                                 'dsl_form' => '[:discard:]',
                                                 'name_source' => 'internal'
                                               },
-                             '[:lex_start:]' => {
-                                                  'dsl_form' => '[:lex_start:]',
-                                                  'name_source' => 'internal'
-                                                },
                              '[:start:]' => {
                                               'dsl_form' => '[:start:]',
                                               'name_source' => 'internal'
                                             },
+                             '[:target:]' => {
+                                               'dsl_form' => '[:target:]',
+                                               'name_source' => 'internal'
+                                             },
                              '[Lex-0]' => {
                                             'dsl_form' => '\';\'',
                                             'name_source' => 'internal'
