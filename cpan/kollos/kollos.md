@@ -6409,7 +6409,7 @@ illegal named arguments.
                 local glade = dumpee.glade
                 local id = glade:id()
                 local header = string.format("Glade %s; %s @%d-%d: %d symches", id,
-                    g1g:symbol_angled_form(glade.nsyid), glade.g1_start,
+                    g1g:nsy_name(glade.nsyid), glade.g1_start,
                     glade.g1_start + glade.g1_length,
                     symch_count)
                 table.insert(lines, string.rep(' ', indent) .. header)
@@ -6679,7 +6679,6 @@ the valuator's Lua-level settings.
         while true do
             id = id + 1
             local parent = bocage:_and_node_parent(id)
-            -- print('parent:', parent)
             if not parent then break end
             local predecessor = bocage:_and_node_predecessor(id)
             local cause = bocage:_and_node_cause(id)
@@ -7008,7 +7007,6 @@ glade has already been dumped.
             end
             local g1_length = g1_end - origin
             local predecessor_eim = predecessor_eim_db[origin]
-            print('downglade cause_nsyid', inspect(cause_nsyid))
             local glade = glade_from_instance(asf, cause_nsyid, origin, g1_length, symch)
             local downglade = { predecessor_eim, glade }
             downglades[#downglades+1] = downglade
@@ -7141,7 +7139,6 @@ arguments are correct.
     local glade_from_instance
     -- miranda: section+ most Lua function definitions
     local function eimset_from_instance(asf, nsyid, g1_start, g1_length)
-        print('eimset_from_instance 1')
         local slr = asf.slr
         local g1r = slr.g1
         local slg = slr.slg
@@ -7151,12 +7148,9 @@ arguments are correct.
         local eimset = {}
 
         for eim_id = 0, max_eim do
-            print('eimset_from_instance loop 1', inspect(eim_id))
             -- io.stderr:write('= trying eim_id: ', eim_id, "\n")
             local trv = _M.traverser_new(g1r, g1_end, eim_id)
-            print('eimset_from_instance loop trv', inspect(trv))
             local origin = trv:origin()
-            print('eimset_from_instance loop origin', inspect(origin))
             if origin ~= g1_start then goto NEXT_EIM end
             local dot = trv:nrl_dot()
             if dot >= 0 then return end
@@ -7164,10 +7158,8 @@ arguments are correct.
             local lh_nsyid = g1g:_nrl_lhs(nrlid)
             if lh_nsyid ~= nsyid then goto NEXT_EIM end
             eimset[#eimset+1] = trv
-            print('eimset_from_instance loop end', inspect(eim_id))
             ::NEXT_EIM::
         end
-        print('eimset_from_instance -- end')
         return eimset
     end
 
@@ -8673,11 +8665,9 @@ indexed by isyid.
         end
 
         local suffix = ''
-        print('1: nsy_id', inspect(nsy_id))
         if nsy_id == grammar:_start_nsy() then
             suffix = suffix .. "[']"
         end
-        print('2: nsy_id', inspect(nsy_id))
         local is_nulling = grammar:_nsy_is_nulling(nsy_id)
         if is_nulling then suffix = suffix .. "[]" end
 
@@ -8694,7 +8684,6 @@ indexed by isyid.
         local slg = grammar.slg
 
         local xsy_name = slg:symbol_name(xsy_id)
-        -- print('xsy_id =', inspect(xsy_id), inspect(xsy_name))
         if xsy_name then
             return xsy_name .. suffix
         end
