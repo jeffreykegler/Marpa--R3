@@ -897,8 +897,10 @@ with no proper start rule is considered trivial.
 @d G_is_Trivial(g) (!(g)->t_start_nrl)
 @<Int aligned grammar elements@> =
 NRL t_start_nrl;
+IRL t_start_irl;
 @ @<Initialize grammar elements@> =
 g->t_start_nrl = NULL;
+g->t_start_irl = NULL;
 
 @*0 The grammar's size.
 Intuitively,
@@ -3310,6 +3312,7 @@ a lot of useless diagnostics.
     @<Census nullable symbols@>@;
     @<Census productive symbols@>@;
     @<Check that start symbol is productive@>@;
+    @<Check that grammar is augmented@>@;
     @<Census accessible symbols@>@;
     @<Census nulling symbols@>@;
     @<Classify rules@>@;
@@ -3656,6 +3659,23 @@ where many of the right hand sides repeat symbols.
 
 @ @<Declare precompute variables@> =
 Bit_Matrix reach_matrix = NULL;
+
+@ Check that the grammar has a start rule
+of length one,
+that the start symbol does not appear
+on a RHS,
+and that the start symbol only appears
+on the LHS of the start rule.
+@<Check that grammar is augmented@> =
+{
+  const ISY start_isy = ISY_by_ID(start_isy_id);
+  const RULEID *p_start_irl = irl_list_x_lh_sym[start_isy_id];
+  const RULEID *p_next_irl = irl_list_x_lh_sym[start_isy_id+1];
+  const int rules_with_this_lhs = p_next_irl - p_start_irl;
+  const RULEID *p_first_rh_irl = irl_list_x_rh_sym[start_isy_id];
+  const RULEID *p_last_rh_irl = irl_list_x_rh_sym[start_isy_id+1];
+  const int rules_with_this_rhs = p_first_rh_irl - p_last_rh_irl;
+}
 
 @ |accessible_v| is a pointer into the |reach_matrix|.
 Therefore there is no code to free it.
