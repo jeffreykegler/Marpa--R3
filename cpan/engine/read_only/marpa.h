@@ -42,7 +42,7 @@
 #define MARPA_MICRO_VERSION 0
 
 #line 1 "./marpa.h-err"
-#define MARPA_ERROR_COUNT 102
+#define MARPA_ERROR_COUNT 103
 #define MARPA_ERR_NONE 0
 #define MARPA_ERR_AHFA_IX_NEGATIVE 1
 #define MARPA_ERR_AHFA_IX_OOB 2
@@ -145,6 +145,7 @@
 #define MARPA_ERR_NOT_A_SEQUENCE 99
 #define MARPA_ERR_GRAMMAR_IS_TRIVIAL 100
 #define MARPA_ERR_BASE_GENERATION_MISMATCH 101
+#define MARPA_ERR_LUA_INTERNAL 102
 
 
 #line 1 "./marpa.h-event"
@@ -173,7 +174,7 @@
 #define MARPA_STEP_INITIAL 7
 
 /*1462:*/
-#line 17475 "./marpa.w"
+#line 17485 "./marpa.w"
 
 extern const int marpa_major_version;
 extern const int marpa_minor_version;
@@ -214,7 +215,7 @@ extern const int marpa_micro_version;
 #define marpa_v_es_id(v) ((v)->t_ys_id)
 
 /*:1160*/
-#line 17480 "./marpa.w"
+#line 17490 "./marpa.w"
 
 /*47:*/
 #line 656 "./marpa.w"
@@ -272,7 +273,7 @@ typedef struct marpa_tree*Marpa_Tree;
 struct marpa_value;
 typedef struct marpa_value*Marpa_Value;
 /*:1155*/
-#line 17481 "./marpa.w"
+#line 17491 "./marpa.w"
 
 /*93:*/
 #line 938 "./marpa.w"
@@ -347,12 +348,12 @@ typedef int Marpa_Nook_ID;
 
 typedef int Marpa_Step_Type;
 /*:1201*//*1349:*/
-#line 16005 "./marpa.w"
+#line 16015 "./marpa.w"
 
 typedef const char*Marpa_Message_ID;
 
 /*:1349*/
-#line 17482 "./marpa.w"
+#line 17492 "./marpa.w"
 
 /*44:*/
 #line 610 "./marpa.w"
@@ -397,22 +398,22 @@ Marpa_Earley_Set_ID t_rule_start_ys_id;
 Marpa_Earley_Set_ID t_ys_id;
 };
 /*:1159*/
-#line 17483 "./marpa.w"
+#line 17493 "./marpa.w"
 
 /*1348:*/
-#line 16002 "./marpa.w"
+#line 16012 "./marpa.w"
 
 extern void*(*const marpa__out_of_memory)(void);
 
 /*:1348*//*1439:*/
-#line 17276 "./marpa.w"
+#line 17286 "./marpa.w"
 
 extern int marpa__default_debug_handler(const char*format,...);
 extern int(*marpa__debug_handler)(const char*,...);
 extern int marpa__debug_level;
 
 /*:1439*/
-#line 17484 "./marpa.w"
+#line 17494 "./marpa.w"
 
 /*414:*/
 #line 4130 "./marpa.w"
@@ -421,7 +422,7 @@ int _marpa_g_nrl_is_chaf(
 Marpa_Grammar g,
 Marpa_NRL_ID nrl_id);
 /*:414*/
-#line 17485 "./marpa.w"
+#line 17495 "./marpa.w"
 
 
 /*:1462*/

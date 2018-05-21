@@ -732,10 +732,29 @@ in `lmw_g`.
     -- miranda: section+ forward declarations
     local do_precompute_errors
     -- miranda: section+ most Lua function definitions
-    function do_precompute_errors(slg, lmw_g)
-        local error_code, error_message = lmw_g:error_code()
+    function do_precompute_errors(slg, lmw_g, error_object)
+
+        if not error_object then
+            local error_code, libmarpa_message = lmw_g:error_code()
+            _M._internal_error('Precompute failed with no error object; code=%d; message=%q',
+                error_code, libmarpa_message)
+        end
+
+        local error_code = error_object.code
+
+        if not error_object then
+            local error_code, libmarpa_message = lmw_g:error_code()
+            _M._internal_error(
+                'Precompute failed -- error object had no code',
+                inspect(error_object, {depth=2} ))
+        end
+
+        if error_code == _M.err.LUA_INTERNAL then
+            -- iprint('LUA_INTERNAL', inspect(error_object))
+            error( error_object )
+        end
         if error_code == _M.err.INTERNAL then
-            error( 'Libmarpa internal error: ' .. error_message )
+            error( error_object )
         end
 
         -- We do not handle cycles here -- we catch the
@@ -786,7 +805,8 @@ in `lmw_g`.
         if error_code == _M.err.UNPRODUCTIVE_START then
                 _M.userX( 'Unproductive start symbol' )
         end
-        _M.userX( '%s', lmw_g:error_description() )
+
+        error(error_object)
     end
 ```
 
@@ -815,10 +835,10 @@ in `lmw_g`.
             ))
         end
         _M.throw = false
-        local result, error = lmw_g:precompute()
+        local result, error_object = lmw_g:precompute()
         _M.throw = true
         if not result then
-            do_precompute_errors(slg, lmw_g)
+            do_precompute_errors(slg, lmw_g, error_object)
         end
         -- Above I went through the error events
         -- Now I go through the events for situations where there was no
@@ -10653,7 +10673,7 @@ The "throw" flag is ignored.
                             )
     {
       int error_object_ix;
-      push_error_object(L, MARPA_ERR_INTERNAL, 0, details);
+      push_error_object(L, MARPA_ERR_LUA_INTERNAL, 0, details);
       error_object_ix = marpa_lua_gettop(L);
       marpa_lua_pushstring(L, function);
       marpa_lua_setfield(L, error_object_ix, "function");
@@ -12221,8 +12241,10 @@ in every other sequence.
 Combines `print` and `inspect`.
 
 ```
+    -- miranda: section+ forward declarations
+    local iprint
     -- miranda: section+ internal utilities
-    function _M.iprint(...)
+    function iprint(...)
         local args = {...}
         local results = {}
         for ix = 1, #args do

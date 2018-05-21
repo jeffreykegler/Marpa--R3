@@ -15876,17 +15876,27 @@ if (_MARPA_UNLIKELY(!R_is_Consistent(r))) {
     @<Fail if fatal error@>@;
     @<Fail if recognizer not started@>@;
 
-@ It is expected the first test, for
+@ It is expected thaqt the test for
 mismatched headers, will be optimized
 completely out if the versions
 numbers are consistent.
+
+On "not OK" status,
+does not clear the error message
+and,
+unless there was no error,
+and preserves the error code.
+
 @<Fail if fatal error@> =
-if (HEADER_VERSION_MISMATCH) {
-    MARPA_ERROR(MARPA_ERR_HEADERS_DO_NOT_MATCH);
+if (_MARPA_UNLIKELY(!IS_G_OK(g))) {
+    if (g->t_error == MARPA_ERR_NONE)
+    {
+        g->t_error = MARPA_ERR_I_AM_NOT_OK;
+    }
     return failure_indicator;
 }
-if (_MARPA_UNLIKELY(!IS_G_OK(g))) {
-    MARPA_ERROR(g->t_error);
+if (HEADER_VERSION_MISMATCH) {
+    MARPA_ERROR(MARPA_ERR_HEADERS_DO_NOT_MATCH);
     return failure_indicator;
 }
 

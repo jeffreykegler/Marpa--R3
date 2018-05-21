@@ -228,6 +228,7 @@ sub ast_to_hash {
     $lexeme{$_} = 'a lexeme in G1' for grep { not $g1_lhs{$_} } keys %g1_rhs;
     $lexeme{$_} = 'a declared lexeme' for keys %{$declarations};
   LEXEME: for my $lexeme ( sort keys %lexeme ) {
+        next LEXEME if $lexeme eq '[:lex_start:]';
         $declarations->{$lexeme} //= {};
         if ( $lexeme ne '[:discard:]' ) {
             if ( not $l0_lhs{$lexeme} ) {
@@ -291,6 +292,8 @@ sub ast_to_hash {
         }
     }
     $hashed_ast->{character_classes} = \%stripped_character_classes;
+
+    # say STDERR Data::Dumper::Dumper($hashed_ast);
 
     return $hashed_ast;
 } ## end sub ast_to_hash

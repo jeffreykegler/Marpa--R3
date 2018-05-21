@@ -5749,15 +5749,6 @@ Numeric value: 4.
 Numeric value: 5.
 @end deftypevr
 
-@deftypevr Macro int MARPA_ERR_BASE_GENERATION_MISMATCH
-The error is reported for an object which tracks its
-base object by "generation".
-The error occurs when the base object generation should
-match, but does not.
-Numeric value: 101.
-Suggested message: "Base object generation does not match."
-@end deftypevr
-
 @deftypevr Macro int MARPA_ERR_BOCAGE_ITERATION_EXHAUSTED
 Numeric value: 7.
 @end deftypevr
@@ -5790,7 +5781,11 @@ Numeric value: 14.
 @end deftypevr
 
 @deftypevr Macro int MARPA_ERR_INTERNAL
-A ``catchall'' internal error.
+A ``catchall'' internal error for error
+in the lower level (the former Libmarpa).
+Error at the Lua level have their own
+error code:
+@code{MARPA_ERR_LUA_INTERNAL}.
 Numeric value: 19.
 @end deftypevr
 
@@ -5876,6 +5871,25 @@ Numeric value: 67.
 @end deftypevr
 @deftypevr Macro int MARPA_ERR_SOURCE_TYPE_IS_UNKNOWN
 Numeric value: 72.
+@end deftypevr
+
+@deftypevr Macro int MARPA_ERR_BASE_GENERATION_MISMATCH
+The error is reported for an object which tracks its
+base object by "generation".
+The error occurs when the base object generation should
+match, but does not.
+Numeric value: 101.
+Suggested message: "Base object generation does not match."
+@end deftypevr
+
+@deftypevr Macro int MARPA_ERR_LUA_INTERNAL
+A ``catchall'' internal error for error
+in the lower level (the Lua code and its
+associated C language code, such as wrappers)
+Error at the lower level (the former Libmarpa)
+have their own error code:
+@code{MARPA_ERR_INTERNAL}.
+Numeric value: 102.
 @end deftypevr
 
 @node Design notes, Work in Progress, Error methods macros and codes, Top

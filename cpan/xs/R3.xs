@@ -754,16 +754,23 @@ static int glue_msghandler (lua_State *L) {
     X_fallback_wrap(L);
     result_ix = marpa_lua_gettop(L);
   }
+
   /* At this point the exception table that will be
    * the result is the top of stack
    */
+
   traceback_type = marpa_lua_getfield(L, result_ix, "traceback");
   /* Default (i.e, nil) is "true" */
   if (traceback_type == LUA_TNIL || marpa_lua_toboolean(L, -1)) {
     /* result.where = debug.traceback() */
-    marpa_luaL_traceback(L, L, NULL, 1);
-    marpa_lua_setfield(L, result_ix, "where");
+    int where_type = marpa_lua_getfield(L, result_ix, "where");
+    /* Do not overwrite an existing "where" field */
+    if (where_type == LUA_TNIL) {
+      marpa_luaL_traceback(L, L, NULL, 1);
+      marpa_lua_setfield(L, result_ix, "where");
+    }
   }
+
   marpa_lua_settop(L, result_ix);
   return 1;
 }

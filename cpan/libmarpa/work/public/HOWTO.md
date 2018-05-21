@@ -8,4 +8,4 @@ New error codes must be
 2.) in the list in ./texi2err.pl
 
 In case of problems, to keep the error messages from being buried,
-try running 'clean', then 'make' in this directory.
+try running 'make clean', then 'make' in this directory.
