@@ -179,7 +179,7 @@ sub ast_to_hash {
     }
 
     # Add the L0 augment rule
-    if (0) {
+    if (1) {
         # Target symbol assumed to exist already
         my $target_lhs = '[:target:]';
         Marpa::R3::exception('No rules in SLIF L0 grammar')

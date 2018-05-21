@@ -111,36 +111,37 @@ S22 WHERE
 S23 WITH
 S24 WithPf
 S25 [:discard:]
-S26 [:start:]
-S27 [:target:]
-S28 [1]
-S29 [A]
-S30 [B]
-S31 [C]
-S32 [F]
-S33 [M]
-S34 [P]
-S35 [S]
-S36 [T]
-S37 [W]
-S38 [\\]
-S39 [\s]
-S40 [a]
-S41 [c]
-S42 [e]
-S43 [f]
-S44 [h]
-S45 [i]
-S46 [l]
-S47 [m]
-S48 [n]
-S49 [o]
-S50 [r]
-S51 [s]
-S52 [t]
-S53 [u]
-S54 [y]
-S55 whitespace
+S26 [:lex_start:]
+S27 [:start:]
+S28 [:target:]
+S29 [1]
+S30 [A]
+S31 [B]
+S32 [C]
+S33 [F]
+S34 [M]
+S35 [P]
+S36 [S]
+S37 [T]
+S38 [W]
+S39 [\\]
+S40 [\s]
+S41 [a]
+S42 [c]
+S43 [e]
+S44 [f]
+S45 [h]
+S46 [i]
+S47 [l]
+S48 [m]
+S49 [n]
+S50 [o]
+S51 [r]
+S52 [s]
+S53 [t]
+S54 [u]
+S55 [y]
+S56 whitespace
 END_OF_SYMBOLS
 
 Marpa::R3::Test::is( $grammar->productions_show(),
@@ -161,37 +162,38 @@ R13 FilterExpr ::= FALSE
 R14 WithPf ::=
 R15 WithPf ::= WITH PF
 R16 Statement ::= CREATE TypeDef
-R17 [:target:] ~ AS
-R18 [:target:] ~ BY
-R19 [:target:] ~ CREATE
-R20 [:target:] ~ FALSE
-R21 [:target:] ~ FOR
-R22 [:target:] ~ ID_METRIC
-R23 [:target:] ~ METRIC
-R24 [:target:] ~ NUMBER
-R25 [:target:] ~ PF
-R26 [:target:] ~ SELECT
-R27 [:target:] ~ SEPARATOR
-R28 [:target:] ~ TRUE
-R29 [:target:] ~ WHERE
-R30 [:target:] ~ WITH
-R31 [:target:] ~ [:discard:]
-R32 TRUE ~ [T] [r] [u] [e]
-R33 BY ~ [B] [y]
-R34 FALSE ~ [F] [a] [l] [s] [e]
-R35 SEPARATOR ~ [\\] [n]
-R36 PF ~ [P] [f]
-R37 [:discard:] ~ whitespace
-R38 whitespace ~ [\s] +
-R39 CREATE ~ [C] [r] [e] [a] [t] [e]
-R40 METRIC ~ [M] [e] [t] [r] [i] [c]
-R41 ID_METRIC ~ [m]
-R42 AS ~ [A] [s]
-R43 SELECT ~ [S] [e] [l] [e] [c] [t]
-R44 NUMBER ~ [1]
-R45 WHERE ~ [W] [h] [e] [r] [e]
-R46 WITH ~ [W] [i] [t] [h]
-R47 FOR ~ [F] [o] [r]
+R17 [:lex_start:] ~ [:target:]
+R18 [:target:] ~ AS
+R19 [:target:] ~ BY
+R20 [:target:] ~ CREATE
+R21 [:target:] ~ FALSE
+R22 [:target:] ~ FOR
+R23 [:target:] ~ ID_METRIC
+R24 [:target:] ~ METRIC
+R25 [:target:] ~ NUMBER
+R26 [:target:] ~ PF
+R27 [:target:] ~ SELECT
+R28 [:target:] ~ SEPARATOR
+R29 [:target:] ~ TRUE
+R30 [:target:] ~ WHERE
+R31 [:target:] ~ WITH
+R32 [:target:] ~ [:discard:]
+R33 TRUE ~ [T] [r] [u] [e]
+R34 BY ~ [B] [y]
+R35 FALSE ~ [F] [a] [l] [s] [e]
+R36 SEPARATOR ~ [\\] [n]
+R37 PF ~ [P] [f]
+R38 [:discard:] ~ whitespace
+R39 whitespace ~ [\s] +
+R40 CREATE ~ [C] [r] [e] [a] [t] [e]
+R41 METRIC ~ [M] [e] [t] [r] [i] [c]
+R42 ID_METRIC ~ [m]
+R43 AS ~ [A] [s]
+R44 SELECT ~ [S] [e] [l] [e] [c] [t]
+R45 NUMBER ~ [1]
+R46 WHERE ~ [W] [h] [e] [r] [e]
+R47 WITH ~ [W] [i] [t] [h]
+R48 FOR ~ [F] [o] [r]
 END_OF_RULES
 
 Marpa::R3::Test::is( $grammar->ahms_show(),

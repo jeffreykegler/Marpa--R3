@@ -59,8 +59,9 @@ R3 A ::= 'a'
 R4 B ::= 'a'
 R5 B ::=
 R6 C ::=
-R7 [:target:] ~ 'a'
-R8 'a' ~ [a]
+R7 [:lex_start:] ~ [:target:]
+R8 [:target:] ~ 'a'
+R9 'a' ~ [a]
 EOS
 
 my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );

@@ -2010,6 +2010,19 @@ $hashed_metag = {
                                            'xprid' => 'l0,[:discard:],whitespace'
                                          },
                                          {
+                                           'lhs' => '[:lex_start:]',
+                                           'rhs' => [
+                                                      '[:target:]'
+                                                    ],
+                                           'subgrammar' => 'l0',
+                                           'xpr_dot' => [
+                                                          0,
+                                                          1
+                                                        ],
+                                           'xpr_top' => 1,
+                                           'xprid' => 'l0,[:lex_start:],[:target:]'
+                                         },
+                                         {
                                            'lhs' => '[:target:]',
                                            'rhs' => [
                                                       'Perl name'
@@ -5433,8 +5446,12 @@ $hashed_metag = {
                                                               'wsyid' => 480,
                                                               'xsy' => '[:discard:]'
                                                             },
+                                           '[:lex_start:]' => {
+                                                                'wsyid' => 658,
+                                                                'xsy' => '[:lex_start:]'
+                                                              },
                                            '[:target:]' => {
-                                                             'wsyid' => 724,
+                                                             'wsyid' => 726,
                                                              'xsy' => '[:target:]'
                                                            },
                                            '[Lex-0]' => {
@@ -8029,6 +8046,16 @@ $hashed_metag = {
                                                                         'subkey' => 0,
                                                                         'symbol_as_event' => 'whitespace'
                                                                       },
+                                       'l0,[:lex_start:],[:target:]' => {
+                                                                          'length' => 0,
+                                                                          'lhs' => '[:lex_start:]',
+                                                                          'rhs' => [
+                                                                                     '[:target:]'
+                                                                                   ],
+                                                                          'start' => 0,
+                                                                          'subgrammar' => 'l0',
+                                                                          'subkey' => 0
+                                                                        },
                                        'l0,[:target:],Perl name' => {
                                                                       'length' => 0,
                                                                       'lhs' => '[:target:]',
@@ -11574,13 +11601,17 @@ $hashed_metag = {
                                                 'dsl_form' => '[:discard:]',
                                                 'name_source' => 'internal'
                                               },
+                             '[:lex_start:]' => {
+                                                  'dsl_form' => '[:lex_start:]',
+                                                  'name_source' => 'internal'
+                                                },
                              '[:start:]' => {
                                               'dsl_form' => '[:start:]',
                                               'name_source' => 'internal'
                                             },
                              '[:target:]' => {
                                                'dsl_form' => '[:target:]',
-                                               'name_source' => 'internal'
+                                               'name_source' => 'lexical'
                                              },
                              '[Lex-0]' => {
                                             'dsl_form' => '\';\'',

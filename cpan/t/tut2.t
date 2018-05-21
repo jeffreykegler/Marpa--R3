@@ -93,16 +93,17 @@ S3 Factor
 S4 Number
 S5 Term
 S6 [:discard:]
-S7 [:start:]
-S8 [:target:]
-S9 '*'
-S10 '+'
-S11 [\*]
-S12 [\+]
-S13 [\d]
-S14 [\s]
-S15 digits
-S16 whitespace
+S7 [:lex_start:]
+S8 [:start:]
+S9 [:target:]
+S10 '*'
+S11 '+'
+S12 [\*]
+S13 [\+]
+S14 [\d]
+S15 [\s]
+S16 digits
+S17 whitespace
 END_SYMBOLS
 
 my $productions_show_output = $grammar->productions_show();
@@ -116,16 +117,17 @@ R4 Expression ::= Expression '+' Term
 R5 Expression ::= Term
 R6 Factor ::= Number
 R7 Term ::= Term '*' Factor
-R8 [:target:] ~ Number
-R9 [:target:] ~ [:discard:]
-R10 [:target:] ~ '*'
-R11 [:target:] ~ '+'
-R12 '*' ~ [\*]
-R13 '+' ~ [\+]
-R14 Number ~ digits
-R15 digits ~ [\d] +
-R16 [:discard:] ~ whitespace
-R17 whitespace ~ [\s] +
+R8 [:lex_start:] ~ [:target:]
+R9 [:target:] ~ Number
+R10 [:target:] ~ [:discard:]
+R11 [:target:] ~ '*'
+R12 [:target:] ~ '+'
+R13 '*' ~ [\*]
+R14 '+' ~ [\+]
+R15 Number ~ digits
+R16 digits ~ [\d] +
+R17 [:discard:] ~ whitespace
+R18 whitespace ~ [\s] +
 END_RULES
 
 my $ahms_show_output = $grammar->ahms_show();

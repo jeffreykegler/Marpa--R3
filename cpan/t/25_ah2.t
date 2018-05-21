@@ -59,8 +59,9 @@ R1 [:start:] ::= S
 R2 S ::= A A A A
 R3 A ::=
 R4 A ::= 'a'
-R5 [:target:] ~ 'a'
-R6 'a' ~ [a]
+R5 [:lex_start:] ~ [:target:]
+R6 [:target:] ~ 'a'
+R7 'a' ~ [a]
 EOS
 
 Marpa::R3::Test::is( $grammar->g1_rules_show(), <<'EOS', 'Aycock/Horspool G1 Rules' );
@@ -74,10 +75,11 @@ Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'EOS', 'Aycock/Horspool Symbols' );
 S1 A
 S2 S
-S3 [:start:]
-S4 [:target:]
-S5 'a'
-S6 [a]
+S3 [:lex_start:]
+S4 [:start:]
+S5 [:target:]
+S6 'a'
+S7 [a]
 EOS
 
 Marpa::R3::Test::is( $grammar->g1_symbols_show(),

@@ -950,7 +950,7 @@ in `lmw_g`.
     function precompute_l0(slg, source_hash)
         local l0g = _M.grammar_new(slg, 'l0')
         slg.l0 = l0g
-        l0g.start_name = '[:target:]'
+        l0g.start_name = '[:lex_start:]'
 
         local g1g = slg.g1
 

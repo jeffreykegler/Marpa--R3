@@ -686,7 +686,7 @@ my $start_id;
             qw([:start:] start1 start2),
             'first start rule',
             'second start rule',
-            qw([:target:] [:target:] X Y)
+            qw([:lex_start:] [:target:] [:target:] X Y)
         ),
         q{Test of $grammar->production_name()}
     );

@@ -79,35 +79,36 @@ R10 Expression ::= Expression '/' Expression; prec=1
 R11 Expression ::= Expression '+' Expression; prec=0
 R12 Expression ::= Expression '-' Expression; prec=0
 R13 Script ::= Expression +
-R14 [:target:] ~ Number
-R15 [:target:] ~ [:discard:]
-R16 [:target:] ~ '('
-R17 [:target:] ~ ')'
-R18 [:target:] ~ '**'
-R19 [:target:] ~ '*'
-R20 [:target:] ~ '/'
-R21 [:target:] ~ '+'
-R22 [:target:] ~ '-'
-R23 [:target:] ~ comma
-R24 comma ~ [,]
-R25 '(' ~ [\(]
-R26 ')' ~ [\)]
-R27 '**' ~ [\*] [\*]
-R28 '*' ~ [\*]
-R29 '/' ~ [\/]
-R30 '+' ~ [\+]
-R31 '-' ~ [\-]
-R32 Number ~ [\d] +
-R33 [:discard:] ~ whitespace
-R34 whitespace ~ [\s] +
-R35 [:discard:] ~ <hash comment>
-R36 <hash comment> ~ <terminated hash comment>
-R37 <hash comment> ~ <unterminated final hash comment>
-R38 <terminated hash comment> ~ [\#] <hash comment body> <vertical space char>
-R39 <unterminated final hash comment> ~ [\#] <hash comment body>
-R40 <hash comment body> ~ <hash comment char> *
-R41 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-R42 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R14 [:lex_start:] ~ [:target:]
+R15 [:target:] ~ Number
+R16 [:target:] ~ [:discard:]
+R17 [:target:] ~ '('
+R18 [:target:] ~ ')'
+R19 [:target:] ~ '**'
+R20 [:target:] ~ '*'
+R21 [:target:] ~ '/'
+R22 [:target:] ~ '+'
+R23 [:target:] ~ '-'
+R24 [:target:] ~ comma
+R25 comma ~ [,]
+R26 '(' ~ [\(]
+R27 ')' ~ [\)]
+R28 '**' ~ [\*] [\*]
+R29 '*' ~ [\*]
+R30 '/' ~ [\/]
+R31 '+' ~ [\+]
+R32 '-' ~ [\-]
+R33 Number ~ [\d] +
+R34 [:discard:] ~ whitespace
+R35 whitespace ~ [\s] +
+R36 [:discard:] ~ <hash comment>
+R37 <hash comment> ~ <terminated hash comment>
+R38 <hash comment> ~ <unterminated final hash comment>
+R39 <terminated hash comment> ~ [\#] <hash comment body> <vertical space char>
+R40 <unterminated final hash comment> ~ [\#] <hash comment body>
+R41 <hash comment body> ~ <hash comment char> *
+R42 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+R43 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 END_OF_SHOW_RULES_OUTPUT
 
 # TODO -- Do I need the following as XPRs?
@@ -165,16 +166,17 @@ R15 <unterminated final hash comment> ~ [\#] <hash comment body>
 R16 <hash comment body> ~ <hash comment char> *
 R17 <vertical space char> ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
 R18 <hash comment char> ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-R19 [:target:] ~ Number
-R20 [:target:] ~ [:discard:]
-R21 [:target:] ~ '('
-R22 [:target:] ~ ')'
-R23 [:target:] ~ '**'
-R24 [:target:] ~ '*'
-R25 [:target:] ~ '/'
-R26 [:target:] ~ '+'
-R27 [:target:] ~ '-'
-R28 [:target:] ~ comma
+R19 [:lex_start:] ~ [:target:]
+R20 [:target:] ~ Number
+R21 [:target:] ~ [:discard:]
+R22 [:target:] ~ '('
+R23 [:target:] ~ ')'
+R24 [:target:] ~ '**'
+R25 [:target:] ~ '*'
+R26 [:target:] ~ '/'
+R27 [:target:] ~ '+'
+R28 [:target:] ~ '-'
+R29 [:target:] ~ comma
 END_OF_SHOW_RULES_OUTPUT
 
 do_test('Calculator 1', $calculator_grammar,

@@ -66,12 +66,13 @@ Marpa::R3::Test::is( $grammar->symbols_show(),
     <<'END_OF_STRING', 'Leo168 Symbols' );
 S1 C
 S2 S
-S3 [:start:]
-S4 [:target:]
-S5 [a]
-S6 [b]
-S7 a
-S8 b
+S3 [:lex_start:]
+S4 [:start:]
+S5 [:target:]
+S6 [a]
+S7 [b]
+S8 a
+S9 b
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->productions_show(),
@@ -81,10 +82,11 @@ R2 C ::= a C b
 R3 C ::=
 R4 S ::= a S
 R5 S ::= C
-R6 [:target:] ~ a
-R7 [:target:] ~ b
-R8 a ~ [a]
-R9 b ~ [b]
+R6 [:lex_start:] ~ [:target:]
+R7 [:target:] ~ a
+R8 [:target:] ~ b
+R9 a ~ [a]
+R10 b ~ [b]
 END_OF_STRING
 
 Marpa::R3::Test::is( $grammar->ahms_show(), <<'END_OF_STRING', 'Leo168 AHMs' );
