@@ -612,15 +612,6 @@ whence the name.
     class_slg_fields.default_blessing = true
 ```
 
-These two memoize two of the special ISYIDs
-in the L0 grammar.
-
-```
-    -- miranda: section+ class_slg field declarations
-    class_slg_fields.l0_discard_isyid = true
-    class_slg_fields.l0_top_isyid = true
-```
-
 ```
     -- miranda: section+ populate metatables
     local class_slg_fields = {}
@@ -1012,26 +1003,26 @@ in `lmw_g`.
             ::NEXT_G1_ISY::
         end
 
-        slg.l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
-        slg.l0_top_isyid = slg:l0_symbol_by_name(l0g.start_name)
+        local l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
+        local l0_target_isyid = slg:l0_symbol_by_name('[:target:]')
         for l0_irlid = 0, l0g:highest_rule_id() do
             local irl = l0g.irls[l0_irlid]
             local lhs_id = l0g:rule_lhs(l0_irlid)
             -- a discard rule
-            if lhs_id == slg.l0_discard_isyid then
+            if lhs_id == l0_discard_isyid then
                 irl.g1_lexeme = -2
                 goto NEXT_L0_IRL
             end
-            -- not a lexeme or discard rule
-            if lhs_id ~= slg.l0_top_isyid then
+            -- not a target or discard rule
+            if lhs_id ~= l0_target_isyid then
                 irl.g1_lexeme = -1
                 goto NEXT_L0_IRL
             end
-            -- a lexeme rule
+            -- a target rule
             local l0_rhs_id = l0g:rule_rhs(l0_irlid, 0)
 
             -- the rule '[:target:] ::= [:discard:]'
-            if l0_rhs_id == slg.l0_discard_isyid then
+            if l0_rhs_id == l0_discard_isyid then
                 irl.g1_lexeme = -1
                 goto NEXT_L0_IRL
             end
@@ -1047,13 +1038,14 @@ in `lmw_g`.
             ::NEXT_L0_IRL::
     end
 
+    -- Add ZWAs for assertions
     for l0_irlid = 0, l0g:highest_rule_id() do
         local lhs_id = l0g:rule_lhs(l0_irlid)
-        if lhs_id == slg.l0_discard_isyid or lhs_id ~= slg.l0_top_isyid then
+        if lhs_id == l0_discard_isyid or lhs_id ~= l0_target_isyid then
             goto NEXT_IRL
         end
         local l0_lexeme_id = l0g:rule_rhs(l0_irlid, 0)
-        if l0_lexeme_id == slg.l0_discard_isyid then
+        if l0_lexeme_id == l0_discard_isyid then
             goto NEXT_IRL
         end
         local lexeme = l0g.isys[l0_lexeme_id].lexeme
@@ -1132,6 +1124,8 @@ in `lmw_g`.
     -- miranda: section+ most Lua function definitions
     function precompute_discard_events(slg, source_hash)
         local l0g = slg.l0
+        local l0_discard_isyid = slg:l0_symbol_by_name('[:discard:]')
+
         for irlid = 0, l0g:highest_rule_id() do
             local irl = l0g.irls[irlid]
             local lhs_id = l0g:rule_lhs(irlid)
@@ -1139,7 +1133,7 @@ in `lmw_g`.
             if not xpr then
                 goto NEXT_IRL_ID
             end
-            if lhs_id ~= slg.l0_discard_isyid then
+            if lhs_id ~= l0_discard_isyid then
                 goto NEXT_IRL_ID
             end
             do
