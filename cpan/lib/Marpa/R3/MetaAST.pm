@@ -180,11 +180,11 @@ sub ast_to_hash {
 
     # Add the L0 augment rule
     if (0) {
-        my $start_lhs = $hashed_ast->{'start_lhs'}
-          // $hashed_ast->{'first_lhs'};
+        # Target symbol assumed to exist already
+        my $target_lhs = '[:target:]';
         Marpa::R3::exception('No rules in SLIF L0 grammar')
-          if not defined $start_lhs;
-        my $augment_lhs = '[:start:]';
+          if not defined $target_lhs;
+        my $augment_lhs = '[:lex_start:]';
         my $symbol_data = {
             dsl_form    => $augment_lhs,
             name_source => 'internal',
@@ -196,9 +196,9 @@ sub ast_to_hash {
             start  => 0,
             length => 0,
             lhs    => $augment_lhs,
-            rhs    => [$start_lhs],
+            rhs    => [$target_lhs],
         };
-        $hashed_ast->symbol_assign_ordinary($start_lhs, 'l0');
+        $hashed_ast->symbol_assign_ordinary($target_lhs, 'l0');
         my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );
         push @{ $hashed_ast->{rules}->{l0} }, $wrl;
     }
@@ -251,7 +251,7 @@ sub ast_to_hash {
                     "    A lexeme cannot be the LHS of any G1 rule\n"
                 );
             }
-            if ( not $g1_rhs{$lexeme} ) {
+            if ( not $g1_rhs{$lexeme} and $lexeme ne '[:lex_start:]') {
                 my $type = $lexeme{$lexeme};
                 Marpa::R3::exception(
 "<$lexeme> is $type, but is not on the RHS of any G1 rule\n",
