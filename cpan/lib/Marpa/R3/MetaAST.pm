@@ -113,7 +113,7 @@ sub ast_to_hash {
     };
     Marpa::R3::exception($EVAL_ERROR) if not $eval_ok;
 
-    # Add the augment rule
+    # Add the G1 augment rule
     {
         my $start_lhs = $hashed_ast->{'start_lhs'}
           // $hashed_ast->{'first_lhs'};
@@ -174,6 +174,31 @@ sub ast_to_hash {
 
               # 'description' => 'Discard rule for <[[^\\d\\D]]>'
         };
+        my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );
+        push @{ $hashed_ast->{rules}->{l0} }, $wrl;
+    }
+
+    # Add the L0 augment rule
+    if (0) {
+        my $start_lhs = $hashed_ast->{'start_lhs'}
+          // $hashed_ast->{'first_lhs'};
+        Marpa::R3::exception('No rules in SLIF L0 grammar')
+          if not defined $start_lhs;
+        my $augment_lhs = '[:start:]';
+        my $symbol_data = {
+            dsl_form    => $augment_lhs,
+            name_source => 'internal',
+        };
+        $hashed_ast->xsy_create( $augment_lhs, $symbol_data );
+        $hashed_ast->symbol_names_set( $augment_lhs, 'l0', { xsy => $augment_lhs } );
+
+        my $rule_data = {
+            start  => 0,
+            length => 0,
+            lhs    => $augment_lhs,
+            rhs    => [$start_lhs],
+        };
+        $hashed_ast->symbol_assign_ordinary($start_lhs, 'l0');
         my $wrl = $hashed_ast->xpr_create( $rule_data, 'l0' );
         push @{ $hashed_ast->{rules}->{l0} }, $wrl;
     }
