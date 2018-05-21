@@ -663,7 +663,7 @@ my $start_id;
 
     $start_id = $grammar->start_symbol_id();
 
-    Test::More::is( $start_id, 3, q{Test of $grammar->start_symbol_id()} );
+    Test::More::is( $start_id, 4, q{Test of $grammar->start_symbol_id()} );
 
     $start_id = $grammar->g1_start_symbol_id();
 
