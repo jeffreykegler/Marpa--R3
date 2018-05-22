@@ -1030,12 +1030,12 @@ in `lmw_g`.
             local lhs_id = l0g:rule_lhs(l0_irlid)
             -- a discard rule
             if lhs_id == l0_discard_isyid then
-                irl.g1_lexeme = -2
+                irl.g1_lexeme = 'discard'
                 goto NEXT_L0_IRL
             end
             -- not a target or discard rule
             if lhs_id ~= l0_target_isyid then
-                irl.g1_lexeme = -1
+                irl.g1_lexeme = 'ignore'
                 goto NEXT_L0_IRL
             end
             -- a target rule
@@ -1043,14 +1043,14 @@ in `lmw_g`.
 
             -- the rule '[:target:] ::= [:discard:]'
             if l0_rhs_id == l0_discard_isyid then
-                irl.g1_lexeme = -1
+                irl.g1_lexeme = 'ignore'
                 goto NEXT_L0_IRL
             end
 
             -- a lexeme rule?
             local l0_rhs_lexeme = l0g.isys[l0_rhs_id].lexeme
             if not l0_rhs_lexeme then
-                irl.g1_lexeme = -1
+                irl.g1_lexeme = 'ignore'
                 goto NEXT_L0_IRL
             end
             irl.g1_lexeme = l0_rhs_lexeme.g1_isy.id
@@ -1295,7 +1295,7 @@ in `lmw_g`.
             if l0g:rule_length(irlid) > 0 then
                 local discard_symbol_id = l0g:rule_rhs(irlid, 0)
                 local g1_lexeme_id = irl.g1_lexeme
-                if g1_lexeme_id >= 0 then
+                if type(g1_lexeme_id) == 'number' then
                     local eager = g1g.isys[g1_lexeme_id].eager
                     if eager then irl.eager = true end
                 end
@@ -4092,7 +4092,7 @@ Determine which lexemes are acceptable or discards.
         local block = slr.current_block
         local block_ix = block.index
         while true do
-            local g1_lexeme = -1
+            local g1_lexeme = 'ignore'
             local rule_id, dot_position, origin = slr.l0:progress_item()
             if not rule_id then
                 return discarded, high_lexeme_priority
@@ -4108,18 +4108,19 @@ Determine which lexemes are acceptable or discards.
                goto NEXT_EARLEY_ITEM
             end
             g1_lexeme = slr.l0_irls[rule_id].g1_lexeme
-            g1_lexeme = g1_lexeme or -1
-            if g1_lexeme == -1 then
+            g1_lexeme = g1_lexeme or 'ignore'
+            if g1_lexeme == 'ignore' then
                goto NEXT_EARLEY_ITEM
             end
             slr.end_of_lexeme = working_pos
             -- -2 means a discarded item
-            if g1_lexeme <= -2 then
+            if g1_lexeme == 'discard' then
                discarded = discarded + 1
                local q = slr.lexeme_queue
                q[#q+1] = discard_event_gen(slr, rule_id, slr.start_of_lexeme, slr.end_of_lexeme)
                goto NEXT_EARLEY_ITEM
             end
+            -- if here, `g1_lexeme` must be a number
             -- this block hides the local's and allows the goto to work
             do
                 local is_expected = slr.g1:terminal_is_expected(g1_lexeme)
@@ -8323,9 +8324,9 @@ TODO: Delete `bless`.  Rename `new_blessing`.
 
 `g1_lexeme` records the G1 ISYID for the lexeme
 if there is one.
-If this is a "discard" rule, `g1_lexeme` is -2.
+If this is a "discard" rule, `g1_lexeme` is 'discard'.
 If this is not a "discard" rule or a lexeme rule,
-`g1_lexeme` is -1.
+`g1_lexeme` is 'ignore'.
 
 An alternative is to have a pointer to a lexeme object
 here, but this would require having a way to deal with
