@@ -1061,7 +1061,7 @@ in `lmw_g`.
     -- Add ZWAs for assertions
     for l0_irlid = 0, l0g:highest_rule_id() do
         local lhs_id = l0g:rule_lhs(l0_irlid)
-        if lhs_id == l0_discard_isyid or lhs_id ~= l0_target_isyid then
+        if lhs_id ~= l0_target_isyid then
             goto NEXT_IRL
         end
         local l0_lexeme_id = l0g:rule_rhs(l0_irlid, 0)
