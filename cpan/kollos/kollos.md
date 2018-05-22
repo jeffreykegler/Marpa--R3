@@ -3523,7 +3523,7 @@ together.
         if too_many_earley_items >= 0 then
             l0r:earley_item_warning_threshold_set(too_many_earley_items)
         end
-         -- for now use a per-slr field
+         -- TODO: for now use a per-slr field
          -- later replace with a local
         slr.terminals_expected = slr.g1:terminals_expected()
         local count = #slr.terminals_expected
@@ -3914,7 +3914,8 @@ rule, false otherwise.
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_track_candidates(slr)
         local l0r = slr.l0
-        local l0g = slr.slg.l0
+        local slg = slr.slg
+        local l0g = slg.l0
         local l0_rules = slr.l0_irls
         local eager = false
         local complete_lexemes = false
@@ -3928,9 +3929,8 @@ rule, false otherwise.
             local dot = trv:dot()
             if dot >= 0 then goto NEXT_EIM end
             complete_lexemes = true
-            -- when we expand this, the ID of the g1 lexeme
-            -- will matter; right now it does not.
-            -- local g1_lexeme = l0_rules[irl_id].g1_lexeme
+            -- TODO: when we expand this, the ID of the g1 lexeme
+            -- may matter; right now it does not.
             eager = eager or l0_rules[irl_id].eager
             ::NEXT_EIM::
         end
@@ -4017,6 +4017,11 @@ TODO: Is the status string needed/used?
         end
         local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
+        -- TODO delete next lines after development
+        -- if not elect_earley_set then _M._internal_error('elect_earley_set %s',
+            -- inspect(elect_earley_set))
+        -- end
+        -- end of TODO
         if not elect_earley_set then return false, exhausted() end
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
@@ -12186,8 +12191,14 @@ that code inlined in Perl can use it.
 ```
     -- miranda: section+ internal utilities
     function _M._internal_error(...)
-        error("Kollos internal error: "
-            .. string.format(...))
+        local X = {
+            code = _M.err.LUA_INTERNAL,
+            where = debug.traceback(),
+            msg = 'Kollos internal error: '
+               .. string.format(...)
+        }
+        setmetatable(X, _M.mt_X)
+        error(X)
     end
 ```
 
