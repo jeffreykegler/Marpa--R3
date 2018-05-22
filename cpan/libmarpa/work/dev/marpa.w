@@ -3695,7 +3695,7 @@ on the LHS of the start rule.
        MARPA_INTERNAL_ERROR("Length of start rule is not 1");
        goto FAILURE;
     }
-    if (0) {
+    {
       const RULEID *p_next_irlid = irl_list_x_lh_sym[start_isy_id+1];
       const ptrdiff_t rules_with_this_lhs = p_next_irlid - p_start_irlid;
       if (rules_with_this_lhs != 1) {
