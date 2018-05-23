@@ -55,7 +55,7 @@ $recce->set( { trace_file_handle => \*STDOUT } );
 close $trace_fh;
 
 my $expected_trace_output = <<'END_OF_TRACE';
-G1 exceeded earley item threshold at pos 2: 11 Earley items
+G1 exceeded earley item threshold at pos 2: 10 Earley items
 END_OF_TRACE
 
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,
