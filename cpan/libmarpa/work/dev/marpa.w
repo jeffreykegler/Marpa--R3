@@ -2288,7 +2288,7 @@ nrl_finish( GRAMMAR g, NRL nrl)
 {
   int symbol_ix;
   const NRL new_nrl = nrl_start (g, rewrite_irl_length);
-  if (1) { g->t_start_nrl = new_nrl; }
+  if (0) { g->t_start_nrl = new_nrl; }
   Source_IRL_of_NRL (new_nrl) = rule;
   Rank_of_NRL(new_nrl) = NRL_Rank_by_IRL(rule);
   for (symbol_ix = 0; symbol_ix <= rewrite_irl_length; symbol_ix++)
@@ -2296,7 +2296,7 @@ nrl_finish( GRAMMAR g, NRL nrl)
       new_nrl->t_nsyid_array[symbol_ix] =
         NSYID_by_ISYID(rule->t_symbols[symbol_ix]);
     }
-  if (1) { g->t_start_nsyid = LHSID_of_NRL(new_nrl); }
+  if (0) { g->t_start_nsyid = LHSID_of_NRL(new_nrl); }
   nrl_finish(g, new_nrl);
 }
 
@@ -3239,9 +3239,7 @@ int marpa_g_precompute(Marpa_Grammar g)
     @<Initialize NRL stack@>@;
     @<Initialize NSY stack@>@;
     @<Rewrite grammar |g| into CHAF form@>@;
-    if (0) {
-      @<Augment grammar |g|@>@;
-    }
+    @<Augment grammar |g|@>@;
     post_census_isy_count = ISY_Count_of_G(g);
     @<Populate the event boolean vectors@>@;
 
