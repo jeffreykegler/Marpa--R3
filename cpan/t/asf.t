@@ -81,8 +81,8 @@ Test::More::ok( ( $valuer->ambiguity_level() > 1 ), 'ambiguity_level()');
     my $expected = <<'EOS';
 (Expr (Expr (Expr (2)) (**) (Expr (Expr (7)) (-) (Expr (3)))) (**) (Expr (10)))
 (Expr (Expr (Expr (Expr (2)) (**) (Expr (7))) (-) (Expr (3))) (**) (Expr (10)))
-(Expr (Expr (2)) (**) (Expr (Expr (Expr (7)) (-) (Expr (3))) (**) (Expr (10))))
 (Expr (Expr (2)) (**) (Expr (Expr (7)) (-) (Expr (Expr (3)) (**) (Expr (10)))))
+(Expr (Expr (2)) (**) (Expr (Expr (Expr (7)) (-) (Expr (3))) (**) (Expr (10))))
 (Expr (Expr (Expr (2)) (**) (Expr (7))) (-) (Expr (Expr (3)) (**) (Expr (10))))
 EOS
     Marpa::R3::Test::is( $actual, $expected, 'Result of ASF traversal' );

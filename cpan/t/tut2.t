@@ -170,10 +170,6 @@ AHM 16: dot=0; nulls=0
     [:start:] ::= . Calculator
 AHM 17: completion; dot=1; nulls=0
     [:start:] ::= Calculator .
-AHM 18: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 19: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_AHM
 
 my $earley_sets_show_output = $recce->earley_sets_show();
@@ -181,8 +177,6 @@ my $earley_sets_show_output = $recce->earley_sets_show();
 my $expected_earley_sets = <<'END_EARLEY_SETS';
 Last Completed: 5; Furthest: 5
 Earley Set 0
-ahm18: R7:0@0-0
-  R7:0: [:start:]['] ::= . [:start:]
 ahm16: R6:0@0-0
   R6:0: [:start:] ::= . Calculator
 ahm0: R0:0@0-0
@@ -219,9 +213,6 @@ ahm1: R0$@0-1
 ahm17: R6$@0-1
   R6$: [:start:] ::= Calculator .
   [p=R6:0@0-0; c=R0$@0-1]
-ahm19: R7$@0-1
-  R7$: [:start:]['] ::= [:start:] .
-  [p=R7:0@0-0; c=R6$@0-1]
 Earley Set 2
 ahm6: R2:2@0-2
   R2:2: Term ::= Term [Lex-0] . Factor
@@ -250,9 +241,6 @@ ahm1: R0$@0-3
 ahm17: R6$@0-3
   R6$: [:start:] ::= Calculator .
   [p=R6:0@0-0; c=R0$@0-3]
-ahm19: R7$@0-3
-  R7$: [:start:]['] ::= [:start:] .
-  [p=R7:0@0-0; c=R6$@0-3]
 Earley Set 4
 ahm12: R4:2@0-4
   R4:2: Expression ::= Expression [Lex-1] . Term
@@ -285,9 +273,6 @@ ahm1: R0$@0-5
 ahm17: R6$@0-5
   R6$: [:start:] ::= Calculator .
   [p=R6:0@0-0; c=R0$@0-5]
-ahm19: R7$@0-5
-  R7$: [:start:]['] ::= [:start:] .
-  [p=R7:0@0-0; c=R6$@0-5]
 END_EARLEY_SETS
 
 Marpa::R3::Test::is( $earley_sets_show_output, $expected_earley_sets,
@@ -352,8 +337,6 @@ starting op MARPA_STEP_RULE lua
 starting lua op MARPA_STEP_RULE result_is_n_of_rhs
 starting op MARPA_STEP_RULE lua
 starting lua op MARPA_STEP_RULE result_is_n_of_rhs
-New Virtual Rule: R7:1@0-5C6@0, rule: 7: [:start:]['] ::= [:start:]
-Real symbol count is 1
 END_TRACE_OUTPUT
 
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,
