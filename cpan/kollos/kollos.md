@@ -592,6 +592,17 @@ perhaps because it is buggy.
 
 ```
 
+A flag intended for developer use.
+It might be used,
+for example
+to turn 'hi there' messages
+on for particular grammars and not others
+
+```
+    -- miranda: section+ class_slg field declarations
+    class_slg_fields.debug_level = true
+```
+
 Maps `(irlid, irl_dot)` pairs to external rule/symbol
 information: `(xrlid, xrl_dot, predot_xsy)`.
 
@@ -656,6 +667,9 @@ This is a registry object.
 
         slg.ranking_method = 'none'
         slg.if_inaccessible = 'warn'
+
+        slg.debug_level = 0
+
         return slg
     end
 ```
@@ -3525,15 +3539,29 @@ together.
         if too_many_earley_items >= 0 then
             l0r:earley_item_warning_threshold_set(too_many_earley_items)
         end
+
+        -- TODO remove next block after development
+        if slr.trace_terminals > 0 then
+            iprint('l0r_new about before call of terminals expected()')
+            iprint('g1_progress_show():\n', slr:g1_progress_show())
+        end
+
          -- TODO: for now use a per-slr field
          -- later replace with a local
         slr.terminals_expected = slr.g1:terminals_expected()
+
+        -- TODO remove next line after development
+        if slr.trace_terminals > 0 then iprint('l0r_new terminals expected', slr.terminals_expected) end
+        -- TODO remove next line after development
+        if slr.trace_terminals > 0 then iprint('l0r_new after call of terminals expected()') end
+
         local count = #slr.terminals_expected
         if not count or count < 0 then
             local error_description = slr.g1:error_description()
             error('Internal error: terminals_expected() failed in u_l0r_new(); %s',
                     error_description)
         end
+
         for i = 0, count -1 do
             local ix = i + 1
             local terminal = slr.terminals_expected[ix]
@@ -3724,7 +3752,20 @@ if there is some way to continue it),
                 end
             end
             local g1r = slr.g1
+
+        -- TODO remove this block after development
+        if slr.trace_terminals > 0 then
+            local slg = slr.slg
+            iprint('inside slr:read()')
+            iprint('nsys_show():', slg.g1:nsys_show())
+            iprint('G1 nrls_show():', slg:g1_nrls_show())
+            iprint('L0 nrls_show():', slg:l0_nrls_show())
+            iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
+            iprint('g1_progress_show():\n', slr:g1_progress_show())
+        end
+
             slr:l0_read_lexeme()
+
             local discard_mode = (g1r:is_exhausted() ~= 0)
             -- TODO: work on this
             local alive = slr:alternatives(discard_mode)
@@ -3874,6 +3915,11 @@ otherwise `false` and a status string.
         end
         while true do
             local block_ix, offset, eoread = slr:block_progress()
+
+            if slr.trace_terminals > 0 then
+                iprint('l0_read_lexeme, block, offset, eoread:', block_ix, offset, eoread)
+            end
+
             if offset >= eoread then
                 return true
             end
@@ -3929,7 +3975,8 @@ rule, false otherwise.
         if slr.trace_terminals > 0 then
             iprint('starting l0_track_candidates')
             iprint('nsys_show():', slg.g1:nsys_show())
-            iprint('nrls_show():', slg:g1_nrls_show())
+            iprint('G1 nrls_show():', slg:g1_nrls_show())
+            iprint('L0 nrls_show():', slg:l0_nrls_show())
             iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
             iprint('g1_progress_show():\n', slr:g1_progress_show())
         end
@@ -12302,6 +12349,8 @@ Combines `print` and `inspect`.
         end
         io.stderr:write( table.concat(results, '    ') .. "\n")
     end
+    -- make it a static, so Lua inlined in Perl can also use it
+    _M.iprint = iprint
 ```
 
 Given a symbol name, convert it to a form

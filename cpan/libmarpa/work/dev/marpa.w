@@ -2288,6 +2288,7 @@ nrl_finish( GRAMMAR g, NRL nrl)
 {
   int symbol_ix;
   const NRL new_nrl = nrl_start (g, rewrite_irl_length);
+    MARPA_DEBUG3("At %s, start nrl is %ld", STRLOC, (long)ID_of_NRL(new_nrl));
   Source_IRL_of_NRL (new_nrl) = rule;
   Rank_of_NRL(new_nrl) = NRL_Rank_by_IRL(rule);
   for (symbol_ix = 0; symbol_ix <= rewrite_irl_length; symbol_ix++)
@@ -4152,17 +4153,26 @@ int _marpa_g_nrl_is_chaf(
   @<CHAF rewrite allocations@>@;
   @<Clone external symbols@>@;
   pre_chaf_rule_count = IRL_Count_of_G (g);
+  MARPA_DEBUG3("At %s, Rewriting %ld IRLs", STRLOC, (long)pre_chaf_rule_count);
   for (rule_id = 0; rule_id < pre_chaf_rule_count; rule_id++)
     {
 
       IRL rule = IRL_by_ID (rule_id);
       IRL rewrite_irl = rule;
+
+      MARPA_DEBUG3("At %s, Rewriting IRL %ld", STRLOC, (long)rule_id);
+      if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
+        MARPA_DEBUG3("At %s, IRL %ld is start rule", STRLOC, (long)rule_id);
+      }
+
       const int rewrite_irl_length = Length_of_IRL (rewrite_irl);
       int nullable_suffix_ix = 0;
       if (!IRL_is_Used(rule))
         continue;
+      MARPA_DEBUG3("At %s, Rewriting used IRL %ld", STRLOC, (long)rule_id);
       if (IRL_is_Sequence (rule))
         {
+          MARPA_DEBUG3("At %s, Rewriting sequence IRL %ld", STRLOC, (long)rule_id);
           @<Rewrite sequence |rule| into BNF@>@;
           continue;
         }
@@ -4170,13 +4180,16 @@ int _marpa_g_nrl_is_chaf(
       /* Do not factor if there is no proper nullable in the rule */
       if (factor_count > 0)
         {
+          MARPA_DEBUG3("At %s, CHAF Factoring IRL %ld", STRLOC, (long)rule_id);
           @<Factor the rule into CHAF rules@>@;
           continue;
         }
       if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
+          MARPA_DEBUG3("At %s, Cloning start IRL %ld", STRLOC, (long)rule_id);
         @<Clone a new start NRL from |rule|@>@;
         continue;
       }
+      MARPA_DEBUG3("At %s, Rewriting normal IRL %ld", STRLOC, (long)rule_id);
       @<Clone a new NRL from |rule|@>@;
     }
 }
@@ -4660,6 +4673,8 @@ a nulling rule.
 }
 
 @ The P Rule.
+Uniquely among the CHAF rules,
+this rule might also be a start rule.
 @<Add final CHAF P rule for one factor@> =
 {
   int piece_ix;
@@ -4673,6 +4688,10 @@ a nulling rule.
     }
   nrl_finish (g, chaf_nrl);
   Rank_of_NRL(chaf_nrl) = NRL_CHAF_Rank_by_IRL(rule, 3);
+  if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
+     g->t_start_nrl = chaf_nrl;
+     g->t_start_nsyid = LHSID_of_NRL(chaf_nrl);
+  }
   @<Add CHAF NRL@>@;
 }
 
@@ -5162,7 +5181,7 @@ Marpa_Symbol_ID _marpa_g_ahm_postdot(Marpa_Grammar g,
     SYMI_Count_of_G(g) = symbol_instance_of_next_rule;
     MARPA_ASSERT(ahm_count == current_item - base_item);
     AHM_Count_of_G(g) = ahm_count;
-    MARPA_DEBUG3("At %s, Setting debug count to %ld", STRLOC, (long)ahm_count);
+    MARPA_DEBUG3("At %s, Setting ahm count to %ld", STRLOC, (long)ahm_count);
     g->t_ahms = marpa_renew(struct s_ahm, base_item, ahm_count);
     @<Populate the first |AHM|'s of the |RULE|'s@>@;
 }
@@ -5674,16 +5693,16 @@ with |S2| on its LHS.
   g->t_bv_nsyid_is_terminal = bv_obs_create (g->t_obs, nsy_count);
   for (isy_id = 0; isy_id < post_census_isy_count; isy_id++)
     {
-      MARPA_DEBUG3("At %s, examining terminal bit for isy %ld", STRLOC, (long)isy_id);
+      MARPA_OFF_DEBUG3("At %s, examining terminal bit for isy %ld", STRLOC, (long)isy_id);
       if (ISYID_is_Terminal (isy_id))
         {
           /* A terminal might have no corresponding NSY.
             Currently that can happen if it is not accessible */
-          MARPA_DEBUG3("At %s, setting terminal bit from isy %ld", STRLOC, (long)isy_id);
+          MARPA_OFF_DEBUG3("At %s, setting terminal bit from isy %ld", STRLOC, (long)isy_id);
           const NSY nsy = NSY_of_ISY (ISY_by_ID (isy_id));
           if (nsy)
             {
-              MARPA_DEBUG3("At %s, setting terminal bit to nsy %ld", STRLOC, (long)ID_of_NSY(nsy));
+              MARPA_OFF_DEBUG3("At %s, setting terminal bit to nsy %ld", STRLOC, (long)ID_of_NSY(nsy));
               bv_bit_set (g->t_bv_nsyid_is_terminal,
                            ID_of_NSY (nsy));
             }
@@ -6349,8 +6368,8 @@ int marpa_r_terminals_expected(Marpa_Recognizer r, Marpa_Symbol_ID* buffer)
       for (nsyid = min; nsyid <= max; nsyid++)
 	{
 	  const ISY isy = Source_ISY_of_NSYID (nsyid);
-          MARPA_DEBUG3("At %s, setting terminal expected bit from nsy %ld", STRLOC, (long)nsyid);
-          MARPA_DEBUG3("At %s, setting terminal expected bit to isy %ld", STRLOC, (long)ID_of_ISY(isy));
+          MARPA_OFF_DEBUG3("At %s, setting terminal expected bit from nsy %ld", STRLOC, (long)nsyid);
+          MARPA_OFF_DEBUG3("At %s, setting terminal expected bit to isy %ld", STRLOC, (long)ID_of_ISY(isy));
 	  bv_bit_set (bv_terminals, ID_of_ISY (isy));
 	}
     }

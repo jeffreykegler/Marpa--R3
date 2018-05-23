@@ -262,6 +262,26 @@ END_OF_LUA
         delete $flat_args->{'ranking_method'};
     }
 
+    if ( exists $flat_args->{'debug_level'} ) {
+
+        my $value = $flat_args->{'debug_level'} // 'undefined';
+
+    $slg->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
+        <<'END_OF_LUA', 'i', $value);
+    local slg, raw_value = ...
+    local value = math.tointeger(raw_value)
+    if not value then
+        _M.userX(
+            'debug_level value is %s -- it should be an integer',
+            inspect(value)
+        )
+    end
+    slg.debug_level = value
+END_OF_LUA
+
+        delete $flat_args->{'debug_level'};
+    }
+
     return $dsl;
 
 }
@@ -295,6 +315,15 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         local slg, source_hash = ...
         _M.wrap(function ()
             slg:seriable_to_runtime(source_hash)
+            -- TODO delete this next block after development
+            if slg.debug_level > 0 then
+                _M.iprint('G1 nsys_show():', slg.g1:nsys_show())
+                _M.iprint('G1 nrls_show():', slg:g1_nrls_show())
+                _M.iprint('L0 nsys_show():', slg.g1:nsys_show())
+                _M.iprint('L0 nrls_show():', slg:g1_nrls_show())
+                _M.iprint('l0_rules_show():', slg:l0_rules_show({ verbose = 3}))
+                _M.iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
+            end
         end)
 END_OF_LUA
 
