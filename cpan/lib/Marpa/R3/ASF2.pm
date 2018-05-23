@@ -263,16 +263,16 @@ sub Marpa::R3::ASF2::peak {
 END_OF_LUA
 
     # TODO: Why does Lua think this was a string?
-    my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
-    my ($start_or_node_id)
-        = $asf->call_by_tag(
-        ('@' . __FILE__ . ':' . __LINE__),
-            'local asf, id = ...; return asf.lmw_b:_and_node_cause(id)',
-            'i',
-            $augment_and_node_id
-            );
+    # my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
+    # my ($start_or_node_id)
+        # = $asf->call_by_tag(
+        # ('@' . __FILE__ . ':' . __LINE__),
+            # 'local asf, id = ...; return asf.lmw_b:_and_node_cause(id)',
+            # 'i',
+            # $augment_and_node_id
+            # );
 
-    my $base_nidset = Marpa::R3::Nidset->obtain( $asf, $start_or_node_id );
+    my $base_nidset = Marpa::R3::Nidset->obtain( $asf, $augment_or_node_id );
     my $glade_id = $base_nidset->id();
 
     # Cannot "obtain" the glade if it is not registered
