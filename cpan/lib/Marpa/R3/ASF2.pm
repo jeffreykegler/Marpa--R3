@@ -262,7 +262,8 @@ sub Marpa::R3::ASF2::peak {
         return bocage:_top_or_node()
 END_OF_LUA
 
-    # TODO: Why does Lua think this was a string?
+    # TODO: This logic is from previous Libmarpa which added its own
+    # augment rule -- commented out, just in case.
     # my $augment_and_node_id = $or_nodes->[$augment_or_node_id]->[0];
     # my ($start_or_node_id)
         # = $asf->call_by_tag(

@@ -315,15 +315,6 @@ sub Marpa::R3::Internal_G::hash_to_runtime {
         local slg, source_hash = ...
         _M.wrap(function ()
             slg:seriable_to_runtime(source_hash)
-            -- TODO delete this next block after development
-            if slg.debug_level > 0 then
-                _M.iprint('G1 nsys_show():', slg.g1:nsys_show())
-                _M.iprint('G1 nrls_show():', slg:g1_nrls_show())
-                _M.iprint('L0 nsys_show():', slg.g1:nsys_show())
-                _M.iprint('L0 nrls_show():', slg:g1_nrls_show())
-                _M.iprint('l0_rules_show():', slg:l0_rules_show({ verbose = 3}))
-                _M.iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
-            end
         end)
 END_OF_LUA
 
