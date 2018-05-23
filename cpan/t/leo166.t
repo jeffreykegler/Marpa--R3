@@ -77,10 +77,6 @@ AHM 5: dot=0; nulls=0
     [:start:] ::= . S
 AHM 6: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 7: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 8: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my $length = 50;
@@ -99,7 +95,7 @@ TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
     $max_size = $size > $max_size ? $size : $max_size;
 } ## end while ( $i++ < $length )
 
-my $expected_size = 7;
+my $expected_size = 6;
 Marpa::R3::Test::is( $max_size, $expected_size, "Leo test of earley set size" );
 
 my $value_ref = $recce->value();

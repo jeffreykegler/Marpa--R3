@@ -122,10 +122,6 @@ AHM 14: dot=0; nulls=0
     [:start:] ::= . S
 AHM 15: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 16: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 17: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my %expected = (

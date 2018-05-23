@@ -332,10 +332,6 @@ AHM 65: dot=0; nulls=0
     [:start:] ::= . Input
 AHM 66: completion; dot=1; nulls=0
     [:start:] ::= Input .
-AHM 67: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 68: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_OF_AHMS
 
 my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
@@ -347,8 +343,6 @@ Marpa::R3::Test::is( $recce->earley_sets_show(),
     <<'END_OF_EARLEY_SETS', 'Earley Sets' );
 Last Completed: 8; Furthest: 8
 Earley Set 0
-ahm67: R24:0@0-0
-  R24:0: [:start:]['] ::= . [:start:]
 ahm65: R23:0@0-0
   R23:0: [:start:] ::= . Input
 ahm0: R0:0@0-0
@@ -439,9 +433,6 @@ ahm1: R0$@0-6
 ahm66: R23$@0-6
   R23$: [:start:] ::= Input .
   [p=R23:0@0-0; c=R0$@0-6]
-ahm68: R24$@0-6
-  R24$: [:start:]['] ::= [:start:] .
-  [p=R24:0@0-0; c=R23$@0-6]
 ahm51: R17:0@6-6
   R17:0: ByClause ::= . BY
 ahm35: R10:0@6-6
@@ -510,9 +501,6 @@ ahm1: R0$@0-8
 ahm66: R23$@0-8
   R23$: [:start:] ::= Input .
   [p=R23:0@0-0; c=R0$@0-8]
-ahm68: R24$@0-8
-  R24$: [:start:]['] ::= [:start:] .
-  [p=R24:0@0-0; c=R23$@0-8]
 ahm62: R22:0@8-8
   R22:0: WithPf ::= . WITH PF
 END_OF_EARLEY_SETS
@@ -524,7 +512,6 @@ And-node #19: R0:1@0-8C2@0
 And-node #18: R2:1@0-8C4@0
 And-node #17: R4:2@0-8C5@1
 And-node #20: R23:1@0-8C0@0
-And-node #21: R24:1@0-8C23@0
 And-node #1: R5:1@1-2S12@1
 And-node #2: R5:2@1-3S10@2
 And-node #3: R5:3@1-4S0@3
@@ -550,7 +537,6 @@ R0:1@0-8
 R2:1@0-8
 R4:2@0-8
 R23:1@0-8
-R24:1@0-8
 R5:1@1-2
 R5:2@1-3
 R5:3@1-4

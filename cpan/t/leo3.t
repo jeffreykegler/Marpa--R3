@@ -108,10 +108,6 @@ AHM 11: dot=0; nulls=0
     [:start:] ::= . S
 AHM 12: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 13: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 14: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my $length = 20;
@@ -128,7 +124,7 @@ TOKEN: for ( my $i = 0; $i < $length; $i++ ) {
     $max_size = $size > $max_size ? $size : $max_size;
 } ## end while ( $i++ < $length )
 
-my $expected_size = 10;
+my $expected_size = 9;
 Marpa::R3::Test::is( $max_size, $expected_size,
 "Earley set size, got $max_size, expected $expected_size" );
 

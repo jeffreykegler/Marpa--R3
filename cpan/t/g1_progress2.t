@@ -97,7 +97,6 @@ Marpa::R3::Test::is( $grammar->nrls_show(),
 20: SS[R1:5] ::= A[] A
 21: A ::= [Lex-0]
 22: [:start:] ::= S
-23: [:start:]['] ::= [:start:]
 EOS
 
 }
