@@ -144,7 +144,11 @@ for my $test_data (@tests_data) {
 sub my_parser {
     my ( $grammar, $string ) = @_;
 
-    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+    say STDERR "G1 Symbols";
+    $grammar->g1_symbols_show();
+    say STDERR "L0 Symbols";
+    $grammar->l0_symbols_show();
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar, trace_terminals => 3 } );
 
     if ( not defined eval { $recce->read( \$string ); 1 } ) {
         my $abbreviated_error = $EVAL_ERROR;

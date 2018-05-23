@@ -3484,6 +3484,7 @@ together.
         if trace_terminals > 1 then
             local terminals_expected = slr.g1:terminals_expected()
             table.sort(terminals_expected)
+            iprint('terminals expected:', terminals_expected)
             for ix = 1, #terminals_expected do
                 local terminal = terminals_expected[ix]
                 coroutine.yield('trace',
