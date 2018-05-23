@@ -3496,10 +3496,8 @@ together.
         slr:g1_convert_events()
 
         if trace_terminals > 1 then
-             iprint('about to call terminals expected:')
             local terminals_expected = slr.g1:terminals_expected()
             table.sort(terminals_expected)
-            iprint('terminals expected:', terminals_expected)
             for ix = 1, #terminals_expected do
                 local terminal = terminals_expected[ix]
                 coroutine.yield('trace',
@@ -3540,20 +3538,9 @@ together.
             l0r:earley_item_warning_threshold_set(too_many_earley_items)
         end
 
-        -- TODO remove next block after development
-        if slr.trace_terminals > 0 then
-            iprint('l0r_new about before call of terminals expected()')
-            iprint('g1_progress_show():\n', slr:g1_progress_show())
-        end
-
          -- TODO: for now use a per-slr field
          -- later replace with a local
         slr.terminals_expected = slr.g1:terminals_expected()
-
-        -- TODO remove next line after development
-        if slr.trace_terminals > 0 then iprint('l0r_new terminals expected', slr.terminals_expected) end
-        -- TODO remove next line after development
-        if slr.trace_terminals > 0 then iprint('l0r_new after call of terminals expected()') end
 
         local count = #slr.terminals_expected
         if not count or count < 0 then
@@ -3753,17 +3740,6 @@ if there is some way to continue it),
             end
             local g1r = slr.g1
 
-        -- TODO remove this block after development
-        if slr.trace_terminals > 0 then
-            local slg = slr.slg
-            iprint('inside slr:read()')
-            iprint('nsys_show():', slg.g1:nsys_show())
-            iprint('G1 nrls_show():', slg:g1_nrls_show())
-            iprint('L0 nrls_show():', slg:l0_nrls_show())
-            iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
-            iprint('g1_progress_show():\n', slr:g1_progress_show())
-        end
-
             slr:l0_read_lexeme()
 
             local discard_mode = (g1r:is_exhausted() ~= 0)
@@ -3906,20 +3882,11 @@ otherwise `false` and a status string.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_read_lexeme(slr)
-        -- TODO Remove this block after development
-        if slr.trace_terminals > 0 then
-            iprint('starting l0_read_lexeme')
-        end
         if not slr.l0 then
             slr:l0r_new()
         end
         while true do
             local block_ix, offset, eoread = slr:block_progress()
-
-            if slr.trace_terminals > 0 then
-                iprint('l0_read_lexeme, block, offset, eoread:', block_ix, offset, eoread)
-            end
-
             if offset >= eoread then
                 return true
             end
@@ -3928,10 +3895,6 @@ otherwise `false` and a status string.
             local alive, status = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
-            -- TODO Remove this block after development
-            if slr.trace_terminals > 0 then
-                iprint('l0_read_lexeme, this_candiate, eager, alive:', this_candidate, eager, alive)
-            end
             if eager then return true end
             if not alive then return false, status end
             slr:block_move(offset + 1)
@@ -3971,15 +3934,6 @@ rule, false otherwise.
     function _M.class_slr.l0_track_candidates(slr)
         local l0r = slr.l0
         local slg = slr.slg
-        -- TODO remove this block after development
-        if slr.trace_terminals > 0 then
-            iprint('starting l0_track_candidates')
-            iprint('nsys_show():', slg.g1:nsys_show())
-            iprint('G1 nrls_show():', slg:g1_nrls_show())
-            iprint('L0 nrls_show():', slg:l0_nrls_show())
-            iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
-            iprint('g1_progress_show():\n', slr:g1_progress_show())
-        end
         local l0g = slg.l0
         local l0_rules = slr.l0_irls
         local eager = false
@@ -3988,10 +3942,6 @@ rule, false otherwise.
         -- Do we have a completion of a lexeme rule?
         local max_eim = l0r:_earley_set_size(es_id) - 1
         for eim_id = 0, max_eim do
-            -- TODO remove this block after development
-            if slr.trace_terminals > 0 then
-                iprint('l0_track_candidates loop, eim_id:', eim_id)
-            end
             local trv = _M.traverser_new(l0r, es_id, eim_id)
             local irl_id = trv:rule_id()
             if not irl_id then goto NEXT_EIM end
@@ -4002,10 +3952,6 @@ rule, false otherwise.
             -- may matter; right now it does not.
             eager = eager or l0_rules[irl_id].eager
             ::NEXT_EIM::
-        end
-        -- TODO remove this block after development
-        if slr.trace_terminals > 0 then
-            iprint('ending l0_track_candidates')
         end
         if complete_lexemes then return es_id, eager end
         return
@@ -4090,16 +4036,7 @@ TODO: Is the status string needed/used?
         end
         local elect_earley_set = slr.l0_candidate
         -- no zero-length lexemes, so Earley set 0 is ignored
-        -- TODO delete next lines after development
-        -- if not elect_earley_set then _M._internal_error('elect_earley_set %s',
-            -- inspect(elect_earley_set))
-        -- end
-        -- end of TODO
-        -- TODO remove next line after development
-        if slr.trace_terminals > 0 then iprint('before exhaustion possibility 1') end
         if not elect_earley_set then return false, exhausted() end
-        -- TODO remove next line after development
-        if slr.trace_terminals > 0 then iprint('after exhaustion possibility 1') end
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
@@ -4111,11 +4048,7 @@ TODO: Is the status string needed/used?
         slr:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = slr.accept_queue
         if #accept_q <= 0 then
-            -- TODO remove next line after development
-            if slr.trace_terminals > 0 then iprint('before exhaustion possibility 2') end
             if discarded <= 0 then return false, exhausted() end
-            -- TODO remove next line after development
-            if slr.trace_terminals > 0 then iprint('after exhaustion possibility 2') end
             -- if here, no accepted lexemes, but discarded ones
             slr:block_move(working_pos)
             local latest_es = slr.g1:latest_earley_set()
