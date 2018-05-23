@@ -2282,25 +2282,10 @@ nrl_finish( GRAMMAR g, NRL nrl)
         NSYID_by_ISYID(rule->t_symbols[symbol_ix]);
     }
   nrl_finish(g, new_nrl);
-}
-
-@ @<Clone a new start NRL from |rule|@> =
-{
-  int symbol_ix;
-  const NRL new_nrl = nrl_start (g, rewrite_irl_length);
-    MARPA_DEBUG3("At %s, start nrl is %ld", STRLOC, (long)ID_of_NRL(new_nrl));
-  Source_IRL_of_NRL (new_nrl) = rule;
-  Rank_of_NRL(new_nrl) = NRL_Rank_by_IRL(rule);
-  for (symbol_ix = 0; symbol_ix <= rewrite_irl_length; symbol_ix++)
-    {
-      new_nrl->t_nsyid_array[symbol_ix] =
-        NSYID_by_ISYID(rule->t_symbols[symbol_ix]);
-    }
-  nrl_finish(g, new_nrl);
-  if (1) { g->t_start_nrl = new_nrl; }
-  if (1) { g->t_start_nsyid = LHSID_of_NRL(new_nrl); }
-    MARPA_DEBUG3("At %s, start nsyid is %ld", STRLOC, (long)(g->t_start_nsyid));
-    MARPA_DEBUG3("At %s, start nrl is %ld", STRLOC, (long)ID_of_NRL(new_nrl));
+  if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
+     g->t_start_nrl = new_nrl;
+     g->t_start_nsyid = LHSID_of_NRL(new_nrl);
+  }
 }
 
 @ @<Function definitions@> =
@@ -3242,9 +3227,6 @@ int marpa_g_precompute(Marpa_Grammar g)
     @<Initialize NRL stack@>@;
     @<Initialize NSY stack@>@;
     @<Rewrite grammar |g| into CHAF form@>@;
-    if (0) {
-      @<Augment grammar |g|@>@;
-    }
     post_census_isy_count = ISY_Count_of_G(g);
     @<Populate the event boolean vectors@>@;
 
@@ -4153,26 +4135,26 @@ int _marpa_g_nrl_is_chaf(
   @<CHAF rewrite allocations@>@;
   @<Clone external symbols@>@;
   pre_chaf_rule_count = IRL_Count_of_G (g);
-  MARPA_DEBUG3("At %s, Rewriting %ld IRLs", STRLOC, (long)pre_chaf_rule_count);
+  MARPA_OFF_DEBUG3("At %s, Rewriting %ld IRLs", STRLOC, (long)pre_chaf_rule_count);
   for (rule_id = 0; rule_id < pre_chaf_rule_count; rule_id++)
     {
 
       IRL rule = IRL_by_ID (rule_id);
       IRL rewrite_irl = rule;
 
-      MARPA_DEBUG3("At %s, Rewriting IRL %ld", STRLOC, (long)rule_id);
+      MARPA_OFF_DEBUG3("At %s, Rewriting IRL %ld", STRLOC, (long)rule_id);
       if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
-        MARPA_DEBUG3("At %s, IRL %ld is start rule", STRLOC, (long)rule_id);
+        MARPA_OFF_DEBUG3("At %s, IRL %ld is start rule", STRLOC, (long)rule_id);
       }
 
       const int rewrite_irl_length = Length_of_IRL (rewrite_irl);
       int nullable_suffix_ix = 0;
       if (!IRL_is_Used(rule))
         continue;
-      MARPA_DEBUG3("At %s, Rewriting used IRL %ld", STRLOC, (long)rule_id);
+      MARPA_OFF_DEBUG3("At %s, Rewriting used IRL %ld", STRLOC, (long)rule_id);
       if (IRL_is_Sequence (rule))
         {
-          MARPA_DEBUG3("At %s, Rewriting sequence IRL %ld", STRLOC, (long)rule_id);
+          MARPA_OFF_DEBUG3("At %s, Rewriting sequence IRL %ld", STRLOC, (long)rule_id);
           @<Rewrite sequence |rule| into BNF@>@;
           continue;
         }
@@ -4180,16 +4162,11 @@ int _marpa_g_nrl_is_chaf(
       /* Do not factor if there is no proper nullable in the rule */
       if (factor_count > 0)
         {
-          MARPA_DEBUG3("At %s, CHAF Factoring IRL %ld", STRLOC, (long)rule_id);
+          MARPA_OFF_DEBUG3("At %s, CHAF Factoring IRL %ld", STRLOC, (long)rule_id);
           @<Factor the rule into CHAF rules@>@;
           continue;
         }
-      if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
-          MARPA_DEBUG3("At %s, Cloning start IRL %ld", STRLOC, (long)rule_id);
-        @<Clone a new start NRL from |rule|@>@;
-        continue;
-      }
-      MARPA_DEBUG3("At %s, Rewriting normal IRL %ld", STRLOC, (long)rule_id);
+      MARPA_OFF_DEBUG3("At %s, Rewriting normal IRL %ld", STRLOC, (long)rule_id);
       @<Clone a new NRL from |rule|@>@;
     }
 }
@@ -4744,34 +4721,6 @@ rule structure, and performing the call back.
   Real_SYM_Count_of_NRL (chaf_nrl) = real_symbol_count;
   LHS_IRL_of_NSY (current_lhs_nsy) = chaf_irl;
   IRL_Offset_of_NSY (current_lhs_nsy) = piece_start;
-}
-
-@** Adding a new start symbol.
-This is such a common rewrite that it has a special name
-in the literature --- it is called ``augmenting the grammar".
-@ @<Augment grammar |g|@> =
-{
-    const ISY start_isy = ISY_by_ID(start_isy_id);
-    if (_MARPA_LIKELY(!ISY_is_Nulling(start_isy))) {
-        @<Set up a new proper start rule@>@;
-    }
-}
-
-@ @<Set up a new proper start rule@> = {
-  NRL new_start_nrl;
-
-  const NSY new_start_nsy = nsy_new(g, start_isy);
-  const NSYID new_start_nsyid = ID_of_NSY(new_start_nsy);
-  g->t_start_nsyid = new_start_nsyid;
-
-  new_start_nrl = nrl_start(g, 1);
-  LHSID_of_NRL(new_start_nrl) = new_start_nsyid;
-  RHSID_of_NRL(new_start_nrl, 0) = NSYID_of_ISY(start_isy);
-  nrl_finish(g, new_start_nrl);
-  NRL_has_Virtual_LHS (new_start_nrl) = 1;
-  Real_SYM_Count_of_NRL (new_start_nrl) = 1;
-  g->t_start_nrl = new_start_nrl;
-
 }
 
 @** Loops.
