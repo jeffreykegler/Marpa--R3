@@ -184,10 +184,6 @@ AHM 22: dot=0; nulls=0
     [:start:] ::= . Statement
 AHM 23: completion; dot=1; nulls=0
     [:start:] ::= Statement .
-AHM 24: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 25: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_AHMS
 
 my $earley_sets_show_output_before = $recce->earley_sets_show();
@@ -196,8 +192,6 @@ Marpa::R3::Test::is( $earley_sets_show_output_before,
     <<'END_EARLEY_SETS', 'Leo Example Earley Sets "Before"' );
 Last Completed: 9; Furthest: 9
 Earley Set 0
-ahm24: R8:0@0-0
-  R8:0: [:start:]['] ::= . [:start:]
 ahm22: R7:0@0-0
   R7:0: [:start:] ::= . Statement
 ahm0: R0:0@0-0
@@ -227,9 +221,6 @@ ahm1: R0$@0-1
 ahm23: R7$@0-1
   R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-1]
-ahm25: R8$@0-1
-  R8$: [:start:]['] ::= [:start:] .
-  [p=R8:0@0-0; c=R7$@0-1]
 ahm15: R4:1@0-1
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@0-0; c=R6$@0-1]
@@ -275,9 +266,6 @@ ahm1: R0$@0-3
 ahm23: R7$@0-3
   R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-3]
-ahm25: R8$@0-3
-  R8$: [:start:]['] ::= [:start:] .
-  [p=R8:0@0-0; c=R7$@0-3]
 ahm15: R4:1@2-3
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@2-2; c=R6$@2-3]
@@ -323,9 +311,6 @@ ahm1: R0$@0-5
 ahm23: R7$@0-5
   R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-5]
-ahm25: R8$@0-5
-  R8$: [:start:]['] ::= [:start:] .
-  [p=R8:0@0-0; c=R7$@0-5]
 ahm15: R4:1@4-5
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@4-4; c=R6$@4-5]
@@ -371,9 +356,6 @@ ahm1: R0$@0-7
 ahm23: R7$@0-7
   R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-7]
-ahm25: R8$@0-7
-  R8$: [:start:]['] ::= [:start:] .
-  [p=R8:0@0-0; c=R7$@0-7]
 ahm15: R4:1@6-7
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@6-6; c=R6$@6-7]
@@ -419,9 +401,6 @@ ahm1: R0$@0-9
 ahm23: R7$@0-9
   R7$: [:start:] ::= Statement .
   [p=R7:0@0-0; c=R0$@0-9]
-ahm25: R8$@0-9
-  R8$: [:start:]['] ::= [:start:] .
-  [p=R8:0@0-0; c=R7$@0-9]
 ahm15: R4:1@8-9
   R4:1: Expression ::= Lvalue . MultiplyAssignOp Expression
   [p=R4:0@8-8; c=R6$@8-9]
@@ -462,8 +441,6 @@ Popping 3 values to evaluate R1:3@0-9C2@2, rule: Expression ::= Lvalue AssignOp 
 Calculated and pushed value: 42
 Popping 1 values to evaluate R0:1@0-9C1@0, rule: Statement ::= Expression
 Calculated and pushed value: 'a=42 b=42 c=-5 d=6 e=3'
-New Virtual Rule: R8:1@0-9C7@0, rule: 8: [:start:]['] ::= [:start:]
-Real symbol count is 1
 END_TRACE_OUTPUT
 
 Marpa::R3::Test::is( $trace_output, $expected_trace_output,

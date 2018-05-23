@@ -162,10 +162,6 @@ AHM 18: dot=0; nulls=0
     [:start:] ::= . E
 AHM 19: completion; dot=1; nulls=0
     [:start:] ::= E .
-AHM 20: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 21: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_AHMS
 
 my %expected = map { ( $_ => 1 ) } (

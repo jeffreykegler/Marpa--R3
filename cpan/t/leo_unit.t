@@ -104,10 +104,6 @@ AHM 10: dot=0; nulls=0
     [:start:] ::= . A
 AHM 11: completion; dot=1; nulls=0
     [:start:] ::= A .
-AHM 12: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 13: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my $recce = Marpa::R3::Recognizer->new(
@@ -123,7 +119,7 @@ TOKEN: for ( my $i = 0; $i < $length_of_input; $i++ ) {
 }
 
 my $max_size = List::Util::max(@sizes);
-my $expected_size = 6;
+my $expected_size = 5;
 Marpa::R3::Test::is( $max_size, $expected_size,
     "Earley set size was $max_size; $expected_size was expected" );
 
