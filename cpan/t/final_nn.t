@@ -117,10 +117,6 @@ AHM 21: dot=0; nulls=0
     [:start:] ::= . S
 AHM 22: completion; dot=1; nulls=0
     [:start:] ::= S .
-AHM 23: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 24: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 END_OF_STRING
 
 my @expected = map {

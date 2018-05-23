@@ -101,7 +101,6 @@ Marpa::R3::Test::is( $grammar->nsys_show(),
 6: [Lex-0]
 7: S[R0:1]
 8: S[R0:2]
-9: [:start:][']
 EOS
 
 Marpa::R3::Test::is( $grammar->nrls_show(),
@@ -117,7 +116,6 @@ Marpa::R3::Test::is( $grammar->nrls_show(),
 8: S[R0:2] ::= A[] A
 9: A ::= [Lex-0]
 10: [:start:] ::= S
-11: [:start:]['] ::= [:start:]
 EOS
 
 # This is in term of ISYs. We don't track these properties for
@@ -252,14 +250,6 @@ AHM 24: completion; dot=1; nulls=0
     [:start:] ::= S .
     {
         brick = { 2 }
-    }
-AHM 25: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-    {}
-AHM 26: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
-    {
-        brick = { 4 }
     }
 EOS
 
@@ -439,19 +429,18 @@ And-node #0: R2:1@0-0S1@0
 And-node #3: R0:1@0-1C9@0
 And-node #2: R3:1@0-1C9@0
 And-node #1: R9:1@0-1S6@0
-And-node #21: R0:2@0-3C3@1
-And-node #20: R0:2@0-3C5@1
+And-node #20: R0:2@0-3C3@1
+And-node #19: R0:2@0-3C5@1
 And-node #16: R2:2@0-3C3@0
 And-node #15: R3:2@0-3C6@1
 And-node #18: R10:1@0-3C0@0
 And-node #17: R10:1@0-3C2@0
-And-node #19: R11:1@0-3C10@0
 And-node #4: R5:1@1-1S1@1
 And-node #6: R3:1@1-2C9@1
 And-node #7: R6:1@1-2C9@1
 And-node #5: R9:1@1-2S6@1
-And-node #22: R3:2@1-3C7@2
-And-node #23: R3:2@1-3C8@2
+And-node #21: R3:2@1-3C7@2
+And-node #22: R3:2@1-3C8@2
 And-node #14: R5:2@1-3C6@1
 And-node #13: R6:2@1-3C9@2
 And-node #8: R8:1@2-2S1@2
@@ -473,7 +462,6 @@ R0:2@0-3
 R2:2@0-3
 R3:2@0-3
 R10:1@0-3
-R11:1@0-3
 R5:1@1-1
 R3:1@1-2
 R6:1@1-2
@@ -511,11 +499,10 @@ END_OF_TEXT
 16: 16=R2:2@0-3 R2:1@0-0 R3:2@0-3
 17: 17=R10:1@0-3 - R2:2@0-3
 18: 17=R10:1@0-3 - R0:2@0-3
-19: 18=R11:1@0-3 - R10:1@0-3
-20: 19=R0:2@0-3 R0:1@0-1 R5:2@1-3
-21: 19=R0:2@0-3 R0:1@0-1 R3:2@1-3
-22: 20=R3:2@1-3 R3:1@1-2 R7:2@2-3
-23: 20=R3:2@1-3 R3:1@1-2 R8:2@2-3
+19: 18=R0:2@0-3 R0:1@0-1 R5:2@1-3
+20: 18=R0:2@0-3 R0:1@0-1 R3:2@1-3
+21: 19=R3:2@1-3 R3:1@1-2 R7:2@2-3
+22: 19=R3:2@1-3 R3:1@1-2 R8:2@2-3
 END_OF_TEXT
 
                 Marpa::R3::Test::is( $valuer->bocage_show(), $bocage_output,
@@ -566,8 +553,6 @@ RECCE_TESTS_FOLDED_FROM_ah2_t: {
 my $expected_earley_sets = <<'END_OF_SETS';
 Last Completed: 4; Furthest: 4
 Earley Set 0
-ahm25: R11:0@0-0
-  R11:0: [:start:]['] ::= . [:start:]
 ahm23: R10:0@0-0
   R10:0: [:start:] ::= . S
 ahm0: R0:0@0-0
@@ -619,9 +604,6 @@ ahm24: R10$@0-1
   R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R1$@0-1]
   [p=R10:0@0-0; c=R2$@0-1]
-ahm26: R11$@0-1
-  R11$: [:start:]['] ::= [:start:] .
-  [p=R11:0@0-0; c=R10$@0-1]
 ahm6: R2$@0-1
   R2$: S ::= A[] S[R0:1] .
   [p=R2:1@0-0; c=R4$@0-1]
@@ -677,9 +659,6 @@ ahm24: R10$@0-2
   R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R0$@0-2]
   [p=R10:0@0-0; c=R2$@0-2]
-ahm26: R11$@0-2
-  R11$: [:start:]['] ::= [:start:] .
-  [p=R11:0@0-0; c=R10$@0-2]
 ahm13: R5$@1-2
   R5$: S[R0:1] ::= A[] S[R0:2] .
   [p=R5:1@1-1; c=R7$@1-2]
@@ -729,9 +708,6 @@ ahm24: R10$@0-3
   R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R0$@0-3]
   [p=R10:0@0-0; c=R2$@0-3]
-ahm26: R11$@0-3
-  R11$: [:start:]['] ::= [:start:] .
-  [p=R11:0@0-0; c=R10$@0-3]
 ahm2: R0$@0-3
   R0$: S ::= A S[R0:1] .
   [p=R0:1@0-1; c=R3$@1-3]
@@ -758,9 +734,6 @@ ahm2: R0$@0-4
 ahm24: R10$@0-4
   R10$: [:start:] ::= S .
   [p=R10:0@0-0; c=R0$@0-4]
-ahm26: R11$@0-4
-  R11$: [:start:]['] ::= [:start:] .
-  [p=R11:0@0-0; c=R10$@0-4]
 END_OF_SETS
 
 Marpa::R3::Test::is(

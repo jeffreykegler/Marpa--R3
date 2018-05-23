@@ -159,10 +159,6 @@ AHM 6: dot=0; nulls=0
     [:start:] ::= . E
 AHM 7: completion; dot=1; nulls=0
     [:start:] ::= E .
-AHM 8: dot=0; nulls=0
-    [:start:]['] ::= . [:start:]
-AHM 9: completion; dot=1; nulls=0
-    [:start:]['] ::= [:start:] .
 EOS
 
 my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
@@ -177,8 +173,6 @@ print $recce->earley_sets_show()
 my $expected_earley_sets = <<'END_OF_EARLEY_SETS';
 Last Completed: 7; Furthest: 7
 Earley Set 0
-ahm8: R3:0@0-0
-  R3:0: [:start:]['] ::= . [:start:]
 ahm6: R2:0@0-0
   R2:0: [:start:] ::= . E
 ahm0: R0:0@0-0
@@ -195,9 +189,6 @@ ahm1: R0:1@0-1
 ahm7: R2$@0-1
   R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R1$@0-1]
-ahm9: R3$@0-1
-  R3$: [:start:]['] ::= [:start:] .
-  [p=R3:0@0-0; c=R2$@0-1]
 Earley Set 2
 ahm2: R0:2@0-2
   R0:2: E ::= E Op . E
@@ -222,9 +213,6 @@ ahm1: R0:1@0-3
 ahm7: R2$@0-3
   R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R0$@0-3]
-ahm9: R3$@0-3
-  R3$: [:start:]['] ::= [:start:] .
-  [p=R3:0@0-0; c=R2$@0-3]
 Earley Set 4
 ahm2: R0:2@0-4
   R0:2: E ::= E Op . E
@@ -256,9 +244,6 @@ ahm1: R0:1@0-5
 ahm7: R2$@0-5
   R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R0$@0-5]
-ahm9: R3$@0-5
-  R3$: [:start:]['] ::= [:start:] .
-  [p=R3:0@0-0; c=R2$@0-5]
 ahm1: R0:1@2-5
   R0:1: E ::= E . Op E
   [p=R0:0@2-2; c=R0$@2-5]
@@ -304,9 +289,6 @@ ahm1: R0:1@0-7
 ahm7: R2$@0-7
   R2$: [:start:] ::= E .
   [p=R2:0@0-0; c=R0$@0-7]
-ahm9: R3$@0-7
-  R3$: [:start:]['] ::= [:start:] .
-  [p=R3:0@0-0; c=R2$@0-7]
 ahm1: R0:1@4-7
   R0:1: E ::= E . Op E
   [p=R0:0@4-4; c=R0$@4-7]
