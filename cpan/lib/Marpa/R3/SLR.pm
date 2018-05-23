@@ -91,9 +91,6 @@ sub Marpa::R3::Internal::meta_recce {
     my ($hash_args) = @_;
     state $meta_grammar = Marpa::R3::Internal::meta_grammar();
     $hash_args->{grammar} = $meta_grammar;
-    $hash_args->{trace_terminals} = 99;
-    say STDERR $meta_grammar->g1_symbols_show( 99 );
-    say STDERR $meta_grammar->l0_symbols_show( 99 );
     my $self = Marpa::R3::Recognizer->new($hash_args);
     return $self;
 } ## end sub Marpa::R3::Internal::meta_recce

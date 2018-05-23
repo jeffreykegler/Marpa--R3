@@ -2288,7 +2288,6 @@ nrl_finish( GRAMMAR g, NRL nrl)
 {
   int symbol_ix;
   const NRL new_nrl = nrl_start (g, rewrite_irl_length);
-  if (1) { g->t_start_nrl = new_nrl; }
   Source_IRL_of_NRL (new_nrl) = rule;
   Rank_of_NRL(new_nrl) = NRL_Rank_by_IRL(rule);
   for (symbol_ix = 0; symbol_ix <= rewrite_irl_length; symbol_ix++)
@@ -2296,8 +2295,11 @@ nrl_finish( GRAMMAR g, NRL nrl)
       new_nrl->t_nsyid_array[symbol_ix] =
         NSYID_by_ISYID(rule->t_symbols[symbol_ix]);
     }
-  if (1) { g->t_start_nsyid = LHSID_of_NRL(new_nrl); }
   nrl_finish(g, new_nrl);
+  if (1) { g->t_start_nrl = new_nrl; }
+  if (1) { g->t_start_nsyid = LHSID_of_NRL(new_nrl); }
+    MARPA_DEBUG3("At %s, start nsyid is %ld", STRLOC, (long)(g->t_start_nsyid));
+    MARPA_DEBUG3("At %s, start nrl is %ld", STRLOC, (long)ID_of_NRL(new_nrl));
 }
 
 @ @<Function definitions@> =
@@ -4171,7 +4173,7 @@ int _marpa_g_nrl_is_chaf(
           @<Factor the rule into CHAF rules@>@;
           continue;
         }
-      if (g->t_start_isy_id == rule_id) {
+      if (g->t_start_isy_id == LHS_ID_of_IRL(rule)) {
         @<Clone a new start NRL from |rule|@>@;
         continue;
       }
@@ -5672,13 +5674,16 @@ with |S2| on its LHS.
   g->t_bv_nsyid_is_terminal = bv_obs_create (g->t_obs, nsy_count);
   for (isy_id = 0; isy_id < post_census_isy_count; isy_id++)
     {
+      MARPA_DEBUG3("At %s, examining terminal bit for isy %ld", STRLOC, (long)isy_id);
       if (ISYID_is_Terminal (isy_id))
         {
           /* A terminal might have no corresponding NSY.
             Currently that can happen if it is not accessible */
+          MARPA_DEBUG3("At %s, setting terminal bit from isy %ld", STRLOC, (long)isy_id);
           const NSY nsy = NSY_of_ISY (ISY_by_ID (isy_id));
           if (nsy)
             {
+              MARPA_DEBUG3("At %s, setting terminal bit to nsy %ld", STRLOC, (long)ID_of_NSY(nsy));
               bv_bit_set (g->t_bv_nsyid_is_terminal,
                            ID_of_NSY (nsy));
             }
@@ -6344,6 +6349,8 @@ int marpa_r_terminals_expected(Marpa_Recognizer r, Marpa_Symbol_ID* buffer)
       for (nsyid = min; nsyid <= max; nsyid++)
 	{
 	  const ISY isy = Source_ISY_of_NSYID (nsyid);
+          MARPA_DEBUG3("At %s, setting terminal expected bit from nsy %ld", STRLOC, (long)nsyid);
+          MARPA_DEBUG3("At %s, setting terminal expected bit to isy %ld", STRLOC, (long)ID_of_ISY(isy));
 	  bv_bit_set (bv_terminals, ID_of_ISY (isy));
 	}
     }
