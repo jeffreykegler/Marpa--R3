@@ -3482,6 +3482,7 @@ together.
         slr:g1_convert_events()
 
         if trace_terminals > 1 then
+             iprint('about to call terminals expected:')
             local terminals_expected = slr.g1:terminals_expected()
             table.sort(terminals_expected)
             iprint('terminals expected:', terminals_expected)
@@ -3864,6 +3865,10 @@ otherwise `false` and a status string.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.l0_read_lexeme(slr)
+        -- TODO Remove this block after development
+        if slr.trace_terminals > 0 then
+            iprint('starting l0_read_lexeme')
+        end
         if not slr.l0 then
             slr:l0r_new()
         end
@@ -3877,6 +3882,10 @@ otherwise `false` and a status string.
             local alive, status = slr:l0_read_codepoint()
             local this_candidate, eager = slr:l0_track_candidates()
             if this_candidate then slr.l0_candidate = this_candidate end
+            -- TODO Remove this block after development
+            if slr.trace_terminals > 0 then
+                iprint('l0_read_lexeme, this_candiate, eager, alive:', this_candidate, eager, alive)
+            end
             if eager then return true end
             if not alive then return false, status end
             slr:block_move(offset + 1)
@@ -3916,6 +3925,14 @@ rule, false otherwise.
     function _M.class_slr.l0_track_candidates(slr)
         local l0r = slr.l0
         local slg = slr.slg
+        -- TODO remove this block after development
+        if slr.trace_terminals > 0 then
+            iprint('starting l0_track_candidates')
+            iprint('nsys_show():', slg.g1:nsys_show())
+            iprint('nrls_show():', slg:g1_nrls_show())
+            iprint('g1_rules_show():', slg:g1_rules_show({ verbose = 3}))
+            iprint('g1_progress_show():\n', slr:g1_progress_show())
+        end
         local l0g = slg.l0
         local l0_rules = slr.l0_irls
         local eager = false
@@ -3924,6 +3941,10 @@ rule, false otherwise.
         -- Do we have a completion of a lexeme rule?
         local max_eim = l0r:_earley_set_size(es_id) - 1
         for eim_id = 0, max_eim do
+            -- TODO remove this block after development
+            if slr.trace_terminals > 0 then
+                iprint('l0_track_candidates loop, eim_id:', eim_id)
+            end
             local trv = _M.traverser_new(l0r, es_id, eim_id)
             local irl_id = trv:rule_id()
             if not irl_id then goto NEXT_EIM end
@@ -3934,6 +3955,10 @@ rule, false otherwise.
             -- may matter; right now it does not.
             eager = eager or l0_rules[irl_id].eager
             ::NEXT_EIM::
+        end
+        -- TODO remove this block after development
+        if slr.trace_terminals > 0 then
+            iprint('ending l0_track_candidates')
         end
         if complete_lexemes then return es_id, eager end
         return
@@ -4023,7 +4048,11 @@ TODO: Is the status string needed/used?
             -- inspect(elect_earley_set))
         -- end
         -- end of TODO
+        -- TODO remove next line after development
+        if slr.trace_terminals > 0 then iprint('before exhaustion possibility 1') end
         if not elect_earley_set then return false, exhausted() end
+        -- TODO remove next line after development
+        if slr.trace_terminals > 0 then iprint('after exhaustion possibility 1') end
         local working_pos = slr.start_of_lexeme + elect_earley_set
         local return_value = l0r:progress_report_start(elect_earley_set)
         if return_value < 0 then
@@ -4035,7 +4064,11 @@ TODO: Is the status string needed/used?
         slr:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = slr.accept_queue
         if #accept_q <= 0 then
+            -- TODO remove next line after development
+            if slr.trace_terminals > 0 then iprint('before exhaustion possibility 2') end
             if discarded <= 0 then return false, exhausted() end
+            -- TODO remove next line after development
+            if slr.trace_terminals > 0 then iprint('after exhaustion possibility 2') end
             -- if here, no accepted lexemes, but discarded ones
             slr:block_move(working_pos)
             local latest_es = slr.g1:latest_earley_set()
@@ -8711,9 +8744,6 @@ indexed by isyid.
         end
 
         local suffix = ''
-        if nsy_id == grammar:_start_nsy() then
-            suffix = suffix .. "[']"
-        end
         local is_nulling = grammar:_nsy_is_nulling(nsy_id)
         if is_nulling then suffix = suffix .. "[]" end
 
@@ -12261,7 +12291,14 @@ Combines `print` and `inspect`.
         local args = {...}
         local results = {}
         for ix = 1, #args do
-            results[#results+1] = inspect(args[ix], { depth=2 } )
+            local arg = args[ix]
+            local arg_type = type(arg)
+            if arg_type == 'string' then
+                table.insert(results, arg)
+                goto ARG
+            end
+            table.insert(results, inspect(args[ix], { depth=2 } ))
+            ::ARG::
         end
         io.stderr:write( table.concat(results, '    ') .. "\n")
     end
