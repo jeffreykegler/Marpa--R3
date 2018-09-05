@@ -4394,7 +4394,7 @@ otherwise the new offset.
         if slr.is_lo_level_scanning then
            return error_lo_hi_scanning("slr.lexeme_read_string()")
         end
-        local ok = lexeme_alternative_i(slr, symbol_name, input_string )
+        local ok = lexeme_alternative_i(slr, symbol_name, input_string, 1)
         if not ok then return end
         local save_block = slr:block_progress()
         local new_block_id = slr:block_progress(slr:block_new(input_string))
@@ -4418,9 +4418,10 @@ otherwise the new offset.
             = slr:block_check_range(block_id_arg, offset_arg, length_arg)
         local ok
         if token_sv then
-            ok = lexeme_alternative_i(slr, symbol_name, token_sv )
+            ok = lexeme_alternative_i(slr, symbol_name, token_sv, 1)
         else
-            ok = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
+            ok = lexeme_alternative_i2(slr, symbol_name,
+                _M.defines.TOKEN_VALUE_IS_UNDEF, 1)
         end
         if not ok then return end
         local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
@@ -4435,7 +4436,8 @@ otherwise the new offset.
         end
         local block_id, offset, eoread
             = slr:block_check_range(block_id_arg, offset_arg, length_arg)
-        local ok = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
+        local ok = lexeme_alternative_i2(slr, symbol_name,
+            _M.defines.TOKEN_VALUE_IS_LITERAL, 1)
         local new_offset = slr:lexeme_complete(block_id, offset, eoread-offset)
         slr:convert_libmarpa_events()
         return new_offset
@@ -4459,7 +4461,7 @@ Other errors are thrown.
     -- miranda: section+ forward declarations
     local lexeme_alternative_i2
     -- miranda: section+ most Lua function definitions
-    function lexeme_alternative_i2(slr, symbol_name, token_ix)
+    function lexeme_alternative_i2(slr, symbol_name, token_ix, length)
         local slg = slr.slg
         local xsy = slg.xsys[symbol_name]
         if not xsy then
@@ -4475,7 +4477,10 @@ Other errors are thrown.
         end
         local symbol_id = lexeme.g1_isy.id
         local g1r = slr.g1
-        local return_value = g1r:alternative(symbol_id, token_ix, 1)
+
+    if not length then print( debug.traceback()) end
+
+        local return_value = g1r:alternative(symbol_id, token_ix, length)
         if return_value == _M.err.NONE then return 1 end
         if return_value == _M.err.UNEXPECTED_TOKEN_ID then return end
         -- Soft failure on last two error codes
@@ -4494,10 +4499,10 @@ Other errors are thrown.
     -- miranda: section+ forward declarations
     local lexeme_alternative_i
     -- miranda: section+ most Lua function definitions
-    function lexeme_alternative_i(slr, symbol_name, token)
+    function lexeme_alternative_i(slr, symbol_name, token, length)
         local token_ix = #slr.token_values + 1
         slr.token_values[token_ix] = token
-        return lexeme_alternative_i2(slr, symbol_name, token_ix)
+        return lexeme_alternative_i2(slr, symbol_name, token_ix, length)
     end
 ```
 
@@ -4506,20 +4511,25 @@ methods
 
 ```
     -- miranda: section+ most Lua function definitions
-    function _M.class_slr.lexeme_alternative_literal(slr, symbol_name)
-        local accepted = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL)
+    function _M.class_slr.lexeme_alternative_literal(slr, symbol_name, length)
+        length = length or 1
+        local accepted =
+            lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_LITERAL, length)
         if not accepted then return end
         slr.is_lo_level_scanning = true
         return accepted
     end
-    function _M.class_slr.lexeme_alternative_undef(slr, symbol_name)
-        local accepted = lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF)
+    function _M.class_slr.lexeme_alternative_undef(slr, symbol_name, length)
+        length = length or 1
+        local accepted =
+            lexeme_alternative_i2(slr, symbol_name, _M.defines.TOKEN_VALUE_IS_UNDEF, length)
         if not accepted then return end
         slr.is_lo_level_scanning = true
         return accepted
     end
-    function _M.class_slr.lexeme_alternative(slr, symbol_name, token)
-        local accepted = lexeme_alternative_i(slr, symbol_name, token)
+    function _M.class_slr.lexeme_alternative(slr, symbol_name, token, length)
+        length = length or 1
+        local accepted = lexeme_alternative_i(slr, symbol_name, token, length)
         if not accepted then return end
         slr.is_lo_level_scanning = true
         return accepted
