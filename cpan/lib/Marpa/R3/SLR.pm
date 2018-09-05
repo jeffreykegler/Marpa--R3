@@ -617,7 +617,8 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Recognizer::lexeme_alternative_literal {
-    my ( $slr, $symbol_name ) = @_;
+    my ( $slr, $symbol_name, $length ) = @_;
+    $length //= 1;
 
     Marpa::R3::exception(
         "slr->alternative_literal(): symbol name is undefined\n",
@@ -625,16 +626,17 @@ sub Marpa::R3::Recognizer::lexeme_alternative_literal {
     ) if not defined $symbol_name;
 
     my ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_name);
-        local slr, symbol_name = ...
-        return slr:lexeme_alternative_literal(symbol_name)
+        <<'END_OF_LUA', 'si', $symbol_name, $length);
+        local slr, symbol_name, length = ...
+        return slr:lexeme_alternative_literal(symbol_name, length)
 END_OF_LUA
     return 1 if $ok;
     return;
 }
 
 sub Marpa::R3::Recognizer::lexeme_alternative {
-    my ( $slr, $symbol_name, $value ) = @_;
+    my ( $slr, $symbol_name, $value, $length ) = @_;
+    $length //= 1;
 
     if ( Scalar::Util::tainted( $value ) ) {
         Marpa::R3::exception(
@@ -651,15 +653,15 @@ sub Marpa::R3::Recognizer::lexeme_alternative {
     my $ok;
     if (defined $value) {
     ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 'sS', $symbol_name, $value );
-        local slr, symbol_name, token_sv = ...
-        return slr:lexeme_alternative(symbol_name, token_sv)
+        <<'END_OF_LUA', 'sSi', $symbol_name, $value, $length );
+        local slr, symbol_name, token_sv, length = ...
+        return slr:lexeme_alternative(symbol_name, token_sv, length)
 END_OF_LUA
     } else {
     ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_name );
+        <<'END_OF_LUA', 's', $symbol_name, $length );
         local slr, symbol_name = ...
-        return slr:lexeme_alternative_undef(symbol_name )
+        return slr:lexeme_alternative_undef(symbol_name, length )
 END_OF_LUA
     }
 
