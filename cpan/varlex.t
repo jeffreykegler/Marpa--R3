@@ -62,12 +62,11 @@ sub do_test {
     my ($main_block) = $recce->block_progress();
 
     my $length = length $string;
-    pos $string = 0;
   TOKEN: while (1) {
-        my $start_of_lexeme = pos $string;
+        my (undef, $start_of_lexeme) = $recce->block_progress();
         last TOKEN if $start_of_lexeme >= $length;
-        for my $lexeme_length ( $start_of_lexeme .. $length ) {
-            my $ok = $reader->( $recce, $length - $start_of_lexeme );
+        for my $lexeme_length ( 1 .. $length - $start_of_lexeme ) {
+            my $ok = $reader->( $recce, $lexeme_length );
             die qq{Parser rejected symbol at position $start_of_lexeme}
                 if not defined $ok;
         }
