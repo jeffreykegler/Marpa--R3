@@ -7427,7 +7427,10 @@ if not the value is an undef.
         end
         local stack = slv.lmw_v.stack
         local result_ix = slv.this_step.result
-        stack[result_ix] = slv:current_token_literal()
+        if slv.this_step.value == slr.token_is_undef then
+          return op_fn_result_is_undef(slv)
+        end
+        stack[result_ix] = slv:current_token_value()
         return 'continue'
     end
     op_fn_add("result_is_token_value", op_fn_result_is_token_value)
@@ -7563,16 +7566,14 @@ Push one of the RHS child values onto the values array.
 
 #### Find current token literal
 
-`current_token_literal` return the literal
-equivalent of the current token.
-It assumes that there *is* a current token,
-that is,
-it assumes that the caller has ensured that
-`slv.this_step.type ~= 'MARPA_STEP_TOKEN'`.
+`current_token_value` returns the value of the current token, calculating
+its literal equivalent if that is what is called for.  It assumes that
+there *is* a current token, that is, it assumes that the caller has
+ensured that `slv.this_step.type ~= 'MARPA_STEP_TOKEN'`.
 
 ```
     -- miranda: section+ VM operations
-    function _M.class_slv.current_token_literal(slv)
+    function _M.class_slv.current_token_value(slv)
       local slr = slv.slr
       if slr.token_is_literal == slv.this_step.value then
           local start_es = slv.this_step.start_es_id
@@ -7604,7 +7605,7 @@ Otherwise the values of the RHS children are pushed.
         local slr = slv.slr
         if slv.this_step.type == 'MARPA_STEP_TOKEN' then
             local next_ix = #new_values + 1;
-            new_values[next_ix] = slv:current_token_literal()
+            new_values[next_ix] = slv:current_token_value()
             return
         end
         if slv.this_step.type == 'MARPA_STEP_RULE' then
