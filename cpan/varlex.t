@@ -34,6 +34,18 @@ sub value_reader {
     return $ok;
 }
 
+sub undef_reader {
+    my ( $recce, $lexeme_length ) = @_;
+    my $ok = $recce->lexeme_alternative( 'A', undef, $lexeme_length );
+    return $ok;
+}
+
+sub literal_reader {
+    my ( $recce, $lexeme_length ) = @_;
+    my $ok = $recce->lexeme_alternative_literal( 'A', $lexeme_length );
+    return $ok;
+}
+
 my $grammar = Marpa::R3::Grammar->new(
     {
         source        => \(<<'END_OF_SOURCE'),
@@ -53,7 +65,6 @@ END_OF_SOURCE
 sub do_test {
     my ($hash) = @_;
     my $reader = $hash->{reader};
-    my $valuer = $hash->{valuer} || \&hi_valuer;
     my $string = 'aaaa';
     my $recce  = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
@@ -74,15 +85,16 @@ sub do_test {
         my $new_offset =
           $recce->lexeme_complete( $block_id, $start_of_lexeme, 1 );
     } ## end TOKEN: while (1)
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
   VALUE: while (1) {
-        my $value_ref = $recce->value();
+        my $value_ref = $valuer->value();
         last VALUE if not $value_ref;
         say STDERR Data::Dumper::Dumper($value_ref);
     }
 }
 
 do_test( { reader => \&value_reader } );
-# do_test( { reader => \&undef_reader } );
-# do_test( { reader => \&literal_reader } );
+do_test( { reader => \&undef_reader } );
+do_test( { reader => \&literal_reader } );
 
 # vim: expandtab shiftwidth=4:

@@ -659,8 +659,8 @@ sub Marpa::R3::Recognizer::lexeme_alternative {
 END_OF_LUA
     } else {
     ($ok) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-        <<'END_OF_LUA', 's', $symbol_name, $length );
-        local slr, symbol_name = ...
+        <<'END_OF_LUA', 'si', $symbol_name, $length );
+        local slr, symbol_name, length = ...
         return slr:lexeme_alternative_undef(symbol_name, length )
 END_OF_LUA
     }
