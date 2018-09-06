@@ -3507,12 +3507,12 @@ together.
         end
         slr.token_values = {}
         slr.token_is_undef = 1
-        slr.token_values[slr.token_is_undef] = coroutine.yield('perl_undef')
+        slr.token_values[slr.token_is_undef] = '[undef]'
 
         -- token is literal is a pseudo-index, and the SV undef
         -- is just a place holder
         slr.token_is_literal = 2
-        slr.token_values[slr.token_is_literal] = coroutine.yield('perl_undef')
+        slr.token_values[slr.token_is_literal] = '[literal]'
 
         return slr
     end
