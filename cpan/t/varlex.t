@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 3;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -64,7 +64,9 @@ END_OF_SOURCE
 
 sub do_test {
     my ($hash) = @_;
+    my $name = $hash->{name};
     my $reader = $hash->{reader};
+    my $expected = $hash->{expected};
     my $string = 'aaaa';
     my $recce  = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
@@ -86,15 +88,56 @@ sub do_test {
           $recce->lexeme_complete( $block_id, $start_of_lexeme, 1 );
     } ## end TOKEN: while (1)
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
+  my @values;
+
+  local $Data::Dumper::Terse = 1;        # don't output names where feasible
+  local $Data::Dumper::Indent = 0;       # turn off all pretty print
+  
   VALUE: while (1) {
         my $value_ref = $valuer->value();
         last VALUE if not $value_ref;
-        say STDERR Data::Dumper::Dumper($value_ref);
+        my $value = Data::Dumper::Dumper($value_ref);
+        push @values, $value;
     }
+    @values = sort { $a cmp $b } @values;
+    Test::More::is_deeply(\@values, $expected, qq{"$name" test});
 }
 
-do_test( { reader => \&value_reader } );
-do_test( { reader => \&undef_reader } );
-do_test( { reader => \&literal_reader } );
+do_test(
+    {
+        name     => 'value',
+        reader   => \&value_reader,
+        expected => [
+            '\\[42,42,42,42]', '\\[42,42,42]',
+            '\\[42,42,42]',    '\\[42,42,42]',
+            '\\[42,42]',       '\\[42,42]',
+            '\\[42,42]',       '\\[42]'
+        ]
+    }
+);
+do_test(
+    {
+        name     => 'undef',
+        reader   => \&undef_reader,
+        expected => [
+            '\\[undef,undef,undef,undef]', '\\[undef,undef,undef]',
+            '\\[undef,undef,undef]',       '\\[undef,undef,undef]',
+            '\\[undef,undef]',             '\\[undef,undef]',
+            '\\[undef,undef]',             '\\[undef]'
+        ]
+    }
+);
+do_test(
+    {
+        name     => 'literal',
+        reader   => \&literal_reader,
+        expected => [
+            '\\[\'a\',\'a\',\'a\',\'a\']', '\\[\'a\',\'a\',\'aa\']',
+            '\\[\'a\',\'aa\',\'a\']',      '\\[\'a\',\'aaa\']',
+            '\\[\'aa\',\'a\',\'a\']',      '\\[\'aa\',\'aa\']',
+            '\\[\'aaa\',\'a\']',           '\\[\'aaaa\']'
+        ]
+    }
+);
 
 # vim: expandtab shiftwidth=4:
