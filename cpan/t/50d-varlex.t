@@ -10,7 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Test of SLIF external interface
+# Test displays for variable-length lexemes
 
 use 5.010001;
 
@@ -30,7 +30,7 @@ use Marpa::R3;
 
 my $grammar = Marpa::R3::Grammar->new(
     {
-        source        => \(<<'END_OF_SOURCE'),
+        source => \(<<'END_OF_SOURCE'),
 :default ::= action => ::array
 As ::= A+
 
@@ -44,30 +44,38 @@ END_OF_SOURCE
     }
 );
 
-    my ($hash) = @_;
-    my $reader = $hash->{reader};
-    my $expected = '\\[42]';
-    my $string = 'aaaaa';
-    my $recce  = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
 
-    $recce->read( \$string, 0, 0 );
+my $string   = 'aaaaa';
+$recce->read( \$string, 0, 0 );
 
-    my $ok;
+my $ok;
 
-    $ok = $recce->lexeme_alternative( 'A', 42, 2 );
+# Marpa::R3::Display
+# name: recognizer lexeme_alternative() variable length synopsis
 
-          $recce->lexeme_complete( undef,undef, 2 );
+$ok = $recce->lexeme_alternative( 'A', 42, 2 );
 
-    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+# Marpa::R3::Display::End
 
-          $recce->lexeme_complete( undef,undef, 3 );
+$recce->lexeme_complete( undef, undef, 2 );
 
-  local $Data::Dumper::Terse = 1;        # don't output names where feasible
-  local $Data::Dumper::Indent = 0;       # turn off all pretty print
-  
-        my $value_ref = $recce->value();
-        my $value = Data::Dumper::Dumper($value_ref);
+# Marpa::R3::Display
+# name: recognizer lexeme_alternative_literal() variable length synopsis
 
-    Test::More::is_deeply($value, $expected, "variable length lexeme displays");
+$ok = $recce->lexeme_alternative_literal( 'A', 3 );
+
+# Marpa::R3::Display::End
+
+$recce->lexeme_complete( undef, undef, 3 );
+
+local $Data::Dumper::Terse  = 1;    # don't output names where feasible
+local $Data::Dumper::Indent = 0;    # turn off all pretty print
+
+my $value_ref = $recce->value();
+my $value     = Data::Dumper::Dumper($value_ref);
+
+my $expected = '\\[42]';
+Test::More::is_deeply( $value, $expected, "variable length lexeme displays" );
 
 # vim: expandtab shiftwidth=4:
