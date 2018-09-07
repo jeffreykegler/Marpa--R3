@@ -663,11 +663,22 @@ The C<lexeme_complete()> method
 accepts three optional arguments.
 Call them, in order,
 C<$block_id>, C<$offset> and C<$length>.
-These are treated as a
+These specify a
 L<block span|Marpa::R3::Recognizer/"Block spans">.
 The block span is used to set the literal equivalent for the
 set of alternative tokens completed by the
 C<lexeme_complete()> call.
+If C<$block_id> is not defined,
+the specified block is the current block.
+If C<$offset> is not defined,
+the specified offset is the current offset
+of the specified block.
+If C<$length> is not defined,
+the specifed length is the
+end-of-block of the specified block,
+less the specified offset --
+in other words, the specified block span
+includes the entire remaining specified block.
 
 C<lexeme_read_literal()> is an external scanning completion
 method and, with one important difference,

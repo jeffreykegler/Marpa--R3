@@ -3291,10 +3291,10 @@ and block-related methods.
     end
 
     -- assumes nothing about arguments
-    -- block_id defaults to current block if block_id_arg == nil
-    -- block_offset defaults to current offset in current block
+    -- block_id specifies current block if block_id_arg == nil
+    -- block_offset specifies current offset in specified block
     --     if block_offset_arg == nil
-    -- eoread defaults to end-of-block if length_arg == nil
+    -- eoread specifies end of specified block if length_arg == nil
     -- returns block_id, block_offset, eoread on success
     -- returns nil, error-message otherwise
     function _M.class_slr.block_check_range(slr, block_id_arg, block_offset_arg, length_arg)
