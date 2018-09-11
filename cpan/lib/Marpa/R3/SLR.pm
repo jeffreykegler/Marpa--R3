@@ -117,7 +117,7 @@ sub gen_app_event_handler {
           $slr->[Marpa::R3::Internal_R::CURRENT_EVENT];
         if ($current_event) {
             Marpa::R3::exception(
-                qq{Attempt to throw call one event handler inside another\n},
+                qq{Attempt to call one event handler inside another\n},
                 qq{  This is not allowed\n},
                 qq{  The currently active handler is for a "$current_event" event\n},
                 qq{  The attempted handler call is for a "$event_name" event\n}
