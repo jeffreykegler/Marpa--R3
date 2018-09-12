@@ -604,6 +604,19 @@ END_OF_LUA
     return $furthest_earleme;
 }
 
+# Not documented, I think
+sub Marpa::R3::Recognizer::latest_earleme {
+    my ($slr) = @_;
+    my ($latest_earleme) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', '');
+    local recce = ...
+    local latest_earleme = recce.g1:latest_earleme()
+    return latest_earleme
+END_OF_LUA
+    return $latest_earleme;
+}
+
 sub Marpa::R3::Recognizer::earleme {
     my ( $slr, $earley_set_id ) = @_;
     my ($earleme) = $slr->call_by_tag(

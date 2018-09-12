@@ -4547,19 +4547,25 @@ Always throws errors.
         local g1r = slr.g1
         slr.event_queue = {}
         slr.is_lo_level_scanning = false
-        local result = g1r:earleme_complete()
-        if result >= 0 then
-            slr:g1_convert_events()
-            local g1r = slr.g1
-            local latest_earley_set = g1r:latest_earley_set()
-            slr.per_es[latest_earley_set] =
-                { block_id, offset, longueur }
-            local new_offset = offset + longueur
-            slr:block_move(new_offset)
-            return new_offset
+        local start_earley_set = g1r:latest_earley_set()
+        local latest_earley_set = start_earley_set
+        -- Loop until we create a new earley set
+        while start_earley_set == latest_earley_set do
+            local result = g1r:earleme_complete()
+            if result < 0 then
+                return error('Problem in slr->lexeme_complete(): '
+                    ..  slr.slg.g1:error_description())
+            end
+            latest_earley_set = g1r:latest_earley_set()
         end
-        error('Problem in slr->lexeme_complete(): '
-            ..  slr.slg.g1:error_description())
+        -- As of this writing, recognizer events only occur when
+        -- an earley set is created.
+        slr:g1_convert_events()
+        slr.per_es[latest_earley_set] =
+            { block_id, offset, longueur }
+        local new_offset = offset + longueur
+        slr:block_move(new_offset)
+        return new_offset
     end
 ```
 
@@ -5021,6 +5027,41 @@ TODO: Assumes that the value is all on one block.
         return event_status, {}
     end
 
+```
+
+### G1 location accessors
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.latest_earley_set(slr)
+        local g1r = slr.g1
+        return g1r:latest_earley_set()
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.current_earleme(slr)
+        local g1r = slr.g1
+        return g1r:current_earleme()
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.furthest_earleme(slr)
+        local g1r = slr.g1
+        return g1r:furthest_earleme()
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.latest_earleme(slr)
+        local g1r = slr.g1
+        local latest_es = g1r:latest_earley_set()
+        return g1r:earleme(latest_es)
+    end
 ```
 
 ### Progress reporting

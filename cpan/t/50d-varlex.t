@@ -75,7 +75,7 @@ local $Data::Dumper::Indent = 0;    # turn off all pretty print
 my $value_ref = $recce->value();
 my $value     = Data::Dumper::Dumper($value_ref);
 
-my $expected = '\\[42]';
+my $expected = '\\[42,\'aaa\']';
 Test::More::is_deeply( $value, $expected, "variable length lexeme displays" );
 
 # vim: expandtab shiftwidth=4:
