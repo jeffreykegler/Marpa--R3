@@ -4585,6 +4585,7 @@ Always throws errors.
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
         local g1r = slr.g1
         slr.is_lo_level_scanning = false
+        slr.event_queue = {}
         local start_earley_set = g1r:latest_earley_set()
         local latest_earley_set = start_earley_set
         -- Loop until we create a new earley set
@@ -4598,7 +4599,6 @@ Always throws errors.
         end
         -- As of this writing, recognizer events only occur when
         -- an earley set is created.
-        slr.event_queue = {}
         slr:g1_convert_events()
         slr.per_es[latest_earley_set] =
             { block_id, offset, longueur }
