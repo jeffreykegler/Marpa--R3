@@ -213,6 +213,22 @@ Readers trying to familiarize themselves with Kollos
 may want to skip it
 in their first readings.
 
+### Stack
+
+This is a (in very rough order) "stack"
+of items to do short term.
+
+#### Allow lexemes on L0 RHS
+
+#### Allow zero-length literals for lexemes
+
+In `lexeme_complete()` and the `per_es` structure,
+allow zero-length literals.
+
+Create a test case for this:
+Census "creators" and "consumers" of the `per_es` structure,
+and make sure all are tested.
+
 ### Preparing for beta release
 
 The following is a checklist of things to do before beta.
