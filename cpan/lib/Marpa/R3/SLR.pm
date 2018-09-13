@@ -276,6 +276,7 @@ sub Marpa::R3::Recognizer::new {
                     say {$trace_file_handle} $msg;
                     return 'ok';
                 },
+                codepoint => gen_codepoint_event_handler($slr),
                 event => gen_app_event_handler($slr),
             }
         },
