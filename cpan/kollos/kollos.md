@@ -3432,7 +3432,7 @@ together.
 
 ```
     -- miranda: section+ class_slr field declarations
-    class_slr_fields.empty_lexeme_block = true
+    class_slr_fields.no_literal_block = true
 ```
 
 ```
@@ -3525,6 +3525,9 @@ together.
             'event_handlers'
         })
         local trace_terminals = slr.trace_terminals
+
+        slr.no_literal_block = slr:block_new('[NO LITERAL]')
+
         local start_input_return = g1r:start_input()
         if start_input_return == -1 then
             error( string.format('Recognizer start of input failed: %s',
@@ -4581,6 +4584,28 @@ Returns new block offset on success.
 Always throws errors.
 
 ```
+    -- miranda: section+ forward declarations
+    local per_es_add
+    local per_es_add_no_literal
+    -- miranda: section+ most Lua function definitions
+    function per_es_add(slr, block_id, offset, longueur)
+        local latest_earley_set = slr:latest_earley_set()
+        slr.per_es[latest_earley_set] =
+            { block_id, offset, longueur }
+        local new_offset = offset + longueur
+        slr:block_set(block_id)
+        slr:block_move(new_offset)
+        return new_offset
+    end
+    function per_es_add_no_literal(slr)
+        local latest_earley_set = slr:latest_earley_set()
+        local no_literal_block = slr.no_literal_block
+        local no_literal_block_id = slr:block_progress(no_literal_block)
+        slr.per_es[latest_earley_set] =
+            { no_literal_block_id, 0, #no_literal_block }
+        local _, old_offset = slr:block_progress()
+        return old_offset
+    end
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
         local g1r = slr.g1
@@ -4589,23 +4614,26 @@ Always throws errors.
         local start_earley_set = g1r:latest_earley_set()
         local latest_earley_set = start_earley_set
         -- Loop until we create a new earley set
-        while start_earley_set == latest_earley_set do
+        while true do
             local result = g1r:earleme_complete()
+            latest_earley_set = g1r:latest_earley_set()
+            if start_earley_set ~= latest_earley_set then
+                break
+            end
             if result < 0 then
                 return error('Problem in slr->lexeme_complete(): '
                     ..  slr.slg.g1:error_description())
             end
-            latest_earley_set = g1r:latest_earley_set()
+            -- If here, events occured that are not at an Earley
+            -- set.  As of this writing, there are no such events:
+            -- recognizer events only occur when
+            -- an earley set is created.
+            slr:g1_convert_events()
+            local _, old_offset = slr:block_progress()
+            return old_offset
         end
-        -- As of this writing, recognizer events only occur when
-        -- an earley set is created.
         slr:g1_convert_events()
-        slr.per_es[latest_earley_set] =
-            { block_id, offset, longueur }
-        local new_offset = offset + longueur
-        slr:block_set(block_id)
-        slr:block_move(new_offset)
-        return new_offset
+        return per_es_add(slr, block_id, offset, longueur)
     end
 ```
 
