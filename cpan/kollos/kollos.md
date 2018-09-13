@@ -3428,6 +3428,13 @@ together.
     class_slr_fields.block_mode = true
 ```
 
+*Empty lexeme block*
+
+```
+    -- miranda: section+ class_slr field declarations
+    class_slr_fields.empty_lexeme_block = true
+```
+
 ```
     -- miranda: section+ populate metatables
     local class_slr_fields = {}
@@ -4576,10 +4583,7 @@ Always throws errors.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.lexeme_complete(slr, block_id, offset, longueur)
-        slr:block_set(block_id)
-        slr:block_move(offset)
         local g1r = slr.g1
-        slr.event_queue = {}
         slr.is_lo_level_scanning = false
         local start_earley_set = g1r:latest_earley_set()
         local latest_earley_set = start_earley_set
@@ -4594,10 +4598,12 @@ Always throws errors.
         end
         -- As of this writing, recognizer events only occur when
         -- an earley set is created.
+        slr.event_queue = {}
         slr:g1_convert_events()
         slr.per_es[latest_earley_set] =
             { block_id, offset, longueur }
         local new_offset = offset + longueur
+        slr:block_set(block_id)
         slr:block_move(new_offset)
         return new_offset
     end
