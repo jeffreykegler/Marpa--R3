@@ -573,7 +573,7 @@ sub Marpa::R3::Recognizer::g1_pos {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    local latest_earley_set = recce.g1:latest_earley_set()
+    local latest_earley_set = recce:latest_earley_set()
     return latest_earley_set
 END_OF_LUA
     return $latest_earley_set;
@@ -585,7 +585,7 @@ sub Marpa::R3::Recognizer::current_earleme {
     ('@' . __FILE__ . ':' . __LINE__),
     <<'END_OF_LUA', '');
     local recce = ...
-    local current_earleme = recce.g1:current_earleme()
+    local current_earleme = recce:current_earleme()
     return current_earleme
 END_OF_LUA
     return $current_earleme;
@@ -598,7 +598,7 @@ sub Marpa::R3::Recognizer::furthest_earleme {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
     local recce = ...
-    local furthest_earleme = recce.g1:furthest_earleme()
+    local furthest_earleme = recce:furthest_earleme()
     return furthest_earleme
 END_OF_LUA
     return $furthest_earleme;
@@ -611,7 +611,7 @@ sub Marpa::R3::Recognizer::latest_earleme {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', '');
     local recce = ...
-    local latest_earleme = recce.g1:latest_earleme()
+    local latest_earleme = recce:latest_earleme()
     return latest_earleme
 END_OF_LUA
     return $latest_earleme;
@@ -1253,7 +1253,7 @@ sub Marpa::R3::Recognizer::earley_set_size {
         <<'END_OF_LUA', 'i', ($set_id // -1));
     local recce, set_id = ...
     local g1r = recce.g1
-    if set_id < 0 then set_id = g1r:lastest_earley_set() end
+    if set_id < 0 then set_id = g1r:latest_earley_set() end
     return g1r:_earley_set_size(set_id)
 END_OF_LUA
     return $size;
