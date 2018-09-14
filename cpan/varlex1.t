@@ -67,8 +67,9 @@ my $furthest_expected = 0;
 my $length = length $string;
 TOKEN: while (1) {
     my ( undef, $start_of_lexeme ) = $recce->block_progress();
-    last TOKEN if $length - $start_of_lexeme < 3;
-    for my $lexeme_length ( 1 .. $length - $start_of_lexeme ) {
+    last TOKEN if $length - $start_of_lexeme <= 3;
+    my $max_lexeme_length = max( 5, $length - $start_of_lexeme );
+    for my $lexeme_length ( 1 .. $max_lexeme_length ) {
         my $ok = $recce->lexeme_alternative_literal( 'A', $lexeme_length );
         $furthest_expected =
           max( $start_of_lexeme + $lexeme_length, $furthest_expected );
@@ -85,8 +86,12 @@ TOKEN: while (1) {
     }
     my ($block_id) = $recce->block_progress();
     my $new_offset = $recce->lexeme_complete( $block_id, $start_of_lexeme, 1 );
-    test_locations( $start_of_lexeme+1, $start_of_lexeme+1, $start_of_lexeme+1,
-        $furthest_expected, "after lexeme complete @" . $start_of_lexeme );
+    test_locations(
+        $start_of_lexeme + 1,
+        $start_of_lexeme + 1,
+        $start_of_lexeme + 1,
+        $furthest_expected, "after lexeme complete @" . $start_of_lexeme
+    );
 } ## end TOKEN: while (1)
 my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
 my @values;
@@ -94,7 +99,7 @@ my @values;
 local $Data::Dumper::Terse  = 1;    # don't output names where feasible
 local $Data::Dumper::Indent = 0;    # turn off all pretty print
 
-test_locations( -1, 9, 9, 9, "before value()" );
+test_locations( 7, 9, 9, 9, "before value()" );
 
 VALUE: while (1) {
     my $value_ref = $valuer->value();
