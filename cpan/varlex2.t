@@ -17,7 +17,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 27;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -76,6 +76,56 @@ if (1) {
         "lexeme_complete() (is $new_offset vs $new_offset_wanted)" );
 
     test_locations( $recce, 1, 5, 5, 5, "after lexeme_complete()" );
+
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
+    my @values;
+
+    local $Data::Dumper::Terse  = 1;    # don't output names where feasible
+    local $Data::Dumper::Indent = 0;    # turn off all pretty print
+
+  VALUE: while (1) {
+        my $value_ref = $valuer->value();
+        say Data::Dumper::Dumper($value_ref);
+        last VALUE if not $value_ref;
+        my $value = Data::Dumper::Dumper($value_ref);
+        push @values, $value;
+    }
+    @values = sort { $a cmp $b } @values;
+    my $values_expected = ['\\[\'12345\']'];
+    Test::More::is_deeply( \@values, $values_expected,
+        qq{"variable length" test} );
+
+    say STDERR Data::Dumper::Dumper( \@values );
+    say STDERR Data::Dumper::Dumper($values_expected);
+}
+
+# Two lexeme_complete() calls
+if (1) {
+    my $string = '12345';
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+
+    $recce->read( \$string, 0, 0 );
+
+    my ($main_block) = $recce->block_progress();
+
+    my $ok = $recce->lexeme_alternative_literal( 'A', 2 );
+    $ok = $recce->lexeme_alternative_literal( 'A', 5 );
+
+    Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
+
+    test_locations( $recce, 0, 0, 0, 5, "after lexeme_alternative_literal()" );
+
+    my $new_offset = $recce->lexeme_complete( undef, 0, 2 );
+    Test::More::is( $new_offset, 2,
+        "lexeme_complete() (is $new_offset vs 2)" );
+
+    test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
+
+    $new_offset = $recce->lexeme_complete( undef, 2, 3 );
+    Test::More::is( $new_offset, 5,
+        "lexeme_complete() (is $new_offset vs 5)" );
+
+    test_locations( $recce, 2, 5, 5, 5, "after lexeme_complete() 1" );
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my @values;
