@@ -34,6 +34,11 @@ sub max {
     return $a > $b ? $a : $b;
 }
 
+sub min {
+    my ( $a, $b ) = @_;
+    return $b > $a ? $a : $b;
+}
+
 my $grammar = Marpa::R3::Grammar->new(
     {
         source => \(<<'END_OF_SOURCE'),
@@ -68,7 +73,7 @@ my $length = length $string;
 TOKEN: while (1) {
     my ( undef, $start_of_lexeme ) = $recce->block_progress();
     last TOKEN if $length - $start_of_lexeme <= 3;
-    my $max_lexeme_length = max( 5, $length - $start_of_lexeme );
+    my $max_lexeme_length = min( 5, $length - $start_of_lexeme );
     for my $lexeme_length ( 1 .. $max_lexeme_length ) {
         my $ok = $recce->lexeme_alternative_literal( 'A', $lexeme_length );
         $furthest_expected =
@@ -78,8 +83,8 @@ TOKEN: while (1) {
             $start_of_lexeme,
             $start_of_lexeme,
             $furthest_expected,
-            "after lexeme_alternative_literal() @"
-              . "$start_of_lexeme, len=$lexeme_length"
+            "after lexeme_alternative_literal('a', $lexeme_length) @"
+              . "$start_of_lexeme"
         );
         die qq{Parser rejected symbol at position $start_of_lexeme}
           if not defined $ok;
