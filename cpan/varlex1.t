@@ -95,12 +95,21 @@ TOKEN: while (1) {
         $start_of_lexeme + 1,
         $start_of_lexeme + 1,
         $start_of_lexeme + 1,
-        $furthest_expected, "after lexeme complete @" . $start_of_lexeme
+        $furthest_expected, 'after lexeme complete @' . ($start_of_lexeme+1)
     );
 } ## end TOKEN: while (1)
 
-$recce->earleme_catchup();
-test_locations( 7, 9, 9, 9, "after earleme_catchup()" );
+{
+    my ( $block_id, $block_offset ) = $recce->block_progress();
+    $recce->earleme_catchup($block_id, $block_offset, 3);
+}
+test_locations( 9, 9, 9, 9, "after earleme_catchup()" );
+
+# my $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+# test_locations( 9, 9, 9, 12, "after lexeme_alternative() with skips" );
+
+# $recce->earleme_catchup();
+# test_locations( 10, 12, 12, 12, "after earleme_catchup() with skips" );
 
 my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
 my @values;
@@ -110,6 +119,7 @@ local $Data::Dumper::Indent = 0;    # turn off all pretty print
 
 VALUE: while (1) {
     my $value_ref = $valuer->value();
+    say Data::Dumper::Dumper($value_ref);
     last VALUE if not $value_ref;
     my $value = Data::Dumper::Dumper($value_ref);
     push @values, $value;
@@ -121,13 +131,18 @@ sub test_locations {
     my ( $latest_es_wanted, $latest_earleme_wanted, $current_earleme_wanted,
         $furthest_earleme_wanted, $where )
       = @_;
-    Test::More::is( $recce->g1_pos(), $latest_es_wanted, "latest es $where" );
-    Test::More::is( $recce->latest_earleme(),
-        $latest_earleme_wanted, "latest earleme $where" );
-    Test::More::is( $recce->current_earleme(),
-        $current_earleme_wanted, "current earleme $where" );
-    Test::More::is( $recce->furthest_earleme(),
-        $furthest_earleme_wanted, "furthest earleme $where" );
+    my $latest_es_seen = $recce->g1_pos();
+    Test::More::is( $latest_es_seen, $latest_es_wanted,
+        "latest es (is $latest_es_seen vs $latest_es_wanted) $where" );
+    my $latest_earleme_seen = $recce->latest_earleme();
+    Test::More::is( $latest_earleme_seen, $latest_earleme_wanted,
+        "latest earleme (is $latest_earleme_seen vs $latest_earleme_wanted) $where" );
+    my $current_earleme_seen = $recce->current_earleme();
+    Test::More::is( $current_earleme_seen, $current_earleme_wanted,
+        "current earleme (is $current_earleme_seen vs $current_earleme_wanted) $where" );
+    my $furthest_earleme_seen = $recce->furthest_earleme();
+    Test::More::is( $furthest_earleme_seen, $furthest_earleme_wanted,
+        "furthest earleme (is $furthest_earleme_seen vs $furthest_earleme_wanted) $where" );
 }
 
 # vim: expandtab shiftwidth=4:

@@ -4653,7 +4653,11 @@ is the same as the original block and offset.  Otherwise the new block is
         local latest_earley_set = slr:latest_earley_set()
         local no_literal_block = slr.no_literal_block
         if not no_literal_block then
-            slr.no_literal_block = slr:block_new('[NO LITERAL]')
+            -- for debubbing
+            local msg = ';es=' .. latest_earley_set
+            local earleme = slr:current_earleme()
+            msg = msg .. ';earleme=' .. earleme
+            slr.no_literal_block = slr:block_new('[NO LITERAL' .. msg .. ']')
             no_literal_block = slr.no_literal_block
         end
         local no_literal_block_id = slr:block_progress(no_literal_block)
@@ -4685,20 +4689,18 @@ is the same as the original block and offset.  Otherwise the new block is
             end
             latest_earley_set = g1r:latest_earley_set()
             latest_earleme = slr:earleme(latest_earley_set)
-            -- End earleme_complete() loop if we are at tbe
+            -- End earleme_complete() loop if we are at the
             -- furthest earleme
             if latest_earleme >= furthest_earleme then
                 slr:g1_convert_events()
                 return per_es_add(slr, block_id, offset, longueur)
             end
-            -- Also end earleme_complete() loop earley if we had
-            -- an event
             local new_offset
             -- Add a `per_es` record if we created a new earley set
             if latest_earley_set ~= start_earley_set then
                 new_offset = per_es_add_no_literal(slr)
             end
-            -- Also end earleme_complete() loop early if we had
+            -- End earleme_complete() loop early if we had
             -- an event
             if event_count > 0 then
                 slr:g1_convert_events()
@@ -4708,7 +4710,6 @@ is the same as the original block and offset.  Otherwise the new block is
                 local _, old_offset = slr:block_progress()
                 return old_offset
             end
-            per_es_add_no_literal(slr)
         end
         divergence('Should not reach here')
     end
