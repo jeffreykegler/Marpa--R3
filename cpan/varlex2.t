@@ -17,7 +17,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 47;
+use Test::More tests => 65;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -167,7 +167,7 @@ if (1) {
 
     test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
 
-    my $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
 
     $new_offset = $recce->lexeme_complete( undef, 2, 3 );
@@ -200,7 +200,6 @@ if (1) {
 
 # Overlapping alternatives, two lexeme_complete() calls
 # Second part has zero-length literal
-# TODO: Delete after development?
 if (1) {
     my $string = '12345';
     my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
@@ -208,7 +207,7 @@ if (1) {
     $recce->read( \$string, 0, 0 );
 
     my ($main_block) = $recce->block_progress();
-    Test::More::ok(1, "=== TODO 2nd is zero length; Overlapping alternatives ===");
+    Test::More::ok(1, "=== Overlapping alternatives; 2nd is zero length ===");
 
     my $ok = $recce->lexeme_alternative_literal( 'A', 2 );
     $ok = $recce->lexeme_alternative_literal( 'A', 5 );
@@ -222,7 +221,7 @@ if (1) {
 
     test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
 
-    my $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
 
     $new_offset = $recce->lexeme_complete( undef, 2, 0 );
@@ -244,13 +243,13 @@ if (1) {
         push @values, $value;
     }
     @values = sort { $a cmp $b } @values;
-    my $values_expected = ['\\[\'12\',\'345\']','\\[\'12345\']'];
+    my $values_expected = ['\\[\'12\',\'\']','\\[\'12\']'];
     $ok = $recce->lexeme_alternative_literal( 'A', 5 );
     Test::More::is_deeply( \@values, $values_expected,
         qq{values test} );
 
-    say STDERR Data::Dumper::Dumper( \@values );
-    say STDERR Data::Dumper::Dumper($values_expected);
+    # say STDERR Data::Dumper::Dumper( \@values );
+    # say STDERR Data::Dumper::Dumper($values_expected);
 }
 
 sub test_locations {
