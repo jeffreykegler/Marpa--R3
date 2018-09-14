@@ -236,15 +236,6 @@ Make sure all of the are in the test suite and documented
 
 #### Allow lexemes on L0 RHS
 
-#### Allow zero-length literals for lexemes
-
-In `lexeme_complete()` and the `per_es` structure,
-allow zero-length literals.
-
-Create a test case for this:
-Census "creators" and "consumers" of the `per_es` structure,
-and make sure all are tested.
-
 ### Preparing for beta release
 
 The following is a checklist of things to do before beta.
@@ -3392,6 +3383,10 @@ in the form of a Lua sequence.
 `block_ix` is the index of the block,
 `start` is the start of the lexeme literal
 and `length` is the length of the lexeme literal.
+
+A zero length is acceptable.
+TODO: Zero length is acceptable but only lightly
+tested so far.
 
 ```
     -- miranda: section+ class_slr field declarations
