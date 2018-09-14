@@ -198,6 +198,61 @@ if (1) {
     # say STDERR Data::Dumper::Dumper($values_expected);
 }
 
+# Overlapping alternatives, two lexeme_complete() calls
+# Second part has zero-length literal
+# TODO: Delete after development?
+if (1) {
+    my $string = '12345';
+    my $recce = Marpa::R3::Recognizer->new( { grammar => $grammar } );
+
+    $recce->read( \$string, 0, 0 );
+
+    my ($main_block) = $recce->block_progress();
+    Test::More::ok(1, "=== TODO 2nd is zero length; Overlapping alternatives ===");
+
+    my $ok = $recce->lexeme_alternative_literal( 'A', 2 );
+    $ok = $recce->lexeme_alternative_literal( 'A', 5 );
+    Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
+
+    test_locations( $recce, 0, 0, 0, 5, "after lexeme_alternative_literal()" );
+
+    my $new_offset = $recce->lexeme_complete( undef, 0, 2 );
+    Test::More::is( $new_offset, 2,
+        "lexeme_complete() (is $new_offset vs 2)" );
+
+    test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
+
+    my $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+    Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
+
+    $new_offset = $recce->lexeme_complete( undef, 2, 0 );
+    Test::More::is( $new_offset, 2,
+        "lexeme_complete() (is $new_offset vs 2)" );
+
+    test_locations( $recce, 2, 5, 5, 5, "after lexeme_complete() 1" );
+
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
+    my @values;
+
+    local $Data::Dumper::Terse  = 1;    # don't output names where feasible
+    local $Data::Dumper::Indent = 0;    # turn off all pretty print
+
+  VALUE: while (1) {
+        my $value_ref = $valuer->value();
+        last VALUE if not $value_ref;
+        my $value = Data::Dumper::Dumper($value_ref);
+        push @values, $value;
+    }
+    @values = sort { $a cmp $b } @values;
+    my $values_expected = ['\\[\'12\',\'345\']','\\[\'12345\']'];
+    $ok = $recce->lexeme_alternative_literal( 'A', 5 );
+    Test::More::is_deeply( \@values, $values_expected,
+        qq{values test} );
+
+    say STDERR Data::Dumper::Dumper( \@values );
+    say STDERR Data::Dumper::Dumper($values_expected);
+}
+
 sub test_locations {
     my ( $recce, $latest_es_wanted, $latest_earleme_wanted, $current_earleme_wanted,
         $furthest_earleme_wanted, $where )
