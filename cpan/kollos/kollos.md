@@ -226,8 +226,6 @@ Make sure all of the are in the test suite and documented
 
 * lexeme_complete()
 
-* earleme_catchup()
-
 * current_earleme()
 
 * furthest_earleme()
@@ -4627,93 +4625,6 @@ Always throws errors.
     end
 ```
 
-`earleme_catchup` takes us up to the furthest earleme.  Any lexemes which
-end earlier are "skipped".  "Skipped" lexemes result in an "skipped"
-Earley set, but no opportunity is allowed to scan new lexemes into
-the Earley set where they end, so that they will be ignored if the
-end-of-parse is the default.  If end-of-parse is set the Earley set at
-which the skipped lexeme ends, then it may be part of a successful parse.
-
-Events cause earleme catchup to end early.  "Skipped" Earley sets have
-a special literal -- the literal of the arguments is only used for the
-final Earley set, the one at the furthest earleme.
-
-`earleme_catchup()` moves the parse to a new block and offset.  When
-`earleme_catchup()` ends early due to an event, the new block and offset
-is the same as the original block and offset.  Otherwise the new block is
-`block_id`, and the new offset is `offset+longueur`, where the `block_id`,
-`offset` and `longueur` are those of the arguments.
-
-
-```
-    -- miranda: section+ forward declarations
-    local per_es_add_no_literal
-    -- miranda: section+ most Lua function definitions
-    function per_es_add_no_literal(slr)
-        local latest_earley_set = slr:latest_earley_set()
-        local no_literal_block = slr.no_literal_block
-        if not no_literal_block then
-            -- for debubbing
-            local msg = ';es=' .. latest_earley_set
-            local earleme = slr:current_earleme()
-            msg = msg .. ';earleme=' .. earleme
-            slr.no_literal_block = slr:block_new('[NO LITERAL' .. msg .. ']')
-            no_literal_block = slr.no_literal_block
-        end
-        local no_literal_block_id = slr:block_progress(no_literal_block)
-        local no_literal_block = slr.inputs[no_literal_block_id]
-        slr.per_es[latest_earley_set] =
-            { no_literal_block_id, 0, #no_literal_block }
-        local _, old_offset = slr:block_progress()
-        return old_offset
-    end
-    -- miranda: section+ most Lua function definitions
-    function _M.class_slr.earleme_catchup(slr, block_id, offset, longueur)
-        local g1r = slr.g1
-        -- Ends low level scanning, just like a lexeme_complete()
-        slr.is_lo_level_scanning = false
-        slr.event_queue = {}
-        local start_earley_set = g1r:latest_earley_set()
-        local latest_earley_set = start_earley_set
-        local this_earley_set = latest_earley_set
-        local furthest_earleme = slr:furthest_earleme();
-        local latest_earleme = slr:earleme(latest_earley_set)
-        -- loop over earleme_complete() operations until
-        -- we reach the furthest earleme, or are interrupted by
-        -- an event
-        while true do
-            local event_count = g1r:earleme_complete()
-            if event_count < 0 then
-                return error('Problem in slr->lexeme_complete(): '
-                    ..  slr.slg.g1:error_description())
-            end
-            latest_earley_set = g1r:latest_earley_set()
-            latest_earleme = slr:earleme(latest_earley_set)
-            -- End earleme_complete() loop if we are at the
-            -- furthest earleme
-            if latest_earleme >= furthest_earleme then
-                slr:g1_convert_events()
-                return per_es_add(slr, block_id, offset, longueur)
-            end
-            local new_offset
-            -- Add a `per_es` record if we created a new earley set
-            if latest_earley_set ~= start_earley_set then
-                new_offset = per_es_add_no_literal(slr)
-            end
-            -- End earleme_complete() loop early if we had
-            -- an event
-            if event_count > 0 then
-                slr:g1_convert_events()
-                if new_offset then
-                    return new_offset
-                end
-                local _, old_offset = slr:block_progress()
-                return old_offset
-            end
-        end
-        divergence('Should not reach here')
-    end
-```
 ### Evaluation
 
 ```

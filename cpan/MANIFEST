@@ -327,6 +327,7 @@ t/topsyn.t
 t/tree.t
 t/tut2.t
 t/varlex.t
+t/varlex2.t
 t/vsyn.t
 t/wall.t
 t/zorro.t

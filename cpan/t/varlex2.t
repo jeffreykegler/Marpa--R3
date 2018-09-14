@@ -10,8 +10,7 @@
 # or implied warranties. For details, see the full text of
 # of the licenses in the directory LICENSES.
 
-# Test of variable-length lexemes,
-# focusing on earleme_catchup() method.
+# Test of variable-length lexemes
 
 use 5.010001;
 
