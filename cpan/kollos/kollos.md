@@ -4657,6 +4657,7 @@ is the same as the original block and offset.  Otherwise the new block is
             no_literal_block = slr.no_literal_block
         end
         local no_literal_block_id = slr:block_progress(no_literal_block)
+        local no_literal_block = slr.inputs[no_literal_block_id]
         slr.per_es[latest_earley_set] =
             { no_literal_block_id, 0, #no_literal_block }
         local _, old_offset = slr:block_progress()
@@ -5204,6 +5205,14 @@ TODO: Assumes that the value is all on one block.
         local g1r = slr.g1
         local latest_es = g1r:latest_earley_set()
         return g1r:earleme(latest_es)
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
+    function _M.class_slr.earleme(slr, earley_set)
+        local g1r = slr.g1
+        return g1r:earleme(earley_set)
     end
 ```
 

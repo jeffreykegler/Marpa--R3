@@ -17,7 +17,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 208;
+use Test::More tests => 212;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -98,13 +98,15 @@ TOKEN: while (1) {
         $furthest_expected, "after lexeme complete @" . $start_of_lexeme
     );
 } ## end TOKEN: while (1)
+
+$recce->earleme_catchup();
+test_locations( 7, 9, 9, 9, "after earleme_catchup()" );
+
 my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
 my @values;
 
 local $Data::Dumper::Terse  = 1;    # don't output names where feasible
 local $Data::Dumper::Indent = 0;    # turn off all pretty print
-
-test_locations( 7, 9, 9, 9, "before value()" );
 
 VALUE: while (1) {
     my $value_ref = $valuer->value();

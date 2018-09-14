@@ -624,7 +624,7 @@ sub Marpa::R3::Recognizer::earleme {
     ('@' . __FILE__ . ':' . __LINE__),
         <<'END_OF_LUA', 'i', $earley_set_id);
     local recce, earley_set_id = ...
-    local earleme = recce.g1:earleme(earley_set_id)
+    local earleme = recce:earleme(earley_set_id)
     return earleme
 END_OF_LUA
     return $earleme;
@@ -710,6 +710,7 @@ sub Marpa::R3::Recognizer::lexeme_complete {
                     say {$trace_file_handle} $msg;
                     return 'ok';
                },
+               codepoint => gen_codepoint_event_handler($slr),
                event => gen_app_event_handler($slr),
            }
         },
@@ -728,6 +729,53 @@ END_OF_LUA
     return $return_value;
 
 } ## end sub Marpa::R3::Recognizer::lexeme_complete
+
+# Returns 0 on unthrown failure, current location on success
+sub Marpa::R3::Recognizer::earleme_catchup {
+    my ( $slr, $block, $offset, $length ) = @_;
+    if ( $slr->[Marpa::R3::Internal_R::CURRENT_EVENT] ) {
+        Marpa::R3::exception(
+            "$slr->lexeme_complete() called from inside a handler\n",
+            "   This is not allowed\n",
+            "   The event was ",
+            $slr->[Marpa::R3::Internal_R::CURRENT_EVENT],
+            "\n",
+        );
+    }
+
+    my $trace_file_handle =
+        $slr->[Marpa::R3::Internal_R::TRACE_FILE_HANDLE];
+
+    my ($return_value) = $slr->coro_by_tag(
+        ( '@' . __FILE__ . ':' . __LINE__ ),
+        {
+           signature => 'iii',
+           args => [ $block, $offset, $length ],
+           handlers => {
+               trace => sub {
+                    my ($msg) = @_;
+                    say {$trace_file_handle} $msg;
+                    return 'ok';
+               },
+               codepoint => gen_codepoint_event_handler($slr),
+               event => gen_app_event_handler($slr),
+           }
+        },
+        <<'END_OF_LUA');
+      local slr, block_id_arg, offset_arg, length_arg = ...
+      local block_id, offset, eoread
+          = slr:block_check_range(block_id_arg, offset_arg, length_arg)
+      _M.wrap(function ()
+          local new_offset = slr:earleme_catchup(block_id, offset, eoread-offset)
+          slr:convert_libmarpa_events()
+          return 'ok', new_offset
+      end
+      )
+END_OF_LUA
+
+    return $return_value;
+
+} ## end sub Marpa::R3::Recognizer::earleme_catchup
 
 # Returns 0 on unthrown failure, current location on success,
 # undef if lexeme not accepted.
