@@ -28,19 +28,18 @@ it is still safe to ignore this document,
 but you might find the possibilities it discusses
 interesting.
 
-=head1 Marpa has two different ideas of location
+=head1 Earlemes
 
 In the other Marpa documentation,
-we have spoken of "location",
-and assumed the standard input model.
-The locations actually in use by the methods
-described for the standard input model were Earley set
-ordinals.
+we have assumed the standard input model,
+and the only idea of
+G1 location we have used is Earley set location --
+that is, location as an Earley set ordinal.
 (An Earley set's ordinal is also its ID.)
 
-Marpa actually has two different ideas of location --
-Earley set ordinal and earleme.
-This is ignored in the other Marpa documents,
+For advanced input models, we must introduce another
+idea of G1 location -- earleme location.
+Earleme location is ignored in the other Marpa documents,
 and it can be, because they
 assume the standard input model.
 Use of the standard input model
@@ -49,8 +48,8 @@ and Earley set ordinal
 will always be exactly the same.
 
 This document introduces methods which make it
-possible (and in fact likely) that earleme and 
-Earley set ordinal will differ.
+very possible that earleme location and 
+Earley set ID will differ.
 From here on,
 the reader will need to pay careful attention
 to the distinction.
@@ -71,12 +70,15 @@ and an alternative input model is any input model which
 =back
 
 To do either of these things,
-a user must use the recognizer's L<C<alternative>|/"alternative()">
-method.
-In other words,
-if an application is not directly
-using the recognizer's C<alternative> method call,
-that application is not using an alternative input method.
+a user must use the recognizer's
+L<low level external scanning
+methods|Marpa::R3::External::Basic/"Low-level mutators">:
+L<C<lexeme_alternative()>|Marpa::R3::External::Basic/"lexeme_alternative()">,
+and
+L<C<lexeme_alternative_literal()>|Marpa::R3::External::Basic/"lexeme_alternative_literal()">.
+If an application is not directly
+using one of these two methods,
+then that application is not using an alternative input method.
 
 Many concepts, such as parsing location,
 parse exhaustion,
@@ -147,7 +149,7 @@ simply of the "location" in the parse.
 
 The B<furthest earleme> is the last earleme at which a token ends.
 In the default input model,
-the furthest earleme and the current earleme
+the furthest earleme and the latest earleme
 are always the same.
 As a result,
 in the default input model, the furthest earleme is not an important
@@ -155,25 +157,18 @@ concept.
 
 In alternative input models,
 tokens may be longer than 1 earleme, and
-the furthest earleme and the current earleme may be far apart.
-This becomes an issue when
-parsing is finished.
-Alternative input models use
-the recognizer's L<C<end_input>|/"end_input()"> method to ensure
-that processing of input catches up to the furthest earleme.
+the furthest earleme and the latest earleme may be far apart.
+To ensure
+that processing of input catches up to the furthest earleme,
+applications using alternative input models may have to call the
+the recognizer's L<C<lexeme_complete>|/"lexeme_complete()"> method repeatedly.
 
 =head1 The latest Earley set and latest earleme
 
 The B<latest earleme> is the earleme location of the latest
 Earley set.
 In the default input model, the latest earleme is always the
-same as the current earleme.
-
-In alternative input models,
-there may not be an Earley set at a given earleme location.
-When that is the case for the current earleme,
-then the latest Earley set is not at the current earleme,
-and the latest earleme and current earlemes are different.
+same as the furthest earleme.
 
 =head1 Methods
 
