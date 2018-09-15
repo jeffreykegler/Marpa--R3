@@ -79,7 +79,7 @@ External scanning can be used instead of internal scanning,
 but Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
 External scanning is described in
-L<its own document|Marpa::R3::Ext_Scan>.
+L<its own document|Marpa::R3::External::Basic>.
 
 =head1 Block position
 
@@ -1001,7 +1001,7 @@ The C<resume()> method is often used,
 in conjunction with external scanning,
 to resume internal scanning.
 External scanning is described
-L<in its own document|Marpa::R3::Ext_Scan>.
+L<in its own document|Marpa::R3::External::Basic>.
 
 B<Return values>:
 On success, C<resume()> returns

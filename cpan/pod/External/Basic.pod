@@ -11,7 +11,7 @@
 
 =head1 Name
 
-Marpa::R3::Ext_Scan - External scanning
+Marpa::R3::External::Basic - External scanning, Basics
 
 =head1 Synopsis
 
