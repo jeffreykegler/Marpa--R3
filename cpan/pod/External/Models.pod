@@ -172,68 +172,14 @@ same as the furthest earleme.
 
 =head1 Methods
 
-=head2 alternative()
-
-=for Marpa::R3::Display
-name: Recognizer alternative Synopsis
-normalize-whitespace: 1
-
-    $recce->alternative( 'a', \42, 1 ) or return 'First alternative failed';
-
-=for Marpa::R3::Display::End
-
-The C<alternative> method is the most general method for reading
-input, and is used in alternative input models.
-It takes three arguments, only the first of which is required.
-
-The first two arguments are 
-the token type and a reference to the token value.
-If the reference to the token value is omitted,
-or is C<undef>,
-the value of the token will be a Perl C<undef>.
-
-The third argument to the C<alternative> method is a token
-length.
-If omitted, token length defaults to 1,
-which is the correct value for the token stream model.
-Its value can be any integer B<greater> than zero.
-Marpa does not allow zero length tokens in any input model.
-
-Unlike the C<read> method, the C<alternative> method does
-B<not> advance the current location
-(current earleme) on each call.
-This allows the application to read several tokens
-at the same earleme.
-This is how ambiguous input is created.
-To advance the current earleme when
-input is read using the C<alternative> method,
-the C<complete_earleme> method must be called.
-
-On success, C<alternative> returns a Perl true value.
-If the token is rejected, C<alternative> returns a Perl false.
-On other failures, C<alternative> throws an exception.
-
-=head2 current_earleme()
-
-=for Marpa::R3::Display
-name: current_earleme Example
-normalize-whitespace: 1
-
-    $current_earleme = $recce->current_earleme();
-
-=for Marpa::R3::Display::End
-
-Returns the current parse location,
-also known as the current earleme.
-Not often needed.
-
 =head2 earleme()
 
 =for Marpa::R3::Display
-name: earleme() Synopsis
+name: recognizer earleme() synopsis
 normalize-whitespace: 1
 
-      my $origin_earleme = $recce->earleme($origin_earley_set_id);
+  my $latest_earley_set = $recce->g1_pos();
+  $latest_earleme = $recce->earleme($latest_earley_set);
 
 =for Marpa::R3::Display::End
 
@@ -262,94 +208,100 @@ are some earlemes that are
 in the valid range of earlemes
 but do not map to any Earley set.
 
-Earleme to Earley set translation is often not needed.
-When it is, it can be implemented at the application
-level, with the application taking advantage of what
+As an alternative is using the C<earleme()> method,
+an application
+may want to implement an Earley set to earleme mapping
+at the application level.
+This allows the application taking advantage of what
 it knows about its choice of input model.
 
-=head2 earleme_complete()
+=head2 furthest_earleme()
 
 =for Marpa::R3::Display
-name: Recognizer earleme_complete Synopsis
+name: recognizer furthest_earleme() synopsis
 normalize-whitespace: 1
 
-    $recce->earleme_complete();
+    my $furthest_earleme = $recce->furthest_earleme();
 
 =for Marpa::R3::Display::End
 
-Processes all tokens at the current earleme and advances the current
-earleme by 1.
-If the earleme cannot be completed,
-an exception is thrown.
-Otherwise, an "event" count is returned.
-If zero is returned, the earleme was completed without event.
-In this context,
-an "event" is one of a list of occurrences of special interest during
-the successful completion of an earleme,
-as described for
-the L<recognizer's C<read> method|Marpa::R3::Recognizer/"read()">.
+Returns the furthest earleme.
 
-All tokens read using the C<alternative> method start at one
-location -- the current earleme.
-When reading input using the C<alternative> method,
-C<earleme_complete> is used to complete processing
-at the current earleme and move
-forward in
-the input stream.
-
-C<earleme_complete> may be called even if the C<alternative>
-method has been not called since the last
-call to C<earleme_complete>.
-This will create an earleme with no tokens.
-In certain input models,
-such as the character-per-earleme model,
-this can be useful.
-
-=head2 end_input()
+=head2 g1_pos()
 
 =for Marpa::R3::Display
-name: Recognizer end_input Synopsis
+name: recognizer earleme() synopsis
 normalize-whitespace: 1
+partial: 1
 
-    $recce->end_input();
+  my $latest_earley_set = $recce->g1_pos();
 
 =for Marpa::R3::Display::End
 
-Indicates that input is finished.
-Calling C<end_input> is not necessary
-or useful
-in the default input model,
-because in the default input model no token
-has a length greater than 1.
+TODO.
 
-The C<end_input> method takes no arguments.
-The C<end_input> method returns a Perl true value on success.
-On failure, it throws an exception.
+The full description of the C<g1_pos()> method is
+L<elsewhere|Marpa::R3::Recognizer/"g1_pos()">.
 
-In alternative input models, calling the C<earleme_complete> method
-once input is finished does not
-ensure that all input has been processed.
-The C<earleme_complete> method completes the current earleme,
-but in alternative models, tokens may extend well past the current earleme.
-The C<end_input> method ensures that all input is processed.
+=head2 latest_earleme()
 
-Calling C<end_input> multiple times on the same recognizer object
-is harmless,
-but useless.
-The second and subsequent calls will
-return a Perl true,
-but will have no effect.
+=for Marpa::R3::Display
+name: recognizer latest_earleme() synopsis
+normalize-whitespace: 1
 
-=head1 Alternative models and C<read()>
+    my $latest_earleme = $recce->latest_earleme();
 
-A recognizer can mix
-calls to
-its L<C<read>|Marpa::R3::Recognizer/"read()">
-method with calls to its L<C<alternative>|/"alternative()">
-method.
-The C<read> method has the same effect as a single call
-to the C<alternative> method, followed immediately
-by a call of the C<earleme_complete> method.
+=for Marpa::R3::Display::End
+
+Returns the latest earleme.
+
+=head2 lexeme_alternative()
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative() variable length synopsis
+normalize-whitespace: 1
+
+    $ok = $recce->lexeme_alternative( 'A', 42, 2 );
+
+=for Marpa::R3::Display::End
+
+TODO.
+
+=head2 lexeme_alternative_literal()
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative_literal() variable length synopsis
+normalize-whitespace: 1
+
+    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+
+=for Marpa::R3::Display::End
+
+TODO.
+
+=head2 lexeme_complete()
+
+TODO.
+
+=head1 Alternative models and high level scanning
+
+A recognizer can alternate
+calls to its
+L<high level scanning methods
+methods|Marpa::R3::External::Basic/"High-level mutators">
+with calls to its
+L<low level scanning methods
+methods|Marpa::R3::External::Basic/"Low-level mutators">,
+with one restriction:
+If a low level scan at a particular earleme has been
+started with
+L<C<lexeme_alternative()>|Marpa::R3::External::Basic/"lexeme_alternative()">,
+and
+L<C<lexeme_alternative_literal()>|Marpa::R3::External::Basic/"lexeme_alternative_literal()">,
+it must be completed with a call to
+L<C<lexeme_complete()>|Marpa::R3::External::Basic/"lexeme_complete()">
+before any high level scanning method can be called.
+Otherwise a fatal error results.
 
 =head1 Ambiguous lexing
 

@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More tests => 4;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -61,21 +61,53 @@ $ok = $recce->lexeme_alternative( 'A', 42, 2 );
 $recce->lexeme_complete( undef, undef, 2 );
 
 # Marpa::R3::Display
-# name: recognizer lexeme_alternative_literal() variable length synopsis
+# name: recognizer latest_earleme() synopsis
 
-$ok = $recce->lexeme_alternative_literal( 'A', 3 );
+my $latest_earleme = $recce->latest_earleme();
 
 # Marpa::R3::Display::End
 
-$recce->lexeme_complete( undef, undef, 3 );
+my $latest_earleme_direct = $latest_earleme;
 
-local $Data::Dumper::Terse  = 1;    # don't output names where feasible
-local $Data::Dumper::Indent = 0;    # turn off all pretty print
+# Marpa::R3::Display
+# name: recognizer earleme() synopsis
 
-my $value_ref = $recce->value();
-my $value     = Data::Dumper::Dumper($value_ref);
+my $latest_earley_set = $recce->g1_pos();
+$latest_earleme = $recce->earleme($latest_earley_set);
+
+# Marpa::R3::Display::End
+
+Test::More::is ($latest_earleme, 2, "latest earleme via earleme()");
+Test::More::is ($latest_earleme_direct, 2,
+		"latest earleme via latest_earleme()");
+
+#Marpa::R3::Display
+#name: recognizer lexeme_alternative_literal() variable length synopsis
+
+$ok = $recce->lexeme_alternative_literal ('A', 3);
+
+#Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: recognizer furthest_earleme() synopsis
+
+my $furthest_earleme = $recce->furthest_earleme();
+
+# Marpa::R3::Display::End
+
+Test::More::is($furthest_earleme, 5, "furthest earleme");
+
+$recce->lexeme_complete (undef, undef, 3);
+
+local $Data::Dumper::Terse = 1;
+#don't output names where feasible
+local $Data::Dumper::Indent = 0;
+#turn off all pretty print
+
+my $value_ref = $recce->value ();
+my $value = Data::Dumper::Dumper ($value_ref);
 
 my $expected = '\\[42,\'aaa\']';
-Test::More::is_deeply( $value, $expected, "variable length lexeme displays" );
+Test::More::is_deeply ($value, $expected, "parse value");
 
-# vim: expandtab shiftwidth=4:
+#vim: expandtab shiftwidth=4:
