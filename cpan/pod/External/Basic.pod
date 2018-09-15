@@ -551,6 +551,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+For advanced uses,
+there is also a three-argument form:
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative() variable length synopsis
+normalize-whitespace: 1
+
+    $ok = $recce->lexeme_alternative( 'A', 42, 2 );
+
+=for Marpa::R3::Display::End
+
 C<lexeme_alternative()> is one of the low-level methods of the external scanner.
 Most applications
 will prefer the simpler
@@ -558,8 +569,8 @@ L<C<lexeme_read_string()>|/"lexeme_read_string()">,
 L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
-C<lexeme_alternative()> takes up to two arguments.
-Call them, in order, C<$symbol_name> and C<$value>.
+C<lexeme_alternative()> takes up to three arguments.
+The first two are, in order, C<$symbol_name> and C<$value>.
 C<$symbol_name> is required
 and must be the name of a symbol to be read
 at the current location.
@@ -567,6 +578,15 @@ C<$value> is optional,
 and specifies the value of the symbol.
 If C<$value> is missing, the value of the symbol
 will be a Perl C<undef>.
+
+The fourth, optional, argument may be ignored by most applications.
+It is the length of the lexeme in earlemes.
+Earleme length will almost always be 1,
+which is the default.
+The ability to specify other earleme lengths enables
+some very powerful, but advanced, techniques,
+which are described
+L<elsewhere|Marpa::R3::External::Models>.
 
 The C<lexeme_alternative()> method is a non-completion method -- it adds to
 the list of accepted tokens.
@@ -613,6 +633,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+For advanced uses,
+there is also a two-argument form:
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative_literal() variable length synopsis
+normalize-whitespace: 1
+
+    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+
+=for Marpa::R3::Display::End
+
 C<lexeme_alternative_literal()> is one of the low-level methods of the external scanner.
 Most applications
 will prefer the simpler
@@ -620,7 +651,8 @@ L<C<lexeme_read_string()>|/"lexeme_read_string()">,
 L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
 and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
 
-C<lexeme_alternative_literal()> takes only one, required, argument.
+C<lexeme_alternative_literal()> takes up to two arguments,
+the first of which is required.
 C<lexeme_alternative_literal()> and
 C<lexeme_alternative()> differ from each other
 only in their arguments,
@@ -633,6 +665,15 @@ C<lexeme_complete()>.
 Otherwise, C<lexeme_alternative_literal()> behaves in
 exactly the same way as
 C<lexeme_alternative()>.
+
+The second, optional, argument may be ignored by most applications.
+It is the length of the lexeme in earlemes.
+Earleme length will almost always be 1,
+which is the default.
+The ability to specify other earleme lengths enables
+some very powerful, but advanced, techniques,
+which are described
+L<elsewhere|Marpa::R3::External::Models>.
 
 =head2 lexeme_complete()
 
