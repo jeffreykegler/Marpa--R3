@@ -580,6 +580,9 @@ END_OF_LUA
     return $latest_earley_set;
 }
 
+# Do not document, at least until there is some
+# R3 situation in which current earleme and latest
+# earleme are different.
 sub Marpa::R3::Recognizer::current_earleme {
     my ($slr) = @_;
     my ($current_earleme) = $slr->call_by_tag(
@@ -592,7 +595,6 @@ END_OF_LUA
     return $current_earleme;
 }
 
-# Not documented, I think
 sub Marpa::R3::Recognizer::furthest_earleme {
     my ($slr) = @_;
     my ($furthest_earleme) = $slr->call_by_tag(

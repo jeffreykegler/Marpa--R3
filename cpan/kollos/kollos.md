@@ -226,8 +226,6 @@ Make sure all of the are in the test suite and documented
 
 * lexeme_complete()
 
-* current_earleme()
-
 * furthest_earleme()
 
 * latest_earleme()
@@ -259,6 +257,9 @@ to `(- <a> <b> <c>-)`.
 * Rename grammar, recognizer methods, classes.
 
 * Change lexeme priorities from per-location to absolute.
+
+* Investigate treatment of duplicate tokens -- make into soft
+  error?  What about other similar error codes?
 
 * Clean up DSL syntax.  Eliminate, or reduce use of,
 or make more orthogonal use of,

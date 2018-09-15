@@ -519,7 +519,7 @@ is addressed in L<Marpa::R3::Recognizer/"Literals and G1 spans">.
 name: glade_g1_span() example
 normalize-whitespace: 1
 
-    my ( $glade_start, $glade_length ) = $asf->glade_g1_span($glade_id);
+    my ( $glade_start, $glade_length ) = $glade->g1_span();
 
 =for Marpa::R3::Display::End
 

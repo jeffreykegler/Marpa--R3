@@ -119,7 +119,7 @@ sub glade_to_basic_tree {
             next SYMCH;
         } ## end if ( $g1_rule_id < 0 )
 
-        # ignore any truncation of the factorings
+        # ignore any truncation of the partitions
         my $factoring_count =
             $asf->symch_factoring_count( $glade, $symch_ix );
         my @symch_description = ("Glade $glade");
@@ -144,7 +144,7 @@ sub glade_to_basic_tree {
         if ( $factoring_count > 1 ) {
             push @symches,
                 bless [
-                "Glade $glade, symch $symch_ix has $factoring_count factorings",
+                "Glade $glade, symch $symch_ix has $factoring_count partitions",
                 @factorings
                 ],
                 'My_Factorings';

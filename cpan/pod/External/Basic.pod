@@ -665,7 +665,7 @@ Call them, in order,
 C<$block_id>, C<$offset> and C<$length>.
 These specify a
 L<block span|Marpa::R3::Recognizer/"Block spans">.
-A zero <$length> is acceptable.
+A zero C<$length> is acceptable.
 The block span is used to set the literal equivalent for the
 set of alternative tokens completed by the
 C<lexeme_complete()> call.
