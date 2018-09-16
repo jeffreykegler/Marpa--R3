@@ -6262,9 +6262,21 @@ earleme, then the closest earleme is the current earleme.
 @d Closest_Earleme_of_R(r) ((r)->t_closest_earleme)
 @<Int aligned recognizer elements@> = JEARLEME t_closest_earleme;
 @ @<Initialize recognizer elements@> = r->t_closest_earleme = 0;
-@ @<Function definitions@> =
+
+@ {\bf To Do}: @^To Do@>
+|marpa_r_closest_earleme| would need to be modified
+to deal with inactive alternatives on
+the |t_alternatives| stack.
+@ Computed ``just in time''.
+@<Function definitions@> =
 unsigned int marpa_r_closest_earleme(Marpa_Recognizer r)
-{ return (unsigned int)Closest_Earleme_of_R(r); }
+{
+  const ALT end_of_stack = MARPA_DSTACK_TOP (r->t_alternatives, ALT_Object);
+  const unsigned int closest_earleme =
+    end_of_stack ? End_Earleme_of_ALT (end_of_stack) :
+    Current_Earleme_of_R (r);
+  return closest_earleme;
+}
 
 @*0 Event variables.
 The count of unmasked ISY events.
@@ -8108,9 +8120,6 @@ altered by the attempt.
   ALT_is_Valued(alternative) = value ? 1 : 0;
   if (Furthest_Earleme_of_R (r) < target_earleme)
     Furthest_Earleme_of_R (r) = target_earleme;
-  if (Closest_Earleme_of_R (r) > target_earleme ||
-    Closest_Earleme_of_R (r) <= current_earleme)
-    Closest_Earleme_of_R (r) = target_earleme;
   alternative->t_start_earley_set = current_earley_set;
   End_Earleme_of_ALT(alternative) = target_earleme;
   if (alternative_insert (r, alternative) < 0)
@@ -8228,7 +8237,6 @@ marpa_r_earleme_complete(Marpa_Recognizer r)
       {
         @<Set |r| exhausted@>@;
       }
-    @<Reset closest earleme@>@;
     earley_set_update_items(r, current_earley_set);
     @<Check count against Earley item warning threshold@>@;
     if (r->t_active_event_count > 0) {
@@ -8291,13 +8299,6 @@ The return value means success, with no events.
     /* |alternative_pop()| does not return inactive alternatives */
   while ((alternative = alternative_pop (r, current_earleme)))
     @<Scan an Earley item from alternative@>@;
-}
-
-@ @<Reset closest earleme@> =
-{
-  ALT end_of_stack = MARPA_DSTACK_TOP (r->t_alternatives, ALT_Object);
-  Closest_Earleme_of_R (r) =
-      end_of_stack ? End_Earleme_of_ALT (end_of_stack) : current_earleme;
 }
 
 @ The consequences of ignoring Leo items here is that a right
@@ -9249,9 +9250,6 @@ rejections.
 \li Re-determine if the parse is exhausted.
 \li What about postdot items?  If a LIM is now rejected, I should look
 at the YIM/PIM, I think, because it was {\bf not} necessarily rejected.
-
-@ {\bf To Do}: @^To Do@>
-Needs to be updated to deal with logic for the ``closest earleme''.
 
 @ Various notes about revision:
 \li I need to make sure that the reading of alternatives
