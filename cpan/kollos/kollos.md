@@ -5101,6 +5101,14 @@ TODO: Assumes that the value is all on one block.
 
 ```
     -- miranda: section+ most Lua function definitions
+    function _M.class_slr.closest_earleme(slr)
+        local g1r = slr.g1
+        return g1r:closest_earleme()
+    end
+```
+
+```
+    -- miranda: section+ most Lua function definitions
     function _M.class_slr.furthest_earleme(slr)
         local g1r = slr.g1
         return g1r:furthest_earleme()
@@ -9355,6 +9363,7 @@ the wrapper's point of view, marpa_r_alternative() always succeeds.
     {"marpa_r_earley_item_warning_threshold_set", "int", "too_many_earley_items"},
     {"marpa_r_earley_set_value", "Marpa_Earley_Set_ID", "ordinal"},
     {"marpa_r_expected_symbol_event_set", "Marpa_Symbol_ID", "isyid", "int", "value"},
+    {"marpa_r_closest_earleme"},
     {"marpa_r_furthest_earleme"},
     {"marpa_r_is_exhausted"},
     {"marpa_r_latest_earley_set"},

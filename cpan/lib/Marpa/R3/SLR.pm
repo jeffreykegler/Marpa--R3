@@ -580,9 +580,6 @@ END_OF_LUA
     return $latest_earley_set;
 }
 
-# Do not document, at least until there is some
-# R3 situation in which current earleme and latest
-# earleme are different.
 sub Marpa::R3::Recognizer::current_earleme {
     my ($slr) = @_;
     my ($current_earleme) = $slr->call_by_tag(
@@ -593,6 +590,18 @@ sub Marpa::R3::Recognizer::current_earleme {
     return current_earleme
 END_OF_LUA
     return $current_earleme;
+}
+
+sub Marpa::R3::Recognizer::closest_earleme {
+    my ($slr) = @_;
+    my ($closest_earleme) = $slr->call_by_tag(
+    ('@' . __FILE__ . ':' . __LINE__),
+        <<'END_OF_LUA', '');
+    local recce = ...
+    local closest_earleme = recce:closest_earleme()
+    return closest_earleme
+END_OF_LUA
+    return $closest_earleme;
 }
 
 sub Marpa::R3::Recognizer::furthest_earleme {
@@ -607,7 +616,6 @@ END_OF_LUA
     return $furthest_earleme;
 }
 
-# Not documented, I think
 sub Marpa::R3::Recognizer::latest_earleme {
     my ($slr) = @_;
     my ($latest_earleme) = $slr->call_by_tag(

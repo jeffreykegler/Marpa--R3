@@ -208,11 +208,10 @@ are some earlemes that are
 in the valid range of earlemes
 but do not map to any Earley set.
 
-As an alternative is using the C<earleme()> method,
+As an alternative to the C<earleme()> method,
 an application
-may want to implement an Earley set to earleme mapping
-at the application level.
-This allows the application taking advantage of what
+may want to its own Earley set to earleme mapping.
+This can allows an application to take advantage of what
 it knows about its choice of input model.
 
 =head2 furthest_earleme()
@@ -238,8 +237,8 @@ partial: 1
 
 =for Marpa::R3::Display::End
 
-TODO.
-
+The C<g1_pos()> method
+returns ID of the latest Earley set.
 The full description of the C<g1_pos()> method is
 L<elsewhere|Marpa::R3::Recognizer/"g1_pos()">.
 
@@ -254,6 +253,7 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 Returns the latest earleme.
+Always succeeds.
 
 =head2 lexeme_alternative()
 
@@ -265,7 +265,13 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-TODO.
+C<lexeme_alternative()> is one of the low level scanning
+mutators used for alternate input models.
+Its last argument is the earleme length, which allows
+variable length lexemes.
+For more about C<lexeme_alternative()> consult
+L<its full
+description|Marpa::R3::Recognizer/"g1_pos()">.
 
 =head2 lexeme_alternative_literal()
 
@@ -277,11 +283,31 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-TODO.
+C<lexeme_alternative_literal()> is one of the low level scanning
+mutators used for alternate input models.
+Its last argument is the earleme length, which allows
+variable length lexemes.
+For more about C<lexeme_alternative_literal()> consult
+L<its full
+description|Marpa::R3::Recognizer/"g1_pos()">.
 
 =head2 lexeme_complete()
 
-TODO.
+=for Marpa::R3::Display
+name: recognizer lexeme_complete() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
+
+=for Marpa::R3::Display::End
+
+C<lexeme_complete()> is the low level mutator used
+in alternative input models.
+C<lexeme_complete()> moves the parse forward to the
+next earleme at which a lexeme ends.
+
+TODO
 
 =head1 Alternative models and high level scanning
 

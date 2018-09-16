@@ -2668,6 +2668,15 @@ the value of the furthest earleme is set to
 the greater of its value before the call,
 and @var{current}+@var{length},
 where @var{current} is the value of the current earleme.
+If the value of the closest earleme is greater than the current
+earleme,
+then the value of the closest earleme is set to
+the lesser of its value before the call,
+and @var{current}+@var{length}.
+If the value of the closest earleme is equal to the current
+earleme,
+then the value of the closest earleme is set to
+@var{current}+@var{length}.
 The values of the current and latest earlemes
 are unchanged by
 calls to @code{marpa_r_alternative()}.
@@ -2903,6 +2912,11 @@ and the pointer value defaults to @code{NULL}.
 
 Return value: On success, returns a non-negative integer.
 On failure, returns @minus{}2.
+@end deftypefun
+
+@deftypefun @code{unsigned int} marpa_r_closest_earleme (Marpa_Recognizer @var{r})
+Return value: On success, the closest earleme.
+Always succeeds.
 @end deftypefun
 
 @deftypefun @code{unsigned int} marpa_r_furthest_earleme (Marpa_Recognizer @var{r})

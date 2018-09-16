@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 65;
+use Test::More tests => 76;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -69,13 +69,13 @@ if (1) {
 
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
 
-    test_locations( $recce, 0, 0, 0, 5, "after lexeme_alternative_literal()" );
+    test_locations( $recce, 0, 0, 0, 5, 5, "after lexeme_alternative_literal()" );
 
     my $new_offset = $recce->lexeme_complete( undef, 0, -1 );
     Test::More::is( $new_offset, $new_offset_wanted,
         "lexeme_complete() (is $new_offset vs $new_offset_wanted)" );
 
-    test_locations( $recce, 1, 5, 5, 5, "after lexeme_complete()" );
+    test_locations( $recce, 1, 5, 5, 5, 5, "after lexeme_complete()" );
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my @values;
@@ -111,19 +111,19 @@ if (1) {
 
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
 
-    test_locations( $recce, 0, 0, 0, 5, "after lexeme_alternative_literal()" );
+    test_locations( $recce, 0, 0, 0, 2, 5, "after lexeme_alternative_literal()" );
 
     my $new_offset = $recce->lexeme_complete( undef, 0, 2 );
     Test::More::is( $new_offset, 2,
         "lexeme_complete() (is $new_offset vs 2)" );
 
-    test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
+    test_locations( $recce, 1, 2, 2, 5, 5, "after lexeme_complete() 1" );
 
     $new_offset = $recce->lexeme_complete( undef, 2, 3 );
     Test::More::is( $new_offset, 5,
         "lexeme_complete() (is $new_offset vs 5)" );
 
-    test_locations( $recce, 2, 5, 5, 5, "after lexeme_complete() 1" );
+    test_locations( $recce, 2, 5, 5, 5, 5, "after lexeme_complete() 1" );
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my @values;
@@ -158,13 +158,13 @@ if (1) {
     $ok = $recce->lexeme_alternative_literal( 'A', 5 );
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
 
-    test_locations( $recce, 0, 0, 0, 5, "after lexeme_alternative_literal()" );
+    test_locations( $recce, 0, 0, 0, 2, 5, "after lexeme_alternative_literal()" );
 
     my $new_offset = $recce->lexeme_complete( undef, 0, 2 );
     Test::More::is( $new_offset, 2,
         "lexeme_complete() (is $new_offset vs 2)" );
 
-    test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
+    test_locations( $recce, 1, 2, 2, 5, 5, "after lexeme_complete() 1" );
 
     $ok = $recce->lexeme_alternative_literal( 'A', 3 );
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
@@ -173,7 +173,7 @@ if (1) {
     Test::More::is( $new_offset, 5,
         "lexeme_complete() (is $new_offset vs 5)" );
 
-    test_locations( $recce, 2, 5, 5, 5, "after lexeme_complete() 1" );
+    test_locations( $recce, 2, 5, 5, 5, 5, "after lexeme_complete() 1" );
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my @values;
@@ -212,13 +212,13 @@ if (1) {
     $ok = $recce->lexeme_alternative_literal( 'A', 5 );
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
 
-    test_locations( $recce, 0, 0, 0, 5, "after lexeme_alternative_literal()" );
+    test_locations( $recce, 0, 0, 0, 2, 5, "after lexeme_alternative_literal()" );
 
     my $new_offset = $recce->lexeme_complete( undef, 0, 2 );
     Test::More::is( $new_offset, 2,
         "lexeme_complete() (is $new_offset vs 2)" );
 
-    test_locations( $recce, 1, 2, 2, 5, "after lexeme_complete() 1" );
+    test_locations( $recce, 1, 2, 2, 5, 5, "after lexeme_complete() 1" );
 
     $ok = $recce->lexeme_alternative_literal( 'A', 3 );
     Test::More::ok( $ok, "lexeme_alternative_literal() succeeded" );
@@ -227,7 +227,7 @@ if (1) {
     Test::More::is( $new_offset, 2,
         "lexeme_complete() (is $new_offset vs 2)" );
 
-    test_locations( $recce, 2, 5, 5, 5, "after lexeme_complete() 1" );
+    test_locations( $recce, 2, 5, 5, 5, 5, "after lexeme_complete() 2" );
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
     my @values;
@@ -253,7 +253,7 @@ if (1) {
 
 sub test_locations {
     my ( $recce, $latest_es_wanted, $latest_earleme_wanted, $current_earleme_wanted,
-        $furthest_earleme_wanted, $where )
+        $closest_earleme_wanted, $furthest_earleme_wanted, $where )
       = @_;
     my $latest_es_seen = $recce->g1_pos();
     Test::More::is( $latest_es_seen, $latest_es_wanted,
@@ -264,6 +264,9 @@ sub test_locations {
     my $current_earleme_seen = $recce->current_earleme();
     Test::More::is( $current_earleme_seen, $current_earleme_wanted,
         "current earleme (is $current_earleme_seen vs $current_earleme_wanted) $where" );
+    my $closest_earleme_seen = $recce->closest_earleme();
+    Test::More::is( $closest_earleme_seen, $closest_earleme_wanted,
+        "closest earleme (is $closest_earleme_seen vs $closest_earleme_wanted) $where" );
     my $furthest_earleme_seen = $recce->furthest_earleme();
     Test::More::is( $furthest_earleme_seen, $furthest_earleme_wanted,
         "furthest earleme (is $furthest_earleme_seen vs $furthest_earleme_wanted) $where" );
