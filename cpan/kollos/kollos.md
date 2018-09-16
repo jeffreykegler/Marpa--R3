@@ -4593,8 +4593,8 @@ Always throws errors.
         local g1r = slr.g1
         slr.is_lo_level_scanning = false
         slr.event_queue = {}
-        local start_earley_set = g1r:latest_earley_set()
-        local latest_earley_set = start_earley_set
+        local this_earleme
+        local closest_earleme = slr:closest_earleme()
         -- Loop until we create a new earley set
         while true do
             local event_count = g1r:earleme_complete()
@@ -4602,10 +4602,8 @@ Always throws errors.
                 return error('Problem in slr->lexeme_complete(): '
                     ..  slr.slg.g1:error_description())
             end
-            latest_earley_set = g1r:latest_earley_set()
-            if start_earley_set ~= latest_earley_set then
-                break
-            end
+            this_earleme = slr:current_earleme()
+            if this_earleme >= closest_earleme then break end
             -- Return early if events occured that are not at an Earley
             -- set.  As of this writing, there are no such events:
             -- recognizer events only occur when
