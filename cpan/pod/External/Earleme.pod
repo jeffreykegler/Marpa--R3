@@ -179,36 +179,55 @@ for a call
 to C<marpa_r_alternative()>,
 the following is true:
 
-* The current earleme before the call was I<c>.
+=over 4
+
+=item * The current earleme before the call was I<c>.
+
+=back
+
 Because this is the standard model,
 this means that we also know that
 
-* The latest earleme before the call was I<c>.
+=over 4
 
-* The furthest earleme before the call was I<c>.
+=item * The latest earleme before the call was I<c>.
+
+=item * The furthest earleme before the call was I<c>.
+
+=back
+
 In that case,
 after the call to
 C<marpa_r_alternative()>,
 the following will be true:
 
-* The current earleme will still be I<c>.
+=over 4
 
-* The latest earleme will still be I<c>.
+=item * The current earleme will still be I<c>.
 
-* The furthest earleme will be I<c>+1.
+=item * The latest earleme will still be I<c>.
+
+=item * The furthest earleme will be I<c>+1.
+
+=back
 
 Suppose, in the standard model that,
 for a call
 to C<marpa_r_earleme_complete()>,
 the following is true:
 
-* The current earleme before the call is I<c>.
+=over 4
+
+=item * The current earleme before the call is I<c>.
 Because this is the standard model,
 this means that we also know that
 
-* The latest earleme before the call was I<c>.
+=item * The latest earleme before the call was I<c>.
 
-* The furthest earleme before the call was I<c+1>.
+=item * The furthest earleme before the call was I<c+1>.
+
+=back
+
 In that case,
 after the call
 to C<marpa_r_earleme_complete()>,
@@ -217,11 +236,15 @@ be the same.
 Specifically,
 the following will be true:
 
-* The current earleme will be advanced to I<c+1>.
+=over 4
 
-* The latest earleme will be advanced to I<c+1>.
+=item * The current earleme will be advanced to I<c+1>.
 
-* The furthest earleme will remain at I<c+1>.
+=item * The latest earleme will be advanced to I<c+1>.
+
+=item * The furthest earleme will remain at I<c+1>.
+
+=back
 
 =head1 Ambiguous input
 
@@ -265,47 +288,65 @@ for a call
 to C<marpa_r_alternative()>,
 the following is true:
 
-* The current earleme before the call was I<c>.
+=over 4
+
+=item * The current earleme before the call was I<c>.
 In this model, this means that
 the latest earleme before the call is also I<c>.
 
-* The furthest earleme before the call was I<old_f>.
+=item * The furthest earleme before the call was I<old_f>.
 
-* The length of the token is I<length>.
+=item * The length of the token is I<length>.
+
+=back
+
 In that case,
 after the call to
 C<marpa_r_alternative()>,
 the following will be true:
 
-* The current and latest earlemes will still be I<c>.
+=over 4
+
+=item * The current and latest earlemes will still be I<c>.
 The current and latest earlemes are never changed by a call
 to C<marpa_r_alternative()>.
 
-* The furthest earleme will be either I<old_f> or
- I<c>+I<length>, whichever was greater.
+=item * The furthest earleme will be either I<old_f> or
+I<c>+I<length>, whichever was greater.
+
+=back
 
 Suppose, in the variable length token model that,
 for a call
 to C<marpa_r_earleme_complete()>,
 the following is true:
 
-* The current earleme before the call is I<c>.
+=over 4
+
+=item * The current earleme before the call is I<c>.
 In this model, this means that
 the latest earleme before the call is also I<c>.
 
-* The furthest earleme before the call is I<old_f>.
+=item * The furthest earleme before the call is I<old_f>.
+
+=back
+
 In that case,
 after the call
 to C<marpa_r_earleme_complete()>,
 the following will be true:
 
-* The current earleme will be advanced to I<c+1>.
+=over 4
 
-* The latest earleme will also be I<c+1>.
+=item * The current earleme will be advanced to I<c+1>.
 
-* The furthest earleme will still be I<old_f>.
+=item * The latest earleme will also be I<c+1>.
+
+=item * The furthest earleme will still be I<old_f>.
 The furthest earleme is never changed by a call
 to C<marpa_r_earleme_complete()>.
+
+=back
 
 =head1 The generalized model
 
@@ -326,27 +367,35 @@ to C<marpa_r_earleme_complete()>
 creates an empty earleme if and only if
 it falls into one of these two cases:
 
-* There has been no call
+=over 4
+
+=item * There has been no call
 to C<marpa_r_alternative()> since
 recognizer initialization.
 
-* No previous call to C<marpa_r_alternative()> created
+=item * No previous call to C<marpa_r_alternative()> created
 a lexeme which ends at the next earleme.
 The "next earleme" is I<c+1>,
 where I<c> is the current earleme.
+
+=back
 
 A previous call to
 C<marpa_r_alternative()> created
 an earleme which ends at I<lex_end>,
 if
 
-* It was called when the current earleme
+=over 4
+
+=item * It was called when the current earleme
 was I<lex_start>.
 
-* It created a lexeme of length I<lex_len>.
+=item * It created a lexeme of length I<lex_len>.
 
-* I<lex_start+lex_len> is equal to
+=item * I<lex_start+lex_len> is equal to
 I<lex_end>.
+
+=back
 
 Note that the above implies the ordinary case:
 If C<marpa_r_alternative()> is called
@@ -361,25 +410,34 @@ to C<marpa_r_earleme_complete()>
 that creates an empty earleme,
 the following is true:
 
-* The current earleme before the call is I<c>.
+=over 4
 
-* The latest earleme before the call is I<old_l>.
+=item * The current earleme before the call is I<c>.
 
-* The furthest earleme before the call is I<old_f>.
+=item * The latest earleme before the call is I<old_l>.
+
+=item * The furthest earleme before the call is I<old_f>.
+
+=back
+
 In that case,
 after the call
 to C<marpa_r_earleme_complete()>,
 the following will be true:
 
-* The current earleme will be advanced to I<c+1>.
+=over 4
 
-* The latest earleme will remain at I<old_l>.
+=item * The current earleme will be advanced to I<c+1>.
+
+=item * The latest earleme will remain at I<old_l>.
 This means that the latest earleme will be less than
 the current earleme.
 
-* The furthest earleme will remain at I<old_f>.
+=item * The furthest earleme will remain at I<old_f>.
 The furthest earleme is never changed by a call
 to C<marpa_r_earleme_complete()>.
+
+=back
 
 Suppose, in the generalized input model that,
 for a call
@@ -387,23 +445,32 @@ to C<marpa_r_earleme_complete()>
 that does not create an empty earleme,
 the following is true:
 
-* The current earleme before the call is I<c>.
+=over 4
 
-* The latest earleme before the call is I<old_l>.
+=item * The current earleme before the call is I<c>.
 
-* The furthest earleme before the call is I<old_f>.
+=item * The latest earleme before the call is I<old_l>.
+
+=item * The furthest earleme before the call is I<old_f>.
+
+=back
+
 In that case,
 after the call
 to C<marpa_r_earleme_complete()>,
 the following will be true:
 
-* The current earleme will be advanced to I<c+1>.
+=over 4
 
-* The latest earleme will be advanced to I<c+1>.
+=item * The current earleme will be advanced to I<c+1>.
 
-* The furthest earleme will remain at I<old_f>.
+=item * The latest earleme will be advanced to I<c+1>.
+
+=item * The furthest earleme will remain at I<old_f>.
 The furthest earleme is never changed by a call
 to C<marpa_r_earleme_complete()>.
+
+=back
 
 =head1 General rules for the earleme variables
 
@@ -412,31 +479,42 @@ introduced.
 Here are some useful facts about the earleme variables that will always be the case,
 no matter which of the input models is in use.
 
-* The current earleme is always greater than
+=over 4
+
+=item * The current earleme is always greater than
 or equal to the latest earleme.
 
-* The furthest earleme is always greater than
+=item * The furthest earleme is always greater than
 or equal to the latest earleme.
 
-* If the furthest earleme is greater than the current earleme,
+=item * If the furthest earleme is greater than the current earleme,
 the parser is not exhausted.
 
-* If the furthest earleme is less than the current earleme,
+=item * If the furthest earleme is less than the current earleme,
 the parser is exhausted.
+
+=back
 
 If the parser is not exhausted,
 the following will always be true,
 no matter which of the input models is in use.
 
-* The furthest earleme is greater than
+=over 4
+
+=item * The furthest earleme is greater than
 or equal to the current earleme.
+
+=back
 
 In an exhausted parser, the following will always be true,
 no matter which of the input models is in use.
 
-* The furthest earleme is less than
+=over 4
+
+=item * The furthest earleme is less than
 or equal to the current earleme.
 
+=back
 
 =head1 Copyright and License
 
