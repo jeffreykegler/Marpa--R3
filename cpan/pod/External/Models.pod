@@ -28,6 +28,10 @@ it is still safe to ignore this document,
 but you might find the possibilities it discusses
 interesting.
 
+This is not the document to which to turn first.
+Before reading this document, you should be familiar with
+L<Marpa::R3::External::Basic>.
+
 =head1 Earlemes
 
 In the other Marpa documentation,
@@ -171,6 +175,30 @@ In the default input model, the latest earleme is always the
 same as the furthest earleme.
 
 =head1 Methods
+
+=head2 closest_earleme()
+
+=for Marpa::R3::Display
+name: recognizer closest_earleme() synopsis
+normalize-whitespace: 1
+
+    my $closest_earleme = $recce->closest_earleme();
+
+=for Marpa::R3::Display::End
+
+Returns the closest earleme.
+
+=head2 current_earleme()
+
+=for Marpa::R3::Display
+name: recognizer current_earleme() synopsis
+normalize-whitespace: 1
+
+    my $current_earleme = $recce->current_earleme();
+
+=for Marpa::R3::Display::End
+
+Returns the current earleme.
 
 =head2 earleme()
 

@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -87,6 +87,15 @@ Test::More::is ($latest_earleme_direct, 2,
 $ok = $recce->lexeme_alternative_literal ('A', 3);
 
 #Marpa::R3::Display::End
+
+# Marpa::R3::Display
+# name: recognizer current_earleme() synopsis
+
+my $current_earleme = $recce->current_earleme();
+
+# Marpa::R3::Display::End
+
+Test::More::is($current_earleme, 2, "current earleme");
 
 # Marpa::R3::Display
 # name: recognizer closest_earleme() synopsis
