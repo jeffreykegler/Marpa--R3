@@ -32,6 +32,23 @@ This is not the document to which to turn first.
 Before reading this document, you should be familiar with
 L<Marpa::R3::External::Basic>.
 
+=head2 The pending lexeme queue
+
+Marpa maintains a queue of pending lexemes,
+from "closest" to "furthest".
+The lexeme which ends closest to the current earleme
+(that is, has the lowest earleme number)
+is the "closest lexeme".
+The lexeme which ends furthest from the current earleme
+(that is, has the highest earleme number)
+is the "furthest lexeme".
+The pending lexeme queue may be empty,
+in which case the closest and furthest earleme
+are the same as the current earleme.
+
+If the pending lexeme queue is of length 1,
+the closest earleme will be equal to the furthest earleme.
+
 =head1 Earlemes, intuitively
 
 In the other Marpa documentation,

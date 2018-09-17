@@ -184,6 +184,12 @@ no token is read.
 The current G1 location will remain where it was
 before external scanning.
 
+A
+L<parse event|Marpa::R3::Event>
+may call an event handler.
+The event handler will see
+a G1 location and an event location as just described.
+
 =head2 Success with other events
 
 What happens if
@@ -202,6 +208,12 @@ The token just read will start at the previous G1 location
 and end at the new current G1 location.
 The G1 location of the token is considered to be
 the new current G1 location.
+
+A
+L<parse event|Marpa::R3::Event>
+may call an event handler.
+The event handler will see
+a G1 location and an event location as just described.
 
 =head2 Soft failure
 
@@ -227,14 +239,6 @@ Marpa::R3 will attempt to leave the current block data valid
 and pointing to an "error location" -- that is, a location
 as relevant as possible to the error.
 Marpa::R3 will attempt to leave the current G1 location valid and unchanged.
-
-=head2 Event handlers
-
-L<Parse events|Marpa::R3::Event>
-may occur during external scanning completion.
-The event handlers will see
-a G1 location and an event location as described
-above.
 
 =head1 High-level mutators
 
@@ -349,6 +353,14 @@ normalize-whitespace: 1
     }
 
 =for Marpa::R3::Display::End
+
+B<Return values>:
+On success, C<lexeme_read_literal()> returns the new current offset.
+Soft failure occurs if and only if
+the token was rejected.
+On soft failure,
+C<lexeme_read_literal()> returns a Perl C<undef>.
+Other failures are thrown as exceptions.
 
 =head2 lexeme_read_string()
 
