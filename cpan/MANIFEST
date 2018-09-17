@@ -217,8 +217,8 @@ pod/Progress.pod
 pod/Scanless.pod
 pod/DSL.pod
 pod/External/Basic.pod
-pod/External/Earleme.pod
-pod/External/Models.pod
+pod/External/Model.pod
+pod/External/Low.pod
 pod/Grammar.pod
 pod/Recognizer.pod
 pod/Valuer.pod
