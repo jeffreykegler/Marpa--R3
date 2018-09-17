@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-Marpa::R3::External::Models - Other input models
+Marpa::R3::External::Low - Low-level external scanning
 
 =head1 About this document
 
@@ -587,6 +587,310 @@ real use in Marpa programs.
 But other models are certainly possible.
 Using earlemes,
 you can structure your input in almost any way you like.
+
+=head1 Mixing internal and external scanning
+
+External scanning can be mixed with internal scanning
+to get the best of both.
+An application can
+terminate the internal scanning of
+the C<read()> method early, if it has defined an parse event
+and that parse event triggers.
+Afterwards,
+internal scanning can be resumed with the L<resume()|/"resume()"> method.
+For details,
+see L<the description of C<resume()>|Marpa::R3::Recognizer/"resume()">,
+as well as
+L<the separate document for events|Marpa::R3::Event>.
+
+=head1 High level equivalents
+
+=head2 Low level equivalent of C<lexeme_read_block()>
+
+=for Marpa::R3::Display
+ignore: 1
+
+    $recce->lexeme_read_block($symbol, $start, $length, $value)
+
+=for Marpa::R3::Display::End
+
+is roughly equivalent to
+
+=for Marpa::R3::Display
+name: recognizer lexeme_read_block() low-level equivalent
+normalize-whitespace: 1
+
+    sub read_block_equivalent {
+        my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
+        return if not defined $recce->lexeme_alternative( $symbol_name, $value );
+        return $recce->lexeme_complete( $block_id, $offset, $length );
+    }
+
+=for Marpa::R3::Display::End
+
+=head2 Low level equivalent of C<lexeme_read_literal()>
+
+In terms of low-level external scanning methods,
+the above is roughly equivalent to
+
+=for Marpa::R3::Display
+name: recognizer lexeme_read_literal() low-level equivalent
+normalize-whitespace: 1
+
+    sub read_literal_equivalent_lo {
+        my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
+        return if not defined $recce->lexeme_alternative_literal( $symbol_name );
+        return $recce->lexeme_complete( $block_id, $offset, $length );
+    }
+
+=for Marpa::R3::Display::End
+
+=head2 Low level equivalent of C<lexeme_read_string()>
+
+In terms of low-level external scanning methods,
+C<lexeme_read_string()> is roughly equivalent to
+
+=for Marpa::R3::Display
+name: recognizer lexeme_read_string() low-level equivalent
+normalize-whitespace: 1
+
+    sub read_string_equivalent_lo {
+        my ($recce, $symbol_name, $string) = @_;
+        my ($save_block) = $recce->block_progress();
+        my $lexeme_block = $recce->block_new( \$string );
+        return if not defined $recce->lexeme_alternative( $symbol_name, $string );
+        my $return_value = $recce->lexeme_complete( $lexeme_block );
+        $recce->block_set($save_block);
+        return $return_value;
+    }
+
+=for Marpa::R3::Display::End
+
+The example just above shows the value of the token being set to a string
+in the C<lexeme_alternative()> call.
+Not that this is not efficient for very long strings.
+
+=head1 Low-level mutators
+
+This section documents the low-level external scanning methods.
+The low-level mutators allows some advanced techniques,
+notably the reading of ambiguous tokens.
+Most applications will want to use
+L<the high-level methods|High-level mutators>
+instead.
+
+=head2 lexeme_alternative()
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
+    if (not defined $ok) {
+        my $literal = $recce->literal( $block_id, $offset, $length );
+        die qq{Parser rejected symbol named "$symbol_name" },
+            qq{at position $offset, before lexeme "$literal"};
+    }
+
+=for Marpa::R3::Display::End
+
+For advanced uses,
+there is also a three-argument form:
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative() variable length synopsis
+normalize-whitespace: 1
+
+    $ok = $recce->lexeme_alternative( 'A', 42, 2 );
+
+=for Marpa::R3::Display::End
+
+C<lexeme_alternative()> is one of the low-level methods of the external scanner.
+Most applications
+will prefer the simpler
+L<C<lexeme_read_string()>|/"lexeme_read_string()">,
+L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
+and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
+
+C<lexeme_alternative()> takes up to three arguments.
+The first two are, in order, C<$symbol_name> and C<$value>.
+C<$symbol_name> is required
+and must be the name of a symbol to be read
+at the current location.
+C<$value> is optional,
+and specifies the value of the symbol.
+If C<$value> is missing, the value of the symbol
+will be a Perl C<undef>.
+
+The fourth, optional, argument may be ignored by most applications.
+It is the length of the lexeme in earlemes.
+Earleme length will almost always be 1,
+which is the default.
+The ability to specify other earleme lengths enables
+some very powerful, but advanced, techniques,
+which are described
+L<elsewhere|Marpa::R3::External::Low>.
+
+The C<lexeme_alternative()> method is a non-completion method -- it adds to
+the list of accepted tokens.
+To be read by the parser, this list of accepted tokens
+must be completed by a later call
+to the C<lexeme_complete()> method.
+By making two or more calls
+of the C<lexeme_alternative()> method
+before the next call of C<lexeme_complete()>,
+an app can read an
+ambiguous token.
+(An ambiguous token is one which can be more than one symbol.)
+
+When the recognizer starts,
+the list of accepted tokens is empty.
+The list of accepted tokens is cleared whenever C<lexeme_complete()>
+is called.
+It is a fatal error
+if a high level scanning method is called while the list of accepted
+tokens is non-empty,
+
+C<lexeme_alternative()> has a soft failure if it rejects 
+C<$symbol_name>.
+All other failures are hard failures.
+
+B<Return values>:
+Returns C<undef> if the token was rejected.
+On success, returns a value reserved for future use.
+The value on success will not necessarily be a Perl true,
+so that apps testing for rejection must test for a Perl C<undef> explicitly.
+Failures are thrown as exceptions.
+
+=head2 lexeme_alternative_literal()
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative_literal() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    my $ok = $recce->lexeme_alternative_literal($symbol_name);
+    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
+            if not defined $ok;
+
+=for Marpa::R3::Display::End
+
+For advanced uses,
+there is also a two-argument form:
+
+=for Marpa::R3::Display
+name: recognizer lexeme_alternative_literal() variable length synopsis
+normalize-whitespace: 1
+
+    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
+
+=for Marpa::R3::Display::End
+
+C<lexeme_alternative_literal()> is one of the low-level methods of the external scanner.
+Most applications
+will prefer the simpler
+L<C<lexeme_read_string()>|/"lexeme_read_string()">,
+L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
+and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
+
+C<lexeme_alternative_literal()> takes up to two arguments,
+the first of which is required.
+C<lexeme_alternative_literal()> and
+C<lexeme_alternative()> differ from each other
+only in their arguments,
+and in how they set the value of the token.
+For a token read by C<lexeme_alternative_literal()>,
+the value of the token will be the same as its literal equivalent.
+This literal equivalent
+will be set by the next call to 
+C<lexeme_complete()>.
+Otherwise, C<lexeme_alternative_literal()> behaves in
+exactly the same way as
+C<lexeme_alternative()>.
+
+The second, optional, argument may be ignored by most applications.
+It is the length of the lexeme in earlemes.
+Earleme length will almost always be 1,
+which is the default.
+The ability to specify other earleme lengths enables
+some very powerful, but advanced, techniques,
+which are described
+L<elsewhere|Marpa::R3::External::Low>.
+
+=head2 lexeme_complete()
+
+=for Marpa::R3::Display
+name: recognizer lexeme_complete() synopsis
+partial: 1
+normalize-whitespace: 1
+
+    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
+
+=for Marpa::R3::Display::End
+
+C<lexeme_complete()> is one of the low-level methods of the external scanner.
+Most applications
+will prefer the simpler
+L<C<lexeme_read_string()>|/"lexeme_read_string()">,
+L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
+and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
+
+Use of the low-level methods allows
+the reading of ambiguous tokens.
+C<lexeme_complete()>
+completes the reading of a set of tokens specified by
+one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
+method.
+
+The C<lexeme_complete()> method
+accepts three optional arguments.
+Call them, in order,
+C<$block_id>, C<$offset> and C<$length>.
+These specify a
+L<block span|Marpa::R3::Recognizer/"Block spans">.
+A zero C<$length> is acceptable.
+The block span is used to set the literal equivalent for the
+set of alternative tokens completed by the
+C<lexeme_complete()> call.
+If C<$block_id> is not defined,
+the specified block is the current block.
+If C<$offset> is not defined,
+the specified offset is the current offset
+of the specified block.
+If C<$length> is not defined,
+the specifed length is the
+end-of-block of the specified block,
+less the specified offset --
+in other words, the specified block span
+includes the entire remaining specified block.
+
+C<lexeme_read_literal()> is an external scanning completion
+method and, with one important difference,
+the details of its behavior are
+L<as described above|"High level methods in general">.
+The difference is that token rejection never occurs
+in C<lexeme_complete()>.
+C<lexeme_complete()> relies on the app to have built a list
+of accepted tokens using the
+C<lexeme_alternative()>
+or
+C<lexeme_alternative_literal()>
+calls.
+
+It is a hard failure if C<lexeme_complete()> is called
+but the list of tokens accepted by
+C<lexeme_alternative()>
+or
+C<lexeme_alternative_literal()>
+methods is empty.
+All failures in C<lexeme_complete()> are hard failures.
+
+B<Return values:>
+On success, C<lexeme_complete()>
+returns the new current location.
+Failure is always thrown.
 
 
 =head1 Copyright and License

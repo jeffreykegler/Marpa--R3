@@ -75,7 +75,7 @@ in external scanning, the app feeds tokens to Marpa::R3 one-by-one.
 This differs from internal scanning -- in internal scanning
 Marpa::R3 tokenizes a string for the app.
 
-Every token must have three things associated with it:
+Every token may have three things associated with it:
 
 =over 4
 
@@ -113,22 +113,19 @@ all of the tokens must have the same literal equivalent.
 
 =back
 
-=head1 Completion and non-completion methods
+=head1 High level and low level methods
 
-If a method might complete external scanning at a G1 location,
-that method is called an external scanning completion method,
-or just a B<completion method>.
-Any other external scanning method is called a non-completion
-method.
+In scanning externally, you can use high level or
+low level methods.
+The simpler methods, and the ones which most
+users will want,
+are the high level methods.
+They are described in this document.
+The low level external scanning methods are
+described
+L<in another document|Marpa::R3::External::Low>.
 
-There are only two non-completion external scanning methods:
-C<lexeme_alternative()>
-and
-C<lexeme_alternative_literal()>.
-These are low-level methods which prepare a list of tokens
-for the C<lexeme_complete()> completion method.
-
-=head1 Completion method details
+=head1 High level methods in general
 
 The external scanning completion methods
 have almost all of their behaviors in common.
@@ -143,7 +140,7 @@ or soft.
 The only soft failure that can occur in external scanning completion
 is the rejection of a token.
 
-=head2 Block location
+=head2 Location
 
 Every external scanning completion must have a valid block span,
 unless that completion results in a hard failure.
@@ -161,23 +158,30 @@ as C<$offset> + C<$length>.
 
 If external scanning completion succeeds and no event occurs,
 the current block is set to C<$block_id>.
-The current offset is set to eolexeme.
+The current offset is set to C<eolexeme>.
 The current eoread of the current block will
 not be changed.
 
+The current G1 location is advanced by one.
+The token just read will start at the previous G1 location
+and end at the new current G1 location.
+The G1 location of the token is considered to be
+the new current G1 location.
+
 =item *
 
-If external scanning completion succeeds and an event occurs,
+If external scanning completion succeeds and an event,
+other than a pre-lexeme event,
+occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the event location.
-The event location will be the same as eolexeme,
+The event location will be the same as C<eolexeme>,
 unless the event was a pre-lexeme event.
 The current eoread of the current block will
 not be changed.
 
 =item *
 
-This is a special case of the immediately preceding case.
 If external scanning completion succeeds and a pre-lexeme event occurs,
 the current block is set to C<$block_id>.
 The current offset is set to the event location,
@@ -185,12 +189,24 @@ which will be the same as C<$offset>.
 The current eoread of the current block will
 not be changed.
 
+If external scanning completion succeeds,
+and a pre-lexeme event does occur,
+no token is read.
+The current G1 location will remain where it was
+before external scanning.
+
 =item *
 
 If an external scanning completion method rejects a token,
 then the external scanning completion results in a soft failure.
 In this case the current block data
 remains unchanged.
+
+If external scanning completion has a soft failure,
+no token is read.
+The current G1 location will remain where it was
+before external scanning.
+
 
 =item *
 
@@ -203,34 +219,11 @@ Marpa::R3 will attempt to leave the current block data valid
 and pointing to an "error location" -- that is, a location
 as relevant as possible to the error.
 
-=back
-
-=head2 G1 location
-
-If external scanning completion succeeds,
-and a pre-lexeme event does not occur,
-a token is read and
-Marpa::R3 advances
-the current G1 location by one.
-The token just read will start at the previous G1 location
-and end at the new current G1 location.
-The G1 location of the token will be considered to be
-the new current G1 location.
-
-If external scanning completion succeeds,
-and a pre-lexeme event does occur,
-no token is read.
-The current G1 location will remain where it was
-before external scanning.
-
-If external scanning completion has a soft failure,
-no token is read.
-The current G1 location will remain where it was
-before external scanning.
-
 If external scanning completion has a hard failure,
 no guarantee is made about the current G1 location.
 Marpa::R3 will attempt to leave it valid and unchanged.
+
+=back
 
 =head2 Event handlers
 
@@ -239,21 +232,6 @@ may occur during external scanning completion.
 The event handlers will see
 a G1 location and an event location as described
 above.
-
-=head1 Mixing internal and external scanning
-
-External scanning can be mixed with internal scanning
-to get the best of both.
-An application can
-terminate the internal scanning of
-the C<read()> method early, if it has defined an parse event
-and that parse event triggers.
-Afterwards,
-internal scanning can be resumed with the L<resume()|/"resume()"> method.
-For details,
-see L<the description of C<resume()>|Marpa::R3::Recognizer/"resume()">,
-as well as
-L<the separate document for events|Marpa::R3::Event>.
 
 =head1 High-level mutators
 
@@ -305,7 +283,7 @@ are the literal equivalent of the token, as a
 L<block span|/"Block spans">.
 C<lexeme_read_block()> is an external scanning completion
 method and details of its behavior are
-L<as described above|"Completion method details">.
+L<as described above|"High level methods in general">.
 
 B<Return values>:
 On success, C<lexeme_read_block()> returns the new current offset.
@@ -314,27 +292,6 @@ the token was rejected.
 On soft failure,
 C<lexeme_read_block()> returns a Perl C<undef>.
 Other failures are thrown as exceptions.
-
-=for Marpa::R3::Display
-ignore: 1
-
-    $recce->lexeme_read_block($symbol, $start, $length, $value)
-
-=for Marpa::R3::Display::End
-
-is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_block() low-level equivalent
-normalize-whitespace: 1
-
-    sub read_block_equivalent {
-        my ( $recce, $symbol_name, $value, $block_id, $offset, $length ) = @_;
-        return if not defined $recce->lexeme_alternative( $symbol_name, $value );
-        return $recce->lexeme_complete( $block_id, $offset, $length );
-    }
-
-=for Marpa::R3::Display::End
 
 =head2 lexeme_read_literal()
 
@@ -367,7 +324,7 @@ The value of the token will be the same
 as its literal equivalent.
 C<lexeme_read_literal()> is an external scanning completion
 method and details of its behavior are
-L<as described above|"Completion method details">.
+L<as described above|"High level methods in general">.
 
 =for Marpa::R3::Display
 ignore: 1
@@ -386,21 +343,6 @@ normalize-whitespace: 1
         my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
         my $value = $recce->literal( $block_id, $offset, $length );
         return $recce->lexeme_read_block( $symbol_name, $value, $block_id, $offset, $length );
-    }
-
-=for Marpa::R3::Display::End
-
-In terms of low-level external scanning methods,
-the above is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_literal() low-level equivalent
-normalize-whitespace: 1
-
-    sub read_literal_equivalent_lo {
-        my ( $recce, $symbol_name, $block_id, $offset, $length ) = @_;
-        return if not defined $recce->lexeme_alternative_literal( $symbol_name );
-        return $recce->lexeme_complete( $block_id, $offset, $length );
     }
 
 =for Marpa::R3::Display::End
@@ -430,7 +372,7 @@ and its literal equivalent.
 C<lexeme_read_literal()> is an external scanning completion
 method and, with two important exceptions,
 the details of its behavior are
-L<as described above|"Completion method details">.
+L<as described above|"High level methods in general">.
 
 The first difference is that,
 on success,
@@ -460,14 +402,6 @@ Also, event handlers
 which
 trigger during the C<lexeme_read_string()> method
 will see the per-string block.
-
-B<Return values>:
-On success, C<lexeme_read_block()> returns the new current offset.
-Soft failure occurs if and only if
-the token was rejected.
-On soft failure,
-C<lexeme_read_block()> returns a Perl C<undef>.
-Other failures are thrown as exceptions.
 
 =for Marpa::R3::Display
 ignore: 1
@@ -503,250 +437,13 @@ while C<lexeme_read_string()> sets the value of the token to a string.
 Marpa::R3 optimizes token values when they are literals in its
 input text blocks.
 
-In terms of low-level external scanning methods,
-C<lexeme_read_string()> is roughly equivalent to
-
-=for Marpa::R3::Display
-name: recognizer lexeme_read_string() low-level equivalent
-normalize-whitespace: 1
-
-    sub read_string_equivalent_lo {
-        my ($recce, $symbol_name, $string) = @_;
-        my ($save_block) = $recce->block_progress();
-        my $lexeme_block = $recce->block_new( \$string );
-        return if not defined $recce->lexeme_alternative( $symbol_name, $string );
-        my $return_value = $recce->lexeme_complete( $lexeme_block );
-        $recce->block_set($save_block);
-        return $return_value;
-    }
-
-=for Marpa::R3::Display::End
-
-The example just above shows the value of the token being set to a string
-in the C<lexeme_alternative()> call.
-As mentioned, this is not efficient for very long strings.
-
-=head1 Low-level mutators
-
-This section documents the low-level external scanning methods.
-The low-level mutators allows some advanced techniques,
-notably the reading of ambiguous tokens.
-Most applications will want to use
-L<the high-level methods|High-level mutators>
-instead.
-
-=head2 lexeme_alternative()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my $ok = $recce->lexeme_alternative( $symbol_name, $value );
-    if (not defined $ok) {
-        my $literal = $recce->literal( $block_id, $offset, $length );
-        die qq{Parser rejected symbol named "$symbol_name" },
-            qq{at position $offset, before lexeme "$literal"};
-    }
-
-=for Marpa::R3::Display::End
-
-For advanced uses,
-there is also a three-argument form:
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative() variable length synopsis
-normalize-whitespace: 1
-
-    $ok = $recce->lexeme_alternative( 'A', 42, 2 );
-
-=for Marpa::R3::Display::End
-
-C<lexeme_alternative()> is one of the low-level methods of the external scanner.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
-C<lexeme_alternative()> takes up to three arguments.
-The first two are, in order, C<$symbol_name> and C<$value>.
-C<$symbol_name> is required
-and must be the name of a symbol to be read
-at the current location.
-C<$value> is optional,
-and specifies the value of the symbol.
-If C<$value> is missing, the value of the symbol
-will be a Perl C<undef>.
-
-The fourth, optional, argument may be ignored by most applications.
-It is the length of the lexeme in earlemes.
-Earleme length will almost always be 1,
-which is the default.
-The ability to specify other earleme lengths enables
-some very powerful, but advanced, techniques,
-which are described
-L<elsewhere|Marpa::R3::External::Models>.
-
-The C<lexeme_alternative()> method is a non-completion method -- it adds to
-the list of accepted tokens.
-To be read by the parser, this list of accepted tokens
-must be completed by a later call
-to the C<lexeme_complete()> method.
-By making two or more calls
-of the C<lexeme_alternative()> method
-before the next call of C<lexeme_complete()>,
-an app can read an
-ambiguous token.
-(An ambiguous token is one which can be more than one symbol.)
-
-When the recognizer starts,
-the list of accepted tokens is empty.
-The list of accepted tokens is cleared whenever C<lexeme_complete()>
-is called.
-It is a fatal error
-if a high level scanning method is called while the list of accepted
-tokens is non-empty,
-
-C<lexeme_alternative()> has a soft failure if it rejects 
-C<$symbol_name>.
-All other failures are hard failures.
-
 B<Return values>:
-Returns C<undef> if the token was rejected.
-On success, returns a value reserved for future use.
-The value on success will not necessarily be a Perl true,
-so that apps testing for rejection must test for a Perl C<undef> explicitly.
-Failures are thrown as exceptions.
-
-=head2 lexeme_alternative_literal()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative_literal() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my $ok = $recce->lexeme_alternative_literal($symbol_name);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
-        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
-            if not defined $ok;
-
-=for Marpa::R3::Display::End
-
-For advanced uses,
-there is also a two-argument form:
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative_literal() variable length synopsis
-normalize-whitespace: 1
-
-    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
-
-=for Marpa::R3::Display::End
-
-C<lexeme_alternative_literal()> is one of the low-level methods of the external scanner.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
-C<lexeme_alternative_literal()> takes up to two arguments,
-the first of which is required.
-C<lexeme_alternative_literal()> and
-C<lexeme_alternative()> differ from each other
-only in their arguments,
-and in how they set the value of the token.
-For a token read by C<lexeme_alternative_literal()>,
-the value of the token will be the same as its literal equivalent.
-This literal equivalent
-will be set by the next call to 
-C<lexeme_complete()>.
-Otherwise, C<lexeme_alternative_literal()> behaves in
-exactly the same way as
-C<lexeme_alternative()>.
-
-The second, optional, argument may be ignored by most applications.
-It is the length of the lexeme in earlemes.
-Earleme length will almost always be 1,
-which is the default.
-The ability to specify other earleme lengths enables
-some very powerful, but advanced, techniques,
-which are described
-L<elsewhere|Marpa::R3::External::Models>.
-
-=head2 lexeme_complete()
-
-=for Marpa::R3::Display
-name: recognizer lexeme_complete() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
-
-=for Marpa::R3::Display::End
-
-C<lexeme_complete()> is one of the low-level methods of the external scanner.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
-Use of the low-level methods allows
-the reading of ambiguous tokens.
-C<lexeme_complete()>
-completes the reading of a set of tokens specified by
-one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
-method.
-
-The C<lexeme_complete()> method
-accepts three optional arguments.
-Call them, in order,
-C<$block_id>, C<$offset> and C<$length>.
-These specify a
-L<block span|Marpa::R3::Recognizer/"Block spans">.
-A zero C<$length> is acceptable.
-The block span is used to set the literal equivalent for the
-set of alternative tokens completed by the
-C<lexeme_complete()> call.
-If C<$block_id> is not defined,
-the specified block is the current block.
-If C<$offset> is not defined,
-the specified offset is the current offset
-of the specified block.
-If C<$length> is not defined,
-the specifed length is the
-end-of-block of the specified block,
-less the specified offset --
-in other words, the specified block span
-includes the entire remaining specified block.
-
-C<lexeme_read_literal()> is an external scanning completion
-method and, with one important difference,
-the details of its behavior are
-L<as described above|"Completion method details">.
-The difference is that token rejection never occurs
-in C<lexeme_complete()>.
-C<lexeme_complete()> relies on the app to have built a list
-of accepted tokens using the
-C<lexeme_alternative()>
-or
-C<lexeme_alternative_literal()>
-calls.
-
-It is a hard failure if C<lexeme_complete()> is called
-but the list of tokens accepted by
-C<lexeme_alternative()>
-or
-C<lexeme_alternative_literal()>
-methods is empty.
-All failures in C<lexeme_complete()> are hard failures.
-
-B<Return values:>
-On success, C<lexeme_complete()>
-returns the new current location.
-Failure is always thrown.
+On success, C<lexeme_read_block()> returns the new current offset.
+Soft failure occurs if and only if
+the token was rejected.
+On soft failure,
+C<lexeme_read_block()> returns a Perl C<undef>.
+Other failures are thrown as exceptions.
 
 =head1 COPYRIGHT AND LICENSE
 

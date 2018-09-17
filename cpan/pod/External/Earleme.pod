@@ -37,7 +37,7 @@ This is not the document to which to turn first.
 Before reading this document, you should be familiar with
 L<Marpa::R3::External::Basic>
 and 
-L<Marpa::R3::External::Models>.
+L<Marpa::R3::External::Low>.
 
 =head1 The traditional model
 
