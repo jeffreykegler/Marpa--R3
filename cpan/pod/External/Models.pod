@@ -32,7 +32,7 @@ This is not the document to which to turn first.
 Before reading this document, you should be familiar with
 L<Marpa::R3::External::Basic>.
 
-=head1 Earlemes
+=head1 Earlemes, intuitively
 
 In the other Marpa documentation,
 we have assumed the standard input model,
@@ -52,11 +52,100 @@ and Earley set ordinal
 will always be exactly the same.
 
 This document introduces methods which make it
-very possible that earleme location and 
+very possible that earleme location and
 Earley set ID will differ.
 From here on,
 the reader will need to pay careful attention
 to the distinction.
+
+Intuitively, earlemes exist because
+because the usual idea of location,
+G1 location, is tied to the tokenization,
+For most applications, it is OK to reduce the parser's idea of
+location to tokenization.
+When an application ties earlemes to the tokenization,
+it is using the earleme-per-token model.
+This is the default.
+
+Location can also be tied to the physical input.
+That is the earleme-per-character model.
+But Marpa allows multiple input blocks,
+and jumping back and forth in them.
+This ability is required in many practical applications.
+Some applications, therefore,
+cannot use either the
+earleme-per-token or
+the earleme-per-character model.
+
+Earlemes provide a "middle" ground.
+They are zero-based and monotonic,
+and therefore can be relied on as a well-behaved idea of location.
+But they are otherwise completely flexible,
+since they do not have to be tied to physical input, tokenization,
+or any other aspect of the parse,
+
+=head1 Earlemes, more formally
+
+There are only three restrictions:
+
+=over 4
+
+=item *
+
+Every Earley set maps to a unique earleme.
+This is,
+if I<Xes> and I<Yes> are the IDs of two Earley sets,
+I<Xearleme> is the earleme of I<Xes>, aqnd
+I<Yearleme> is the earleme of I<Yes>,
+then I<Xes>C<=>I<Yes> if and only if
+I<Xearleme>C<=>I<Yearleme>.
+
+=item *
+
+The earlemes increase monotonically with the 
+IDs of the Earley sets.
+That is, again
+let I<Xes> and I<Yes> be the IDs of two Earley sets;
+let I<Xearleme> be earleme of I<Xes> and
+let I<Yearleme> be earleme of I<Yes>.
+Then I<Xes>C<< < >>I<Yes> if and only if
+I<Xearleme>C<< < >>I<Yearleme>.
+
+=item *
+
+Earley set 0 is always earleme 0,
+and vice versa.
+
+=item *
+
+The start earleme of a token is the earleme of the Earley
+set at which the token starts.
+
+=item *
+
+The end earleme of a token is the earleme of the Earley
+set at which the token ends.
+
+=item *
+
+Every token has a length in earlemes.
+Call the start earleme of a token, I<start>
+and the end earleme of a token, I<end>.
+Then the length of the token is I<start>C<->I<end>.
+
+=item *
+
+The length of a token must be 1 or greater.
+
+=back
+
+Less formally, the above states that
+all tokens starting at
+earleme I<N> must be scanned before
+any tokens starting at earleme I<N+1>;
+that earleme location, like Earley set ID
+is zero-based;
+and that tokens are never zero-length.
 
 =head1 What is an alternative input model?
 
@@ -67,9 +156,13 @@ and an alternative input model is any input model which
 
 =over
 
-=item * Allows a token whose length is not exactly 1, or
+=item *
 
-=item * Allows locations which have more than one token.
+allows a token whose length is not exactly 1, or
+
+=item *
+
+allows locations which have more than one token.
 
 =back
 
@@ -87,12 +180,12 @@ then that application is not using an alternative input method.
 Many concepts, such as parsing location,
 parse exhaustion,
 and the end of parsing,
-are somewhat more complicated when alternative
+become more complicated when alternative
 input models are involved.
-These concepts were explained in L<the main document for
-the recognizer|Marpa::R3::Recognizer> on the assumption
+In L<the main document for the recognizer|Marpa::R3::Recognizer>
+these concepts were explained on the assumption
 that the default input model was in use.
-This document revises those explanations as necessary
+This document expands revises those explanations as necessary
 to take into
 account the alternative input models.
 
@@ -126,6 +219,10 @@ The second token would start at location 1 and end at location 2.
 For most parsers, position is location in a token stream.
 To deal with variable-length and overlapping tokens,
 Marpa needs a more flexible idea of location.
+L<A separate
+document|Marpa::R3::External::Earleme>
+gives full and more precise detail on earleme location,
+but this document should be read first for an overview.
 
 Marpa's tracks position in terms of B<earlemes>.
 B<Earlemes> are named after Jay Earley,
@@ -491,31 +588,6 @@ But other models are certainly possible.
 Using earlemes,
 you can structure your input in almost any way you like.
 
-There are only three restrictions:
-
-=over 4
-
-=item 1
-
-Scanning always starts at earleme 0.
-
-=item 2
-
-All tokens starting at
-earleme I<N> must be scanned before
-any tokens starting at earleme I<N+1>.
-In other words, the tokens must be scanned in non-decreasing order
-by start earleme.
-
-=item 3
-
-Every token must have a length, in earlemes,
-which is greater than zero.
-In other words,
-token length can never
-be zero or negative.
-
-=back
 
 =head1 Copyright and License
 
