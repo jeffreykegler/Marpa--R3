@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-Marpa::R3::External::Earleme - Details on input models and earlemes
+Marpa::R3::External::Model - Details on input models and earlemes
 
 =head1 TO DO
 

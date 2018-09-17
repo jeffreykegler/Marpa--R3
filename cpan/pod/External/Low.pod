@@ -220,7 +220,7 @@ For most parsers, position is location in a token stream.
 To deal with variable-length and overlapping tokens,
 Marpa needs a more flexible idea of location.
 L<A separate
-document|Marpa::R3::External::Earleme>
+document|Marpa::R3::External::Model>
 gives full and more precise detail on earleme location,
 but this document should be read first for an overview.
 
