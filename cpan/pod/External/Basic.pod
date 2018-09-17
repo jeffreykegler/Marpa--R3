@@ -123,54 +123,66 @@ are the high level methods.
 They are described in this document.
 The low level external scanning methods are
 described
-L<in another document|Marpa::R3::External::Low>.
+L<Marpa::R3::External::Low>.
 
 =head1 High level methods in general
 
-The external scanning completion methods
+The high levels scanning methods
 have almost all of their behaviors in common.
 For convenience, therefore, the usual behaviors
 of the completion methods are described in the section,
 and exceptions to these behaviors are noted
 in the descriptions of the individual methods.
 
-External scanning completion can succeed or fail.
-If external scanning completion fails, the failure may be hard
-or soft.
-The only soft failure that can occur in external scanning completion
-is the rejection of a token.
+Every call of an external scanning method
+is made with a specified block span.
+How that the block span is specified varies by method.
+Unless the call results in 
+a hard failure,
+on return it leaves a valid current block span.
 
-=head2 Location
-
-Every external scanning completion must have a valid block span,
-unless that completion results in a hard failure.
-How that valid block span is specified varies by method.
-For the purposes of this section, let that
-block span be C<< <$block_id, $offset, $length> >>.
+For the purposes of this section, let the specified block
+span
+be C<< <$block_id, $offset, $length> >>.
 Also for the purposes of this section,
 we will define B<eolexeme>,
 or "end of lexeme",
 as C<$offset> + C<$length>.
 
-=head2 Success with no events
+External scanning can succeed or fail.
+If external scanning fails, the failure may be hard
+or soft.
+The only soft failure that can occur in external scanning
+is the rejection of a token.
 
-If external scanning completion succeeds and no event occurs,
-the current block is set to C<$block_id>.
-The current offset is set to C<eolexeme>.
-The current eoread of the current block will
+=head2 Successful reads
+
+An external scanning methods succeeds and reads a token
+if no pre-lexeme event occurs.
+In the case of a successful read,
+the current block is set to C<$block_id>;
+The current offset is set to C<eolexeme>;
+and the current eoread of the current block will
 not be changed.
 
-The current G1 location is advanced by one.
-The token just read will start at the previous G1 location
-and end at the new current G1 location.
-The G1 location of the token is considered to be
+Also in the case of a successful read,
+the current G1 location is advanced by one;
+the token just read will start at the previous G1 location
+and end at the new current G1 location;
+and the G1 location of the token is considered to be
 the new current G1 location.
 
-=head2 Success with pre-lexeme events
+A
+L<parse event|Marpa::R3::Event> may occur
+during a successful read.
+The parse event may call an event handler.
+The event handler will see
+a G1 location and an event location as just described.
 
-What happens if
-external scanning completion succeeds, events occur,
-and one of these events is a pre-lexeme event?
+=head2 Pre-lexeme events
+
+An external scanning method may succeed with a
+pre-lexeme event.
 In that case,
 the current block is set to C<$block_id>.
 The current offset is set to the event location,
@@ -178,38 +190,12 @@ which will be the same as C<$offset>.
 The current eoread of the current block will
 not be changed.
 
-If external scanning completion succeeds,
-and a pre-lexeme event does occur,
+If a pre-lexeme event does occur,
 no token is read.
 The current G1 location will remain where it was
 before external scanning.
 
-A
-L<parse event|Marpa::R3::Event>
-may call an event handler.
-The event handler will see
-a G1 location and an event location as just described.
-
-=head2 Success with other events
-
-What happens if
-external scanning completion succeeds, events occur,
-but none of these events is a pre-lexeme event?
-In that case,
-the current block is set to C<$block_id>.
-The current offset is set to the event location.
-The event location will be the same as C<eolexeme>,
-unless the event was a pre-lexeme event.
-The current eoread of the current block will
-not be changed.
-
-The current G1 location is advanced by one.
-The token just read will start at the previous G1 location
-and end at the new current G1 location.
-The G1 location of the token is considered to be
-the new current G1 location.
-
-A
+The pre-lexeme
 L<parse event|Marpa::R3::Event>
 may call an event handler.
 The event handler will see
@@ -222,7 +208,8 @@ then the external scanning completion results in a soft failure.
 In this case the current block data
 remains unchanged.
 
-No token is read.
+On soft failure,
+no token is read.
 The current G1 location will remain where it was
 before external scanning.
 
@@ -235,6 +222,7 @@ In the case of a hard failure,
 no guarantee is made about the current block data,
 or about the current G1 location.
 
+On hard failure,
 Marpa::R3 will attempt to leave the current block data valid
 and pointing to an "error location" -- that is, a location
 as relevant as possible to the error.
