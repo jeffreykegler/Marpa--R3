@@ -152,9 +152,7 @@ we will define B<eolexeme>,
 or "end of lexeme",
 as C<$offset> + C<$length>.
 
-=over 4
-
-=item *
+=head2 Success with no events
 
 If external scanning completion succeeds and no event occurs,
 the current block is set to C<$block_id>.
@@ -168,21 +166,12 @@ and end at the new current G1 location.
 The G1 location of the token is considered to be
 the new current G1 location.
 
-=item *
+=head2 Success with pre-lexeme events
 
-If external scanning completion succeeds and an event,
-other than a pre-lexeme event,
-occurs,
-the current block is set to C<$block_id>.
-The current offset is set to the event location.
-The event location will be the same as C<eolexeme>,
-unless the event was a pre-lexeme event.
-The current eoread of the current block will
-not be changed.
-
-=item *
-
-If external scanning completion succeeds and a pre-lexeme event occurs,
+What happens if
+external scanning completion succeeds, events occur,
+and one of these events is a pre-lexeme event?
+In that case,
 the current block is set to C<$block_id>.
 The current offset is set to the event location,
 which will be the same as C<$offset>.
@@ -195,35 +184,49 @@ no token is read.
 The current G1 location will remain where it was
 before external scanning.
 
-=item *
+=head2 Success with other events
+
+What happens if
+external scanning completion succeeds, events occur,
+but none of these events is a pre-lexeme event?
+In that case,
+the current block is set to C<$block_id>.
+The current offset is set to the event location.
+The event location will be the same as C<eolexeme>,
+unless the event was a pre-lexeme event.
+The current eoread of the current block will
+not be changed.
+
+The current G1 location is advanced by one.
+The token just read will start at the previous G1 location
+and end at the new current G1 location.
+The G1 location of the token is considered to be
+the new current G1 location.
+
+=head2 Soft failure
 
 If an external scanning completion method rejects a token,
 then the external scanning completion results in a soft failure.
 In this case the current block data
 remains unchanged.
 
-If external scanning completion has a soft failure,
-no token is read.
+No token is read.
 The current G1 location will remain where it was
 before external scanning.
 
-
-=item *
+=head2 Hard failure
 
 Any failure in external scanning completion,
 other than token rejection,
 is a hard failure.
 In the case of a hard failure,
-no guarantee is made about the current block data.
+no guarantee is made about the current block data,
+or about the current G1 location.
+
 Marpa::R3 will attempt to leave the current block data valid
 and pointing to an "error location" -- that is, a location
 as relevant as possible to the error.
-
-If external scanning completion has a hard failure,
-no guarantee is made about the current G1 location.
-Marpa::R3 will attempt to leave it valid and unchanged.
-
-=back
+Marpa::R3 will attempt to leave the current G1 location valid and unchanged.
 
 =head2 Event handlers
 
@@ -369,7 +372,7 @@ to be read.
 C<$string>
 is a string which becomes both the value of the token
 and its literal equivalent.
-C<lexeme_read_literal()> is an external scanning completion
+C<lexeme_read_string()> is an external scanning completion
 method and, with two important exceptions,
 the details of its behavior are
 L<as described above|"High level methods in general">.
@@ -438,11 +441,11 @@ Marpa::R3 optimizes token values when they are literals in its
 input text blocks.
 
 B<Return values>:
-On success, C<lexeme_read_block()> returns the new current offset.
+On success, C<lexeme_read_string()> returns the new current offset.
 Soft failure occurs if and only if
 the token was rejected.
 On soft failure,
-C<lexeme_read_block()> returns a Perl C<undef>.
+C<lexeme_read_string()> returns a Perl C<undef>.
 Other failures are thrown as exceptions.
 
 =head1 COPYRIGHT AND LICENSE
