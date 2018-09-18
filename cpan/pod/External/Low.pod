@@ -373,9 +373,11 @@ C<$value> is optional,
 and specifies the value of the symbol.
 If C<$value> is missing, the value of the symbol
 will be a Perl C<undef>.
+
 The fourth, optional, argument
 is the length of the lexeme in earlemes.
-By default, earleme length is 1.
+Earleme length will usually be 1,
+which is the default.
 
 The C<lexeme_alternative()> method is a non-completion method -- it adds to
 the list of accepted tokens.
@@ -407,26 +409,6 @@ On success, returns a value reserved for future use.
 The value on success will not necessarily be a Perl true,
 so that apps testing for rejection must test for a Perl C<undef> explicitly.
 Failures are thrown as exceptions.
-
-=head2 lexeme_alternative_literal()
-
-TODO
-
-=for Marpa::R3::Display
-name: recognizer lexeme_alternative_literal() variable length synopsis
-normalize-whitespace: 1
-
-    $ok = $recce->lexeme_alternative_literal( 'A', 3 );
-
-=for Marpa::R3::Display::End
-
-C<lexeme_alternative_literal()> is one of the low level scanning
-mutators used for alternate input models.
-Its last argument is the earleme length, which allows
-variable length lexemes.
-For more about C<lexeme_alternative_literal()> consult
-L<its full
-description|Marpa::R3::Recognizer/"g1_pos()">.
 
 =head2 lexeme_alternative_literal()
 
@@ -479,28 +461,6 @@ The second, optional, argument may be ignored by most applications.
 It is the length of the lexeme in earlemes.
 Earleme length will almost always be 1,
 which is the default.
-The ability to specify other earleme lengths enables
-some very powerful, but advanced, techniques,
-which are described
-L<elsewhere|Marpa::R3::External::Low>.
-
-=head2 lexeme_complete()
-
-TODO
-
-=for Marpa::R3::Display
-name: recognizer lexeme_complete() synopsis
-partial: 1
-normalize-whitespace: 1
-
-    my $new_offset = $recce->lexeme_complete( $block_id, $offset, $length );
-
-=for Marpa::R3::Display::End
-
-C<lexeme_complete()> is the low level mutator used
-in alternative input models.
-C<lexeme_complete()> moves the parse forward to the
-next earleme at which a lexeme ends.
 
 =head2 lexeme_complete()
 
@@ -513,19 +473,17 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-C<lexeme_complete()> is one of the low-level methods of the external scanner.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
+C<lexeme_complete()> reads lexemes
+from the pending lexeme queue.
+It will read those lexemes which end at the closest earleme.
 
-Use of the low-level methods allows
-the reading of ambiguous tokens.
-C<lexeme_complete()>
-completes the reading of a set of tokens specified by
-one or more calls of the L<C<lexeme_alternative()>|/"lexeme_alternative()">
-method.
+C<lexeme_complete()> relies on the app to have added lexemes
+to the pending lexeme queue,
+using the C<lexeme_alternative()>
+or C<lexeme_alternative_literal()>
+calls.
+If the pending lexeme queue is empty,
+a hard failure is thrown.
 
 The C<lexeme_complete()> method
 accepts three optional arguments.
@@ -549,33 +507,12 @@ less the specified offset --
 in other words, the specified block span
 includes the entire remaining specified block.
 
-C<lexeme_read_literal()> is an external scanning completion
-method and, with one important difference,
-the details of its behavior are
-L<as described above|"High level methods in general">.
-The difference is that token rejection never occurs
-in C<lexeme_complete()>.
-C<lexeme_complete()> relies on the app to have built a list
-of accepted tokens using the
-C<lexeme_alternative()>
-or
-C<lexeme_alternative_literal()>
-calls.
-
-It is a hard failure if C<lexeme_complete()> is called
-but the list of tokens accepted by
-C<lexeme_alternative()>
-or
-C<lexeme_alternative_literal()>
-methods is empty.
-All failures in C<lexeme_complete()> are hard failures.
 
 B<Return values:>
 On success, C<lexeme_complete()>
 returns the new current location.
+All failures in C<lexeme_complete()> are hard failures.
 Failure is always thrown.
-
-TODO
 
 =head1 Alternative models and high level scanning
 
@@ -668,33 +605,11 @@ when there is a duplicate token.
 
 =head1 Earlemes: the details
 
-While scanning, Marpa keeps track of the B<current earleme>.
-Earlemes in a parse start at earleme 0 and increase numerically.
-The earleme immediately following earleme 0 is earleme 1,
-the earleme immediately following earleme 1 is earleme 2,
-and so on.
-The earleme immediately following earleme I<N> is always earleme I<N+1>.
-
-B<Distance> in the earleme stream is
-what you would intuitively expect it to be.
-The distance between earleme I<X> and earleme I<Y> is
-the absolute value of the difference between I<X> and I<Y>,
-I<|X-Y|>.
-The distance from earleme 3 to earleme 6,
-for example, is 3 earlemes.
-
 Whenever a token is given to Marpa to be scanned,
 it starts at the current earleme.
 In addition to the type and value of the token,
 Marpa must be told the token's B<length> in earlemes.
 The length of a Marpa token must be greater than zero.
-
-This earleme length will become
-the distance from the start of the
-token to the end of the token.
-If the length of the token is I<L>,
-and the current earleme is I<C>,
-the end of the token will be at earleme I<C+L>.
 
 =head1 The character-per-earleme model
 
@@ -737,7 +652,7 @@ see L<the description of C<resume()>|Marpa::R3::Recognizer/"resume()">,
 as well as
 L<the separate document for events|Marpa::R3::Event>.
 
-=head1 High level equivalents
+=head1 Equivalents of high level methods
 
 =head2 Low level equivalent of C<lexeme_read_block()>
 
