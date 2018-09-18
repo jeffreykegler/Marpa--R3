@@ -16,7 +16,7 @@ use 5.010001;
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 5;
 use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale( LC_ALL, "C" );
@@ -61,41 +61,33 @@ $ok = $recce->lexeme_alternative( 'A', 42, 2 );
 $recce->lexeme_complete( undef, undef, 2 );
 
 # Marpa::R3::Display
-# name: recognizer latest_earleme() synopsis
-
-my $latest_earleme = $recce->latest_earleme();
-
-# Marpa::R3::Display::End
-
-my $latest_earleme_direct = $latest_earleme;
-
-# Marpa::R3::Display
-# name: recognizer earleme() synopsis
-
-my $latest_earley_set = $recce->g1_pos();
-$latest_earleme = $recce->earleme($latest_earley_set);
-
-# Marpa::R3::Display::End
-
-Test::More::is ($latest_earleme, 2, "latest earleme via earleme()");
-Test::More::is ($latest_earleme_direct, 2,
-		"latest earleme via latest_earleme()");
-
-#Marpa::R3::Display
-#name: recognizer lexeme_alternative_literal() variable length synopsis
-
-$ok = $recce->lexeme_alternative_literal ('A', 3);
-
-#Marpa::R3::Display::End
-
-# Marpa::R3::Display
 # name: recognizer current_earleme() synopsis
 
 my $current_earleme = $recce->current_earleme();
 
 # Marpa::R3::Display::End
 
-Test::More::is($current_earleme, 2, "current earleme");
+my $current_earleme_direct = $current_earleme;
+
+# Marpa::R3::Display
+# name: recognizer earleme() synopsis
+
+my $current_earley_set = $recce->g1_pos();
+$current_earleme = $recce->earleme($current_earley_set);
+
+# Marpa::R3::Display::End
+
+my $current_earleme_via_es = $current_earleme;
+
+Test::More::is ($current_earleme_via_es, 2, "current earleme via earleme()");
+Test::More::is($current_earleme_direct, 2, "current earleme via current_earleme()");
+
+# Marpa::R3::Display
+# name: recognizer lexeme_alternative_literal() variable length synopsis
+
+$ok = $recce->lexeme_alternative_literal( 'A', 3 );
+
+# Marpa::R3::Display::End
 
 # Marpa::R3::Display
 # name: recognizer closest_earleme() synopsis

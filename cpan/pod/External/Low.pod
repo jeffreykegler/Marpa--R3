@@ -59,6 +59,11 @@ location is measured in "earlemes".
 
 Earlemes are an idea of location,
 used by the low-level scanning routines.
+B<Earlemes> are named after Jay Earley,
+the inventor of the first algorithm
+in Marpa's lineage.
+
+Every token has a start earleme and an end earleme.
 Earlemes exist to provide a "middle" ground.
 They are not tied to physical location,
 and they are not tied to Earley set (G1) location,
@@ -112,6 +117,7 @@ allows locations which have more than one token.
 =back
 
 Many concepts, such as parsing location,
+parse ambiguity,
 parse exhaustion,
 and the end of parsing,
 become more complicated when alternative
@@ -150,79 +156,12 @@ are the same as the current earleme.
 If the pending lexeme queue is of length 1,
 the closest earleme will be equal to the furthest earleme.
 
-=head1 Token streams
-
-Marpa's default input model is the traditional one --
-a token stream.
-Token streams are very standard in parsing applications --
-so much so
-that most texts do not take the trouble
-of defining the term.
-A B<token stream> is input structured as
-a sequence of tokens,
-where each token occupies one location
-and every location has a token.
-In the token stream model, all tokens are
-of the same length.
-
-Conventionally, all tokens are of length 1,
-and the token stream starts at location 0.
-Following this convention,
-the I<N>th token would start at
-location I<N-1> and end
-at location I<N>.
-For example,
-the first token would start at location 0 and end at location 1.
-The second token would start at location 1 and end at location 2.
-
-=head1 Earlemes
-
-Marpa's tracks position in terms of B<earlemes>.
-B<Earlemes> are named after Jay Earley,
-the inventor of the first algorithm
-in Marpa's lineage.
-Every token has a start earleme and an end earleme.
-
-The token stream model may also be called the token-per-earleme
-model.
-In the token stream model,
-token location and earleme location
-are exactly identical.
-More formally, in the token stream model,
-if the token location is I<N>,
-then the earleme location is also I<N>.
-If a user's application uses the token stream model,
-the user can ignore the existence of earlemes,
-and can think entirely in terms of
-tokens and their position in a token stream.
-Because of this, the main Marpa documents
-often speak
-simply of the "location" in the parse.
-
 =head1 The furthest earleme
 
-The B<furthest earleme> is the last earleme at which a token ends.
-In the default input model,
-the furthest earleme and the latest earleme
-are always the same.
-As a result,
-in the default input model, the furthest earleme is not an important
-concept.
-
-In alternative input models,
-tokens may be longer than 1 earleme, and
-the furthest earleme and the latest earleme may be far apart.
 To ensure
 that processing of input catches up to the furthest earleme,
 applications using alternative input models may have to call the
 the recognizer's L<C<lexeme_complete>|/"lexeme_complete()"> method repeatedly.
-
-=head1 The latest Earley set and latest earleme
-
-The B<latest earleme> is the earleme location of the latest
-Earley set.
-In the default input model, the latest earleme is always the
-same as the furthest earleme.
 
 =head1 Methods
 
@@ -256,8 +195,8 @@ Returns the current earleme.
 name: recognizer earleme() synopsis
 normalize-whitespace: 1
 
-  my $latest_earley_set = $recce->g1_pos();
-  $latest_earleme = $recce->earleme($latest_earley_set);
+  my $current_earley_set = $recce->g1_pos();
+  $current_earleme = $recce->earleme($current_earley_set);
 
 =for Marpa::R3::Display::End
 
@@ -265,12 +204,12 @@ Given an Earley set ID as its argument,
 the C<earleme()> recognizer method
 returns the corresponding earleme.
 Every integer in the range from 0
-to the ID of the latest Earley
+to the ID of the current Earley
 is a valid Earley set ID,
 and every valid Earley set ID corresponds to an
 earleme.
 If the argument of C<earleme()> is
-greater than the latest Earley set ID,
+greater than the current Earley set ID,
 C<earleme()> returns Perl C<undef>.
 
 There is currently no method that translates from
@@ -311,27 +250,14 @@ name: recognizer earleme() synopsis
 normalize-whitespace: 1
 partial: 1
 
-  my $latest_earley_set = $recce->g1_pos();
+  my $current_earley_set = $recce->g1_pos();
 
 =for Marpa::R3::Display::End
 
 The C<g1_pos()> method
-returns ID of the latest Earley set.
+returns ID of the current Earley set.
 The full description of the C<g1_pos()> method is
 L<elsewhere|Marpa::R3::Recognizer/"g1_pos()">.
-
-=head2 latest_earleme()
-
-=for Marpa::R3::Display
-name: recognizer latest_earleme() synopsis
-normalize-whitespace: 1
-
-    my $latest_earleme = $recce->latest_earleme();
-
-=for Marpa::R3::Display::End
-
-Returns the latest earleme.
-Always succeeds.
 
 =head2 lexeme_alternative()
 
@@ -533,6 +459,10 @@ it must be completed with a call to
 L<C<lexeme_complete()>|Marpa::R3::External::Basic/"lexeme_complete()">
 before any high level scanning method can be called.
 Otherwise a fatal error results.
+
+=head1 Parse exhaustion
+
+TODO
 
 =head1 Ambiguous lexing
 
