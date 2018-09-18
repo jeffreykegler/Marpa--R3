@@ -32,7 +32,7 @@ This is not the document to which to turn first.
 Before reading this document, you should be familiar with
 L<Marpa::R3::External::Basic>.
 
-=head2 The low level
+=head1 The low level
 
 The high level scanning methods both read a lexeme and add it
 to the Earley sets.
@@ -139,7 +139,18 @@ This is the way most applications use physical input,
 but earlemes allow for a more complicated
 relationship between parse location and physical input.
 
-=head2 The pending lexeme queue
+=head1 The pending lexeme queue
+
+Whenever C<lexeme_alternative()> reads a lexeme,
+it adds it to the pending lexeme queue.
+(Everything said in this section,
+applied to the 
+C<lexeme_alternative_literal()> method as well.
+But for brevity, we will speak only of the
+C<lexeme_alternative()> method.)
+
+The pending lexeme queue is a queue of B<sets>
+of lexemes, one 
 
 Marpa maintains a queue of sets of pending lexemes,
 from "closest" to "furthest".
@@ -459,6 +470,10 @@ it must be completed with a call to
 L<C<lexeme_complete()>|Marpa::R3::External::Basic/"lexeme_complete()">
 before any high level scanning method can be called.
 Otherwise a fatal error results.
+
+=head1 End of parsing
+
+In the standard input model, the default end of parsing
 
 =head1 Parse exhaustion
 
