@@ -5853,17 +5853,6 @@ the valuator's Lua-level settings.
             local slg = slr.slg
             local g1r = slr.g1
 
-            local furthest_earleme = g1r:furthest_earleme()
-            local last_completed_earleme = g1r:current_earleme()
-            if furthest_earleme ~= last_completed_earleme then
-                error(string.format(
-                    "Attempt to evaluate incompletely recognized parse:\n"
-                    .. "  Last token ends at location %d\n"
-                    .. "  Recognition done only as far as location %d\n",
-                    furthest_earleme,
-                    last_completed_earleme
-                ))
-            end
             local lmw_t = slv.lmw_t
             local lmw_o = slv.lmw_o
 
