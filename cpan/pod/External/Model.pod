@@ -39,6 +39,69 @@ L<Marpa::R3::External::Basic>
 and 
 L<Marpa::R3::External::Low>.
 
+=head1 Earlemes
+
+There are only three restrictions:
+
+=over 4
+
+=item *
+
+Every Earley set maps to a unique earleme.
+This is,
+if I<Xes> and I<Yes> are the IDs of two Earley sets,
+I<Xearleme> is the earleme of I<Xes>, aqnd
+I<Yearleme> is the earleme of I<Yes>,
+then I<Xes>C<=>I<Yes> if and only if
+I<Xearleme>C<=>I<Yearleme>.
+
+=item *
+
+The earlemes increase monotonically with the 
+IDs of the Earley sets.
+That is, again
+let I<Xes> and I<Yes> be the IDs of two Earley sets;
+let I<Xearleme> be earleme of I<Xes> and
+let I<Yearleme> be earleme of I<Yes>.
+Then I<Xes>C<< < >>I<Yes> if and only if
+I<Xearleme>C<< < >>I<Yearleme>.
+
+=item *
+
+Earley set 0 is always earleme 0,
+and vice versa.
+
+=item *
+
+The start earleme of a token is the earleme of the Earley
+set at which the token starts.
+
+=item *
+
+The end earleme of a token is the earleme of the Earley
+set at which the token ends.
+
+=item *
+
+Every token has a length in earlemes.
+Call the start earleme of a token, I<start>
+and the end earleme of a token, I<end>.
+Then the length of the token is I<start>C<->I<end>.
+
+=item *
+
+The length of a token must be 1 or greater.
+
+=back
+
+Less formally, the above states that
+all tokens starting at
+earleme I<N> must be scanned before
+any tokens starting at earleme I<N+1>;
+that earleme location, like Earley set ID
+is zero-based;
+and that tokens are never zero-length.
+
 =head1 The traditional model
 
 In traditional Earley parsers, the concept of location is very simple.
@@ -72,28 +135,6 @@ or its B<ordinal>.
 In the traditional model, the ordinal of an Earley set and
 its earleme are always exactly the same, but in Libmarpa
 they will be different.
-
-=head1 The low level scanning mutators
-
-This document describes the behavior of Marpa::R3's
-L<low level external scanning
-methods|Marpa::R3::External::Basic/"Low-level mutators">:
-That is, the
-L<C<lexeme_completion()>|Marpa::R2::External::Basic/"lexeme_completion()">,
-L<C<lexeme_alternative()>|Marpa::R2::External::Basic/"lexeme_alternative()">,
-and
-L<C<lexeme_alternative_literal()>|Marpa::R2::External::Basic/"lexeme_alternative_literal()">
-methods.
-The
-L<lexeme_alternative()|Marpa::R2::External::Basic/"lexeme_alternative()">
-and
-L<C<lexeme_alternative_literal()>|Marpa::R2::External::Basic/"lexeme_alternative_literal()">
-has the same effect in terms of Earley set and earleme location.
-Unless explicitly stated otherwise,
-Whenever a statement this document refers to
-the "C<lexeme_alternative()>" method,
-that statement also applies
-to the "C<lexeme_alternative_literal()>" method.
 
 =head1 The earleme variables
 

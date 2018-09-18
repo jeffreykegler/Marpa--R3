@@ -32,137 +32,57 @@ This is not the document to which to turn first.
 Before reading this document, you should be familiar with
 L<Marpa::R3::External::Basic>.
 
-=head2 The pending lexeme queue
+=head2 The low level
 
-Marpa maintains a queue of pending lexemes,
-from "closest" to "furthest".
-The lexeme which ends closest to the current earleme
-(that is, has the lowest earleme number)
-is the "closest lexeme".
-The lexeme which ends furthest from the current earleme
-(that is, has the highest earleme number)
-is the "furthest lexeme".
-The pending lexeme queue may be empty,
-in which case the closest and furthest earleme
-are the same as the current earleme.
+The high level scanning methods both read a lexeme and add it
+to the Earley sets.
+This is very natural,
+and usually what the user wants.
+But sometimes the user want to add more than one lexeme
+at a location,
+or to use lexemes of varying length.
+For this,
+the low level methods exist.
 
-If the pending lexeme queue is of length 1,
-the closest earleme will be equal to the furthest earleme.
+The low level methods separate the two operations:
+L<C<lexeme_alternative()>|/"lexeme_alternative()">,
+and
+L<C<lexeme_alternative_literal()>|/"lexeme_alternative_literal()">
+read a lexeme and add it to the pending lexeme queue.
+L<C<lexeme_complete()>|/"lexeme_complete()">
+adds the tokens at the next (or "closest") location
+in the pending lexeme queue to the Earley sets.
+In the pending lexeme queue,
+location is measured in "earlemes".
 
-=head1 Earlemes, intuitively
+=head1 Earlemes
 
-In the other Marpa documentation,
-we have assumed the standard input model,
-and the only idea of
-G1 location we have used is Earley set location --
-that is, location as an Earley set ordinal.
-(An Earley set's ordinal is also its ID.)
+Earlemes are an idea of location,
+used by the low-level scanning routines.
+Intuitively, 
+earlemes exist to provide a "middle" ground.
+They are not tied to physical location,
+and they are not tied to Earley set (G1) location,
+so they can be very flexible.
 
-For advanced input models, we must introduce another
-idea of G1 location -- earleme location.
-Earleme location is ignored in the other Marpa documents,
-and it can be, because they
-assume the standard input model.
-Use of the standard input model
-guarantees that earleme
-and Earley set ordinal
-will always be exactly the same.
+But earlemes do behave like locations should --
+They are monotonic, each Earley set has a unique earleme location,
+and higher numbered Earley sets are guaranteed to have higher numbered
+locations.
+(Earlemes are desribed more formally in
+L<Marpa::R3::External::Model/"Earleme">.
 
-This document introduces methods which make it
-very possible that earleme location and
-Earley set ID will differ.
-From here on,
-the reader will need to pay careful attention
-to the distinction.
+Earlemes actually exist in the standard (default) input model,
+but in the standard input model,
+earleme location is always precisely the same as Earley set ID
+(aka G1 location).
+Most of the Marpa::R3 documents assume the standard input model,
+and therefore have no need to mention earlemes.
 
-Intuitively, earlemes exist because
-because the usual idea of location,
-G1 location, is tied to the tokenization,
-For most applications, it is OK to reduce the parser's idea of
-location to tokenization.
-When an application ties earlemes to the tokenization,
-it is using the earleme-per-token model.
-This is the default.
+=head1 Alternative input models
 
-Location can also be tied to the physical input.
-That is the earleme-per-character model.
-But Marpa allows multiple input blocks,
-and jumping back and forth in them.
-This ability is required in many practical applications.
-Some applications, therefore,
-cannot use either the
-earleme-per-token or
-the earleme-per-character model.
-
-Earlemes provide a "middle" ground.
-They are zero-based and monotonic,
-and therefore can be relied on as a well-behaved idea of location.
-But they are otherwise completely flexible,
-since they do not have to be tied to physical input, tokenization,
-or any other aspect of the parse,
-
-=head1 Earlemes, more formally
-
-There are only three restrictions:
-
-=over 4
-
-=item *
-
-Every Earley set maps to a unique earleme.
-This is,
-if I<Xes> and I<Yes> are the IDs of two Earley sets,
-I<Xearleme> is the earleme of I<Xes>, aqnd
-I<Yearleme> is the earleme of I<Yes>,
-then I<Xes>C<=>I<Yes> if and only if
-I<Xearleme>C<=>I<Yearleme>.
-
-=item *
-
-The earlemes increase monotonically with the 
-IDs of the Earley sets.
-That is, again
-let I<Xes> and I<Yes> be the IDs of two Earley sets;
-let I<Xearleme> be earleme of I<Xes> and
-let I<Yearleme> be earleme of I<Yes>.
-Then I<Xes>C<< < >>I<Yes> if and only if
-I<Xearleme>C<< < >>I<Yearleme>.
-
-=item *
-
-Earley set 0 is always earleme 0,
-and vice versa.
-
-=item *
-
-The start earleme of a token is the earleme of the Earley
-set at which the token starts.
-
-=item *
-
-The end earleme of a token is the earleme of the Earley
-set at which the token ends.
-
-=item *
-
-Every token has a length in earlemes.
-Call the start earleme of a token, I<start>
-and the end earleme of a token, I<end>.
-Then the length of the token is I<start>C<->I<end>.
-
-=item *
-
-The length of a token must be 1 or greater.
-
-=back
-
-Less formally, the above states that
-all tokens starting at
-earleme I<N> must be scanned before
-any tokens starting at earleme I<N+1>;
-that earleme location, like Earley set ID
-is zero-based;
-and that tokens are never zero-length.
+By explicitly using earlemes in the low level scanning methods,
+applications can use oth
 
 =head1 What is an alternative input model?
 
@@ -206,6 +126,45 @@ This document expands revises those explanations as necessary
 to take into
 account the alternative input models.
 
+!!! FRAG !!!
+
+Intuitively, earlemes exist because
+because the usual idea of location,
+G1 location, is tied to the tokenization,
+For most applications, it is OK to reduce the parser's idea of
+location to tokenization.
+When an application ties earlemes to the tokenization,
+it is using the earleme-per-token model.
+This is the default.
+
+Location can also be tied to the physical input.
+That is the earleme-per-character model.
+But Marpa allows multiple input blocks,
+and jumping back and forth in them.
+This ability is required in many practical applications.
+Some applications, therefore,
+cannot use either the
+earleme-per-token or
+the earleme-per-character model.
+
+
+=head2 The pending lexeme queue
+
+Marpa maintains a queue of sets of pending lexemes,
+from "closest" to "furthest".
+The lexeme which ends closest to the current earleme
+(that is, has the lowest earleme number)
+is the "closest lexeme".
+The lexeme which ends furthest from the current earleme
+(that is, has the highest earleme number)
+is the "furthest lexeme".
+The pending lexeme queue may be empty,
+in which case the closest and furthest earleme
+are the same as the current earleme.
+
+If the pending lexeme queue is of length 1,
+the closest earleme will be equal to the furthest earleme.
+
 =head1 Token streams
 
 Marpa's default input model is the traditional one --
@@ -232,14 +191,6 @@ the first token would start at location 0 and end at location 1.
 The second token would start at location 1 and end at location 2.
 
 =head1 Earlemes
-
-For most parsers, position is location in a token stream.
-To deal with variable-length and overlapping tokens,
-Marpa needs a more flexible idea of location.
-L<A separate
-document|Marpa::R3::External::Model>
-gives full and more precise detail on earleme location,
-but this document should be read first for an overview.
 
 Marpa's tracks position in terms of B<earlemes>.
 B<Earlemes> are named after Jay Earley,
