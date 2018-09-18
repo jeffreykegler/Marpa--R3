@@ -167,12 +167,6 @@ are the same as the current earleme.
 If the pending lexeme queue is of length 1,
 the closest earleme will be equal to the furthest earleme.
 
-=head1 The furthest earleme
-
-To ensure
-that processing of input catches up to the furthest earleme,
-applications using alternative input models may have to call the
-the recognizer's L<C<lexeme_complete>|/"lexeme_complete()"> method repeatedly.
 
 =head1 Methods
 
@@ -473,7 +467,27 @@ Otherwise a fatal error results.
 
 =head1 End of parsing
 
-In the standard input model, the default end of parsing
+The default end of parsing is always at the current earley set,
+and therefore at the current earleme.
+This means that
+and lexemes in the pending lexeme queue
+will be ignored.
+If the application ends processing With that one parse,
+these lexemes will be "abandoned".
+
+"Abandoning" lexemes may be the intended behavior.
+If not,
+the application must ensure that processing of input
+catches up to the furthest earleme,
+by calling
+the L<C<lexeme_complete>|/"lexeme_complete()"> method until
+the furthest earleme is equal to the current earleme.
+
+Events are another circumstance which may cause an application
+to wish to "catch up" in the pending lexeme queue.
+Lexemes in the pending lexeme queue do not cause events
+until they are added to the parse
+by the L<C<lexeme_complete>|/"lexeme_complete()"> method.
 
 =head1 Parse exhaustion
 
