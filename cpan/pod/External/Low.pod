@@ -34,8 +34,8 @@ L<Marpa::R3::External::Basic>.
 
 =head1 The low level
 
-The high level scanning methods both read a lexeme and add it
-to the Earley sets.
+The high level scanning methods read a lexeme and add that
+lexeme to the Earley sets in a single operation.
 This is very natural,
 and usually what the user wants.
 But sometimes the user want to add more than one lexeme
@@ -139,34 +139,185 @@ This is the way most applications use physical input,
 but earlemes allow for a more complicated
 relationship between parse location and physical input.
 
-=head1 The pending lexeme queue
+=head1 How low level scanning works.
+
+Low level scanning divides scanning into two operations.
+First, it reads a lexeme and adds it to a queue
+(the "pending lexeme queue").
+Second, it creates a new Earley set,
+pops a set of lexemes from the pending lexeme
+queue,
+and adds those lexemes to the Earley set,
+"completing" that Earley set.
+
+=head2 Reading a lexeme
 
 Whenever C<lexeme_alternative()> reads a lexeme,
-it adds it to the pending lexeme queue.
-(Everything said in this section,
+it assigns it a start and an end earleme.
+The B<start lexeme> of a token is the current earleme.
+The B<current earleme> is the earleme of the latest
+(or current) Earley set.
+
+C<lexeme_alternative()> specifies a B<lexeme length>,
+either explicitly or implicitly.
+Lexeme length is always an integer greater than one.
+The B<end earleme> of a lexeme is
+the B<start earleme> plus its length.
+In other words,
+if I<S> is the start earleme,
+and I<L> is the lexeme length,
+then the end earleme is I<S>C<+>I<L>.
+
+(Note that everything said in this section,
 applied to the 
 C<lexeme_alternative_literal()> method as well.
-But for brevity, we will speak only of the
+For brevity, we will speak only of the
 C<lexeme_alternative()> method.)
 
-The pending lexeme queue is a queue of B<sets>
-of lexemes, one 
+When C<lexeme_alternative()> reads a lexeme,
+it places it into the B<pending lexeme queue>,
+according to its end earleme.
+The pending lexeme queue is a queue of
+B<pending lexeme sets>.
+All the lexemes in a B<pending lexeme sets>
+share the same earleme.
+Therefore we can think of,
+and sometimes will speak of,
+the pending lexeme queue as a queue of earlemes.
 
-Marpa maintains a queue of sets of pending lexemes,
-from "closest" to "furthest".
-The lexeme which ends closest to the current earleme
-(that is, has the lowest earleme number)
-is the "closest lexeme".
-The lexeme which ends furthest from the current earleme
-(that is, has the highest earleme number)
-is the "furthest lexeme".
-The pending lexeme queue may be empty,
-in which case the closest and furthest earleme
-are the same as the current earleme.
+The pending lexeme queue is ordered from the
+closest earleme to the furthest earleme.
+The B<closest earleme> is the earleme in the pending
+lexeme queue that is "closest" to the current earleme --
+there it is the lowest numbered earleme in the queue.
+The B<furthest earleme> is the earleme in the pending
+lexeme queue that is "furthest" from the current earleme --
+there it is the lowest numbered earleme in the queue.
 
-If the pending lexeme queue is of length 1,
-the closest earleme will be equal to the furthest earleme.
+In addition to tracking the current earleme,
+the Marpa::R3 recognizer always had a closest
+and furthest earleme.
+As a special case,
+if the pending lexeme queue is empty,
+the closest and furthest earlemes are both
+the same as the current earleme.
 
+Let a non-empty pending lexeme queue be
+
+=for Marpa::R3::Display
+ignore: 1
+
+    lexset[1] ... lexset[n],
+
+=for Marpa::R3::Display::End
+
+where C<< n >= 1 >>.
+Then C<lexset[1]> is the set of lexemes at the
+closest earleme,
+and 
+C<lexset[n]> is the set of lexemes at the
+furthest earleme.
+If C<n = 1>, then the closest and furthest earlemes
+are equal.
+
+=head2 Completing the Earley set
+
+When the C<lexeme_complete()> method is called,
+it creates a new Earley set,
+and pops the closest pending lexeme set,
+adding those lexemes to the Earley set.
+It then "completes" the Earley set,
+fixing its context,
+so that no more lexemes can be added.
+
+The earleme number of the new Earley set will be
+the end earleme of lexemes that were added to it.
+It is a fatal error if
+C<lexeme_complete()> is called
+when the pending lexeme queue is empty.
+
+=head2 Pending lexemes and the standard input model
+
+Note that the process described in this section
+also occurs in the standard input model,
+but in that case it is invisible.
+In the standard input model, if the current
+earleme is C<c>, the lexeme being read starts
+at
+C<c>.
+All lexemes in the standard input model have
+length 1,
+so that the lexeme will end at earleme 
+C<c + 1>.
+
+The lexeme being read is added to the pending lexeme queue,
+which must be empty.
+(See 
+L</"Alternative models and high level scanning">.)
+A lexeme set for earleme 
+C<c + 1> is created whose only element is the one
+lexeme.
+
+Next, an Earley set is created.
+If the ID of the last Earley set was
+C<esid>, the ID
+of the new Earley set will be
+C<esid + 1>.
+The lexeme set for earleme 
+C<c + 1> is popped
+from the pending lexeme queue,
+its lexeme is added to the new Earley set,
+and the new Earley set is completed.
+Only at this point might control be returned to the
+application using the standard input model,
+
+Current earleme and Earley set ID both
+begin at 0.
+And in the standard input model,
+they are always incremented together.
+Therefore,
+a simple mathematical induction shows that,
+in the standard input model,
+the earleme of an Earley set is always
+the same as its Earley set ID
+(aka G1 location).
+
+Again, in the standard input model,
+this whole process occurs without returning control to the
+user.
+Therefore, from the point of view of an application using
+the standard input model,
+the pending lexeme queue is always empty,
+and the closest and furthest earlemes are always equal
+to the current earleme.
+Because, 
+in the standard input model,
+the current earleme will always be the same as the Earley
+set ID,
+applications using
+the standard input model
+can ignore the pending lexeme queue,
+and treat current, closest and furthest earleme all as
+irrelevant.
+
+=head1 Alternative models and high level scanning
+
+A recognizer can alternate
+calls to the
+L<high level external scanning methods
+methods|Marpa::R3::External::Basic>
+with calls to the
+low level scanning methods,
+with one restriction:
+If a low level scan at a particular earleme has been
+started with
+L<C<lexeme_alternative()>|Marpa::R3::External::Basic/"lexeme_alternative()">,
+and
+L<C<lexeme_alternative_literal()>|Marpa::R3::External::Basic/"lexeme_alternative_literal()">,
+it must be completed with a call to
+L<C<lexeme_complete()>|Marpa::R3::External::Basic/"lexeme_complete()">
+before any high level scanning method can be called.
+Otherwise a fatal error results.
 
 =head1 Methods
 
@@ -449,26 +600,6 @@ returns the new current location.
 All failures in C<lexeme_complete()> are hard failures.
 Failure is always thrown.
 
-=head1 Alternative models and high level scanning
-
-A recognizer can alternate
-calls to its
-L<high level scanning methods
-methods|Marpa::R3::External::Basic/"High-level mutators">
-with calls to its
-L<low level scanning methods
-methods|Marpa::R3::External::Basic/"Low-level mutators">,
-with one restriction:
-If a low level scan at a particular earleme has been
-started with
-L<C<lexeme_alternative()>|Marpa::R3::External::Basic/"lexeme_alternative()">,
-and
-L<C<lexeme_alternative_literal()>|Marpa::R3::External::Basic/"lexeme_alternative_literal()">,
-it must be completed with a call to
-L<C<lexeme_complete()>|Marpa::R3::External::Basic/"lexeme_complete()">
-before any high level scanning method can be called.
-Otherwise a fatal error results.
-
 =head1 Catching up
 
 An application "catches up" to the furthest earleme
@@ -630,21 +761,6 @@ so there will be no Earley sets at those earlemes.
 The earlemes between the start and end earlemes of
 the comment will be "emptybetween the start and end earlemes of
 the comment will be "empty".
-
-=head1 Mixing internal and external scanning
-
-External scanning can be mixed with internal scanning
-to get the best of both.
-An application can
-terminate the internal scanning of
-the C<read()> method early, if it has defined an parse event
-and that parse event triggers.
-Afterwards,
-internal scanning can be resumed with the L<resume()|/"resume()"> method.
-For details,
-see L<the description of C<resume()>|Marpa::R3::Recognizer/"resume()">,
-as well as
-L<the separate document for events|Marpa::R3::Event>.
 
 =head1 Equivalents of high level methods
 
