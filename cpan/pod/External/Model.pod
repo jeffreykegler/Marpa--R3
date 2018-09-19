@@ -197,6 +197,10 @@ The current earleme will be advanced to I<c+1>.
 
 =item *
 
+The current Earley set ID will still be I<c>.
+
+=item *
+
 The pending lexeme queue will be empty.
 
 =item *
