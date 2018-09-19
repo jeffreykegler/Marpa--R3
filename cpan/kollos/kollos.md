@@ -4501,12 +4501,10 @@ Other errors are thrown.
         local symbol_id = lexeme.g1_isy.id
         local g1r = slr.g1
 
-    if not length then print( debug.traceback()) end
-
         local return_value = g1r:alternative(symbol_id, token_ix, length)
         if return_value == _M.err.NONE then return 1 end
         if return_value == _M.err.UNEXPECTED_TOKEN_ID then return end
-        -- Soft failure on last two error codes
+        -- Soft failure on next two error codes
         -- is perhaps unnecessary or arguable,
         -- but it preserves compatibility with Marpa::XS
         if return_value == _M.err.NO_TOKEN_EXPECTED_HERE then return end

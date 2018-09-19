@@ -67,15 +67,15 @@ External scanning can be used as a replacement for internal scanning.
 Marpa::R3 also allows application to switch back and
 forth between internal and external scanning.
 
-=head1 Tokens
+=head1 Lexemes
 
 In external scanning, the app controls tokenization directly.
 External scanning might also be called one-by-one scanning because,
-in external scanning, the app feeds tokens to Marpa::R3 one-by-one.
+in external scanning, the app feeds lexemes to Marpa::R3 one-by-one.
 This differs from internal scanning -- in internal scanning
 Marpa::R3 tokenizes a string for the app.
 
-Every token may have three things associated with it:
+Every lexeme may have three things associated with it:
 
 =over 4
 
@@ -85,31 +85,31 @@ A B<symbol name>, which is required.
 The symbol name must be the name of a lexeme in
 both the L0 and G1 grammars.
 The symbol name
-tells the parser which symbol represents this token to
+tells the parser which symbol represents this lexeme to
 the Marpa semantics.
 The symbol name, in other words,
-connects the token to the grammar.
+connects the lexeme to the grammar.
 
 =item 2.
 
 A B<symbol value> or B<value>, which may be undefined.
 The
-value of the token is also seen by the semantics.
+value of the lexeme is also seen by the semantics.
 
 =item 3.
 
 A B<literal equivalent>, which is required
 and must be a span in the input.
-The literal equivalent of a token is not directly visible
+The literal equivalent of a lexeme is not directly visible
 to the semantics,
 although in Marpa::R3 it can always be accessed,
 if desired.
 The literal equivalent is needed for
 the messages produced by
 tracing, debugging, error reporting, etc.
-If more than one token is accepted at a G1 location --
-which can happen if tokens are ambiguous --
-all of the tokens must have the same literal equivalent.
+If more than one lexeme is accepted at a G1 location --
+which can happen if lexemes are ambiguous --
+all of the lexemes must have the same literal equivalent.
 
 =back
 
@@ -153,11 +153,11 @@ External scanning can succeed or fail.
 If external scanning fails, the failure may be hard
 or soft.
 The only soft failure that can occur in external scanning
-is the rejection of a token.
+is the rejection of a lexeme.
 
 =head2 Successful reads
 
-An external scanning methods succeeds and reads a token
+An external scanning methods succeeds and reads a lexeme
 if no pre-lexeme event occurs.
 In the case of a successful read,
 the current block is set to C<$block_id>;
@@ -167,9 +167,9 @@ not be changed.
 
 Also in the case of a successful read,
 the current G1 location is advanced by one;
-the token just read will start at the previous G1 location
+the lexeme just read will start at the previous G1 location
 and end at the new current G1 location;
-and the G1 location of the token is considered to be
+and the G1 location of the lexeme is considered to be
 the new current G1 location.
 
 A
@@ -191,7 +191,7 @@ The current eoread of the current block will
 not be changed.
 
 If a pre-lexeme event does occur,
-no token is read.
+no lexeme is read.
 The current G1 location will remain where it was
 before external scanning.
 
@@ -203,20 +203,20 @@ a G1 location and an event location as just described.
 
 =head2 Soft failure
 
-If an external scanning completion method rejects a token,
+If an external scanning completion method rejects a lexeme,
 then the external scanning completion results in a soft failure.
 In this case the current block data
 remains unchanged.
 
 On soft failure,
-no token is read.
+no lexeme is read.
 The current G1 location will remain where it was
 before external scanning.
 
 =head2 Hard failure
 
 Any failure in external scanning completion,
-other than token rejection,
+other than lexeme rejection,
 is a hard failure.
 In the case of a hard failure,
 no guarantee is made about the current block data,
@@ -252,7 +252,7 @@ normalize-whitespace: 1
 
     my $ok = $recce->lexeme_read_block($symbol_name, $value,
         $main_block, $start_of_lexeme, $lexeme_length);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
       $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
           if not defined $ok;
 
@@ -270,11 +270,11 @@ C<$length>.
 
 The C<$symbol_name> argument is the name of the symbol
 to scan.
-The C<$value> argument will be the value of the token.
+The C<$value> argument will be the value of the lexeme.
 If C<$value> is missing or undefined,
-the value of the token will be a Perl C<undef>.
+the value of the lexeme will be a Perl C<undef>.
 The C<$block_id>, C<$offset>, and C<$length> arguments
-are the literal equivalent of the token, as a 
+are the literal equivalent of the lexeme, as a 
 L<block span|/"Block spans">.
 C<lexeme_read_block()> is an external scanning completion
 method and details of its behavior are
@@ -283,7 +283,7 @@ L<as described above|"High level methods in general">.
 B<Return values>:
 On success, C<lexeme_read_block()> returns the new current offset.
 Soft failure occurs if and only if
-the token was rejected.
+the lexeme was rejected.
 On soft failure,
 C<lexeme_read_block()> returns a Perl C<undef>.
 Other failures are thrown as exceptions.
@@ -296,7 +296,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $ok = $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
            if not defined $ok;
 
@@ -313,9 +313,9 @@ C<$length>.
 The C<$symbol_name> argument is the name of the symbol
 to scan.
 The C<$block_id>, C<$offset>, and C<$length> arguments
-are the literal equivalent of the token, as a 
+are the literal equivalent of the lexeme, as a 
 L<block span|/"Block spans">.
-The value of the token will be the same
+The value of the lexeme will be the same
 as its literal equivalent.
 C<lexeme_read_literal()> is an external scanning completion
 method and details of its behavior are
@@ -345,7 +345,7 @@ normalize-whitespace: 1
 B<Return values>:
 On success, C<lexeme_read_literal()> returns the new current offset.
 Soft failure occurs if and only if
-the token was rejected.
+the lexeme was rejected.
 On soft failure,
 C<lexeme_read_literal()> returns a Perl C<undef>.
 Other failures are thrown as exceptions.
@@ -358,7 +358,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $ok = $recce->lexeme_read_string( $symbol_name, $lexeme );
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
       $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
          if not defined $ok;
 
@@ -367,10 +367,10 @@ normalize-whitespace: 1
 The C<lexeme_read_string()> method takes 2 arguments, both required.
 Call them, in order, C<$symbol_name> and C<$string>.
 C<$symbol_name>
-is the symbol name of a token
+is the symbol name of a lexeme
 to be read.
 C<$string>
-is a string which becomes both the value of the token
+is a string which becomes both the value of the lexeme
 and its literal equivalent.
 C<lexeme_read_string()> is an external scanning completion
 method and, with two important exceptions,
@@ -383,7 +383,7 @@ C<lexeme_read_string()>
 creates a new input text block,
 using C<$string> as its text.
 We'll call this block the "per-string block".
-The literal equivalent of the token
+The literal equivalent of the lexeme
 will be the per-string block, starting at offset 0 and ending at eoblock.
 
 The second difference is that,
@@ -434,16 +434,16 @@ C<lexeme_read_string()> is not designed for
 very long values of C<$string>.
 For efficiency with long strings,
 use the equivalent in terms of C<lexeme_read_literal()>, as just shown.
-C<lexeme_read_literal()> sets the value of the token to a span
+C<lexeme_read_literal()> sets the value of the lexeme to a span
 of an input text block,
-while C<lexeme_read_string()> sets the value of the token to a string.
-Marpa::R3 optimizes token values when they are literals in its
+while C<lexeme_read_string()> sets the value of the lexeme to a string.
+Marpa::R3 optimizes lexeme values when they are literals in its
 input text blocks.
 
 B<Return values>:
 On success, C<lexeme_read_string()> returns the new current offset.
 Soft failure occurs if and only if
-the token was rejected.
+the lexeme was rejected.
 On soft failure,
 C<lexeme_read_string()> returns a Perl C<undef>.
 Other failures are thrown as exceptions.

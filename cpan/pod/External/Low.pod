@@ -38,7 +38,7 @@ The high level scanning methods read a lexeme and add that
 lexeme to the Earley sets in a single operation.
 This is very natural,
 and usually what the user wants.
-But sometimes the user want to add more than one lexeme
+But sometimes the user wants to add more than one lexeme
 at a location,
 or to use lexemes of varying length.
 For this,
@@ -50,7 +50,7 @@ and
 L<C<lexeme_alternative_literal()>|/"lexeme_alternative_literal()">
 read a lexeme and add it to the pending lexeme queue.
 L<C<lexeme_complete()>|/"lexeme_complete()">
-adds the tokens at the next (or "closest") location
+adds the lexemes at the next (or "closest") location
 in the pending lexeme queue to the Earley sets.
 In the pending lexeme queue,
 location is measured in "earlemes".
@@ -63,7 +63,7 @@ B<Earlemes> are named after Jay Earley,
 the inventor of the first algorithm
 in Marpa's lineage.
 
-Every token has a start earleme and an end earleme.
+Every lexeme has a start earleme and an end earleme.
 Earlemes exist to provide a "middle" ground.
 They are not tied to physical location,
 and they are not tied to Earley set (G1) location,
@@ -90,7 +90,7 @@ but in the standard input model,
 earleme location is always precisely the same as Earley set ID
 (aka G1 location).
 The standard input model is also called the
-B<token-per-earleme> model.
+B<lexeme-per-earleme> model.
 Most of the Marpa::R3 documents assume the standard input model,
 and therefore have no need to mention earlemes.
 
@@ -100,19 +100,19 @@ By explicitly using earlemes in the low level scanning methods,
 applications can use input models
 other than the standard one.
 An alternative input model
-is anything that is not the default, token-stream model.
-More helpfully, Marpa allows variable-length tokens and ambiguous tokens,
+is anything that is not the default, lexeme-per-earleme model.
+Marpa allows variable-length lexemes and ambiguous lexemes,
 and an alternative input model is any input model which
 
 =over
 
 =item *
 
-allows a token whose length is not exactly 1, or
+allows a lexeme whose length is not exactly 1, or
 
 =item *
 
-allows locations which have more than one token.
+allows Earley sets which have more than one lexeme.
 
 =back
 
@@ -154,7 +154,7 @@ and adds those lexemes to the Earley set,
 
 Whenever C<lexeme_alternative()> reads a lexeme,
 it assigns it a start and an end earleme.
-The B<start lexeme> of a token is the current earleme.
+The B<start earleme> of a lexeme is the current earleme.
 The B<current earleme> is the earleme of the latest
 (or current) Earley set.
 
@@ -463,32 +463,22 @@ greater than or equal to 1.
 Earleme length will usually be 1,
 which is the default.
 
-The C<lexeme_alternative()> method is a non-completion method -- it adds to
-the list of accepted tokens.
-To be read by the parser, this list of accepted tokens
-must be completed by a later call
-to the C<lexeme_complete()> method.
-By making two or more calls
-of the C<lexeme_alternative()> method
-before the next call of C<lexeme_complete()>,
-an app can read an
-ambiguous token.
-(An ambiguous token is one which can be more than one symbol.)
-
 When the recognizer starts,
-the list of accepted tokens is empty.
-The list of accepted tokens is cleared whenever C<lexeme_complete()>
+the pending lexeme queue
+is empty.
+The pending lexeme queue is cleared whenever C<lexeme_complete()>
 is called.
 It is a fatal error
-if a high level scanning method is called while the list of accepted
-tokens is non-empty,
+if a low level scanning method is called
+when the pending lexeme queue
+is empty,
 
 C<lexeme_alternative()> has a soft failure if it rejects 
 C<$symbol_name>.
 All other failures are hard failures.
 
 B<Return values>:
-Returns C<undef> if the token was rejected.
+Returns C<undef> if the lexeme was rejected.
 On success, returns a value reserved for future use.
 The value on success will not necessarily be a Perl true,
 so that apps testing for rejection must test for a Perl C<undef> explicitly.
@@ -502,7 +492,7 @@ partial: 1
 normalize-whitespace: 1
 
     my $ok = $recce->lexeme_alternative_literal($symbol_name);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
         $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
             if not defined $ok;
 
@@ -519,21 +509,14 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-C<lexeme_alternative_literal()> is one of the low-level methods of the external scanner.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
 C<lexeme_alternative_literal()> takes up to two arguments,
 the first of which is required.
 C<lexeme_alternative_literal()> and
 C<lexeme_alternative()> differ from each other
 only in their arguments,
-and in how they set the value of the token.
-For a token read by C<lexeme_alternative_literal()>,
-the value of the token will be the same as its literal equivalent.
+and in how they set the value of the lexeme.
+For a lexeme read by C<lexeme_alternative_literal()>,
+the value of the lexeme will be the same as its literal equivalent.
 This literal equivalent
 will be set by the next call to 
 C<lexeme_complete()>.
@@ -561,7 +544,9 @@ normalize-whitespace: 1
 
 C<lexeme_complete()> reads lexemes
 from the pending lexeme queue.
-It will read those lexemes which end at the closest earleme.
+It will read those lexemes
+in the pending lexeme set
+for the closest earleme.
 
 C<lexeme_complete()> relies on the app to have added lexemes
 to the pending lexeme queue,
@@ -579,7 +564,7 @@ These specify a
 L<block span|Marpa::R3::Recognizer/"Block spans">.
 A zero C<$length> is acceptable.
 The block span is used to set the literal equivalent for the
-set of alternative tokens completed by the
+set of alternative lexemes completed by the
 C<lexeme_complete()> call.
 If C<$block_id> is not defined,
 the specified block is the current block.
@@ -592,7 +577,6 @@ end-of-block of the specified block,
 less the specified offset --
 in other words, the specified block span
 includes the entire remaining specified block.
-
 
 B<Return values:>
 On success, C<lexeme_complete()>
@@ -660,24 +644,24 @@ L<catch up|/"Catching up"> to the furthest earleme.
 
 =head1 Ambiguous lexing
 
-Marpa allows ambiguous tokens.
-Several Marpa tokens can start at a single parsing location.
-Ambiguous tokens can be of various lengths.
+Marpa allows ambiguous lexemes.
+Several Marpa lexemes can start at a single parsing location.
+Ambiguous lexemes can be of various lengths.
 Tokens can also overlap.
 
 B<Potentially
 ambiguous lexing>
-occurs when more than one token starts
+occurs when more than one lexeme starts
 at a single earleme.
 When potentially ambiguous lexing occurs,
 it becomes possible for there to be more
-than one sequence of tokens.
+than one sequence of lexemes.
 
 An B<actual lexical ambiguity> only occurs if
-more than one of the potential token sequences is consistent with
+more than one of the potential lexeme sequences is consistent with
 the grammar.
 If there is no actual lexical ambiguity,
-Marpa will use the only token choice that is
+Marpa will use the only lexeme choice that is
 consistent with the grammar.
 
 When lexing is B<actually ambiguous>, Marpa
@@ -699,33 +683,32 @@ In Marpa,
 if the input is ambiguous,
 even an unambiguous grammar can produce more than one parse.
 
-=head1 Duplicate tokens
+=head1 Duplicate lexemes
 
-A duplicate token is a token of the same type
-and the same length as another
+A duplicate lexeme is a lexeme of the same type
+and the same length as another lexeme
 that was read at the same earleme.
-Duplicate tokens are impossible in the default, token-stream,
-model.
-This is because in the token-stream model only one token can be
+Duplicate lexemes are impossible in the standard input model.
+This is because in the standard input model only one lexeme can be
 read at each earleme.
 
-In alternative models, more than one token may be read at
+In alternative models, more than one lexeme may be read at
 an earleme, and duplicates B<are> possible.
-Marpa detects duplicate tokens and treats them as
+Marpa detects duplicate lexemes and treats them as
 "hard errors" --
 Marpa throws an exception
-when it sees a duplicate token.
+when it sees a duplicate lexeme.
 Marpa's assumption is that
-duplicate tokens indicate
+duplicate lexemes indicate
 an error at the application level.
 
 An application can retry input after
-a duplicate token, if it
+a duplicate lexeme, if it
 catches the exception.
-In the future, if recovery from duplicate tokens is found
+In the future, if recovery from duplicate lexemes is found
 to be a useful technique, Marpa may provide an option to change
 its behavior, so that a soft failure is returned
-when there is a duplicate token.
+when there is a duplicate lexeme.
 
 =head1 Empty earlemes
 
@@ -743,10 +726,10 @@ In particular,
 in the one-character-per-earleme model,
 every character is treated as being exactly one
 earleme in length.
-If a token is more than one character in length,
-that token will span earlemes.
+If a lexeme is more than one character in length,
+that lexeme will span earlemes.
 The earlemes in between the start earleme of the
-token and the end earleme of the token
+lexeme and the end earleme of the lexeme
 will not correspond to any Earley set --
 they will be "empty".
 
@@ -754,7 +737,7 @@ An one example,
 consider a straightforward character-per-earleme implementation
 of a grammar for a language that allows
 comments.
-No tokens will start at
+No lexemes will start at
 any earlemes which correspond to character locations inside
 the comment,
 so there will be no Earley sets at those earlemes.
@@ -825,7 +808,7 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-The example just above shows the value of the token being set to a string
+The example just above shows the value of the lexeme being set to a string
 in the C<lexeme_alternative()> call.
 Not that this is not efficient for very long strings.
 

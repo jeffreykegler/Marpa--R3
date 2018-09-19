@@ -67,7 +67,7 @@ sub hi_block_reader {
 
     my $ok = $recce->lexeme_read_block($symbol_name, $value,
         $main_block, $start_of_lexeme, $lexeme_length);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
       $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
           if not defined $ok;
 
@@ -98,7 +98,7 @@ sub eq_block_reader {
       )
     {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before lexeme "},
           $recce->literal( $main_block, $start_of_lexeme, $length ), q{"};
     }
 }
@@ -112,7 +112,7 @@ sub lo_literal_reader {
 # name: recognizer lexeme_alternative_literal() synopsis
 
     my $ok = $recce->lexeme_alternative_literal($symbol_name);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
         $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
             if not defined $ok;
     $ok = $recce->lexeme_complete( $main_block, $start_of_lexeme, $lexeme_length);
@@ -130,7 +130,7 @@ sub hi_literal_reader {
 # name: recognizer lexeme_read_literal() synopsis
 
     my $ok = $recce->lexeme_read_literal($symbol_name, $main_block, $start_of_lexeme, $lexeme_length);
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
        $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
            if not defined $ok;
 
@@ -161,7 +161,7 @@ sub eq_literal_reader {
       )
     {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before lexeme "},
           $recce->literal( $main_block, $start_of_lexeme, $length ), q{"};
     }
 }
@@ -189,7 +189,7 @@ sub eq2_literal_reader {
       )
     {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before lexeme "},
           $recce->literal( $main_block, $start_of_lexeme, $length ), q{"};
     }
 }
@@ -202,7 +202,7 @@ sub hi_string_reader {
 # name: recognizer lexeme_read_string() synopsis
 
     my $ok = $recce->lexeme_read_string( $symbol_name, $lexeme );
-    die qq{Parser rejected token "$long_name" at position $start_of_lexeme, before "},
+    die qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before "},
       $recce->literal( $main_block, $start_of_lexeme, 40 ), q{"}
          if not defined $ok;
 
@@ -230,7 +230,7 @@ sub eq_string_reader {
     my ( $recce, $start_of_lexeme, $lexeme, $symbol_name, $long_name ) = @_;
     if ( not defined read_string_equivalent_lo( $recce, $symbol_name, $lexeme ) ) {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before lexeme "},
           $lexeme;
     }
 }
@@ -257,7 +257,7 @@ sub eq2_string_reader {
     if ( not defined read_string_equivalent_hi( $recce, $symbol_name, $lexeme ) )
     {
         die
-qq{Parser rejected token "$long_name" at position $start_of_lexeme, before lexeme "},
+qq{Parser rejected lexeme "$long_name" at position $start_of_lexeme, before lexeme "},
           $recce->literal( $main_block, $start_of_lexeme, $length ), q{"};
     }
 }
