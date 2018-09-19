@@ -45,7 +45,7 @@ For this,
 the low level methods exist.
 
 The low level methods separate the two operations:
-L<C<lexeme_alternative()>|/"lexeme_alternative()">,
+L<C<lexeme_alternative()>|/"lexeme_alternative()">
 and
 L<C<lexeme_alternative_literal()>|/"lexeme_alternative_literal()">
 read a lexeme and add it to the pending lexeme queue.
@@ -62,12 +62,10 @@ used by the low-level scanning routines.
 B<Earlemes> are named after Jay Earley,
 the inventor of the first algorithm
 in Marpa's lineage.
-
-Every lexeme has a start earleme and an end earleme.
-Earlemes exist to provide a "middle" ground.
-They are not tied to physical location,
+Earlemes are not tied to physical location,
 and they are not tied to Earley set (G1) location,
 so they can be very flexible.
+Earlemes exist to provide a "middle" ground.
 
 Intuitively,
 Earlemes behave the way that zero-based idea of parse location should.
@@ -164,7 +162,7 @@ The B<current earleme> is the earleme of the latest
 
 C<lexeme_alternative()> specifies a B<lexeme length>,
 either explicitly or implicitly.
-Lexeme length is always an integer greater than one.
+Lexeme length is always an integer greater than zero.
 The B<end earleme> of a lexeme is
 the B<start earleme> plus its length.
 In other words,
@@ -173,7 +171,7 @@ and I<L> is the lexeme length,
 then the end earleme is I<S>C<+>I<L>.
 
 (Note that everything said in this section,
-applied to the 
+applies to the 
 C<lexeme_alternative_literal()> method as well.
 For brevity, we will speak only of the
 C<lexeme_alternative()> method.)
@@ -183,7 +181,7 @@ it places it into the B<pending lexeme queue>,
 according to its end earleme.
 The pending lexeme queue is a queue of
 B<pending lexeme sets>.
-All the lexemes in a B<pending lexeme sets>
+All the lexemes in a B<pending lexeme set>
 share the same earleme.
 Therefore we can think of,
 and sometimes will speak of,
@@ -193,13 +191,13 @@ The pending lexeme queue is ordered from the
 closest earleme to the furthest earleme.
 The B<closest earleme> is the earleme in the pending
 lexeme queue that is "closest" to the current earleme --
-there it is the lowest numbered earleme in the queue.
+that is, it is the lowest numbered earleme in the queue.
 The B<furthest earleme> is the earleme in the pending
 lexeme queue that is "furthest" from the current earleme --
-there it is the lowest numbered earleme in the queue.
+in other words, it is the highest numbered earleme in the queue.
 
 In addition to tracking the current earleme,
-the Marpa::R3 recognizer always had a closest
+the Marpa::R3 recognizer always has a closest
 and furthest earleme.
 As a special case,
 if the pending lexeme queue is empty,
@@ -364,7 +362,7 @@ Given an Earley set ID as its argument,
 the C<earleme()> recognizer method
 returns the corresponding earleme.
 Every integer in the range from 0
-to the ID of the current Earley
+to the ID of the current Earley set
 is a valid Earley set ID,
 and every valid Earley set ID corresponds to an
 earleme.
@@ -375,7 +373,7 @@ C<earleme()> returns Perl C<undef>.
 There is currently no method that translates from
 earleme to Earley set.
 Earley set to earleme translation is a well-behaved
-one-to-one function
+one-to-one (injective) function
 in all input models -- for every Earley set there is
 a earleme,
 and every earleme is mapped to by at most one Earley set.
@@ -384,10 +382,11 @@ In many input models, it is a partial function -- there
 are some earlemes that are
 in the valid range of earlemes
 but do not map to any Earley set.
+(See L</"Empty earlemes">.)
 
 As an alternative to the C<earleme()> method,
 an application
-may want to its own Earley set to earleme mapping.
+can implement its own Earley set to earleme mapping.
 This can allows an application to take advantage of what
 it knows about its choice of input model.
 
@@ -443,39 +442,30 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-C<lexeme_alternative()> is one of the low-level methods of the external scanner.
-Most applications
-will prefer the simpler
-L<C<lexeme_read_string()>|/"lexeme_read_string()">,
-L<C<lexeme_read_literal()>|/"lexeme_read_literal()">
-and L<C<lexeme_read_block()>|/"lexeme_read_block()"> methods.
-
 C<lexeme_alternative()> takes up to three arguments.
 The first two are, in order, C<$symbol_name> and C<$value>.
 C<$symbol_name> is required
 and must be the name of a symbol to be read
-at the current location.
+starting at the current earleme.
 C<$value> is optional,
 and specifies the value of the symbol.
 If C<$value> is missing, the value of the symbol
 will be a Perl C<undef>.
 
-The fourth, optional, argument
-is the length of the lexeme in earlemes.
+The third, optional, argument
+specifies the length of the lexeme in earlemes.
 Earleme length must be always be
 greater than or equal to 1.
-Earleme length will usually be 1,
-which is the default.
+By default,
+the specified earleme length is 1.
 
-When the recognizer starts,
-the pending lexeme queue
-is empty.
-The pending lexeme queue is cleared whenever C<lexeme_complete()>
-is called.
-It is a fatal error
-if a low level scanning method is called
-when the pending lexeme queue
-is empty,
+The C<lexeme_alternative()> method adds
+the lexeme described to the pending lexeme set
+for its end earleme,
+creating a new pending lexeme set if necessary.
+The end earleme is I<C>C<+>I<L>, where
+I<C> is the current earleme,
+and I<L> is the specified earleme length.
 
 C<lexeme_alternative()> has a soft failure if it rejects 
 C<$symbol_name>.
@@ -502,9 +492,6 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
-For advanced uses,
-there is also a two-argument form:
-
 =for Marpa::R3::Display
 name: recognizer lexeme_alternative_literal() variable length synopsis
 normalize-whitespace: 1
@@ -514,26 +501,46 @@ normalize-whitespace: 1
 =for Marpa::R3::Display::End
 
 C<lexeme_alternative_literal()> takes up to two arguments,
-the first of which is required.
-C<lexeme_alternative_literal()> and
-C<lexeme_alternative()> differ from each other
-only in their arguments,
-and in how they set the value of the lexeme.
-For a lexeme read by C<lexeme_alternative_literal()>,
+call them C<$symbol_name> and C<$earleme_length>.
+C<$symbol_name> is required
+and specifies the name of a lexeme.
+
+C<$earleme_length> is optional,
+and specifies the earleme length of the lexeme.
+By default,
+the specified earleme length is 1.
+Earleme length must be always be
+greater than or equal to 1.
+
+For the lexeme specified by C<lexeme_alternative_literal()>,
 the value of the lexeme will be the same as its literal equivalent.
 This literal equivalent
 will be set by the next call to 
 C<lexeme_complete()>.
-Otherwise, C<lexeme_alternative_literal()> behaves in
-exactly the same way as
-C<lexeme_alternative()>.
 
-The second, optional, argument may be ignored by most applications.
-It is the length of the lexeme in earlemes.
-Earleme length must be always be
-greater than or equal to 1.
-Earleme length will almost always be 1,
-which is the default.
+The C<lexeme_alternative_literal()> method adds
+the lexeme described to the pending lexeme set
+for its end earleme,
+creating a new pending lexeme set if necessary.
+The end earleme is I<C>C<+>I<L>, where
+I<C> is the current earleme,
+and I<L> is the specified earleme length.
+
+C<lexeme_alternative_literal()> has a soft failure if it rejects 
+C<$symbol_name>.
+All other failures are hard failures.
+
+C<lexeme_alternative_literal()> and
+C<lexeme_alternative()> differ from each other
+only in their arguments,
+and in how they set the value of the lexeme.
+
+B<Return values>:
+Returns C<undef> if the lexeme was rejected.
+On success, returns a value reserved for future use.
+The value on success will not necessarily be a Perl true,
+so that apps testing for rejection must test for a Perl C<undef> explicitly.
+Failures are thrown as exceptions.
 
 =head2 lexeme_complete()
 
@@ -546,12 +553,19 @@ normalize-whitespace: 1
 
 =for Marpa::R3::Display::End
 
+The C<lexeme_complete()> method
+accepts three optional arguments.
+Call them, in order,
+C<$block_id>, C<$offset> and C<$length>.
+These specify a
+L<block span|Marpa::R3::Recognizer/"Block spans">.
+A zero C<$length> is acceptable.
+
 C<lexeme_complete()> reads lexemes
 from the pending lexeme queue.
 It will read those lexemes
 in the pending lexeme set
 for the closest earleme.
-
 C<lexeme_complete()> relies on the app to have added lexemes
 to the pending lexeme queue,
 using the C<lexeme_alternative()>
@@ -560,14 +574,7 @@ calls.
 If the pending lexeme queue is empty,
 a hard failure is thrown.
 
-The C<lexeme_complete()> method
-accepts three optional arguments.
-Call them, in order,
-C<$block_id>, C<$offset> and C<$length>.
-These specify a
-L<block span|Marpa::R3::Recognizer/"Block spans">.
-A zero C<$length> is acceptable.
-The block span is used to set the literal equivalent for the
+The specified block span is used to set the literal equivalent for the
 set of alternative lexemes completed by the
 C<lexeme_complete()> call.
 If C<$block_id> is not defined,
@@ -576,7 +583,7 @@ If C<$offset> is not defined,
 the specified offset is the current offset
 of the specified block.
 If C<$length> is not defined,
-the specifed length is the
+the specified length is the
 end-of-block of the specified block,
 less the specified offset --
 in other words, the specified block span
@@ -605,19 +612,20 @@ finding
 the intended
 L<end of parsing|/"End of parsing">,
 ensuring all desired events are generated,
-and, L<ensuring that a parse is exhausted|/"Exhaustion">.
+and L<ensuring that a parse is exhausted|/"Exhaustion">.
 
 =head1 End of parsing
 
 The default end of parsing is always at the current earley set,
 and therefore at the current earleme.
 This means that
-and lexemes in the pending lexeme queue
-will be ignored in evaluation the parse.
-If the application ends processing With that one parse,
-these lexemes will be "abandoned".
+lexemes in the pending lexeme queue
+will be ignored in evaluating the parse.
+For the purposes of that parse,
+at least,
+these lexemes will be "ignored".
 
-"Abandoning" lexemes may be the intended behavior.
+"Ignoring" lexemes may be the intended behavior.
 If not,
 the application must ensure that processing of input
 L<catches up|/"Catching up">
@@ -639,7 +647,6 @@ there may be lexemes in the pending lexeme queue.
 Therefore, in alternative input models,
 a parse may find no acceptable lexemes at the current earleme,
 but still not be exhausted.
-
 Applications which need to ensure that a parse
 is run until exhaustion
 will need to make sure
@@ -651,7 +658,7 @@ L<catch up|/"Catching up"> to the furthest earleme.
 Marpa allows ambiguous lexemes.
 Several Marpa lexemes can start at a single parsing location.
 Ambiguous lexemes can be of various lengths.
-Tokens can also overlap.
+Lexemes can also overlap.
 
 B<Potentially
 ambiguous lexing>
@@ -727,15 +734,15 @@ so there is not necessarily a function from
 earlemes to Earley sets.
 
 In particular,
-in the one-character-per-earleme model,
+in the character-per-earleme model,
 every character is treated as being exactly one
 earleme in length.
 If a lexeme is more than one character in length,
 that lexeme will span earlemes.
 The earlemes in between the start earleme of the
 lexeme and the end earleme of the lexeme
-will not correspond to any Earley set --
-they will be "empty".
+may not correspond to any Earley set --
+they may be "empty".
 
 An one example,
 consider a straightforward character-per-earleme implementation
@@ -746,7 +753,6 @@ any earlemes which correspond to character locations inside
 the comment,
 so there will be no Earley sets at those earlemes.
 The earlemes between the start and end earlemes of
-the comment will be "emptybetween the start and end earlemes of
 the comment will be "empty".
 
 =head1 Equivalents of high level methods
@@ -777,7 +783,7 @@ normalize-whitespace: 1
 =head2 Low level equivalent of C<lexeme_read_literal()>
 
 In terms of low-level external scanning methods,
-the above is roughly equivalent to
+the C<lexeme_read_literal()> is roughly equivalent to
 
 =for Marpa::R3::Display
 name: recognizer lexeme_read_literal() low-level equivalent
@@ -814,7 +820,7 @@ normalize-whitespace: 1
 
 The example just above shows the value of the lexeme being set to a string
 in the C<lexeme_alternative()> call.
-Not that this is not efficient for very long strings.
+Note that this is not efficient for very long strings.
 
 =head1 Copyright and License
 
