@@ -17,11 +17,6 @@
 
 Marpa::R3::External::Model - Details on input models and earlemes
 
-=head1 TO DO
-
-Copied verbatim from libmarpa doc.
-Needs revision to apply to R3.
-
 =head1 About this document
 
 The alternative input models described in this document are an
@@ -33,261 +28,79 @@ it is still safe to ignore this document,
 but you might find the possibilities it discusses
 interesting.
 
+This document contains a taxonomy of alternative input models,
+detailing their behavior in terms of G1 location and earlemes.
+The primary purpose is to aid a programmer in designing new
+alternative input models.
+A secondary purpose is to clarify Marpa's behavior for all
+input models.
+
+Understanding the
+settings of G1 location
+and of current, latest and furthest earleme is
+crucial to working with advanced input models.
+For this reason the next sections will go
+through the possibilities carefully.
+The presentation will start with the most traditional
+and restrictive models.
+It will proceed to less restrictive models.
+
 This is not the document to which to turn first.
 Before reading this document, you should be familiar with
 L<Marpa::R3::External::Basic>
 and 
 L<Marpa::R3::External::Low>.
 
-=head1 Earlemes
-
-There are only three restrictions:
-
-=over 4
-
-=item *
-
-Every Earley set maps to a unique earleme.
-This is,
-if I<Xes> and I<Yes> are the IDs of two Earley sets,
-I<Xearleme> is the earleme of I<Xes>, aqnd
-I<Yearleme> is the earleme of I<Yes>,
-then I<Xes>C<=>I<Yes> if and only if
-I<Xearleme>C<=>I<Yearleme>.
-
-=item *
-
-The earlemes increase monotonically with the 
-IDs of the Earley sets.
-That is, again
-let I<Xes> and I<Yes> be the IDs of two Earley sets;
-let I<Xearleme> be earleme of I<Xes> and
-let I<Yearleme> be earleme of I<Yes>.
-Then I<Xes>C<< < >>I<Yes> if and only if
-I<Xearleme>C<< < >>I<Yearleme>.
-
-=item *
-
-Earley set 0 is always earleme 0,
-and vice versa.
-
-=item *
-
-The start earleme of a token is the earleme of the Earley
-set at which the token starts.
-
-=item *
-
-The end earleme of a token is the earleme of the Earley
-set at which the token ends.
-
-=item *
-
-Every token has a length in earlemes.
-Call the start earleme of a token, I<start>
-and the end earleme of a token, I<end>.
-Then the length of the token is I<start>C<->I<end>.
-
-=item *
-
-The length of a token must be 1 or greater.
-
-=back
-
-Less formally, the above states that
-all tokens starting at
-earleme I<N> must be scanned before
-any tokens starting at earleme I<N+1>;
-that earleme location, like Earley set ID
-is zero-based;
-and that tokens are never zero-length.
-
-=head1 The traditional model
-
-In traditional Earley parsers, the concept of location is very simple.
-Locations are numbered from 0 to I<n>, where I<n> is the length of
-the input.
-Every location has an Earley set, and vice versa.
-Location 0 is the start location.
-Every location after the start location has exactly one input token
-associated with it.
-
-Some applications
-do not fit this traditional input model ---
-natural language processing requires ambiguous tokens,
-for example.
-Libmarpa allows a wide variety of alternative input models.
-
-This document assumes that the reader knows the concepts
-behind Libmarpa's
-alternative input models, either from the documentation
-of a higher level interface, such as
-C<Marpa::XS>,
-C<Marpa::R2>,
-or C<Marpa::R3>,
-or from Marpa's
-L<https://docs.google.com/file/d/0B9_mR_M2zOc4Ni1zSW5IYzk3TGc/edit?usp=sharing, theory document>.
-
-As a reminder,
-in Libmarpa a location is called a B<earleme>.
-The number of an Earley set is the B<ID of the Earley set>,
-or its B<ordinal>.
-In the traditional model, the ordinal of an Earley set and
-its earleme are always exactly the same, but in Libmarpa
-they will be different.
-
-=head1 The earleme variables
-
-The important earleme variables are the current earleme,
-the furthest earleme,
-the closest earleme,
-and the latest earleme.
-The B<current earleme> is the earleme that Libmarpa is currently working on.
-More specifically, it is the one at which new tokens will B<start>.
-Since tokens are never zero length, a new token will always end after the
-current earleme.
-The current earleme is initially earleme 0.
-Every call to C<marpa_r_earleme_complete()> advances the
-current earleme by 1.
-
-=head2 The pending lexeme queue
-
-Marpa maintains a queue of pending lexemes,
-from "closest" to "furthest".
-The lexeme which ends closest to the current earleme
-(that is, has the lowest earleme number)
-is the "closest lexeme".
-The lexeme which ends furthest from the current earleme
-(that is, has the highest earleme number)
-is the "furthest lexeme".
-The pending lexeme queue may be empty,
-in which case the closest and furthest earleme
-are the same as the current earleme.
-
-If the pending lexeme queue is of length 1,
-the closest earleme will be equal to the furthest earleme.
-
-=head2 Furthest earleme
-
-The B<furthest earleme> is the highest numbered (and therefore ``furthest'')
-earleme at which a token ends.
-The furthest earleme is initially earleme 0.
-With every call to C<marpa_r_alternative()>, the end of the token
-it adds is calculated.
-A token ends at the earleme location I<current>+I<length>,
-where I<current> is the current earleme,
-and I<length> is the length of the newly added token.
-After a call to C<marpa_r_alternative()>,
-the furthest earleme is its value before the call,
-or I<current>+I<length>,
-whichever is greater.
-
-=head2 Closest earleme
-
-The B<closest earleme> is the lowest numbered (and therefore ``closest'')
-at which a queued, but unscanned token ends.
-As a special case, if there are no queued tokens,
-the closest earleme is the current earleme.
-
-=head2 Latest earleme
-
-TODO: latest earleme is always current earleme.
-
-The B<latest earleme> is the earleme of the latest
-Earley set.
-The B<latest Earley set> is the last Earley set completed.
-This is always the highest numbered Earley set.
-If there is an Earley set at the current earleme,
-it is the latest Earley set and the latest earleme
-is equal to the current earleme.
-There is never an Earley set after the current earleme.
-
-If Marpa::R2 successfully adds a token using the
-C<lexeme_complete()> method,
-it creates an Earley set.
-After every call to the C<lexeme_complete()> method
-that creates an Earley set,
-the value of the latest earleme is
-same as the value of the current earleme.
-After every call to the C<lexeme_complete()> method
-that does B<not> create an Earley set,
-the value of the latest earleme is unchanged
-from its value before the call.
-
-=head1 The significances of the earleme variables
-
-The current earleme tracks the advance of the recognizer through the input.
-Input tokens always start at the current earleme.
-An application can advance past the current earleme,
-by calling C<lexeme_complete()>, which
-advances the current earleme to the closest earleme.
-After initialization,
-C<lexeme_complete()> is
-the only way to manipulate the value of the current earleme.
-
-The furthest earleme tracks how ``far out'' tokens can be found.
-In the standard input model, calling
-C<lexeme_complete()> after each
-C<marpa_r_alternative()> call is sufficient to process
-all inputs,
-and the furthest earleme's value
-can be typically be ignored.
-In alternative input models, if tokens have lengths greater than
-1, calling
-C<lexeme_complete()> once after the last token
-is read may not be enough to ensure that all tokens have been processed.
-To ensure that all tokens have been processed,
-an application must advance the current earleme
-by calling C<lexeme_complete()>,
-until the current earleme is equal to the furthest earleme.
-
-The lastest earleme is the earleme of the last Earley set.
-The latest earleme is different from the current earleme if and only if
-there is no Earley set at the current earleme.
-A different end of parsing can be specified,
-but by default, parsing is of the input
-in the range
-from earleme 0 to the latest earleme.
+For brevity, this document speaks only of the
+C<lexeme_alternative()> method.
+Note that, unless otherwise stated,
+everything said in this document
+applies to the 
+C<lexeme_alternative_literal()> method as well.
 
 =head1 The initial earleme settings
 
 All input models have the same initial values.
-Initially the current, latest and furthest earleme
+Initially the current Earley set ID (G1 location)
+in always 0;
+and the current, latest and furthest earleme
 are always earleme 0.
-
-Understanding the
-settings of current, latest and furthest earleme is
-crucial to working with advanced input models,
-and for this reason the next sections will go
-through the possibilities carefully.
-The presentation will start with the most traditional
-and restrictive models.
-It will proceed to less restrictive models.
 
 =head1 The standard model of input
 
-In the standard model of input,
-calls to C<marpa_r_alternative()>
+An application will rarely implement
+the standard model of input
+using the low level external scanning methods.
+The high level methods are much simpler
+and handier.
+
+But when an application does implement
+the standard model of input,
+using the low level methods,
+it does so by making
+calls to C<lexeme_alternative()>
 and C<lexeme_complete()> are
 made in pairs.
-There is, first, exactly one call
-to C<marpa_r_alternative()>,
-and it is for a token with length 1.
-Following it must be a call
+It will make, first, exactly one call
+to C<lexeme_alternative()>,
+and for a lexeme with length 1.
+Following the call to C<lexeme_alternative()>
+must come the second call of the pair --
+a call
 to C<lexeme_complete()>.
 For an input of length I<n>, there will be
 exactly I<n> such paired calls.
 
 Suppose, in the standard model that,
 for a call
-to C<marpa_r_alternative()>,
+to C<lexeme_alternative()>,
 the following is true:
 
 =over 4
 
 =item *
 
-The current earleme before the call was I<c>.
+The current earleme before the call is I<c>.
 
 =back
 
@@ -298,17 +111,21 @@ this means that we also know that
 
 =item *
 
-The latest earleme before the call was I<c>.
+The current Earley set before the call is I<c>.
 
 =item *
 
-The furthest earleme before the call was I<c>.
+The closest earleme before the call is I<c>.
+
+=item *
+
+The furthest earleme before the call is I<c>.
 
 =back
 
 In that case,
 after the call to
-C<marpa_r_alternative()>,
+C<lexeme_alternative()>,
 the following will be true:
 
 =over 4
@@ -319,7 +136,11 @@ The current earleme will still be I<c>.
 
 =item *
 
-The latest earleme will still be I<c>.
+The current Earley set ID will still be I<c>.
+
+=item *
+
+The closest earleme will be I<c>+1.
 
 =item *
 
@@ -328,7 +149,7 @@ The furthest earleme will be I<c>+1.
 =back
 
 Suppose, in the standard model that,
-for a call
+before a call
 to C<lexeme_complete()>,
 the following is true:
 
@@ -342,7 +163,17 @@ this means that we also know that
 
 =item *
 
-The latest earleme before the call was I<c>.
+The current Earley set ID before the call is I<c>.
+
+=item *
+
+The pending lexeme queue contains
+exactly one pending lexeme set,
+a singleton set at earleme I<c+1>.
+
+=item *
+
+The closest earleme before the call was I<c+1>.
 
 =item *
 
@@ -366,7 +197,11 @@ The current earleme will be advanced to I<c+1>.
 
 =item *
 
-The latest earleme will be advanced to I<c+1>.
+The pending lexeme queue will be empty.
+
+=item *
+
+The closest earleme will remain at I<c+1>.
 
 =item *
 
@@ -377,41 +212,69 @@ The furthest earleme will remain at I<c+1>.
 =head1 Ambiguous input
 
 As a first loosening of the standard model,
-we no longer require calls to C<marpa_r_alternative()>
+we no longer require calls to C<lexeme_alternative()>
 to be paired with calls to
 C<lexeme_complete()>.
 Instead,
 we allow a series of one or more calls
-to C<marpa_r_alternative()>
+to C<lexeme_alternative()>
 before each call to
 C<lexeme_complete()>.
+
 We still require that there be at least one call
-to C<marpa_r_alternative()>
+to C<lexeme_alternative()>
 before each call to
-C<lexeme_complete()>,
-and we still require that all tokens have
-a length of 1.
+C<lexeme_complete()>.
+We also still require that all lexemes have
+a length of exactly 1.
 
 In the ambiguous input model, the behavior of the current,
 latest and furthest earlemes are exactly
-as described for the standard model, with one minor
-exception:
+as described for the standard model, with these exceptions:
+
+=over 4
+
+=item *
+
 Where the current earleme is I<c>,
-and a call to C<marpa_r_alternative()> is not the first
+and a call to C<lexeme_alternative()> is not the first
 of a series,
-the value of the furthest earleme before the call will be
+the value of the closest earleme before the second and subsequent calls
+calls of C<lexeme_alternative()>
+will be
 I<c>+1.
 
-=head1 Variable length tokens
+=item *
+
+Where the current earleme is I<c>,
+and a call to C<lexeme_alternative()> is not the first
+of a series,
+the value of the furthest earleme before the second and subsequent calls
+calls of C<lexeme_alternative()>
+will be
+I<c>+1.
+
+=item *
+
+The pending lexeme queue will still always contains
+exactly one pending lexeme set,
+and it will still be
+at earleme I<c+1>.
+But after the C<n>'th successful call to C<lexeme_alternative()>
+it will contain C<n> lexemes.
+
+=back
+
+=head1 Variable length lexemes
 
 Our next loosening of the restrictions is to allow
-variable length tokens.
-That is, instead of requiring that all tokens
+variable length lexemes.
+That is, instead of requiring that all lexemes
 be of length 1,
-we allow tokens to be of length 1 or longer.
+we allow lexemes to be of length 1 or longer.
 This does change the behavior of the earleme variables.
 
-Suppose, in the variable length token model that,
+Suppose, in the variable length lexeme model that,
 for a call
 to C<marpa_r_alternative()>,
 the following is true:
@@ -430,7 +293,7 @@ The furthest earleme before the call was I<old_f>.
 
 =item *
 
-The length of the token is I<length>.
+The length of the lexeme is I<length>.
 
 =back
 
@@ -454,7 +317,7 @@ I<c>+I<length>, whichever was greater.
 
 =back
 
-Suppose, in the variable length token model that,
+Suppose, in the variable length lexeme model that,
 for a call
 to C<lexeme_complete()>,
 the following is true:
@@ -496,59 +359,6 @@ to C<lexeme_complete()>.
 
 =back
 
-=head1 The generalized model
-
-To fully generalize the input model,
-we now need to remove only one restriction.
-We now allow empty earlemes --- earlemes with
-no tokens and no Earley set.
-
-Suppose, in the generalized input model that,
-for a call
-to C<marpa_r_earleme_complete()>
-the following is true:
-
-=over 4
-
-=item *
-
-The current earleme before the call is I<c>.
-
-=item *
-
-The closest earleme before the call is I<old_close>.
-
-=item *
-
-The furthest earleme before the call is I<old_far>.
-
-=back
-
-In that case,
-after a successful call
-to C<lexeme_complete()>,
-the following will be true:
-
-=over 4
-
-=item *
-
-The current earleme will be set to I<old_close>.
-
-=item *
-
-The closest earleme will set in the
-standard manner,
-and may or may not change.
-
-=item *
-
-The furthest earleme will remain at I<old_f>.
-The furthest earleme is never changed by a call
-to C<lexeme_complete()>.
-
-=back
-
 =head1 General rules for the earleme variables
 
 At this point, the most generalized input model has been
@@ -561,47 +371,17 @@ no matter which of the input models is in use.
 =item *
 
 The current earleme is always greater than
-or equal to the latest earleme.
+or equal to the current Earley set Id.
+
+=item *
+
+The closest earleme is always greater than
+or equal to the current earleme.
 
 =item *
 
 The furthest earleme is always greater than
-or equal to the latest earleme.
-
-=item *
-
-If the furthest earleme is greater than the current earleme,
-the parser is not exhausted.
-
-=item *
-
-If the furthest earleme is less than the current earleme,
-the parser is exhausted.
-
-=back
-
-If the parser is not exhausted,
-the following will always be true,
-no matter which of the input models is in use.
-
-=over 4
-
-=item *
-
-The furthest earleme is greater than
-or equal to the current earleme.
-
-=back
-
-In an exhausted parser, the following will always be true,
-no matter which of the input models is in use.
-
-=over 4
-
-=item *
-
-The furthest earleme is less than
-or equal to the current earleme.
+or equal to the closest earleme.
 
 =back
 
