@@ -90,7 +90,7 @@ but in the standard input model,
 earleme location is always precisely the same as Earley set ID
 (aka G1 location).
 The standard input model is also called the
-B<earleme-per-token> model.
+B<token-per-earleme> model.
 Most of the Marpa::R3 documents assume the standard input model,
 and therefore have no need to mention earlemes.
 
@@ -131,7 +131,7 @@ account the alternative input models.
 
 The most popular alternative input model ties location
 to the physical input.
-That is the B<earleme-per-character model>.
+That is the B<character-per-earleme> model.
 The strict version of this would restrict physical input
 to a single block,
 with no jumps backward.
@@ -307,6 +307,8 @@ will be a Perl C<undef>.
 
 The fourth, optional, argument
 is the length of the lexeme in earlemes.
+Earleme length must be always be
+greater than or equal to 1.
 Earleme length will usually be 1,
 which is the default.
 
@@ -390,6 +392,8 @@ C<lexeme_alternative()>.
 
 The second, optional, argument may be ignored by most applications.
 It is the length of the lexeme in earlemes.
+Earleme length must be always be
+greater than or equal to 1.
 Earleme length will almost always be 1,
 which is the default.
 
@@ -592,39 +596,40 @@ to be a useful technique, Marpa may provide an option to change
 its behavior, so that a soft failure is returned
 when there is a duplicate token.
 
-=head1 Earlemes: the details
+=head1 Empty earlemes
 
-Whenever a token is given to Marpa to be scanned,
-it starts at the current earleme.
-In addition to the type and value of the token,
-Marpa must be told the token's B<length> in earlemes.
-The length of a Marpa token must be greater than zero.
+As mentioned,
+there is a function from Earley sets to earlemes.
+In the standard input model, this function has an
+inverse -- there is a function from earlemes to Earley sets.
 
-=head1 The character-per-earleme model
+In alternative input models,
+some earlemes may not correspond to an Earley set,
+so there is not necessarily a function from 
+earlemes to Earley sets.
 
-Many different models of the relationship between tokens and earlemes
-are possible, but two are particularly important.
-One is the one-token-per-earleme model,
-which is the default,
-and which has already been described.
-The other is the one-character-per-earleme model.
-
-In the one-character-per-earleme model,
-every character will be treated as being exactly one
+In particular,
+in the one-character-per-earleme model,
+every character is treated as being exactly one
 earleme in length.
 If a token is more than one character in length,
 that token will span earlemes.
-When the lexing is ambiguous, tokens may overlap.
+The earlemes in between the start earleme of the
+token and the end earleme of the token
+will not correspond to any Earley set --
+they will be "empty".
 
-When a one-character-per-earleme model of input is used,
-there may be many earlemes at which no tokens start.
-For example,
-in a straightforward character-per-earleme implementation
+An one example,
+consider a straightforward character-per-earleme implementation
 of a grammar for a language that allows
-comments,
-no tokens will start at
+comments.
+No tokens will start at
 any earlemes which correspond to character locations inside
-a comment.
+the comment,
+so there will be no Earley sets at those earlemes.
+The earlemes between the start and end earlemes of
+the comment will be "emptybetween the start and end earlemes of
+the comment will be "empty".
 
 =head1 Mixing internal and external scanning
 

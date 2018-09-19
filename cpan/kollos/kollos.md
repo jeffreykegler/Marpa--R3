@@ -218,20 +218,6 @@ in their first readings.
 This is a (in very rough order) "stack"
 of items to do short term.
 
-#### Calls needed for variable-length lexemes
-
-Make sure all of the are in the test suite and documented
-
-* earleme()
-
-* lexeme_complete()
-
-* furthest_earleme()
-
-* latest_earleme()
-
-* latest_earley_set()
-
 #### Allow lexemes on L0 RHS
 
 ### Preparing for beta release
