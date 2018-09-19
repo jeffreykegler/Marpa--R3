@@ -83,7 +83,6 @@ That means that if Earley set I<N> is at earleme I<X>
 and 
 Earley set I<N+1> is at earleme I<Y>,
 then I<X>C<< < >>I<Y>.
-L<Marpa::R3::External::Model/"Earleme">.
 
 Earlemes actually exist in the standard (default) input model,
 but in the standard input model,
@@ -138,6 +137,11 @@ with no jumps backward.
 This is the way most applications use physical input,
 but earlemes allow for a more complicated
 relationship between parse location and physical input.
+
+There are many 
+possibilities for alternative models.
+They are explored in detail in
+L<Marpa::R3::External::Model>.
 
 =head1 How low level scanning works.
 
