@@ -12,9 +12,11 @@
 
 Revision history for Marpa::R3
 
-4.001_052 (forked libmarpa 8.6.0) Tue May  1 17:40:47 EDT 2018
+4.001_053 (forked libmarpa 8.6.0) Thu Sep 20 14:09:02 EDT 2018
 
-   * For this series of releases, see Changes.pod
+   * Added variable length lexemes.
+
+   * For other changes in this series of releases, see Changes.pod
 
 1.001_000 (libmarpa 8.3.0) Thu Mar 31 19:05:09 PDT 2016
 

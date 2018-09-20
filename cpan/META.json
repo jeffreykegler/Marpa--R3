@@ -124,6 +124,6 @@
          "url" : "git://github.com/jeffreykegler/Marpa--R3.git"
       }
    },
-   "version" : "4.001_052",
+   "version" : "4.001_053",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }
