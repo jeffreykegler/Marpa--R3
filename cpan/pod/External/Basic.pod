@@ -11,7 +11,7 @@
 
 =head1 Name
 
-Marpa::R3::External::Basic - External scanning, Basics
+Marpa::R3::External::Basic - External scanning, basics
 
 =head1 Synopsis
 
@@ -64,7 +64,7 @@ many applications find it useful or necessary to
 do their own scanning in procedural code.
 In Marpa::R3 this is called B<external scanning>.
 External scanning can be used as a replacement for internal scanning.
-Marpa::R3 also allows application to switch back and
+Marpa::R3 also allows applications to switch back and
 forth between internal and external scanning.
 
 =head1 Lexemes
@@ -75,7 +75,7 @@ in external scanning, the app feeds lexemes to Marpa::R3 one-by-one.
 This differs from internal scanning -- in internal scanning
 Marpa::R3 tokenizes a string for the app.
 
-Every lexeme may have three things associated with it:
+Every lexeme has three things associated with it:
 
 =over 4
 
@@ -100,14 +100,10 @@ value of the lexeme is also seen by the semantics.
 
 A B<literal equivalent>, which is required
 and must be a span in the input.
-The literal equivalent of a lexeme is not directly visible
-to the semantics,
-although in Marpa::R3 it can always be accessed,
-if desired.
 The literal equivalent is needed for
 the messages produced by
 tracing, debugging, error reporting, etc.
-If more than one lexeme is accepted at a G1 location --
+If more than one lexeme ends at the same G1 location --
 which can happen if lexemes are ambiguous --
 all of the lexemes must have the same literal equivalent.
 
@@ -122,7 +118,7 @@ users will want,
 are the high level methods.
 They are described in this document.
 The low level external scanning methods are
-described
+described in
 L<Marpa::R3::External::Low>.
 
 =head1 High level methods in general
@@ -157,19 +153,21 @@ is the rejection of a lexeme.
 
 =head2 Successful reads
 
-An external scanning methods succeeds and reads a lexeme
-if no pre-lexeme event occurs.
+An external scanning methods reads a lexeme
+if it is successful and no pre-lexeme event occurs.
 In the case of a successful read,
 the current block is set to C<$block_id>;
-The current offset is set to C<eolexeme>;
-and the current eoread of the current block will
+the offset of the current block is set to C<eolexeme>;
+and the eoread of the current block will
 not be changed.
 
 Also in the case of a successful read,
-the current G1 location is advanced by one;
-the lexeme just read will start at the previous G1 location
-and end at the new current G1 location;
-and the G1 location of the lexeme is considered to be
+the current G1 location is advanced by one.
+The lexeme just read will start at the previous G1 location
+and end at the new current G1 location.
+When we speak simply of the G1 location of a lexeme,
+we refer to its end location, so that
+the G1 location of the lexeme is considered to be
 the new current G1 location.
 
 A
@@ -177,7 +175,7 @@ L<parse event|Marpa::R3::Event> may occur
 during a successful read.
 The parse event may call an event handler.
 The event handler will see
-a G1 location and an event location as just described.
+the block and G1 locations as just described.
 
 =head2 Pre-lexeme events
 
@@ -185,9 +183,9 @@ An external scanning method may succeed with a
 pre-lexeme event.
 In that case,
 the current block is set to C<$block_id>.
-The current offset is set to the event location,
+The offset of the current block is set to the event location,
 which will be the same as C<$offset>.
-The current eoread of the current block will
+The eoread of the current block will
 not be changed.
 
 If a pre-lexeme event does occur,
@@ -199,19 +197,19 @@ The pre-lexeme
 L<parse event|Marpa::R3::Event>
 may call an event handler.
 The event handler will see
-a G1 location and an event location as just described.
+the block and G1 locations as just described.
 
 =head2 Soft failure
 
-If an external scanning completion method rejects a lexeme,
-then the external scanning completion results in a soft failure.
+If a high level external scanning method rejects a lexeme,
+then that method results in a soft failure.
 In this case the current block data
 remains unchanged.
 
 On soft failure,
 no lexeme is read.
 The current G1 location will remain where it was
-before external scanning.
+before the method call.
 
 =head2 Hard failure
 
@@ -223,8 +221,9 @@ no guarantee is made about the current block data,
 or about the current G1 location.
 
 On hard failure,
-Marpa::R3 will attempt to leave the current block data valid
-and pointing to an "error location" -- that is, a location
+Marpa::R3 will attempt to leave
+the block location at
+an "error location" -- a location
 as relevant as possible to the error.
 Marpa::R3 will attempt to leave the current G1 location valid and unchanged.
 
@@ -268,7 +267,7 @@ C<$offset>,
 and
 C<$length>.
 
-The C<$symbol_name> argument is the name of the symbol
+The C<$symbol_name> argument is the symbol name of the lexeme
 to scan.
 The C<$value> argument will be the value of the lexeme.
 If C<$value> is missing or undefined,
@@ -276,8 +275,8 @@ the value of the lexeme will be a Perl C<undef>.
 The C<$block_id>, C<$offset>, and C<$length> arguments
 are the literal equivalent of the lexeme, as a 
 L<block span|/"Block spans">.
-C<lexeme_read_block()> is an external scanning completion
-method and details of its behavior are
+C<lexeme_read_block()> is a high level method
+and details of its behavior are
 L<as described above|"High level methods in general">.
 
 B<Return values>:
@@ -310,15 +309,15 @@ C<$block_id>,
 C<$offset>,
 and
 C<$length>.
-The C<$symbol_name> argument is the name of the symbol
+The C<$symbol_name> argument is the symbol name of the lexeme
 to scan.
 The C<$block_id>, C<$offset>, and C<$length> arguments
 are the literal equivalent of the lexeme, as a 
 L<block span|/"Block spans">.
 The value of the lexeme will be the same
 as its literal equivalent.
-C<lexeme_read_literal()> is an external scanning completion
-method and details of its behavior are
+C<lexeme_read_literal()> is a high level method
+and details of its behavior are
 L<as described above|"High level methods in general">.
 
 =for Marpa::R3::Display
@@ -367,12 +366,12 @@ normalize-whitespace: 1
 The C<lexeme_read_string()> method takes 2 arguments, both required.
 Call them, in order, C<$symbol_name> and C<$string>.
 C<$symbol_name>
-is the symbol name of a lexeme
+is the symbol name of the lexeme
 to be read.
 C<$string>
 is a string which becomes both the value of the lexeme
 and its literal equivalent.
-C<lexeme_read_string()> is an external scanning completion
+C<lexeme_read_string()> is a high level
 method and, with two important exceptions,
 the details of its behavior are
 L<as described above|"High level methods in general">.
