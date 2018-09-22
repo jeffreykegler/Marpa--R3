@@ -1172,15 +1172,6 @@ and any "eager" match is available,
 then Marpa
 will match the B<shortest eager> token or lexeme that is
 acceptable to the grammar.
-Intuitively, "eagerness" may be thought of as
-overriding "greediness", even for greedy tokens.
-
-Whatever the settings, all tokens matched by Marpa
-will always be of the same length.
-Several tokens may match at a single location,
-and they may be all greedy,
-all eager, or any combination of both.
-
 If an "eager" token matches, all "greedy" tokens
 of the same length will also match.
 In this case, these "greedy" token matches may not be
@@ -1190,6 +1181,12 @@ If this behavior is considered undesirable,
 it can be changed
 using the
 L<priority|/"priority"> adverb.
+
+Whatever the settings, all tokens matched by Marpa
+will always be of the same length.
+Several tokens may match at a single location,
+and they may be all greedy,
+all eager, or any combination of both.
 
 Note that it is possible that
 a matching "eager" token
