@@ -7,16 +7,10 @@
 # 1.) A Perl-oriented preamble, which the Perl-adverse
 # can skip.
 #
-# 2.) The context-free syntax
+# 2.) The Marpa grammars
 #
-# 3.) The lexical syntax
+# 3.) Wrappers and event handlers, in Perl.
 #
-# 4.) Wrappers and event handlers, in Perl.
-#
-# The comments interspersed in the code are not self-sufficient.
-# They assume that the reader has read a description of the overall
-# logic of this parser, for example the one in my blog post.
-
 # ===== Part 1: Perl preamble =====
 
 use 5.010;
@@ -45,7 +39,48 @@ sub divergence {
     die join '', 'Unrecoverable internal error: ', @_;
 }
 
-# ===== Part 2: Haskell context-free syntax =====
+# ===== Part 2: Marpa grammars =====
+
+my $dsl = <<'END_OF_TOP_DSL';
+
+# This tells Marpa to construct an AST whose nodes consist of the
+# symbol name, line,and column; followed a by a list of the child values.
+:default ::= action => [name,line,column,values]
+
+# TODO
+# top ::= perlCode luaCode CCode texSource
+top ::= perlCode texSource
+
+texSource ::= texBody ( texTrailer )
+texTrailer ::= L0_textLine+
+texBody ::= textLines texCodeBlock
+textLines ::= L0_textLine*
+
+:lexeme ~ L0_textline priority => 0
+L0_textLine ~ nonNewLines newLine
+nonNewLines ~ nonNewLine*
+nonNewLine ~ [^\n]
+newLines ~ [\n]
+
+perlCode ~ unicorn event => perlCode pause => before priority => 1
+
+:lexeme ~ L0_unicorn
+L0_unicorn ~ unicorn
+unicorn ~ [^\d\D]
+
+END_OF_TOP_DSL
+
+my $dsl = <<'END_OF_TEX_DSL';
+
+# This tells Marpa to construct an AST whose nodes consist of the
+# symbol name, line,and column; followed a by a list of the child values.
+:default ::= action => [name,line,column,values]
+
+:lexeme ~ L0_unicorn
+L0_unicorn ~ unicorn
+unicorn ~ [^\d\D]
+
+END_OF_TEX_DSL
 
 # Marpa divides symbols into
 #
@@ -65,13 +100,6 @@ sub divergence {
 # to allow a clean boundary, the new symbol has the prefix "L0_".
 
 my $dsl = <<'END_OF_DSL';
-
-# This tells Marpa to construct an AST whose nodes consist of the
-# symbol name, followed a by a list of the child values.
-:default ::= action => [name,line,column,values]
-
-top ::= perlCode hsCode luaCode CCode text
-
 # Revised TO HERE
 
 # Here is one of the rules which are part of the Ruby Slippers logic.
