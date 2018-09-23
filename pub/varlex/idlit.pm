@@ -2,10 +2,9 @@
 
 # TO READERS OF THIS CODE:
 
-# The code is in 4 parts
+# The code is in 3 parts
 #
-# 1.) A Perl-oriented preamble, which the Perl-adverse
-# can skip.
+# 1.) A Perl-oriented preamble
 #
 # 2.) The Marpa grammars
 #
@@ -53,24 +52,50 @@ top ::= perlCode texSource
 
 texSource ::= texBody ( texTrailer )
 texTrailer ::= L0_textLine+
-texBody ::= textLines texCodeBlock
+texBody ::= texPrefixedBlock*
+texPrefixedBlock ::= textLines texCodeBlock
+texPrefixedBlock ::= textLines texCodeStray
 textLines ::= L0_textLine*
+
+texCodeBlock ::= L0_texCodeBegin L0_texCodeRemainder
+
+# empty block must be special case
+texCodeBlock ::= L0_texCodeBegin L0_texCodeEnd
+
+# Catch "stray" begin lines
+L0_texCodeStray 
+
+# TODO completed event on texCodeStray
 
 :lexeme ~ L0_textline priority => 0
 L0_textLine ~ nonNewLines newLine
 nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
-newLines ~ [\n]
+newLine ~ [\n]
 
 perlCode ~ unicorn event => perlCode pause => before priority => 1
 
 :lexeme ~ L0_unicorn
 L0_unicorn ~ unicorn
 unicorn ~ [^\d\D]
+anything ~ anyChar*
+anyChar ~ [\d\D]
+
+:lexeme ~ L0_texCodeBegin priority => 1
+L0_texCodeBegin ~ texCodeBegin
+texCodeBegin ~ '\begin{code}' newLine
+
+:lexeme ~ L0_texCodeEnd priority => 1
+L0_texCodeEnd ~ texCodeEnd
+texCodeEnd ~ '\begin{code}' newLine
+
+:lexeme ~ L0_texCodeRemainder eager => 1 priority => 1
+L0_texCodeRemainder ~ anything newLine texCodeEnd newLine
+
+:lexeme ~ L0_texCodeStray priority => 1
+L0_texCodeStray ~ '\begin{code}' newLine priority => 1
 
 END_OF_TOP_DSL
-
-my $dsl = <<'END_OF_TEX_DSL';
 
 # This tells Marpa to construct an AST whose nodes consist of the
 # symbol name, line,and column; followed a by a list of the child values.
