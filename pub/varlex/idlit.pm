@@ -106,7 +106,8 @@ END_OF_TOP_DSL
 # The following logic pre-generates all the grammars we
 # will need, both for the top level and the combinators.
 
-my $topGrammar = Marpa::R3::Grammar->new( { source => \$dsl } );
+my $topGrammar =
+  Marpa::R3::Grammar->new( { source => \$dsl, rejection => 'event', } );
 
 local $main::DEBUG = 0;
 
@@ -118,7 +119,6 @@ sub parse {
     my $recce = Marpa::R3::Recognizer->new(
         {
             grammar   => $topGrammar,
-            rejection => 'event',
 	    # event_is_active => { 'indent' => $indent_is_active },
             trace_terminals => ($main::DEBUG ? 99 : 0),
         }
@@ -133,16 +133,15 @@ sub parse {
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
-      my $latest_es = $recce->current_g1_location();
+      my $latest_es = $recce->g1_pos();
       for my $es (0 .. $latest_es) {
 	say STDERR "ES = ", $es;
 	if ($main::TRACE_ES >= 2) {
 	    # These calls are undocumented, and should not be
 	    # called in the test suite.
-	    my $thick_recce = $recce->thick_g1_recce();
-	    say STDERR "Size of ES $es is ", $thick_recce->earley_set_size($es);
+	    say STDERR "Size of ES $es is ", $recce->earley_set_size($es);
 	}
-	say STDERR $recce->show_progress($es);
+	say STDERR $recce->progress_show($es);
       }
     }
     # Return result and parse value
