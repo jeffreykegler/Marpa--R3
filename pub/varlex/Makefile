@@ -12,6 +12,6 @@ test_suite:
 
 undoc_tests:
 	@echo NYI
-	perl -I. idlit_ex.pl >idlit_ex.pl.out 2>&1
+	perl -I. -I../../cpan/lib/ -I../../cpan/blib/arch idlit_ex.pl >idlit_ex.pl.out 2>&1
 	# diff idliidlitl.out idlit_trace.out || echo 'Trace example FAILED'
 

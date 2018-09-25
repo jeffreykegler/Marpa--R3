@@ -61,7 +61,7 @@ my $dsl = <<'END_OF_TOP_DSL';
 
 # This tells Marpa to construct an AST whose nodes consist of the
 # symbol name, line,and column; followed a by a list of the child values.
-:default ::= action => [name,line,column,values]
+:default ::= action => [name,start,length,values]
 
 # top ::= perlCode luaCode CCode texSource
 top ::= perlCode texSource
@@ -106,7 +106,7 @@ END_OF_TOP_DSL
 # The following logic pre-generates all the grammars we
 # will need, both for the top level and the combinators.
 
-my $topGrammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
+my $topGrammar = Marpa::R3::Grammar->new( { source => \$dsl } );
 
 %main::GRAMMARS = (
     'ruby_x_body'  => ['body'],
@@ -128,7 +128,7 @@ for my $key ( keys %main::GRAMMARS ) {
     my $this_dsl     = ":start ::= $start\n";
     $this_dsl .= "inaccessible is ok by default\n";
     $this_dsl .= $dsl;
-    my $this_grammar = Marpa::R2::Scanless::G->new( { source => \$this_dsl } );
+    my $this_grammar = Marpa::R3::Grammar->new( { source => \$this_dsl } );
     $grammar_data->[1] = $this_grammar;
     my $iKey = $key;
     $iKey =~ s/_x_/_i_/xms;
@@ -142,20 +142,12 @@ local $main::DEBUG = 0;
 
 sub parse {
     my ($inputRef) = @_;
-    my ($initialWS) = ${$inputRef} =~ m/ ^ ([\s]*) /xms;
-    my $firstLexemeOffset = length $initialWS;
 
-    # Create the recognizer instance.
-    # The 'indent' event is turned on or off, depending on whether
-    # explicit or implicit layout is in use.
-
-    my $indent_is_active = ($currentIndent >= 0 ? 1 : 0);
-    say STDERR "Calling top level parser, indentation = $indent_is_active" if $main::DEBUG;
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar   => $topGrammar,
             rejection => 'event',
-	    event_is_active => { 'indent' => $indent_is_active },
+	    # event_is_active => { 'indent' => $indent_is_active },
             trace_terminals => ($main::DEBUG ? 99 : 0),
         }
     );
@@ -165,7 +157,7 @@ sub parse {
     my $value_ref;
     my $result = 'OK';
     my $eval_ok =
-      eval { ( $value_ref, undef ) = getValue( $recce, 'module', $inputRef, $firstLexemeOffset, $currentIndent ); 1; };
+      eval { ( $value_ref, undef ) = getValue( $recce, 'module', $inputRef, 0 ); 1; };
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
@@ -196,7 +188,7 @@ sub parse {
 # Errors are thrown.
 
 sub getValue {
-    my ( $recce, $target, $input ) = @_;
+    my ( $recce, $target, $input, $offset ) = @_;
     my $input_length = length ${$input};
     my $resume_pos;
     my $this_pos;
@@ -240,7 +232,7 @@ sub getValue {
             my $firstNL     = index( ${$input}, "\n" );
             my $lastNL      = rindex( ${$input}, "\n", $eoCodeBlock );
 
-            my ( $line, $column );
+            my ( $line1, $column1, $line2, $column2 );
             ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
             ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
             push @values, join '',
@@ -264,7 +256,7 @@ sub getValue {
               '-', 'L', $line2, 'c', $column2,
               ' [CODE]';
 
-            $this_pos = $lastNL;
+            $this_pos = $eoCodeBlock;
             last READ;
         }
 
@@ -275,7 +267,7 @@ sub getValue {
             my $firstNL     = index( ${$input}, "\n" );
 
             my @values = ();
-            my ( $line, $column );
+            my ( $line1, $column1, $line2, $column2 );
             ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
             ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
             push @values, join '',
@@ -292,7 +284,7 @@ sub getValue {
               '-', 'L', $line2, 'c', $column2,
               ' [CODE]';
 
-            $this_pos = $lastNL;
+            $this_pos = $eoCodeBlock;
             last READ;
         }
 
@@ -341,16 +333,15 @@ sub subParse {
 
     divergence(qq{No grammar for target = "$target"}) if not $grammar_data;
     my ( undef, $subgrammar ) = @{$grammar_data};
-    my $indent_is_active = ($currentIndent >= 0 ? 1 : 0);
-    my $recce = Marpa::R2::Scanless::R->new(
+    my $recce = Marpa::R3::Recognizer->new(
         {
             grammar         => $subgrammar,
             rejection       => 'event',
-	    event_is_active => { 'indent' => $indent_is_active },
+	    # event_is_active => { 'indent' => $indent_is_active },
             trace_terminals => ($main::DEBUG ? 99 : 0),
         }
     );
-    my ( $value_ref, $pos ) = getValue( $recce, $target, $input, $offset, $currentIndent );
+    my ( $value_ref, $pos ) = getValue( $recce, $target, $input, $offset );
     say STDERR qq{Returning from combinator for "$target" at $currentIndent}
         if $main::DEBUG;
 
