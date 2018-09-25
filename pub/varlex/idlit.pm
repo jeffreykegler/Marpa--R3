@@ -201,9 +201,11 @@ sub getValue {
     my $resume_pos;
     my $this_pos;
 
-  # The main read loop.  Read starting at $offset.
-  # If interrupted execute the handler logic,
-  # and, possibly, resume.
+    my @values = ();
+
+    # The main read loop.  Read starting at $offset.
+    # If interrupted execute the handler logic,
+    # and, possibly, resume.
 
   READ:
     for (
@@ -213,9 +215,9 @@ sub getValue {
       )
     {
 
-	# Only one event at a time is expected -- more
-	# than one is an error.  No event means parsing
-	# is exhausted.
+        # Only one event at a time is expected -- more
+        # than one is an error.  No event means parsing
+        # is exhausted.
 
         my $events      = $recce->events();
         my $event_count = scalar @{$events};
@@ -226,149 +228,107 @@ sub getValue {
             divergence("One event expected, instead got $event_count");
         }
 
-	# Find the event name
+        # Find the event name
 
         my $event = $events->[0];
-        my $name = $event->[0];
+        my $name  = $event->[0];
+
+        if ( $name eq 'properBlock' ) {
+
+            my ( undef, $symbolID, $blockID, $offset, $length ) = @{$event};
+            my $eoCodeBlock = $offset + $length;
+            my $firstNL     = index( ${$input}, "\n" );
+            my $lastNL      = rindex( ${$input}, "\n", $eoCodeBlock );
+
+            my ( $line, $column );
+            ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
+            ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
+            push @values, join '',
+              'L', $line1, 'c', $column1,
+              '-', 'L', $line2, 'c', $column2,
+              ' \begin{code}';
+
+            ( $line1, $column1 ) =
+              $recce->line_column( $blockID, $firstNL + 1 );
+            ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
+            push @values, join '',
+              'L', $line1, 'c', $column1,
+              '-', 'L', $line2, 'c', $column2,
+              ' [CODE]';
+
+            ( $line1, $column1 ) = $recce->line_column( $blockID, $lastNL + 1 );
+            ( $line2, $column2 ) =
+              $recce->line_column( $blockID, $eoCodeBlock );
+            push @values, join '',
+              'L', $line1, 'c', $column1,
+              '-', 'L', $line2, 'c', $column2,
+              ' [CODE]';
+
+            $this_pos = $lastNL;
+            last READ;
+        }
 
         if ( $name eq 'openBlock' ) {
 
             my ( undef, $symbolID, $blockID, $offset, $length ) = @{$event};
-	    my $lastNL = rindex(${$input}, "\n", $Coend);
+            my $eoCodeBlock = $offset + $length;
+            my $firstNL     = index( ${$input}, "\n" );
 
-	    my $indent_length = ($indent_end - $lastNL) - 1;
-	    $indent_length = 0 if $indent_length < 0;
+            my @values = ();
+            my ( $line, $column );
+            ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
+            ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
+            push @values, join '',
+              'L', $line1, 'c', $column1,
+              '-', 'L', $line2, 'c', $column2,
+              ' \begin{code}';
 
-	    say STDERR 'Indent length = ', $indent_length
-	       if $main::DEBUG;
+            ( $line1, $column1 ) =
+              $recce->line_column( $blockID, $firstNL + 1 );
+            ( $line2, $column2 ) =
+              $recce->line_column( $blockID, $eoCodeBlock );
+            push @values, join '',
+              'L', $line1, 'c', $column1,
+              '-', 'L', $line2, 'c', $column2,
+              ' [CODE]';
 
-	    # On outdent, we end the read loop.  An EOF is treated as
-	    # an outdent.
-            if (   $indent_length < $currentIndent
-                or $indent_end >= length ${$input} )
-            {
-                say STDERR 'Indent is outdent'
-                  if $main::DEBUG;
-                $this_pos = $lastNL;
-                last READ;
-            }
-
-	    # Indentation deeper than the current indent means the current
-	    # syntactic item is being continued.  Just resume the read.
-            if ( $indent_length > $currentIndent ) {
-		# Statement continuation
-		say STDERR 'Indent is item continuation: "',
-		      substr(${$input}, $indent_end, 10),
-		      '"'
-		   if $main::DEBUG;
-                $resume_pos = $indent_end;
-                next READ;
-            }
-
-	    say STDERR 'Indent is new item : "',
-		  substr(${$input}, $indent_end, 10),
-		  '"'
-	       if $main::DEBUG;
-
-	    # If we are here, indent is at the current indent level.
-	    # This means we are starting a new syntactic item.  The
-	    # parser will be expecting a Ruby Slippers semicolon,
-	    # and we provide it, then resume reading.
-	    {
-	      my $result = $recce->lexeme_read( 'ruby_semicolon', $indent_start,
-		  $indent_length, ';' );
-	      say STDERR "lexeme-read('ruby_semicolon',...) returned ",
-		  Data::Dumper::Dumper(\$result)
-		  if $main::DEBUG;
-
-	    }
-            $resume_pos = $indent_end;
-            next READ;
+            $this_pos = $lastNL;
+            last READ;
         }
 
-	# Items subject to layout are represented by Ruby Slippers tokens,
-	# which are not recognized by the internal lexer.  Therefore they
-	# generate rejection events.
+        # Items subject to layout are represented by Ruby Slippers tokens,
+        # which are not recognized by the internal lexer.  Therefore they
+        # generate rejection events.
 
-	# Errors in the source can also generate "rejected" events.  To
-	# become ready for production, this module would need to add better
-	# logic for debugging and tracing in those cases.
+        # Errors in the source can also generate "rejected" events.  To
+        # become ready for production, this module would need to add better
+        # logic for debugging and tracing in those cases.
         if ( $name eq "'rejected" ) {
-            my @expected =
-              grep { /^ruby_/xms; } @{ $recce->terminals_expected() };
-
-	    # If no Ruby Slippers tokens are expected, it probably
-	    # indicates a syntax error in the Haskell source.
-            if ( not scalar @expected ) {
-                divergence( "All tokens rejected, expecting ",
-                    ( join " ", @expected ) );
-            }
-
-	    # More than one Ruby Slippers token expected is a
-	    # circumstance which should not occur.
-            if ( scalar @expected > 2 ) {
-                divergence( "More than one ruby token expected; ",
-                    ( join " ", @expected ) );
-            }
-
-	    # If we rejected all tokens, and we expect a Ruby
-	    # Slippers semicolon, it indicates we have recognized
-	    # the target of this combinator.  We therefore terminate
-	    # the read.
-            my $expected = pop @expected;
-	    if ($expected eq 'ruby_semicolon') {
-	       say STDERR "Ending READ loop expecting ruby_semicolon"
-	           if $main::DEBUG;
-	       last READ;
-	    }
-
-	    # If here, we need to start a new sub-combinator.  These
-	    # can be nested arbitrarily deep.  Calculate
-	    # new current indent.
-            my $subParseIndent   = -1;
-	    DETERMINE_SUBINDENT: {
-		my $prefix = substr($expected, 0, 7);
-		last DETERMINE_SUBINDENT
-		  if $prefix eq 'ruby_x_';
-		if ($prefix ne 'ruby_i_') {
-		  divergence(qq{All tokens rejected, expecting "$expected"});
-		}
-		my $pos = $recce->pos();
-		my $lastNL = rindex(${$input}, "\n", $pos);
-		$subParseIndent = $pos - ($lastNL + 1);
-	    }
-
-	    # Start the new combinator.
-            my ( $value_ref, $next_pos ) =
-              subParse( $expected, $input, $this_pos, $subParseIndent );
-
-	    # The child combinator finished -- read its result into the current
-	    # combinator as a lexeme.
-            $recce->lexeme_read( $expected, $this_pos,
-                $next_pos - $this_pos, $value_ref )
-              // divergence("lexeme_read($expected, ...) failed");
-
-	    # Set up to resume this combinator where the child combinator left off.
-            $resume_pos = $next_pos;
-
-	    # Resume reading.
-            next READ;
+            my $expected = $recce->terminals_expected();
+            return divergence(
+                "All tokens rejected, expecting ",
+                ( join " ", @{$expected} )
+            );
         }
 
-	divergence(qq{Unexpected event: "$name"});
+        divergence(qq{Unexpected event: "$name"});
     }
 
-    say STDERR "Left main READ loop" if $main::DEBUG;
+    return [\@values], $this_pos;
 
-    # Return value and new offset
+    if (0) {
+        say STDERR "Left main READ loop" if $main::DEBUG;
 
-    my $value_ref = $recce->value();
-    if ( !$value_ref ) {
-	say STDERR $recce->show_progress() if $main::DEBUG;
-        divergence( qq{input read, but there was no parse} );
+        # Return value and new offset
+
+        my $value_ref = $recce->value();
+        if ( !$value_ref ) {
+            say STDERR $recce->show_progress() if $main::DEBUG;
+            divergence(qq{input read, but there was no parse});
+        }
+
+        return $value_ref, $this_pos;
     }
-
-    return $value_ref, $this_pos;
 }
 
 sub subParse {

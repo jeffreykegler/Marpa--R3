@@ -8,10 +8,10 @@ test: test_suite undoc_tests
 
 test_suite:
 	@echo NYI
-	# prove -I. long.t short.t semis.t note1.t short13.t listcomp.t
+	# prove -I. long.t short.t semis.t note1.t short13.t idlit.t
 
 undoc_tests:
 	@echo NYI
-	# perl -I. listcomp_ex.pl >listcomp_ex.pl.out 2>&1
-	# diff listcomp_ex.pl.out listcomp_trace.out || echo 'Trace example FAILED'
+	perl -I. idlit_ex.pl >idlit_ex.pl.out 2>&1
+	# diff idliidlitl.out idlit_trace.out || echo 'Trace example FAILED'
 
