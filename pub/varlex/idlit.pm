@@ -122,6 +122,8 @@ sub parse {
             grammar   => $topGrammar,
 	    # event_is_active => { 'indent' => $indent_is_active },
 	    event_handlers => {
+		properBlock => sub () { 'pause' },
+		openBlock => sub () { 'pause' },
 		q{'rejected} => sub () {
 		  my ($recce) = @_;
 		  my $expected = $recce->terminals_expected();
