@@ -32,7 +32,7 @@ sub show_last_expression {
     return qq{No "$target" was successfully parsed} if not defined $g1_start;
     my $last_expression = $recce->substring( $g1_start, $g1_length );
     return "Last expression successfully parsed was: $last_expression";
-} 
+}
 
 sub divergence {
     die join '', 'Unrecoverable internal error: ', @_;
@@ -73,18 +73,18 @@ texBodyElement ::= L0_textLine
 texBodyElement ::= L0_texCodeBlock
 texBodyElement ::= L0_texCodeOpenBlock
 
-textLines ::= L0_textLine*
-
-:lexeme ~ L0_textline priority => 0
+:lexeme ~ L0_textLine priority => 0
 L0_textLine ~ nonNewLines newLine
 nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
 newLine ~ [\n]
 
-perlCode ~ unicorn event => perlCode pause => before priority => 1
+perlCode ::= L0_perlCode
+:lexeme ~ L0_perlCode priority => 0 event => perlCode pause => before
+L0_perlCode ~ unicorn
 
-:lexeme ~ L0_unicorn
-L0_unicorn ~ unicorn
+# :lexeme ~ L0_unicorn
+# L0_unicorn ~ unicorn
 unicorn ~ [^\d\D]
 anything ~ anyChar*
 anyChar ~ [\d\D]
@@ -96,8 +96,8 @@ texCodeEnd ~ '\end{code}'
 L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
 
 :lexeme ~ L0_texCodeOpenBlock priority => 1 event => openBlock pause => after
-L0_texCodeEnd ~ texCodeEnd
-texCodeEnd ~ '\begin{code}' anything
+L0_texCodeOpenBlock ~ texCodeOpenBlock
+texCodeOpenBlock ~ texCodeBegin anything
 
 END_OF_TOP_DSL
 
@@ -107,34 +107,6 @@ END_OF_TOP_DSL
 # will need, both for the top level and the combinators.
 
 my $topGrammar = Marpa::R3::Grammar->new( { source => \$dsl } );
-
-%main::GRAMMARS = (
-    'ruby_x_body'  => ['body'],
-    'ruby_x_stmts'  => ['stmts'],
-    'ruby_x_decls' => ['decls'],
-    'ruby_x_alts'  => ['alts'],
-);
-
-# Rather than writing 6 grammars for the combinators, we can
-# (mostly) reuse the top-level grammar.  Marpa's ":start"
-# pseudo-symbol allows us to override the default start
-# symbol.  Changing the start symbol makes a long of symbols
-# inaccessible, but the "inaccessible is ok by default"
-# statement turns of the warnings for these.
-
-for my $key ( keys %main::GRAMMARS ) {
-    my $grammar_data = $main::GRAMMARS{$key};
-    my ($start)      = @{$grammar_data};
-    my $this_dsl     = ":start ::= $start\n";
-    $this_dsl .= "inaccessible is ok by default\n";
-    $this_dsl .= $dsl;
-    my $this_grammar = Marpa::R3::Grammar->new( { source => \$this_dsl } );
-    $grammar_data->[1] = $this_grammar;
-    my $iKey = $key;
-    $iKey =~ s/_x_/_i_/xms;
-    $main::GRAMMARS{$iKey} = $grammar_data;
-
-}
 
 local $main::DEBUG = 0;
 
@@ -369,7 +341,7 @@ sub subParse {
 # Takes one argument and returns a ref to an array of acceptable
 # nodes.  The array may be empty.  All scalars are acceptable
 # leaf nodes.  Acceptable interior nodes have length at least 1
-# and contain a Haskell Standard symbol name, followed by zero or
+# and contain a "standard" symbol name, followed by zero or
 # more acceptable nodes.
 sub pruneNodes {
     my ($v) = @_;

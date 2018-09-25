@@ -950,12 +950,15 @@ sub Marpa::R3::Recognizer::line_column {
         local erreur
         block_id, erreur = slr:block_check_offset(block_id, offset)
         if not block_id then
-           error(erreur)
+           return nil, erreur
         end
         local _, line_no, column_no = slr:per_pos(block_id, offset)
         return line_no, column_no
 END_OF_LUA
 
+    # if $line_no is nil, 2nd return value is error message
+    # Marpa::R3::exception("line_column(): ", $column_no) if not defined $line_no;
+    $DB::single = 1 if not defined $line_no;
     return $line_no, $column_no;
 } ## end sub Marpa::R3::Recognizer::line_column
 

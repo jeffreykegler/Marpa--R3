@@ -38,7 +38,7 @@ local $main::TRACE_ES = 2;
 local $main::DEBUG = 0;
 my $inputRef = \$sourceFile;
 
-my ($result, $valueRef) = MarpaX::R2::Haskell::parse($inputRef);
+my ($result, $valueRef) = MarpaX::R3::Idlit::parse($inputRef);
 if ( $result ne 'OK' ) {
     Test::More::fail(qq{Result was "$result", not OK});
     return;

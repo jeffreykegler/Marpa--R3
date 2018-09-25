@@ -833,7 +833,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                     next ADVERB;
                 }
                 my ( $line, $column ) =
-                    $parse->{meta_recce}->line_column($start);
+                    $parse->{meta_recce}->line_column(undef, $start);
                 die qq{Adverb "$key" not allowed in an prioritized rule\n},
                     '  Rule was ', $parse->substring( $start, $length ), "\n";
             } ## end ADVERB: for my $key ( keys %{$adverb_list} )
@@ -1002,7 +1002,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::priority_rule::evaluate {
                 $rank = $adverb_list->{$key};
                 next ADVERB;
             }
-            my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+            my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
             die qq{Adverb "$key" not allowed in a prioritized rule\n},
                 '  Rule was ', $parse->substring( $start, $length ), "\n";
         } ## end ADVERB: for my $key ( keys %{$adverb_list} )
@@ -1157,7 +1157,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::empty_rule::evaluate {
             $rank = $adverb_list->{$key};
             next ADVERB;
         }
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{Adverb "$key" not allowed in an empty rule\n},
             '  Rule was ', $parse->substring( $start, $length ), "\n";
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
@@ -1212,7 +1212,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
     my $symbol_name  = $symbol->name();
     my $declarations = $parse->{lexeme_declarations}->{$symbol_name};
     if ( defined $declarations ) {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die "Duplicate lexeme rule for <$symbol_name>\n",
             "  Only one lexeme rule is allowed for each symbol\n",
             "  Location was line $line, column $column\n",
@@ -1248,7 +1248,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
                 $declarations{$key} = 1;
                 next ADVERB;
             }
-            my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+            my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
             die qq{Bad value for "pause" adverb: "$raw_value"},
                 "  Location was line $line, column $column\n",
                 '  Rule was ', $parse->substring( $start, $length ), "\n";
@@ -1257,14 +1257,14 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
             $declarations{$key} = $raw_value + 0;
             next ADVERB;
         }
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{"$key" adverb not allowed in lexeme rule"\n},
             "  Location was line $line, column $column\n",
             '  Rule was ', $parse->substring( $start, $length ), "\n";
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
     if ( exists $declarations{'event'} and not exists $declarations{'pause'} )
     {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die
             qq{"event" adverb not allowed without "pause" adverb in lexeme rule"\n},
             "  Location was line $line, column $column\n",
@@ -1272,7 +1272,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::lexeme_rule::evaluate {
     } ## end if ( exists $declarations{'event'} and not exists $declarations...)
     if ( exists $declarations{'pause'} and not exists $declarations{'event'} )
     {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die
             qq{"pause" adverb not allowed without "event" adverb in lexeme rule"\n},
             qq{  Events must be named with the "event" adverb\n},
@@ -1315,7 +1315,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::start_rule::evaluate {
     my ( $values, $parse ) = @_;
     my ( $start, $length, $symbol ) = @{$values};
     if ( defined $parse->{'start_lhs'} ) {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{There are two start rules\n},
             qq{  That is not allowed\n},
             '  The second start rule is ',
@@ -1451,7 +1451,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::quantified_rule::evaluate {
             $separator = $adverb_list->{$key};
             next ADVERB;
         }
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{Adverb "$key" not allowed in quantified rule\n},
             '  Rule was ', $parse->substring( $start, $length ), "\n";
     } ## end ADVERB: for my $key ( keys %{$adverb_list} )
@@ -1512,7 +1512,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::completion_event_declaration::evaluate
     my $symbol_name       = $raw_symbol_name->name();
     my $completion_events = $parse->{completion_events} //= {};
     if ( defined $completion_events->{$symbol_name} ) {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{Completion event for symbol "$symbol_name" declared twice\n},
             qq{  That is not allowed\n},
             '  Second declaration was ', $parse->substring( $start, $length ),
@@ -1530,7 +1530,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::nulled_event_declaration::evaluate {
     my $symbol_name   = $raw_symbol_name->name();
     my $nulled_events = $parse->{nulled_events} //= {};
     if ( defined $nulled_events->{$symbol_name} ) {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{nulled event for symbol "$symbol_name" declared twice\n},
             qq{  That is not allowed\n},
             '  Second declaration was ', $parse->substring( $start, $length ),
@@ -1549,7 +1549,7 @@ sub Marpa::R3::Internal::MetaAST_Nodes::prediction_event_declaration::evaluate
     my $symbol_name       = $raw_symbol_name->name();
     my $prediction_events = $parse->{prediction_events} //= {};
     if ( defined $prediction_events->{$symbol_name} ) {
-        my ( $line, $column ) = $parse->{meta_recce}->line_column($start);
+        my ( $line, $column ) = $parse->{meta_recce}->line_column(undef, $start);
         die qq{prediction event for symbol "$symbol_name" declared twice\n},
             qq{  That is not allowed\n},
             '  Second declaration was ', $parse->substring( $start, $length ),
