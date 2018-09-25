@@ -64,7 +64,8 @@ my $dsl = <<'END_OF_TOP_DSL';
 :default ::= action => [name,start,length,values]
 
 # top ::= perlCode luaCode CCode texSource
-top ::= perlCode texSource
+top ::= perlCode
+top ::= texSource
 
 texSource ::= texBody ( texTrailer )
 texTrailer ::= L0_textLine+
@@ -120,6 +121,16 @@ sub parse {
         {
             grammar   => $topGrammar,
 	    # event_is_active => { 'indent' => $indent_is_active },
+	    event_handlers => {
+		q{'rejected} => sub () {
+		  my ($recce) = @_;
+		  my $expected = $recce->terminals_expected();
+		  return divergence(
+		      "All tokens rejected, expecting ",
+		      ( join " ", @{$expected} )
+		  );
+		}
+	    },
             trace_terminals => ($main::DEBUG ? 99 : 0),
         }
     );
