@@ -117,13 +117,75 @@ local $main::DEBUG = 0;
 sub parse {
     my ($inputRef) = @_;
 
+    my @values = ();
+    my $thisPos;
+
+    my $properBlockHandler = sub {
+
+        my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
+        my $eoCodeBlock = $offset + $length;
+        my $firstNL     = index( ${$inputRef}, "\n" );
+        my $lastNL      = rindex( ${$inputRef}, "\n", $eoCodeBlock );
+
+        my ( $line1, $column1, $line2, $column2 );
+        ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
+        ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
+        push @values, join '',
+          'L', $line1, 'c', $column1,
+          '-', 'L', $line2, 'c', $column2,
+          ' \begin{code}';
+
+        ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
+        ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
+        push @values, join '',
+          'L', $line1, 'c', $column1,
+          '-', 'L', $line2, 'c', $column2,
+          ' [CODE]';
+
+        ( $line1, $column1 ) = $recce->line_column( $blockID, $lastNL + 1 );
+        ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
+        push @values, join '',
+          'L', $line1, 'c', $column1,
+          '-', 'L', $line2, 'c', $column2,
+          ' [CODE]';
+
+        $thisPos = $eoCodeBlock;
+        'ok';
+    };
+
+    my $openBlockHandler = sub () {
+
+        my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
+        my $eoCodeBlock = $offset + $length;
+        my $firstNL = index( $inputRef, "\n" );
+
+        my @values = ();
+        my ( $line1, $column1, $line2, $column2 );
+        ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
+        ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
+        push @values, join '',
+          'L', $line1, 'c', $column1,
+          '-', 'L', $line2, 'c', $column2,
+          ' \begin{code}';
+
+        ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
+        ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
+        push @values, join '',
+          'L', $line1, 'c', $column1,
+          '-', 'L', $line2, 'c', $column2,
+          ' [CODE]';
+
+        $thisPos = $eoCodeBlock;
+        'ok';
+    };
+
     my $recce = Marpa::R3::Recognizer->new(
         {
             grammar   => $topGrammar,
 	    # event_is_active => { 'indent' => $indent_is_active },
 	    event_handlers => {
-		properBlock => sub () { 'pause' },
-		openBlock => sub () { 'pause' },
+		properBlock => $properBlockHandler,
+		openBlock => $openBlockHandler,
 		q{'rejected} => sub () {
 		  my ($recce) = @_;
 		  my $expected = $recce->terminals_expected();
@@ -137,12 +199,10 @@ sub parse {
         }
     );
 
-    # Get the parse value.
-
-    my $value_ref;
-    my $result = 'OK';
-    my $eval_ok =
-      eval { ( $value_ref, undef ) = getValue( $recce, 'module', $inputRef, 0 ); 1; };
+    $thisPos = $recce->read( $inputRef ) ;
+    my $inputLength = lenght ${$inputRef};
+    divergence('Premature end of parse') if $thisPos < $inputLength;
+    return [\@values], $thisPos;
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
@@ -158,12 +218,6 @@ sub parse {
       }
     }
     # Return result and parse value
-
-    if ( !$eval_ok ) {
-        my $eval_error = $EVAL_ERROR;
-	$result = "Error: $EVAL_ERROR";
-    }
-    return $result, $value_ref;
 }
 
 # This handler assumes a recognizer has been created.  Given
@@ -175,138 +229,16 @@ sub getValue {
     my ( $recce, $target, $input, $offset ) = @_;
     my $input_length = length ${$input};
     my $resume_pos;
-    my $this_pos;
-
     my @values = ();
 
     # The main read loop.  Read starting at $offset.
     # If interrupted execute the handler logic,
     # and, possibly, resume.
 
-  READ:
-    for (
-        $this_pos = $recce->read( $input, $offset ) ;
-        $this_pos < $input_length ;
-        $this_pos = $recce->resume($resume_pos)
-      )
-    {
+    my $thisPos = $recce->read( $input, $offset ) ;
+        divergence('Premature end of parse') if $thisPos < $input_length;
+    return [\@values], $thisPos;
 
-        # Only one event at a time is expected -- more
-        # than one is an error.  No event means parsing
-        # is exhausted.
-
-        my $events      = $recce->events();
-        my $event_count = scalar @{$events};
-        if ( $event_count < 0 ) {
-            last READ;
-        }
-        if ( $event_count != 1 ) {
-            divergence("One event expected, instead got $event_count");
-        }
-
-        # Find the event name
-
-        my $event = $events->[0];
-        my $name  = $event->[0];
-
-        if ( $name eq 'properBlock' ) {
-
-            my ( undef, $symbolID, $blockID, $offset, $length ) = @{$event};
-	    say STDERR join " ! ", @{$event};
-            my $eoCodeBlock = $offset + $length;
-            my $firstNL     = index( ${$input}, "\n" );
-            my $lastNL      = rindex( ${$input}, "\n", $eoCodeBlock );
-
-            my ( $line1, $column1, $line2, $column2 );
-            ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
-            ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
-            push @values, join '',
-              'L', $line1, 'c', $column1,
-              '-', 'L', $line2, 'c', $column2,
-              ' \begin{code}';
-
-            ( $line1, $column1 ) =
-              $recce->line_column( $blockID, $firstNL + 1 );
-            ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
-            push @values, join '',
-              'L', $line1, 'c', $column1,
-              '-', 'L', $line2, 'c', $column2,
-              ' [CODE]';
-
-            ( $line1, $column1 ) = $recce->line_column( $blockID, $lastNL + 1 );
-            ( $line2, $column2 ) =
-              $recce->line_column( $blockID, $eoCodeBlock );
-            push @values, join '',
-              'L', $line1, 'c', $column1,
-              '-', 'L', $line2, 'c', $column2,
-              ' [CODE]';
-
-            $this_pos = $eoCodeBlock;
-            last READ;
-        }
-
-        if ( $name eq 'openBlock' ) {
-
-            my ( undef, $symbolID, $blockID, $offset, $length ) = @{$event};
-	    say STDERR join " ! ", @{$event};
-            my $eoCodeBlock = $offset + $length;
-            my $firstNL     = index( ${$input}, "\n" );
-
-            my @values = ();
-            my ( $line1, $column1, $line2, $column2 );
-            ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
-            ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
-            push @values, join '',
-              'L', $line1, 'c', $column1,
-              '-', 'L', $line2, 'c', $column2,
-              ' \begin{code}';
-
-            ( $line1, $column1 ) =
-              $recce->line_column( $blockID, $firstNL + 1 );
-            ( $line2, $column2 ) =
-              $recce->line_column( $blockID, $eoCodeBlock );
-            push @values, join '',
-              'L', $line1, 'c', $column1,
-              '-', 'L', $line2, 'c', $column2,
-              ' [CODE]';
-
-            $this_pos = $eoCodeBlock;
-            last READ;
-        }
-
-        # Items subject to layout are represented by Ruby Slippers tokens,
-        # which are not recognized by the internal lexer.  Therefore they
-        # generate rejection events.
-
-        # Errors in the source can also generate "rejected" events.  To
-        # become ready for production, this module would need to add better
-        # logic for debugging and tracing in those cases.
-        if ( $name eq "'rejected" ) {
-            my $expected = $recce->terminals_expected();
-            return divergence(
-                "All tokens rejected, expecting ",
-                ( join " ", @{$expected} )
-            );
-        }
-
-        divergence(qq{Unexpected event: "$name"});
-    }
-
-    return [\@values], $this_pos;
-
-    if (0) {
-        say STDERR "Left main READ loop" if $main::DEBUG;
-
-        # Return value and new offset
-
-        my $value_ref = $recce->value();
-        if ( !$value_ref ) {
-            say STDERR $recce->show_progress() if $main::DEBUG;
-            divergence(qq{input read, but there was no parse});
-        }
-
-        return $value_ref, $this_pos;
-    }
 }
 
 sub subParse {
