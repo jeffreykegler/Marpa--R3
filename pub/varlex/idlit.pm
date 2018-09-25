@@ -228,6 +228,7 @@ sub getValue {
         if ( $name eq 'properBlock' ) {
 
             my ( undef, $symbolID, $blockID, $offset, $length ) = @{$event};
+	    say STDERR join " ! ", @{$event};
             my $eoCodeBlock = $offset + $length;
             my $firstNL     = index( ${$input}, "\n" );
             my $lastNL      = rindex( ${$input}, "\n", $eoCodeBlock );
@@ -263,6 +264,7 @@ sub getValue {
         if ( $name eq 'openBlock' ) {
 
             my ( undef, $symbolID, $blockID, $offset, $length ) = @{$event};
+	    say STDERR join " ! ", @{$event};
             my $eoCodeBlock = $offset + $length;
             my $firstNL     = index( ${$input}, "\n" );
 

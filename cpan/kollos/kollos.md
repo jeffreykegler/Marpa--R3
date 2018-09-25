@@ -3225,7 +3225,7 @@ and block-related methods.
     function _M.class_slr.block_check_id(slr, block_id_arg)
         local block_id, l0_pos, end_pos = slr:block_progress(block_id_arg)
         if not block_id then
-            return nil, string.format('Bad block index' .. block_id_arg)
+            return nil, string.format('Bad block index ' .. block_id_arg)
         end
         return block_id
     end

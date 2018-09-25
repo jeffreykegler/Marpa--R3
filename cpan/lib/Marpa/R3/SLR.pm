@@ -938,15 +938,21 @@ END_OF_LUA
 }
 
 sub Marpa::R3::Recognizer::line_column {
-    my ( $slr, $block, $pos, ) = @_;
-    $pos //= $slr->pos();
+    my ( $slr, $block, $offset, ) = @_;
+    $offset //= -1;
     $block //= -1;
 
     my ($line_no, $column_no) = $slr->call_by_tag( ( '@' . __FILE__ . ':' . __LINE__ ),
-            <<'END_OF_LUA', 'ii', $block, $pos  );
-        local slr, block, pos = ...
-        if block <= 0 then block = slr.current_block.index end
-        local _, line_no, column_no = slr:per_pos(block, pos)
+            <<'END_OF_LUA', 'ii', $block, $offset  );
+        local slr, block_arg, offset_arg = ...
+        local block_id = block_arg ~= -1 and block_arg or nil
+        local offset = offset_arg ~= -1 and offset_arg or nil
+        local erreur
+        block_id, erreur = slr:block_check_offset(block_id, offset)
+        if not block_id then
+           error(erreur)
+        end
+        local _, line_no, column_no = slr:per_pos(block_id, offset)
         return line_no, column_no
 END_OF_LUA
 
