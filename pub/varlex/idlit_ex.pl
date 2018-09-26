@@ -38,11 +38,7 @@ local $main::TRACE_ES = 2;
 local $main::DEBUG = 0;
 my $inputRef = \$sourceFile;
 
-my ($result, $valueRef) = MarpaX::R3::Idlit::parse($inputRef);
-say Data::Dumper::Dumper($result);
+my ($valueRef) = MarpaX::R3::Idlit::parse($inputRef);
+# say Data::Dumper::Dumper($result);
 say Data::Dumper::Dumper($valueRef);
-if ( $result ne 'OK' ) {
-    Test::More::fail(qq{Result was "$result", not OK});
-    return;
-}
-Test::More::pass(qq{Result is OK});
+Test::More::is_deeply($valueRef, []);

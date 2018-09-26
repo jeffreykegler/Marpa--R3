@@ -149,7 +149,8 @@ sub parse {
           ' [CODE]';
 
         $thisPos = $eoCodeBlock;
-        'ok';
+	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $thisPos - $offset);
+        'pause';
     };
 
     my $openBlockHandler = sub () {
@@ -175,7 +176,9 @@ sub parse {
           ' [CODE]';
 
         $thisPos = $eoCodeBlock;
-        'ok';
+
+	$recce->lexeme_alternative('L0_texCodeBlock', \@values, $thisPos - $offset);
+        'pause';
     };
 
     my $recce = Marpa::R3::Recognizer->new(
@@ -198,9 +201,14 @@ sub parse {
         }
     );
 
-    $thisPos = $recce->read( $inputRef ) ;
     my $inputLength = length ${$inputRef};
-    divergence('Premature end of parse') if $thisPos < $inputLength;
+    my $resumePos;
+    $thisPos = $recce->read($inputRef);
+    while ( $thisPos < $inputLength ) {
+        my $closest_earleme = $recce->closest_earleme();
+        $resumePos = $recce->lexeme_complete( undef, undef, $closest_earleme - $thisPos);
+        $thisPos = $recce->resume($resumePos);
+    }
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
@@ -223,7 +231,7 @@ sub parse {
 	say STDERR $recce->show_progress() if $main::DEBUG;
         divergence( qq{input read, but there was no parse} );
     }
-    return [\@values, $value_ref], $thisPos;
+    return [$value_ref], $thisPos;
 
 }
 
