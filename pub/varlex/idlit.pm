@@ -102,7 +102,7 @@ texCodeOpenBlock ~ texCodeBegin anything
 
 END_OF_TOP_DSL
 
-# ===== Part 4: Wrappers and handlers =====
+# ===== Part 3: Wrappers and handlers =====
 
 # The following logic pre-generates all the grammars we
 # will need, both for the top level and the combinators.
@@ -202,7 +202,6 @@ sub parse {
     $thisPos = $recce->read( $inputRef ) ;
     my $inputLength = length ${$inputRef};
     divergence('Premature end of parse') if $thisPos < $inputLength;
-    return [\@values], $thisPos;
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
@@ -217,7 +216,16 @@ sub parse {
 	say STDERR $recce->progress_show($es);
       }
     }
-    # Return result and parse value
+
+    # Return value and new offset
+
+    my $value_ref = $recce->value();
+    if ( !$value_ref ) {
+	say STDERR $recce->show_progress() if $main::DEBUG;
+        divergence( qq{input read, but there was no parse} );
+    }
+    return [\@values, $value_ref], $thisPos;
+
 }
 
 # This handler assumes a recognizer has been created.  Given
