@@ -948,9 +948,10 @@ sub Marpa::R3::Recognizer::line_column {
         local block_id = block_arg ~= -1 and block_arg or nil
         local offset = offset_arg ~= -1 and offset_arg or nil
         local erreur
-        block_id, erreur = slr:block_check_offset(block_id, offset)
+        block_id, offset = slr:block_check_offset(block_id, offset)
         if not block_id then
-           return nil, erreur
+           -- if block_id is nil, then offset is an error message
+           return nil, offset
         end
         local _, line_no, column_no = slr:per_pos(block_id, offset)
         return line_no, column_no

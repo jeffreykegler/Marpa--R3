@@ -3174,6 +3174,10 @@ Caller must ensure `block` and `pos` are valid.
 ```
     -- miranda: section+ most Lua function definitions
     function _M.class_slr.per_pos(slr, block_ix, pos)
+
+        -- TODO
+        if not pos then error(debug.traceback()) end
+
         local block = slr.inputs[block_ix]
         -- codepoints array is 1-based
         local codepoint_ix = pos+1

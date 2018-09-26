@@ -200,7 +200,7 @@ sub parse {
     );
 
     $thisPos = $recce->read( $inputRef ) ;
-    my $inputLength = lenght ${$inputRef};
+    my $inputLength = length ${$inputRef};
     divergence('Premature end of parse') if $thisPos < $inputLength;
     return [\@values], $thisPos;
 

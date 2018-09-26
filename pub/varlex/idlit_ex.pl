@@ -39,6 +39,8 @@ local $main::DEBUG = 0;
 my $inputRef = \$sourceFile;
 
 my ($result, $valueRef) = MarpaX::R3::Idlit::parse($inputRef);
+say Data::Dumper::Dumper($result);
+say Data::Dumper::Dumper($valueRef);
 if ( $result ne 'OK' ) {
     Test::More::fail(qq{Result was "$result", not OK});
     return;
