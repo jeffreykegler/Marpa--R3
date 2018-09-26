@@ -67,8 +67,7 @@ my $dsl = <<'END_OF_TOP_DSL';
 top ::= perlCode
 top ::= texSource
 
-texSource ::= texBody ( texTrailer )
-texTrailer ::= L0_textLine+
+texSource ::= texBody
 texBody ::= texBodyElement*
 texBodyElement ::= L0_textLine
 texBodyElement ::= L0_texCodeBlock
@@ -96,7 +95,7 @@ texCodeEnd ~ '\end{code}'
 :lexeme ~ L0_texCodeBlock priority => 1 eager => 1 event => properBlock pause => after
 L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
 
-:lexeme ~ L0_texCodeOpenBlock priority => 1 event => openBlock pause => after
+:lexeme ~ L0_texCodeOpenBlock priority => 0 event => openBlock pause => after
 L0_texCodeOpenBlock ~ texCodeOpenBlock
 texCodeOpenBlock ~ texCodeBegin anything
 
