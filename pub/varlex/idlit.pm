@@ -122,24 +122,24 @@ sub parse {
         my ( $line1, $column1, $line2, $column2 );
         ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
         ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
-        push @values, join '',
+        push @values, ['BRICK', $offset, ($firstNL+1)-$offset, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' \begin{code}';
+          ' \begin{code}'];
 
         ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
         ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
-        push @values, join '',
+        push @values, ['BRICK', $firstNL+1, $lastNL-$firstNL, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' [CODE]';
+          ' [CODE]'];
 
         ( $line1, $column1 ) = $recce->line_column( $blockID, $lastNL + 1 );
         ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
-        push @values, join '',
+        push @values, ['BRICK', $lastNL+1, $eoCodeBlock-$lastNL, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' [\end{code}]';
+          ' [\end{code}]'];
 
         $thisPos = $eoCodeBlock;
 	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $thisPos - $offset);
