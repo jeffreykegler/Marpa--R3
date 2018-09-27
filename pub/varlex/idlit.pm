@@ -259,6 +259,9 @@ sub showBricks {
       my ( $line1, $column1, $line2, $column2 );
       ( $line1, $column1 ) = $recce->line_column( $blockID, $start );
       ( $line2, $column2 ) = $recce->line_column( $blockID, $start+$length-1 );
+      if ($id eq 'BRICK_texLine') {
+          $tag =~ s/\n.*//;
+      }
       push @results, join '', $id, '@', $line1, '-', $line2, ' ', $tag, "\n";
     }
     return join '', @results;
