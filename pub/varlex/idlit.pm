@@ -249,10 +249,19 @@ sub extractLines {
 }
 
 sub showBricks {
-   my ($recce, $tree) = @_;
-   my $lines = extractLines($tree);
-   my @bricks = sort { $a->[1] <=> $b->[1] } @$lines;
-   return Data::Dumper::Dumper(\@bricks);
+    my ($recce, $tree) = @_;
+    my $lines = extractLines($tree);
+    my @bricks = sort { $a->[1] <=> $b->[1] } @$lines;
+    my ($blockID) = $recce->block_progress();
+    my @results = ();
+    for my $brick (@bricks) {
+      my ($id, $start, $length, $tag) = @{$brick};
+      my ( $line1, $column1, $line2, $column2 );
+      ( $line1, $column1 ) = $recce->line_column( $blockID, $start );
+      ( $line2, $column2 ) = $recce->line_column( $blockID, $start+$length-1 );
+      push @results, join '', $id, '@', $line1, '-', $line2, ' ', $tag, "\n";
+    }
+    return join '', @results;
 }
 
 # This handler assumes a recognizer has been created.  Given
