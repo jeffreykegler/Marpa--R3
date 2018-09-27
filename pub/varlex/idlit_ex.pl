@@ -24,21 +24,22 @@ use Marpa::R3 4.001_053;
 
 require "idlit.pm";
 
-my $sourceFile = <<'EOS';
+# This trace level above that allowed in test suite
+local $main::TRACE_ES = 2;
+local $main::DEBUG = 0;
+
+if (1) {
+
+    my $sourceFile = <<'EOS';
 some Tex ..
 \begin{code}
 some code ..
 \end{code}
 some Tex ..
 EOS
+    my ($valueRef) = MarpaX::R3::Idlit::parse( \$sourceFile );
 
-# This trace level above that allowed in test suite
-local $main::TRACE_ES = 2;
-
-local $main::DEBUG = 0;
-my $inputRef = \$sourceFile;
-
-my ($valueRef) = MarpaX::R3::Idlit::parse($inputRef);
-# say Data::Dumper::Dumper($result);
-say Data::Dumper::Dumper($valueRef);
-Test::More::is_deeply($valueRef, []);
+    # say Data::Dumper::Dumper($result);
+    say Data::Dumper::Dumper($valueRef);
+    Test::More::is_deeply( $valueRef, [] );
+}

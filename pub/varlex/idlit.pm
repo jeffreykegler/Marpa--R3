@@ -26,14 +26,6 @@ $Data::Dumper::Deepcopy = 1;
 
 use English qw( -no_match_vars );
 
-sub show_last_expression {
-    my ($recce, $target) = @_;
-    my ( $g1_start, $g1_length ) = $recce->last_completed($target);
-    return qq{No "$target" was successfully parsed} if not defined $g1_start;
-    my $last_expression = $recce->substring( $g1_start, $g1_length );
-    return "Last expression successfully parsed was: $last_expression";
-}
-
 sub divergence {
     die join '', 'Unrecoverable internal error: ', @_;
 }
@@ -69,12 +61,13 @@ top ::= texSource
 
 texSource ::= texBody
 texBody ::= texBodyElement*
-texBodyElement ::= L0_textLine
+texBodyElement ::= BRICK_texLine
+BRICK_texLine ::= L0_texLine
 texBodyElement ::= L0_texCodeBlock
 texBodyElement ::= L0_texCodeOpenBlock
 
-:lexeme ~ L0_textLine priority => 0
-L0_textLine ~ nonNewLines newLine
+:lexeme ~ L0_texLine priority => 0
+L0_texLine ~ nonNewLines newLine
 nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
 newLine ~ [\n]
@@ -123,8 +116,8 @@ sub parse {
 
         my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
         my $eoCodeBlock = $offset + $length;
-        my $firstNL     = index( ${$inputRef}, "\n" );
-        my $lastNL      = rindex( ${$inputRef}, "\n", $eoCodeBlock );
+        my $firstNL     = index( ${$inputRef}, "\n", $offset );
+        my $lastNL      = rindex( ${$inputRef}, "\n", $eoCodeBlock-1 );
 
         my ( $line1, $column1, $line2, $column2 );
         ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
@@ -146,7 +139,7 @@ sub parse {
         push @values, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' [CODE]';
+          ' [\end{code}]';
 
         $thisPos = $eoCodeBlock;
 	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $thisPos - $offset);
@@ -157,7 +150,7 @@ sub parse {
 
         my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
         my $eoCodeBlock = $offset + $length;
-        my $firstNL = index( $inputRef, "\n" );
+        my $firstNL = index( $inputRef, "\n", $offset );
 
         my @values = ();
         my ( $line1, $column1, $line2, $column2 );
