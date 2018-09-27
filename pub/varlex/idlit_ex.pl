@@ -40,27 +40,34 @@ EOS
     my ($valueRef) = MarpaX::R3::Idlit::parse( \$sourceFile );
 
     # say Data::Dumper::Dumper($result);
-    say Data::Dumper::Dumper($valueRef);
-    say Data::Dumper::Dumper(extractLines($valueRef));
+    # say Data::Dumper::Dumper($valueRef);
+    say showBricks($valueRef);
     Test::More::is_deeply( $valueRef, [] );
 }
 
 sub extractLines {
    my ($tree) = @_;
    my $refType = ref $tree;
-   say STDERR $refType;
+   # say STDERR $refType;
    return extractLines(${$tree}) if $refType eq 'REF';
-   say STDERR __LINE__;
+   # say STDERR __LINE__;
    return [] if $refType ne 'ARRAY';
-   say STDERR __LINE__;
+   # say STDERR __LINE__;
    my @lines = ();
    if (substr($tree->[0], 0, 5) eq 'BRICK') {
-       say STDERR 'BRICK!';
+       # say STDERR 'BRICK!';
        return [$tree];
    }
-   say STDERR __LINE__;
-   say STDERR '$#$tree: ';
-   say STDERR join '', '$#$tree: ', $#$tree;
+   # say STDERR __LINE__;
+   # say STDERR '$#$tree: ';
+   # say STDERR join '', '$#$tree: ', $#$tree;
    push @lines, @{ extractLines($tree->[$_]) } for 0 .. $#$tree;
    return \@lines;
+}
+
+sub showBricks {
+   my ($tree) = @_;
+   my $lines = extractLines($tree);
+   my @bricks = sort { $a->[1] <=> $b->[1] } @$lines;
+   return Data::Dumper::Dumper(\@bricks);
 }
