@@ -142,7 +142,9 @@ sub parse {
           '-', 'L', $line2, 'c', $column2,
           ' \end{code}'];
 
-	# skip ahead to after next newline
+	# Skip ahead to after next newline.
+	# Sometime check standards to see it this is OK, but
+	# for now it is convenient for testing.
         $handlerPos = index(${$inputRef}, "\n", $eoCodeBlock) + 1;
 	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $handlerPos - $offset);
         'pause';
@@ -152,23 +154,23 @@ sub parse {
 
         my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
         my $eoCodeBlock = $offset + $length;
-        my $firstNL = index( $inputRef, "\n", $offset );
+        my $firstNL = index( ${$inputRef}, "\n", $offset );
 
         my @values = ();
         my ( $line1, $column1, $line2, $column2 );
         ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
         ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
-        push @values, join '',
+        push @values, ['BRICK', $offset, ($firstNL+1)-$offset, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' \begin{code}';
+          ' \begin{code}'];
 
         ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
         ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
-        push @values, join '',
+        push @values, ['BRICK', $firstNL+1, $eoCodeBlock-$firstNL, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' [CODE]';
+          ' [CODE]'];
 
         $handlerPos = $eoCodeBlock;
 

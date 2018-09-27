@@ -30,6 +30,7 @@ local $main::DEBUG = 0;
 
 if (1) {
 
+    # Tex code block
     my $sourceFile = <<'EOS';
 some Tex ..
 \begin{code}
@@ -38,9 +39,23 @@ some code ..
 some Tex ..
 EOS
     my $result = MarpaX::R3::Idlit::parse( \$sourceFile );
-
     # say Data::Dumper::Dumper($result);
-    # say showBricks($valueRef);
+    # eq_or_diff $result, "";
+    say $result;
+}
+
+if (1) {
+
+    # Misformed Tex code block
+    my $sourceFile = <<'EOS';
+some Tex ..
+\begin{code}
+some code ..
+more ...
+and more ...
+EOS
+    my $result = MarpaX::R3::Idlit::parse( \$sourceFile );
+    # say Data::Dumper::Dumper($result);
     # eq_or_diff $result, "";
     say $result;
 }
