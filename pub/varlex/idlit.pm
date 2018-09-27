@@ -142,7 +142,8 @@ sub parse {
           '-', 'L', $line2, 'c', $column2,
           ' \end{code}'];
 
-        $handlerPos = $eoCodeBlock;
+	# skip ahead to after next newline
+        $handlerPos = index(${$inputRef}, "\n", $eoCodeBlock) + 1;
 	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $handlerPos - $offset);
         'pause';
     };
@@ -196,15 +197,22 @@ sub parse {
     );
 
     my $inputLength = length ${$inputRef};
-    my $resumePos;
     $thisPos = $recce->read($inputRef);
     say STDERR join ' ', __LINE__, "inputLength=$inputLength";
     say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
-    while ( $thisPos < $inputLength ) {
-        my $closest_earleme = $recce->closest_earleme();
-	say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
-	say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
-        $resumePos = $recce->lexeme_complete( undef, undef, $closest_earleme - $thisPos);
+    READ_LOOP: while ( 1 ) {
+	my $resumePos = $thisPos;
+	if ( defined $handlerPos ) {
+	  my $closest_earleme = $recce->closest_earleme();
+	  say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
+	  say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
+	  say STDERR join ' ', __LINE__, 'lexeme_complete(', $thisPos, $closest_earleme - $thisPos, ')';
+	  $recce->lexeme_complete( undef, $thisPos, $closest_earleme - $thisPos);
+	  $resumePos = $handlerPos;
+	  $handlerPos = undef;
+	}
+	last READ_LOOP if $resumePos >= $inputLength;
+	say STDERR join ' ', __LINE__, "resuming at $resumePos";
         $thisPos = $recce->resume($resumePos);
 	say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 	say STDERR join ' ', __LINE__, "thisPos=$thisPos";
