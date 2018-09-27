@@ -85,10 +85,10 @@ anyChar ~ [\d\D]
 texCodeBegin ~ '\begin{code}'
 texCodeEnd ~ '\end{code}'
 
-:lexeme ~ L0_texCodeBlock priority => 1 eager => 1 event => properBlock pause => after
+:lexeme ~ L0_texCodeBlock priority => 1 eager => 1 event => properBlock pause => before
 L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
 
-:lexeme ~ L0_texCodeOpenBlock priority => 0 event => openBlock pause => after
+:lexeme ~ L0_texCodeOpenBlock priority => 0 event => openBlock pause => before
 L0_texCodeOpenBlock ~ texCodeOpenBlock
 texCodeOpenBlock ~ texCodeBegin anything
 
@@ -111,6 +111,7 @@ sub parse {
 
     my @values = ();
     my $thisPos;
+    my $handlerPos;
 
     my $properBlockHandler = sub {
 
@@ -139,10 +140,10 @@ sub parse {
         push @values, ['BRICK', $lastNL+1, $eoCodeBlock-$lastNL, join '',
           'L', $line1, 'c', $column1,
           '-', 'L', $line2, 'c', $column2,
-          ' [\end{code}]'];
+          ' \end{code}'];
 
-        $thisPos = $eoCodeBlock;
-	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $thisPos - $offset);
+        $handlerPos = $eoCodeBlock;
+	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $handlerPos - $offset);
         'pause';
     };
 
@@ -168,9 +169,9 @@ sub parse {
           '-', 'L', $line2, 'c', $column2,
           ' [CODE]';
 
-        $thisPos = $eoCodeBlock;
+        $handlerPos = $eoCodeBlock;
 
-	$recce->lexeme_alternative('L0_texCodeBlock', \@values, $thisPos - $offset);
+	$recce->lexeme_alternative('L0_texCodeBlock', \@values, $handlerPos - $offset);
         'pause';
     };
 
@@ -197,11 +198,18 @@ sub parse {
     my $inputLength = length ${$inputRef};
     my $resumePos;
     $thisPos = $recce->read($inputRef);
+    say STDERR join ' ', __LINE__, "inputLength=$inputLength";
+    say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
     while ( $thisPos < $inputLength ) {
         my $closest_earleme = $recce->closest_earleme();
+	say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
+	say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
         $resumePos = $recce->lexeme_complete( undef, undef, $closest_earleme - $thisPos);
         $thisPos = $recce->resume($resumePos);
+	say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
+	say STDERR join ' ', __LINE__, "thisPos=$thisPos";
     }
+    say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
@@ -220,6 +228,7 @@ sub parse {
     # Return value and new offset
 
     my $value_ref = $recce->value();
+    say Data::Dumper::Dumper($value_ref);
     if ( !$value_ref ) {
 	say STDERR $recce->show_progress() if $main::DEBUG;
         divergence( qq{input read, but there was no parse} );
@@ -259,10 +268,24 @@ sub showBricks {
       my ( $line1, $column1, $line2, $column2 );
       ( $line1, $column1 ) = $recce->line_column( $blockID, $start );
       ( $line2, $column2 ) = $recce->line_column( $blockID, $start+$length-1 );
-      if ($id eq 'BRICK_texLine') {
-          $tag =~ s/\n.*//;
+      my $desc;
+      FIND_DESC: {
+	if ($id eq 'BRICK_texLine') {
+	    say "start line=$line1, column=$column1";
+	    say Data::Dumper::Dumper($brick);
+	    $tag =~ s/\n.*//;
+	    $desc = ' texLine ' . $tag;
+	    last FIND_DESC;
+	}
+	if ($id eq 'BRICK') {
+	    say "start line=$line1, column=$column1";
+	    say Data::Dumper::Dumper($brick);
+	    $desc = " $tag";
+	    last FIND_DESC;
+	}
+         $desc = " $id $tag";
       }
-      push @results, join '', $id, '@', $line1, '-', $line2, ' ', $tag, "\n";
+      push @results, join '', '@', $line1, '-', $line2, $desc, "\n";
     }
     return join '', @results;
 }

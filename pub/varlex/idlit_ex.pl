@@ -25,7 +25,7 @@ use Marpa::R3 4.001_053;
 require "idlit.pm";
 
 # This trace level above that allowed in test suite
-local $main::TRACE_ES = 2;
+local $main::TRACE_ES = 0;
 local $main::DEBUG = 0;
 
 if (1) {
