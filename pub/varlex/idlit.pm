@@ -72,13 +72,29 @@ nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
 newLine ~ [\n]
 
-TOP_CCode ::= L0_unicorn
+TOP_CCode ::= C_element*
+C_element ::= BRICK_C_Comment
+C_element ::= BRICK_C_Token
+C_element ::= BRICK_C_WhiteSpace
 
-:lexeme ~ L0_unicorn
-L0_unicorn ~ unicorn
-unicorn ~ [^\d\D]
+BRICK_C_Comment ::= L0_CComment
+BRICK_C_Token ::= L0_CToken
+BRICK_C_WhiteSpace ::= L0_CWhiteSpace
+
+# :lexeme ~ L0_unicorn
+# L0_unicorn ~ unicorn
+# unicorn ~ [^\d\D]
 anything ~ anyChar*
 anyChar ~ [\d\D]
+
+:lexeme ~ L0_CComment eager => 1 priority => 1
+L0_CComment ~ '/*' anything '*/'
+
+:lexeme ~ L0_CToken
+L0_CToken ~ [\S]+
+
+:lexeme ~ L0_CWhiteSpace
+L0_CWhiteSpace ~ [\s]+
 
 texCodeBegin ~ '\begin{code}'
 texCodeEnd ~ '\end{code}'
