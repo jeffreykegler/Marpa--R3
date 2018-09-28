@@ -352,39 +352,43 @@ sub getValue {
 }
 
 sub subParse {
-    my ( $target, $input, $offset, $currentIndent ) = @_;
-    say STDERR qq{Starting combinator for "$target" at $currentIndent}
-        if $main::TRACE_ES;
-    say STDERR qq{Starting combinator for "$target" at $currentIndent}
-        if $main::DEBUG;
-    my $grammar_data = $main::GRAMMARS{$target};
-
-    divergence(qq{No grammar for target = "$target"}) if not $grammar_data;
-    my ( undef, $subgrammar ) = @{$grammar_data};
+    my ( $grammar, $target, $inputRef ) = @_;
+    say STDERR qq{Starting combinator for "$target"}
+      if $main::TRACE_ES;
+    say STDERR qq{Starting combinator for "$target"}
+      if $main::DEBUG;
     my $recce = Marpa::R3::Recognizer->new(
         {
-            grammar         => $subgrammar,
+            grammar         => $grammar,
             rejection       => 'event',
-	    # event_is_active => { 'indent' => $indent_is_active },
-            trace_terminals => ($main::DEBUG ? 99 : 0),
+            trace_terminals => ( $main::DEBUG ? 99 : 0 ),
         }
     );
-    my ( $value_ref, $pos ) = getValue( $recce, $target, $input, $offset );
-    say STDERR qq{Returning from combinator for "$target" at $currentIndent}
-        if $main::DEBUG;
+
+    my $thisPos = $recce->read( $inputRef );
+
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
+    my @values = ();
+  VALUE: while (1) {
+        my $valueRef = $valuer->value();
+        last VALUE if not $valueRef;
+
+        # my $value = Data::Dumper::Dumper($valueRef);
+        push @values, $valueRef;
+    }
+    say STDERR qq{Returning from combinator for "$target"}
+      if $main::DEBUG;
 
     if ($main::TRACE_ES) {
-      my $thick_recce = $recce->thick_g1_recce();
-      say STDERR qq{Returning from combinator for "$target" at $currentIndent};
-      my $latest_es = $thick_recce->latest_earley_set();
-      say STDERR "latest ES = ", $latest_es;
-      for my $es (0 .. $latest_es) {
-	say STDERR "ES $es = ", $thick_recce->earley_set_size($es);
-      }
-      say STDERR qq{Returning from combinator for "$target" at $currentIndent};
+        my $latest_es = $recce->latest_earley_set();
+        say STDERR "latest ES = ", $latest_es;
+        for my $es ( 0 .. $latest_es ) {
+            say STDERR "ES $es = ", $recce->earley_set_size($es);
+        }
+        say STDERR qq{Returning from combinator for "$target"};
     }
 
-    return $value_ref, $pos;
+    return [@values], $thisPos;
 }
 
 # This utility right now is primarily for testing.  It takes an
