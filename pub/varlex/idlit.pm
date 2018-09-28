@@ -116,6 +116,22 @@ END_OF_TOP_DSL
 my $topGrammar =
   Marpa::R3::Grammar->new( { source => \$dsl, rejection => 'event', } );
 
+my $CCodeGrammar = do {
+    my $CCodeDSL =
+      join "\n",
+      ':start ::= TOP_CCode',
+      'inaccessible is ok by default',
+      $dsl,
+      ;
+
+    Marpa::R3::Grammar->new(
+        {
+            source    => \$CCodeDSL,
+            rejection => 'event',
+        }
+    );
+};
+
 local $main::DEBUG = 0;
 
 # This is the top level parse routine.
