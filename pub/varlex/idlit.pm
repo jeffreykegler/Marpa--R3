@@ -158,12 +158,15 @@ sub parse {
           '-', 'L', $line2, 'c', $column2,
           ' \begin{code}'];
 
-        ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
-        ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
-        push @values, ['BRICK', $firstNL+1, $lastNL-$firstNL, join '',
-          'L', $line1, 'c', $column1,
-          '-', 'L', $line2, 'c', $column2,
-          ' [CODE]'];
+	my $Ccode = substr(${$inputRef}, $firstNL + 1, $lastNL - $firstNL);
+	my ($subParseValues, $nextPos) = subParse($CCodeGrammar, 'C code', \$Ccode);
+	push @values, $subParseValues;
+        # ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
+        # ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
+        # push @values, ['BRICK', $firstNL+1, $lastNL-$firstNL, join '',
+          # 'L', $line1, 'c', $column1,
+          # '-', 'L', $line2, 'c', $column2,
+          # ' [CODE]'];
 
         ( $line1, $column1 ) = $recce->line_column( $blockID, $lastNL + 1 );
         ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
@@ -360,7 +363,6 @@ sub subParse {
     my $recce = Marpa::R3::Recognizer->new(
         {
             grammar         => $grammar,
-            rejection       => 'event',
             trace_terminals => ( $main::DEBUG ? 99 : 0 ),
         }
     );
