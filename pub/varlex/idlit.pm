@@ -56,10 +56,10 @@ my $dsl = <<'END_OF_TOP_DSL';
 :default ::= action => [name,start,length,values]
 
 # top ::= perlCode luaCode CCode texSource
-top ::= perlCode
-top ::= texSource
+top ::= TOP_CCode
+top ::= TOP_texSource
 
-texSource ::= texBody
+TOP_texSource ::= texBody
 texBody ::= texBodyElement*
 texBodyElement ::= BRICK_texLine
 BRICK_texLine ::= L0_texLine
@@ -72,12 +72,10 @@ nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
 newLine ~ [\n]
 
-perlCode ::= L0_perlCode
-:lexeme ~ L0_perlCode priority => 0 event => perlCode pause => before
-L0_perlCode ~ unicorn
+TOP_CCode ::= L0_unicorn
 
-# :lexeme ~ L0_unicorn
-# L0_unicorn ~ unicorn
+:lexeme ~ L0_unicorn
+L0_unicorn ~ unicorn
 unicorn ~ [^\d\D]
 anything ~ anyChar*
 anyChar ~ [\d\D]
