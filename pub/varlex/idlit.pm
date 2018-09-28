@@ -76,22 +76,36 @@ TOP_CCode ::= C_element*
 C_element ::= BRICK_C_Comment
 C_element ::= BRICK_C_Token
 C_element ::= BRICK_C_WhiteSpace
+C_element ::= BRICK_C_CharacterConstant
+C_element ::= BRICK_C_StringLiteral
 
 BRICK_C_Comment ::= L0_CComment
 BRICK_C_Token ::= L0_CToken
 BRICK_C_WhiteSpace ::= L0_CWhiteSpace
+BRICK_C_CharacterConstant ::= L0_CCharacterConstant
+BRICK_C_StringLiteral ::= L0_CStringLiteral
 
 # :lexeme ~ L0_unicorn
 # L0_unicorn ~ unicorn
 # unicorn ~ [^\d\D]
 anything ~ anyChar*
 anyChar ~ [\d\D]
+singleQuote ~ [']
+doubleQuote ~ ["]
+backslash ~ '\'
 
 :lexeme ~ L0_CComment eager => 1 priority => 1
 L0_CComment ~ '/*' anything '*/'
 
+:lexeme ~ L0_CCharacterConstant eager => 1 priority => 1
+L0_CCharacterConstant ~ C_characterConstant
+
+:lexeme ~ L0_CStringLiteral eager => 1 priority => 1
+L0_CStringLiteral ~ C_stringLiteral
+
 :lexeme ~ L0_CToken
-L0_CToken ~ [\S]+
+L0_CToken ~ C_ordinaryTokenChar+
+C_ordinaryTokenChar ~ [^\s'"]
 
 :lexeme ~ L0_CWhiteSpace
 L0_CWhiteSpace ~ [\s]+
@@ -105,6 +119,44 @@ L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
 :lexeme ~ L0_texCodeOpenBlock priority => 0 event => openBlock pause => before
 L0_texCodeOpenBlock ~ texCodeOpenBlock
 texCodeOpenBlock ~ texCodeBegin anything
+
+# most of this untested as of Fri Sep 28 17:22:36 EDT 2018
+C_universalCharacterName ~ '\' [uU] C_hexQuad C_hexQuad
+C_universalCharacterName ~ '\' [uU] C_hexQuad
+C_hexQuad ~ C_hexDigit C_hexDigit C_hexDigit C_hexDigit
+C_hexdigits1 ~ C_hexDigit+
+C_hexDigit ~ [0-9a-fA-F]
+
+C_characterConstant ~ singleQuote C_cCharSequence1 singleQuote
+C_cCharSequence1 ~ C_cChar+
+C_cChar ~ C_universalCharacterName
+C_cChar ~ [^'\\\n] # C std N1256 6.4.4.4
+C_cChar ~ C_escapeSequence
+C_escapeSequence ~ C_simpleEscapeSequence
+C_simpleEscapeSequence ~ backslash singleQuote
+C_simpleEscapeSequence ~ backslash doubleQuote
+C_simpleEscapeSequence ~ backslash '?'
+C_simpleEscapeSequence ~ backslash backslash
+C_simpleEscapeSequence ~ backslash 'a'
+C_simpleEscapeSequence ~ backslash 'b'
+C_simpleEscapeSequence ~ backslash 'f'
+C_simpleEscapeSequence ~ backslash 'n'
+C_simpleEscapeSequence ~ backslash 'r'
+C_simpleEscapeSequence ~ backslash 't'
+C_simpleEscapeSequence ~ backslash 'v'
+C_escapeSequence ~ C_octalEscapeSequence
+C_octalEscapeSequence ~ backslash C_octalDigit
+C_octalEscapeSequence ~ backslash C_octalDigit C_octalDigit
+C_octalEscapeSequence ~ backslash C_octalDigit C_octalDigit C_octalDigit
+C_octalDigit ~ [0-7]
+
+C_escapeSequence ~ C_hexadecimalEscapeSequence
+C_hexadecimalEscapeSequence ~ C_hexdigits1
+
+C_stringLiteral ~ doubleQuote C_sCharSequence1 doubleQuote
+C_sCharSequence1 ~ C_sChar+
+C_sChar ~ C_escapeSequence
+C_sChar ~ [^"\\\n] # C std N1256 6.4.5
 
 END_OF_TOP_DSL
 
