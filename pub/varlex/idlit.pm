@@ -78,12 +78,19 @@ C_element ::= BRICK_C_Token
 C_element ::= BRICK_C_WhiteSpace
 C_element ::= BRICK_C_CharacterConstant
 C_element ::= BRICK_C_StringLiteral
+C_element ::= ERROR_C_Comment
+C_element ::= ERROR_C_CharacterConstant
+C_element ::= ERROR_C_StringLiteral
 
 BRICK_C_Comment ::= L0_CComment
 BRICK_C_Token ::= L0_CToken
 BRICK_C_WhiteSpace ::= L0_CWhiteSpace
 BRICK_C_CharacterConstant ::= L0_CCharacterConstant
 BRICK_C_StringLiteral ::= L0_CStringLiteral
+
+ERROR_C_Comment ::= L0_errorCComment
+ERROR_C_CharacterConstant ::= L0_errorCCharacterConstant
+ERROR_C_StringLiteral ::= L0_errorCStringLiteral
 
 # :lexeme ~ L0_unicorn
 # L0_unicorn ~ unicorn
@@ -97,11 +104,20 @@ backslash ~ '\'
 :lexeme ~ L0_CComment eager => 1 priority => 1
 L0_CComment ~ '/*' anything '*/'
 
+:lexeme ~ L0_errorCComment
+L0_errorCComment ~ '/*' anything
+
 :lexeme ~ L0_CCharacterConstant eager => 1 priority => 1
 L0_CCharacterConstant ~ C_characterConstant
 
+:lexeme ~ L0_errorCCharacterConstant
+L0_errorCCharacterConstant ~ singleQuote anything
+
 :lexeme ~ L0_CStringLiteral eager => 1 priority => 1
 L0_CStringLiteral ~ C_stringLiteral
+
+:lexeme ~ L0_errorCStringLiteral
+L0_errorCStringLiteral ~ doubleQuote anything
 
 :lexeme ~ L0_CToken
 L0_CToken ~ C_ordinaryTokenChar+
@@ -285,26 +301,26 @@ sub parse {
 
     my $inputLength = length ${$inputRef};
     $thisPos = $recce->read($inputRef);
-    say STDERR join ' ', __LINE__, "inputLength=$inputLength";
-    say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
+    # say STDERR join ' ', __LINE__, "inputLength=$inputLength";
+    # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
     READ_LOOP: while ( 1 ) {
 	my $resumePos = $thisPos;
 	if ( defined $handlerPos ) {
 	  my $closest_earleme = $recce->closest_earleme();
-	  say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
-	  say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
-	  say STDERR join ' ', __LINE__, 'lexeme_complete(', $thisPos, $closest_earleme - $thisPos, ')';
+	  # say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
+	  # say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
+	  # say STDERR join ' ', __LINE__, 'lexeme_complete(', $thisPos, $closest_earleme - $thisPos, ')';
 	  $recce->lexeme_complete( undef, $thisPos, $closest_earleme - $thisPos);
 	  $resumePos = $handlerPos;
 	  $handlerPos = undef;
 	}
 	last READ_LOOP if $resumePos >= $inputLength;
-	say STDERR join ' ', __LINE__, "resuming at $resumePos";
+	# say STDERR join ' ', __LINE__, "resuming at $resumePos";
         $thisPos = $recce->resume($resumePos);
-	say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
-	say STDERR join ' ', __LINE__, "thisPos=$thisPos";
+	# say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
+	# say STDERR join ' ', __LINE__, "thisPos=$thisPos";
     }
-    say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
+    # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 
     if ($main::TRACE_ES) {
       say STDERR qq{Returning from top level parser};
@@ -322,13 +338,19 @@ sub parse {
 
     # Return value and new offset
 
-    my $value_ref = $recce->value();
-    say Data::Dumper::Dumper($value_ref);
-    if ( !$value_ref ) {
-	say STDERR $recce->show_progress() if $main::DEBUG;
-        divergence( qq{input read, but there was no parse} );
+    my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
+	say STDERR $recce->progress_show(0, -1);
+    my $valueRef;
+    my @results = ();
+  VALUE: while (1) {
+        $valueRef = $valuer->value();
+        last VALUE if not $valueRef;
+        say STDERR Data::Dumper::Dumper($valueRef);
+        push @results, '=== Value ===';
+        push @results, showBricks($recce, $valueRef);
     }
-    return showBricks($recce, $value_ref);
+    # say Data::Dumper::Dumper($value_ref);
+    return join "\n", @results, '';
 
 }
 
@@ -366,16 +388,30 @@ sub showBricks {
       my $desc;
       FIND_DESC: {
 	if ($id eq 'BRICK_texLine') {
-	    say "start line=$line1, column=$column1";
-	    say Data::Dumper::Dumper($brick);
+	    # say "start line=$line1, column=$column1";
+	    # say Data::Dumper::Dumper($brick);
 	    $tag =~ s/\n.*//;
 	    $desc = ' texLine ' . $tag;
 	    last FIND_DESC;
 	}
 	if ($id eq 'BRICK') {
-	    say "start line=$line1, column=$column1";
-	    say Data::Dumper::Dumper($brick);
+	    # say "start line=$line1, column=$column1";
+	    # say Data::Dumper::Dumper($brick);
 	    $desc = " $tag";
+	    last FIND_DESC;
+	}
+	if (substr($id, 0, 6) eq 'BRICK_') {
+	    # say "start line=$line1, column=$column1";
+	    # say Data::Dumper::Dumper($brick);
+	    $tag =~ s/\n.*//;
+	    $desc = ' ' . substr($id, 6) . $tag;
+	    last FIND_DESC;
+	}
+	if (substr($id, 0, 6) eq 'ERROR_') {
+	    # say "start line=$line1, column=$column1";
+	    # say Data::Dumper::Dumper($brick);
+	    $tag =~ s/\n.*//;
+	    $desc = ' ' . $id . ' ' . $tag;
 	    last FIND_DESC;
 	}
          $desc = " $id $tag";

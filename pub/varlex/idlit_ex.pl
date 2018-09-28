@@ -30,7 +30,7 @@ local $main::DEBUG = 0;
 
 if (1) {
 
-    # Tex code block
+    say STDERR "Tex code block";
     my $sourceFile = <<'EOS';
 some Tex ..
 \begin{code}
@@ -46,6 +46,7 @@ EOS
 
 if (1) {
 
+    say STDERR "Misformed Tex code block";
     # Misformed Tex code block
     my $sourceFile = <<'EOS';
 some Tex ..
@@ -53,6 +54,44 @@ some Tex ..
 some code ..
 more ...
 and more ...
+EOS
+    my $result = MarpaX::R3::Idlit::parse( \$sourceFile );
+    # say Data::Dumper::Dumper($result);
+    # eq_or_diff $result, "";
+    say $result;
+}
+
+if (1) {
+
+    say STDERR "C code block";
+    # C code block
+    my $sourceFile = <<'EOS';
+some Tex ..
+/*
+\begin{code}
+*/
+some code ..
+code ... /*
+\end{code}
+*/
+some Tex ..
+EOS
+    my $result = MarpaX::R3::Idlit::parse( \$sourceFile );
+    # say Data::Dumper::Dumper($result);
+    # eq_or_diff $result, "";
+    say $result;
+}
+
+if (1) {
+
+    say STDERR "small C code block";
+    # C code block
+    my $sourceFile = <<'EOS';
+    token
+/* test
+\begin{code}
+   */
+\end{code}
 EOS
     my $result = MarpaX::R3::Idlit::parse( \$sourceFile );
     # say Data::Dumper::Dumper($result);
