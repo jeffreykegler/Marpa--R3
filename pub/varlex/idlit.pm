@@ -88,9 +88,9 @@ BRICK_C_WhiteSpace ::= L0_CWhiteSpace
 BRICK_C_CharacterConstant ::= L0_CCharacterConstant
 BRICK_C_StringLiteral ::= L0_CStringLiteral
 
-ERROR_C_Comment ::= L0_errorCComment
-ERROR_C_CharacterConstant ::= L0_errorCCharacterConstant
-ERROR_C_StringLiteral ::= L0_errorCStringLiteral
+ERROR_C_Comment ::= L0_CUnclosedComment
+ERROR_C_CharacterConstant ::= L0_CUnclosedCharacterConstant
+ERROR_C_StringLiteral ::= L0_CUnclosedStringLiteral
 
 # :lexeme ~ L0_unicorn
 # L0_unicorn ~ unicorn
@@ -100,24 +100,32 @@ anyChar ~ [\d\D]
 singleQuote ~ [']
 doubleQuote ~ ["]
 backslash ~ '\'
+stars ~ star*
+stars1 ~ star stars
+star ~ [*]
+nonStars ~ nonStar*
+nonStar ~ [^*]
 
-:lexeme ~ L0_CComment eager => 1 priority => 1
-L0_CComment ~ '/*' anything '*/'
+:lexeme ~ L0_CComment
+L0_CComment ~ '/*' C_commentInterior '/'
+C_commentInterior ~ interiorStarSegments
+interiorStarSegments ~ interiorStarSegment*
+interiorStarSegment ~ nonStars stars1
 
-:lexeme ~ L0_errorCComment
-L0_errorCComment ~ '/*' anything
+:lexeme ~ L0_CUnclosedComment
+L0_CUnclosedComment ~ '/*' C_commentInterior
 
-:lexeme ~ L0_CCharacterConstant eager => 1 priority => 1
+:lexeme ~ L0_CCharacterConstant
 L0_CCharacterConstant ~ C_characterConstant
 
-:lexeme ~ L0_errorCCharacterConstant
-L0_errorCCharacterConstant ~ singleQuote anything
+:lexeme ~ L0_CUnclosedCharacterConstant
+L0_CUnclosedCharacterConstant ~ C_unclosedCharacterConstant
 
-:lexeme ~ L0_CStringLiteral eager => 1 priority => 1
+:lexeme ~ L0_CStringLiteral
 L0_CStringLiteral ~ C_stringLiteral
 
-:lexeme ~ L0_errorCStringLiteral
-L0_errorCStringLiteral ~ doubleQuote anything
+:lexeme ~ L0_CUnclosedStringLiteral
+L0_CUnclosedStringLiteral ~ C_unclosedStringLiteral
 
 :lexeme ~ L0_CToken
 L0_CToken ~ C_ordinaryTokenChar+
@@ -143,6 +151,7 @@ C_hexQuad ~ C_hexDigit C_hexDigit C_hexDigit C_hexDigit
 C_hexdigits1 ~ C_hexDigit+
 C_hexDigit ~ [0-9a-fA-F]
 
+C_unclosedCharacterConstant ~ singleQuote C_cCharSequence1
 C_characterConstant ~ singleQuote C_cCharSequence1 singleQuote
 C_cCharSequence1 ~ C_cChar+
 C_cChar ~ C_universalCharacterName
@@ -169,6 +178,7 @@ C_octalDigit ~ [0-7]
 C_escapeSequence ~ C_hexadecimalEscapeSequence
 C_hexadecimalEscapeSequence ~ C_hexdigits1
 
+C_unclosedStringLiteral ~ doubleQuote C_sCharSequence1
 C_stringLiteral ~ doubleQuote C_sCharSequence1 doubleQuote
 C_sCharSequence1 ~ C_sChar+
 C_sChar ~ C_escapeSequence

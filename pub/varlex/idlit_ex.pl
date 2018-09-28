@@ -28,7 +28,7 @@ require "idlit.pm";
 local $main::TRACE_ES = 0;
 local $main::DEBUG = 0;
 
-if (1) {
+if (0) {
 
     say STDERR "Tex code block";
     my $sourceFile = <<'EOS';
@@ -44,7 +44,7 @@ EOS
     say $result;
 }
 
-if (1) {
+if (0) {
 
     say STDERR "Misformed Tex code block";
     # Misformed Tex code block
@@ -61,7 +61,7 @@ EOS
     say $result;
 }
 
-if (1) {
+if (0) {
 
     say STDERR "C code block";
     # C code block
