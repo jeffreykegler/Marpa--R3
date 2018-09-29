@@ -57,24 +57,22 @@ my $dsl = <<'END_OF_TOP_DSL';
 
 # top ::= perlCode luaCode CCode texSource
 top ::= L0_unicorn TOP_CCode
-top ::= TOP_texSource
-top ::= L0_unicorn TOP_CComment
-top ::= L0_unicorn TOP_CCharacterConstant
-top ::= L0_unicorn TOP_CStringLiteral
+top ::= TOP_Tex_Source
+top ::= L0_unicorn TOP_C_CharacterConstant
+top ::= L0_unicorn TOP_C_StringLiteral
 
-TOP_CComment ::= L0_CComment
-TOP_CCharacterConstant ::= L0_CCharacterConstant
-TOP_CStringLiteral ::= L0_CStringLiteral
+TOP_C_CharacterConstant ::= L0_i_C_CharacterConstant
+TOP_C_StringLiteral ::= L0_i_C_StringLiteral
 
-TOP_texSource ::= texBody
+TOP_Tex_Source ::= texBody
 texBody ::= texBodyElement*
-texBodyElement ::= BRICK_texLine
-BRICK_texLine ::= L0_texLine
-texBodyElement ::= L0_texCodeBlock
-texBodyElement ::= L0_texStrayOpenCodeBlock
+texBodyElement ::= BRICK_Tex_Line
+BRICK_Tex_Line ::= L0_Tex_Line
+texBodyElement ::= L0_Tex_CodeBlock
+texBodyElement ::= L0_Tex_StrayOpenCodeBlock
 
-:lexeme ~ L0_texLine
-L0_texLine ~ nonNewLines newLine
+:lexeme ~ L0_Tex_Line
+L0_Tex_Line ~ nonNewLines newLine
 nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
 newLine ~ [\n]
@@ -85,19 +83,19 @@ C_element ::= BRICK_C_Token
 C_element ::= BRICK_C_WhiteSpace
 C_element ::= BRICK_C_CharacterConstant
 C_element ::= BRICK_C_StringLiteral
-C_element ::= ERROR_C_Comment
-C_element ::= ERROR_C_CharacterConstant
-C_element ::= ERROR_C_StringLiteral
+C_element ::= ERROR_C_StrayCommentOpen
+C_element ::= ERROR_C_StraySingleQuote
+C_element ::= ERROR_C_StrayDoubleQuote
 
-BRICK_C_Comment ::= L0_CComment
-BRICK_C_Token ::= L0_CToken
-BRICK_C_WhiteSpace ::= L0_CWhiteSpace
-BRICK_C_CharacterConstant ::= L0_CCharacterConstant
-BRICK_C_StringLiteral ::= L0_CStringLiteral
+BRICK_C_Comment ::= L0_C_Comment
+BRICK_C_Token ::= L0_C_Token
+BRICK_C_WhiteSpace ::= L0_C_WhiteSpace
+BRICK_C_CharacterConstant ::= L0_C_CharacterConstant
+BRICK_C_StringLiteral ::= L0_C_StringLiteral
 
-ERROR_C_Comment ::= L0_CUnclosedComment
-ERROR_C_CharacterConstant ::= L0_CUnclosedCharacterConstant
-ERROR_C_StringLiteral ::= L0_CUnclosedStringLiteral
+ERROR_C_StrayCommentOpen ::= L0_C_StrayCommentOpen
+ERROR_C_StraySingleQuote ::= L0_C_StraySingleQuote
+ERROR_C_StrayDoubleQuote ::= L0_C_StrayDoubleQuote
 
 :lexeme ~ L0_unicorn
 L0_unicorn ~ unicorn
@@ -107,45 +105,21 @@ unicorn ~ [^\d\D]
 singleQuote ~ [']
 doubleQuote ~ ["]
 backslash ~ '\'
-stars ~ star*
-stars1 ~ star stars
-star ~ [*]
-nonStars ~ nonStar*
-nonStar ~ [^*]
 
-:lexeme ~ L0_CComment
-L0_CComment ~ '/*' C_commentInterior '/'
-C_commentInterior ~ interiorStarSegments
-interiorStarSegments ~ interiorStarSegment*
-interiorStarSegment ~ nonStars stars1
+L0_C_StrayCommentOpen ~ unicorn
+L0_C_StraySingleQuote ~ unicorn
+L0_C_StrayDoubleQuote ~ unicorn
+L0_C_Comment ~ unicorn
+L0_C_CharacterConstant ~ unicorn
+L0_C_StringLiteral ~ unicorn
 
-:lexeme ~ L0_CUnclosedComment
-L0_CUnclosedComment ~ unicorn
+L0_i_C_CharacterConstant ~ C_characterConstant
+L0_i_C_StringLiteral ~ C_stringLiteral
 
-:lexeme ~ L0_CCharacterConstant
-L0_CCharacterConstant ~ C_characterConstant
-
-:lexeme ~ L0_CUnclosedCharacterConstant
-L0_CUnclosedCharacterConstant ~ C_unclosedCharacterConstant
-
-:lexeme ~ L0_CStringLiteral
-L0_CStringLiteral ~ C_stringLiteral
-
-:lexeme ~ L0_CUnclosedStringLiteral
-L0_CUnclosedStringLiteral ~ C_unclosedStringLiteral
-
-:lexeme ~ L0_CToken
-L0_CToken ~ C_ordinaryTokenChar+
-C_ordinaryTokenChar ~ [^\s'"]
-
-:lexeme ~ L0_CWhiteSpace
-L0_CWhiteSpace ~ [\s]+
-
-:lexeme ~ L0_texCodeBlock
-L0_texCodeBlock ~ unicorn
-
-:lexeme ~ L0_texStrayOpenCodeBlock
-L0_texStrayOpenCodeBlock ~ unicorn
+L0_C_Token ~ unicorn
+L0_C_WhiteSpace ~ unicorn
+L0_Tex_CodeBlock ~ unicorn
+L0_Tex_StrayOpenCodeBlock ~ unicorn
 
 # most of this untested as of Fri Sep 28 17:22:36 EDT 2018
 C_universalCharacterName ~ '\' [uU] C_hexQuad C_hexQuad
@@ -180,7 +154,6 @@ C_octalDigit ~ [0-7]
 C_escapeSequence ~ C_hexadecimalEscapeSequence
 C_hexadecimalEscapeSequence ~ C_hexdigits1
 
-C_unclosedStringLiteral ~ doubleQuote C_sCharSequence1
 C_stringLiteral ~ doubleQuote C_sCharSequence1 doubleQuote
 C_sCharSequence1 ~ C_sChar+
 C_sChar ~ C_escapeSequence
@@ -242,8 +215,8 @@ sub lexer {
           TEX_LEXEME: {
 
                 # Find a Tex lexeme
-                # L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
-                if ( $expected{L0_texCodeBlock}
+                # L0_Tex_CodeBlock ~ texCodeBegin anything newLine texCodeEnd
+                if ( $expected{L0_Tex_CodeBlock}
                     and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E .*? \Q$texCodeEnd\E )/xms )
                 {
 		    my @values = ();
@@ -301,13 +274,13 @@ sub lexer {
                     # Sometime check standards to see it this is OK, but
                     # for now it is convenient for testing.
                     my $endPos = index( ${$inputRef}, "\n", $eoMatch ) + 1;
-                    $recce->lexeme_alternative( 'L0_texCodeBlock', \@values,
+                    $recce->lexeme_alternative( 'L0_Tex_CodeBlock', \@values,
                         $endPos - $thisPos );
                     last TEX_LEXEME;
                 }
 
 		# Check for stray '\begin{code}' lines
-                if ( $expected{L0_texStrayOpenCodeBlock}
+                if ( $expected{L0_Tex_StrayOpenCodeBlock}
                     and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E )/xms )
                 {
 		    my @values = ();
@@ -334,36 +307,25 @@ sub lexer {
                     # Sometime check standards to see it this is OK, but
                     # for now it is convenient for testing.
                     my $endPos = $nextNL + 1;
-                    $recce->lexeme_alternative( 'L0_texStrayOpenCodeBlock',
+                    $recce->lexeme_alternative( 'L0_Tex_StrayOpenCodeBlock',
                         \@values, $endPos - $thisPos );
 		    # Once we've seen a stray open, we can never see a valid
 		    # block.  Every stray open causes a scan to the end of input,
 		    # can in theory they can make a parse go quadratic.  Therefore
 		    # we disable tex Code Blocks -- from now on, we will only look
 		    # for strays.
-		    $disabled{L0_texCodeBlock} = 1;
+		    $disabled{L0_Tex_CodeBlock} = 1;
                     last TEX_LEXEME;
                 }
 
-                if ( $expected{L0_texLine} and ${$inputRef} =~ m/\G([^\n]*\n)/xms )
+                if ( $expected{L0_Tex_Line} and ${$inputRef} =~ m/\G([^\n]*\n)/xms )
                 {
                     my $match = $1;
-                    $recce->lexeme_alternative( 'L0_texLine', $match,
+                    $recce->lexeme_alternative( 'L0_Tex_Line', $match,
                         length $match );
                     last TEX_LEXEME;
                 }
             }
-
-            # L0_CComment ~ '/*' C_commentInterior '/'
-            # L0_CUnclosedComment ~ '/*' C_commentInterior
-            # L0_CCharacterConstant ~ C_characterConstant
-            # L0_CUnclosedCharacterConstant ~ C_unclosedCharacterConstant
-            # L0_CStringLiteral ~ C_stringLiteral
-            # L0_CUnclosedStringLiteral ~ C_unclosedStringLiteral
-            # L0_CToken ~ C_ordinaryTokenChar+
-            # L0_CWhiteSpace ~ [\s]+
-            # L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
-            # L0_texCodeOpenBlock ~ texCodeOpenBlock
         }
         my $closest_earleme = $recce->closest_earleme();
 
@@ -475,7 +437,7 @@ sub showBricks {
       ( $line2, $column2 ) = $recce->line_column( $blockID, $start+$length-1 );
       my $desc;
       FIND_DESC: {
-	if ($id eq 'BRICK_texLine') {
+	if ($id eq 'BRICK_Tex_Line') {
 	    # say "start line=$line1, column=$column1";
 	    # say Data::Dumper::Dumper($brick);
 	    $tag =~ s/\n.*//;
