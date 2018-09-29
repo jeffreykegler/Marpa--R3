@@ -56,7 +56,7 @@ my $dsl = <<'END_OF_TOP_DSL';
 :default ::= action => [name,start,length,values]
 
 # top ::= perlCode luaCode CCode texSource
-top ::= L0_unicorn TOP_CCode
+top ::= TOP_CCode
 top ::= TOP_Tex_Source
 top ::= L0_unicorn TOP_C_CharacterConstant
 top ::= L0_unicorn TOP_C_StringLiteral
@@ -83,6 +83,7 @@ C_element ::= BRICK_C_Token
 C_element ::= BRICK_C_WhiteSpace
 C_element ::= BRICK_C_CharacterConstant
 C_element ::= BRICK_C_StringLiteral
+C_element ::= BRICK_C_DivideOp
 C_element ::= ERROR_C_StrayCommentOpen
 C_element ::= ERROR_C_StraySingleQuote
 C_element ::= ERROR_C_StrayDoubleQuote
@@ -92,6 +93,7 @@ BRICK_C_Token ::= L0_C_Token
 BRICK_C_WhiteSpace ::= L0_C_WhiteSpace
 BRICK_C_CharacterConstant ::= L0_C_CharacterConstant
 BRICK_C_StringLiteral ::= L0_C_StringLiteral
+BRICK_C_DivideOp ::= L0_C_DivideOp
 
 ERROR_C_StrayCommentOpen ::= L0_C_StrayCommentOpen
 ERROR_C_StraySingleQuote ::= L0_C_StraySingleQuote
@@ -112,6 +114,7 @@ L0_C_StrayDoubleQuote ~ unicorn
 L0_C_Comment ~ unicorn
 L0_C_CharacterConstant ~ unicorn
 L0_C_StringLiteral ~ unicorn
+L0_C_DivideOp ~ unicorn
 
 L0_i_C_CharacterConstant ~ C_characterConstant
 L0_i_C_StringLiteral ~ C_stringLiteral
@@ -217,7 +220,7 @@ sub lexer {
                 # Find a Tex lexeme
                 # L0_Tex_CodeBlock ~ texCodeBegin anything newLine texCodeEnd
                 if ( $expected{L0_Tex_CodeBlock}
-                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E .*? \Q$texCodeEnd\E )/xms )
+                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E .*? \Q$texCodeEnd\E )/gcxms )
                 {
 		    my @values = ();
                     my $match   = $1;
@@ -281,7 +284,7 @@ sub lexer {
 
 		# Check for stray '\begin{code}' lines
                 if ( $expected{L0_Tex_StrayOpenCodeBlock}
-                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E )/xms )
+                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E )/gcxms )
                 {
 		    my @values = ();
                     my $match   = $1;
@@ -318,12 +321,139 @@ sub lexer {
                     last TEX_LEXEME;
                 }
 
-                if ( $expected{L0_Tex_Line} and ${$inputRef} =~ m/\G([^\n]*\n)/xms )
+                if ( $expected{L0_Tex_Line} and ${$inputRef} =~ m/\G([^\n]*\n)/gcxms )
                 {
                     my $match = $1;
                     $recce->lexeme_alternative( 'L0_Tex_Line', $match,
                         length $match );
                     last TEX_LEXEME;
+                }
+            }
+          C_LEXEME: {
+
+                # Find a C lexeme
+                if ( $expected{L0_C_Comment}
+                    and ${$inputRef} =~ m{\G ( [/][*] .*? [*][/] )}gcxms )
+                {
+		    my @values = ();
+                    my $match   = $1;
+                    my $eoMatch = $thisPos + (length $match) - 1;
+                    my ( $line1, $column1, $line2, $column2 );
+                    ( $line1, $column1 ) =
+                      $recce->line_column( $blockID, $thisPos );
+                    ( $line2, $column2 ) =
+                      $recce->line_column( $blockID, $eoMatch );
+                    push @values,
+                      [
+                        'BRICK',                     $thisPos,
+                        ( $eoMatch + 1 ) - $thisPos, join '',
+                        'L',                         $line1,
+                        'c',                         $column1,
+                        '-',                         'L',
+                        $line2,                      'c',
+                        $column2,                    ' ',
+			substr($match, 0, 10)
+                      ];
+
+                    # Skip ahead to after next newline.
+                    # Sometime check standards to see it this is OK, but
+                    # for now it is convenient for testing.
+                    my $endPos = index( ${$inputRef}, "\n", $eoMatch ) + 1;
+                    $recce->lexeme_alternative( 'L0_C_Comment', \@values,
+                        $endPos - $thisPos );
+                    last C_LEXEME;
+                }
+
+		# Check for unclosed C comments
+                if ( $expected{L0_C_StrayCommentOpen}
+                    and ${$inputRef} =~ m{\G ( [/][*] )}gcxms )
+                {
+		    my @values = ();
+                    my $match   = $1;
+                    my $eoMatch = $thisPos + (length $match) - 1;
+                    my $nextNL = index( ${$inputRef}, "\n", $eoMatch );
+                    my ( $line1, $column1, $line2, $column2 );
+                    ( $line1, $column1 ) =
+                      $recce->line_column( $blockID, $thisPos );
+                    ( $line2, $column2 ) =
+                      $recce->line_column( $blockID, $nextNL );
+                    push @values,
+                      [
+                        'BRICK',                     $thisPos,
+                        ( $nextNL + 1 ) - $thisPos, join '',
+                        'L',                         $line1,
+                        'c',                         $column1,
+                        '-',                         'L',
+                        $line2,                      'c',
+                        $column2,                    ' stray "/*"'
+                      ];
+
+                    # Skip ahead to after next newline.
+                    # Sometime check standards to see it this is OK, but
+                    # for now it is convenient for testing.
+                    my $endPos = $nextNL + 1;
+                    $recce->lexeme_alternative( 'L0_C_StrayCommentOpen',
+                        \@values, $endPos - $thisPos );
+		    # Once we've seen an unclosed comment, we can never see a valid
+		    # C comment.  Every stray open causes a scan to the end of input,
+		    # which can make a parse go quadratic.  Therefore
+		    # we disable C comments -- from now on, we will only look
+		    # for strays.
+		    $disabled{L0_C_Comment} = 1;
+                    last C_LEXEME;
+                }
+
+		# For now, an absurdly liberal idea of what a token is -- any
+		# non-whitespace sequence without quotes or slashes.  Quotes
+		# and slashes are taken care of above
+                if ( $expected{L0_C_DivideOp} and ${$inputRef} =~ m{\G([/])}gcxms )
+                {
+                    my $match = $1;
+                    $recce->lexeme_alternative( 'L0_C_DivideOp', $match,
+                        length $match );
+                    last C_LEXEME;
+                }
+
+		# For now, an absurdly liberal idea of what a token is -- any
+		# non-whitespace sequence without quotes or slashes.  Quotes
+		# and slashes are taken care of above
+                if ( $expected{L0_C_StrayDoubleQuote} and ${$inputRef} =~ m/\G(["])/gcxms )
+                {
+                    my $match = $1;
+                    $recce->lexeme_alternative( 'L0_C_StrayDoubleQuote', $match,
+                        length $match );
+                    last C_LEXEME;
+                }
+
+		# For now, an absurdly liberal idea of what a token is -- any
+		# non-whitespace sequence without quotes or slashes.  Quotes
+		# and slashes are taken care of above
+                if ( $expected{L0_C_StraySingleQuote} and ${$inputRef} =~ m/\G(['])/gcxms )
+                {
+                    my $match = $1;
+                    $recce->lexeme_alternative( 'L0_C_StraySingleQuote', $match,
+                        length $match );
+                    last C_LEXEME;
+                }
+
+		# For now, an absurdly liberal idea of what a token is -- any
+		# non-whitespace sequence without quotes or slashes.  Quotes
+		# and slashes are taken care of above
+                if ( $expected{L0_C_Token} and ${$inputRef} =~ m{\G([^\s'"/]+)}gcxms )
+                {
+                    my $match = $1;
+                    $recce->lexeme_alternative( 'L0_C_Token', $match,
+                        length $match );
+                    last C_LEXEME;
+                }
+
+		# Whitespace
+                if ( $expected{L0_C_WhiteSpace} and ${$inputRef} =~ m/\G([\s]+)/gcxms )
+                {
+                    my $match = $1;
+                    $recce->lexeme_alternative( 'L0_C_WhiteSpace', $match,
+                        length $match );
+                    last C_LEXEME;
                 }
             }
         }
