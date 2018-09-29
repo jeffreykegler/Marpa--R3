@@ -137,10 +137,10 @@ L0_CWhiteSpace ~ [\s]+
 texCodeBegin ~ '\begin{code}'
 texCodeEnd ~ '\end{code}'
 
-:lexeme ~ L0_texCodeBlock priority => 1 eager => 1 event => properBlock pause => before
+:lexeme ~ L0_texCodeBlock
 L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
 
-:lexeme ~ L0_texCodeOpenBlock priority => 0 event => openBlock pause => before
+:lexeme ~ L0_texCodeOpenBlock
 L0_texCodeOpenBlock ~ texCodeOpenBlock
 texCodeOpenBlock ~ texCodeBegin anything
 
@@ -194,21 +194,31 @@ END_OF_TOP_DSL
 my $topGrammar =
   Marpa::R3::Grammar->new( { source => \$dsl, rejection => 'event', } );
 
-my $CCodeGrammar = do {
-    my $CCodeDSL =
-      join "\n",
-      ':start ::= TOP_CCode',
-      'inaccessible is ok by default',
-      $dsl,
-      ;
+my %grammar = ();
 
-    Marpa::R3::Grammar->new(
-        {
-            source    => \$CCodeDSL,
-            rejection => 'event',
-        }
-    );
-};
+for my $top (qw(TOP_CCode)) {
+    $grammar{$top} = do {
+        my $CCodeDSL =
+          join "\n",
+          ':start ::= ' . $top,
+          'inaccessible is ok by default',
+          $dsl,
+          ;
+
+        Marpa::R3::Grammar->new(
+            {
+                source    => \$CCodeDSL,
+                rejection => 'event',
+            }
+        );
+    };
+}
+
+my @lexemes = (
+    # [ Number   => qr/\d+/xms,  "Number" ],
+    # [ 'op pow' => qr/[\^]/xms, 'Exponentiation operator' ],
+    # [ 'op divide'   => qr/[\/]/xms, 'Division operator' ],
+);
 
 local $main::DEBUG = 0;
 
@@ -219,83 +229,11 @@ sub parse {
 
     my @values = ();
     my $thisPos;
-    my $handlerPos;
-
-    my $properBlockHandler = sub {
-
-        my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
-        my $eoCodeBlock = $offset + $length;
-        my $firstNL     = index( ${$inputRef}, "\n", $offset );
-        my $lastNL      = rindex( ${$inputRef}, "\n", $eoCodeBlock-1 );
-
-        my ( $line1, $column1, $line2, $column2 );
-        ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
-        ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
-        push @values, ['BRICK', $offset, ($firstNL+1)-$offset, join '',
-          'L', $line1, 'c', $column1,
-          '-', 'L', $line2, 'c', $column2,
-          ' \begin{code}'];
-
-	my $Ccode = substr(${$inputRef}, $firstNL + 1, $lastNL - $firstNL);
-	my ($subParseValues, $nextPos) = subParse($CCodeGrammar, 'C code', \$Ccode);
-	push @values, $subParseValues;
-        # ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
-        # ( $line2, $column2 ) = $recce->line_column( $blockID, $lastNL );
-        # push @values, ['BRICK', $firstNL+1, $lastNL-$firstNL, join '',
-          # 'L', $line1, 'c', $column1,
-          # '-', 'L', $line2, 'c', $column2,
-          # ' [CODE]'];
-
-        ( $line1, $column1 ) = $recce->line_column( $blockID, $lastNL + 1 );
-        ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
-        push @values, ['BRICK', $lastNL+1, $eoCodeBlock-$lastNL, join '',
-          'L', $line1, 'c', $column1,
-          '-', 'L', $line2, 'c', $column2,
-          ' \end{code}'];
-
-	# Skip ahead to after next newline.
-	# Sometime check standards to see it this is OK, but
-	# for now it is convenient for testing.
-        $handlerPos = index(${$inputRef}, "\n", $eoCodeBlock) + 1;
-	$recce->lexeme_alternative('L0_texCodeOpenBlock', \@values, $handlerPos - $offset);
-        'pause';
-    };
-
-    my $openBlockHandler = sub () {
-
-        my ( $recce, $name, $symbolID, $blockID, $offset, $length ) = @_;
-        my $eoCodeBlock = $offset + $length;
-        my $firstNL = index( ${$inputRef}, "\n", $offset );
-
-        my @values = ();
-        my ( $line1, $column1, $line2, $column2 );
-        ( $line1, $column1 ) = $recce->line_column( $blockID, $offset );
-        ( $line2, $column2 ) = $recce->line_column( $blockID, $firstNL );
-        push @values, ['BRICK', $offset, ($firstNL+1)-$offset, join '',
-          'L', $line1, 'c', $column1,
-          '-', 'L', $line2, 'c', $column2,
-          ' \begin{code}'];
-
-        ( $line1, $column1 ) = $recce->line_column( $blockID, $firstNL + 1 );
-        ( $line2, $column2 ) = $recce->line_column( $blockID, $eoCodeBlock );
-        push @values, ['BRICK', $firstNL+1, $eoCodeBlock-$firstNL, join '',
-          'L', $line1, 'c', $column1,
-          '-', 'L', $line2, 'c', $column2,
-          ' [CODE]'];
-
-        $handlerPos = $eoCodeBlock;
-
-	$recce->lexeme_alternative('L0_texCodeBlock', \@values, $handlerPos - $offset);
-        'pause';
-    };
 
     my $recce = Marpa::R3::Recognizer->new(
         {
             grammar   => $topGrammar,
-	    # event_is_active => { 'indent' => $indent_is_active },
 	    event_handlers => {
-		properBlock => $properBlockHandler,
-		openBlock => $openBlockHandler,
 		q{'rejected} => sub () {
 		  my ($recce) = @_;
 		  my $expected = $recce->terminals_expected();
@@ -310,26 +248,38 @@ sub parse {
     );
 
     my $inputLength = length ${$inputRef};
-    $thisPos = $recce->read($inputRef);
+    $thisPos = $recce->read( $inputRef, 0, 0 );
+
     # say STDERR join ' ', __LINE__, "inputLength=$inputLength";
     # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
-    READ_LOOP: while ( 1 ) {
-	my $resumePos = $thisPos;
-	if ( defined $handlerPos ) {
-	  my $closest_earleme = $recce->closest_earleme();
-	  # say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
-	  # say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
-	  # say STDERR join ' ', __LINE__, 'lexeme_complete(', $thisPos, $closest_earleme - $thisPos, ')';
-	  $recce->lexeme_complete( undef, $thisPos, $closest_earleme - $thisPos);
-	  $resumePos = $handlerPos;
-	  $handlerPos = undef;
-	}
-	last READ_LOOP if $resumePos >= $inputLength;
-	# say STDERR join ' ', __LINE__, "resuming at $resumePos";
-        $thisPos = $recce->resume($resumePos);
-	# say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
-	# say STDERR join ' ', __LINE__, "thisPos=$thisPos";
+  COMPLETION: while ( $thisPos < $inputLength ) {
+      ALTERNATIVE: for my $lexeme (@lexemes) {
+            my ( $symbol_name, $method, $long_name ) = @{$lexeme};
+            if ( ref $method eq 'Regexp' ) {
+                pos ${$inputRef} = $thisPos;
+                next ALTERNATIVE if not ${$inputRef} =~ m/\G($method)/gcxms;
+                my $match = $1;
+                $recce->lexeme_alternative( $symbol_name, $match,
+                    length $match );
+                next ALTERNATIVE;
+            }
+            my ( $values, $nextPos ) = subParse( $inputRef, $method );
+            $recce->lexeme_alternative( $method, $values, $nextPos - $thisPos );
+        }
+        my $closest_earleme = $recce->closest_earleme();
+
+# say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
+# say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
+# say STDERR join ' ', __LINE__, 'lexeme_complete(', $thisPos, $closest_earleme - $thisPos, ')';
+
+        $thisPos =
+          $recce->lexeme_complete( undef, $thisPos,
+            $closest_earleme - $thisPos );
+
+        # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
+        # say STDERR join ' ', __LINE__, "thisPos=$thisPos";
     }
+
     # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 
     if ($main::TRACE_ES) {
