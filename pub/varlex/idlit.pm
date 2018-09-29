@@ -221,32 +221,12 @@ local $main::DEBUG = 0;
 
 # This is the top level parse routine.
 
-sub parse {
-    my ($inputRef) = @_;
-
-    my @values = ();
-    my $thisPos;
-
-    my $recce = Marpa::R3::Recognizer->new(
-        {
-            grammar   => $topGrammar,
-	    event_handlers => {
-		q{'rejected} => sub () {
-		  my ($recce) = @_;
-		  my $expected = $recce->terminals_expected();
-		  return divergence(
-		      "All tokens rejected, expecting ",
-		      ( join " ", @{$expected} )
-		  );
-		}
-	    },
-            trace_terminals => ($main::DEBUG ? 99 : 0),
-        }
-    );
-
-    my $inputLength = length ${$inputRef};
+sub lexer {
+    my ($recce, $inputRef) = @_;
     my %disabled = ();
-    $thisPos = $recce->read( $inputRef, 0, 0 );
+    my $inputLength = length ${$inputRef};
+
+    my $thisPos = $recce->read( $inputRef, 0, 0 );
     my ($blockID) = $recce->block_progress();
 
     # say STDERR join ' ', __LINE__, "inputLength=$inputLength";
@@ -264,6 +244,7 @@ sub parse {
                 if ( $expected{L0_texCodeBlock}
                     and ${$inputRef} =~ m/\G ( $texCodeBegin .*? $texCodeEnd )/xms )
                 {
+		    my @values = ();
                     my $match   = $1;
                     my $eoMatch = $thisPos + length $match - 1;
                     my $firstNL = index( ${$inputRef}, "\n", $thisPos );
@@ -357,6 +338,33 @@ sub parse {
     }
 
     # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
+}
+
+sub parse {
+    my ($inputRef) = @_;
+
+    my @values = ();
+    my $thisPos;
+
+    my $recce = Marpa::R3::Recognizer->new(
+        {
+            grammar   => $topGrammar,
+	    event_handlers => {
+		q{'rejected} => sub () {
+		  my ($recce) = @_;
+		  my $expected = $recce->terminals_expected();
+		  return divergence(
+		      "All tokens rejected, expecting ",
+		      ( join " ", @{$expected} )
+		  );
+		}
+	    },
+            trace_terminals => ($main::DEBUG ? 99 : 0),
+        }
+    );
+
+
+    lexer($recce, $inputRef);
 
     if ($main::TRACE_ES) {
         say STDERR qq{Returning from top level parser};
