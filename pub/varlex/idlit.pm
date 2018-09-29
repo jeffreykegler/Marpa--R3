@@ -186,6 +186,9 @@ C_sChar ~ [^"\\\n] # C std N1256 6.4.5
 
 END_OF_TOP_DSL
 
+my $texCodeBegin = '\\begin{code}';
+my $texCodeEnd = '\\end{code}';
+
 # ===== Part 3: Wrappers and handlers =====
 
 # The following logic pre-generates all the grammars we
@@ -213,12 +216,6 @@ for my $top (qw(TOP_CCode)) {
         );
     };
 }
-
-my @lexemes = (
-    # [ Number   => qr/\d+/xms,  "Number" ],
-    # [ 'op pow' => qr/[\^]/xms, 'Exponentiation operator' ],
-    # [ 'op divide'   => qr/[\/]/xms, 'Division operator' ],
-);
 
 local $main::DEBUG = 0;
 
@@ -248,23 +245,102 @@ sub parse {
     );
 
     my $inputLength = length ${$inputRef};
+    my %disabled = ();
     $thisPos = $recce->read( $inputRef, 0, 0 );
+    my ($blockID) = $recce->block_progress();
 
     # say STDERR join ' ', __LINE__, "inputLength=$inputLength";
     # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
   COMPLETION: while ( $thisPos < $inputLength ) {
-      ALTERNATIVE: for my $lexeme (@lexemes) {
-            my ( $symbol_name, $method, $long_name ) = @{$lexeme};
-            if ( ref $method eq 'Regexp' ) {
-                pos ${$inputRef} = $thisPos;
-                next ALTERNATIVE if not ${$inputRef} =~ m/\G($method)/gcxms;
-                my $match = $1;
-                $recce->lexeme_alternative( $symbol_name, $match,
-                    length $match );
-                next ALTERNATIVE;
+        my %expected =
+          map { +( $_, 1 ) }
+          grep { not defined $disabled{$_} } @{ $recce->terminals_expected() };
+	 pos ${$inputRef} = $thisPos;
+      ALTERNATIVE: {
+          TEX_LEXEME: {
+
+                # Find a Tex lexeme
+                # L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
+                if ( $expected{L0_texCodeBlock}
+                    and ${$inputRef} =~ m/\G ( $texCodeBegin .*? $texCodeEnd )/xms )
+                {
+                    my $match   = $1;
+                    my $eoMatch = $thisPos + length $match - 1;
+                    my $firstNL = index( ${$inputRef}, "\n", $thisPos );
+                    my $lastNL  = rindex( ${$inputRef}, "\n", $eoMatch - 1 );
+                    my ( $line1, $column1, $line2, $column2 );
+                    ( $line1, $column1 ) =
+                      $recce->line_column( $blockID, $thisPos );
+                    ( $line2, $column2 ) =
+                      $recce->line_column( $blockID, $firstNL );
+                    push @values,
+                      [
+                        'BRICK',                     $thisPos,
+                        ( $firstNL + 1 ) - $thisPos, join '',
+                        'L',                         $line1,
+                        'c',                         $column1,
+                        '-',                         'L',
+                        $line2,                      'c',
+                        $column2,                    ' \begin{code}'
+                      ];
+
+                    ( $line1, $column1 ) =
+                      $recce->line_column( $blockID, $firstNL + 1 );
+                    ( $line2, $column2 ) =
+                      $recce->line_column( $blockID, $lastNL );
+                    push @values,
+                      [
+                        'BRICK',            $firstNL + 1,
+                        $lastNL - $firstNL, join '',
+                        'L',                $line1,
+                        'c',                $column1,
+                        '-',                'L',
+                        $line2,             'c',
+                        $column2,           ' [CODE]'
+                      ];
+
+                    ( $line1, $column1 ) =
+                      $recce->line_column( $blockID, $lastNL + 1 );
+                    ( $line2, $column2 ) =
+                      $recce->line_column( $blockID, $eoMatch );
+                    push @values,
+                      [
+                        'BRICK',            $lastNL + 1,
+                        $eoMatch - $lastNL, join '',
+                        'L',                $line1,
+                        'c',                $column1,
+                        '-',                'L',
+                        $line2,             'c',
+                        $column2,           ' \end{code}'
+                      ];
+
+                    # Skip ahead to after next newline.
+                    # Sometime check standards to see it this is OK, but
+                    # for now it is convenient for testing.
+                    my $endPos = index( ${$inputRef}, "\n", $eoMatch ) + 1;
+                    $recce->lexeme_alternative( 'L0_texCodeBlock', \@values,
+                        $endPos - $thisPos );
+                    last TEX_LEXEME;
+                }
+                if ( $expected{L0_texLine} and ${$inputRef} =~ m/\G([^\n]*\n)/xms )
+                {
+                    my $match = $1;
+                    $recce->lexeme_alternative( 'L0_texLine', $match,
+                        length $match );
+                    last TEX_LEXEME;
+                }
             }
-            my ( $values, $nextPos ) = subParse( $inputRef, $method );
-            $recce->lexeme_alternative( $method, $values, $nextPos - $thisPos );
+
+            # L0_CComment ~ '/*' C_commentInterior '/'
+            # L0_CUnclosedComment ~ '/*' C_commentInterior
+            # L0_CCharacterConstant ~ C_characterConstant
+            # L0_CUnclosedCharacterConstant ~ C_unclosedCharacterConstant
+            # L0_CStringLiteral ~ C_stringLiteral
+            # L0_CUnclosedStringLiteral ~ C_unclosedStringLiteral
+            # L0_CToken ~ C_ordinaryTokenChar+
+            # L0_CWhiteSpace ~ [\s]+
+            # L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
+            # L0_texCodeOpenBlock ~ texCodeOpenBlock
         }
         my $closest_earleme = $recce->closest_earleme();
 
@@ -283,23 +359,24 @@ sub parse {
     # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 
     if ($main::TRACE_ES) {
-      say STDERR qq{Returning from top level parser};
-      my $latest_es = $recce->g1_pos();
-      for my $es (0 .. $latest_es) {
-	say STDERR "ES = ", $es;
-	if ($main::TRACE_ES >= 2) {
-	    # These calls are undocumented, and should not be
-	    # called in the test suite.
-	    say STDERR "Size of ES $es is ", $recce->earley_set_size($es);
-	}
-	say STDERR $recce->progress_show($es);
-      }
+        say STDERR qq{Returning from top level parser};
+        my $latest_es = $recce->g1_pos();
+        for my $es ( 0 .. $latest_es ) {
+            say STDERR "ES = ", $es;
+            if ( $main::TRACE_ES >= 2 ) {
+
+                # These calls are undocumented, and should not be
+                # called in the test suite.
+                say STDERR "Size of ES $es is ", $recce->earley_set_size($es);
+            }
+            say STDERR $recce->progress_show($es);
+        }
     }
 
     # Return value and new offset
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
-	say STDERR $recce->progress_show(0, -1);
+    say STDERR $recce->progress_show( 0, -1 );
     my $valueRef;
     my @results = ();
   VALUE: while (1) {
@@ -307,8 +384,9 @@ sub parse {
         last VALUE if not $valueRef;
         say STDERR Data::Dumper::Dumper($valueRef);
         push @results, '=== Value ===';
-        push @results, showBricks($recce, $valueRef);
+        push @results, showBricks( $recce, $valueRef );
     }
+
     # say Data::Dumper::Dumper($value_ref);
     return join "\n", @results, '';
 
