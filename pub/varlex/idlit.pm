@@ -248,7 +248,7 @@ sub lexer {
                 {
 		    my @values = ();
                     my $match   = $1;
-                    my $eoMatch = $thisPos + length $match - 1;
+                    my $eoMatch = $thisPos + (length $match) - 1;
                     my $firstNL = index( ${$inputRef}, "\n", $thisPos );
                     my $lastNL  = rindex( ${$inputRef}, "\n", $eoMatch - 1 );
                     my ( $line1, $column1, $line2, $column2 );
