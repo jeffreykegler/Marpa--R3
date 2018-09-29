@@ -56,17 +56,24 @@ my $dsl = <<'END_OF_TOP_DSL';
 :default ::= action => [name,start,length,values]
 
 # top ::= perlCode luaCode CCode texSource
-top ::= TOP_CCode
+top ::= L0_unicorn TOP_CCode
 top ::= TOP_texSource
+top ::= L0_unicorn TOP_CComment
+top ::= L0_unicorn TOP_CCharacterConstant
+top ::= L0_unicorn TOP_CStringLiteral
+
+TOP_CComment ::= L0_CComment
+TOP_CCharacterConstant ::= L0_CCharacterConstant
+TOP_CStringLiteral ::= L0_CStringLiteral
 
 TOP_texSource ::= texBody
 texBody ::= texBodyElement*
 texBodyElement ::= BRICK_texLine
 BRICK_texLine ::= L0_texLine
 texBodyElement ::= L0_texCodeBlock
-texBodyElement ::= L0_texCodeOpenBlock
+texBodyElement ::= L0_texStrayOpenCodeBlock
 
-:lexeme ~ L0_texLine priority => 0
+:lexeme ~ L0_texLine
 L0_texLine ~ nonNewLines newLine
 nonNewLines ~ nonNewLine*
 nonNewLine ~ [^\n]
@@ -92,11 +99,11 @@ ERROR_C_Comment ::= L0_CUnclosedComment
 ERROR_C_CharacterConstant ::= L0_CUnclosedCharacterConstant
 ERROR_C_StringLiteral ::= L0_CUnclosedStringLiteral
 
-# :lexeme ~ L0_unicorn
-# L0_unicorn ~ unicorn
-# unicorn ~ [^\d\D]
-anything ~ anyChar*
-anyChar ~ [\d\D]
+:lexeme ~ L0_unicorn
+L0_unicorn ~ unicorn
+unicorn ~ [^\d\D]
+# anything ~ anyChar*
+# anyChar ~ [\d\D]
 singleQuote ~ [']
 doubleQuote ~ ["]
 backslash ~ '\'
@@ -113,7 +120,7 @@ interiorStarSegments ~ interiorStarSegment*
 interiorStarSegment ~ nonStars stars1
 
 :lexeme ~ L0_CUnclosedComment
-L0_CUnclosedComment ~ '/*' C_commentInterior
+L0_CUnclosedComment ~ unicorn
 
 :lexeme ~ L0_CCharacterConstant
 L0_CCharacterConstant ~ C_characterConstant
@@ -134,15 +141,11 @@ C_ordinaryTokenChar ~ [^\s'"]
 :lexeme ~ L0_CWhiteSpace
 L0_CWhiteSpace ~ [\s]+
 
-texCodeBegin ~ '\begin{code}'
-texCodeEnd ~ '\end{code}'
-
 :lexeme ~ L0_texCodeBlock
-L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
+L0_texCodeBlock ~ unicorn
 
-:lexeme ~ L0_texCodeOpenBlock
-L0_texCodeOpenBlock ~ texCodeOpenBlock
-texCodeOpenBlock ~ texCodeBegin anything
+:lexeme ~ L0_texStrayOpenCodeBlock
+L0_texStrayOpenCodeBlock ~ unicorn
 
 # most of this untested as of Fri Sep 28 17:22:36 EDT 2018
 C_universalCharacterName ~ '\' [uU] C_hexQuad C_hexQuad
@@ -151,7 +154,6 @@ C_hexQuad ~ C_hexDigit C_hexDigit C_hexDigit C_hexDigit
 C_hexdigits1 ~ C_hexDigit+
 C_hexDigit ~ [0-9a-fA-F]
 
-C_unclosedCharacterConstant ~ singleQuote C_cCharSequence1
 C_characterConstant ~ singleQuote C_cCharSequence1 singleQuote
 C_cCharSequence1 ~ C_cChar+
 C_cChar ~ C_universalCharacterName
@@ -242,7 +244,7 @@ sub lexer {
                 # Find a Tex lexeme
                 # L0_texCodeBlock ~ texCodeBegin anything newLine texCodeEnd
                 if ( $expected{L0_texCodeBlock}
-                    and ${$inputRef} =~ m/\G ( $texCodeBegin .*? $texCodeEnd )/xms )
+                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E .*? \Q$texCodeEnd\E )/xms )
                 {
 		    my @values = ();
                     my $match   = $1;
