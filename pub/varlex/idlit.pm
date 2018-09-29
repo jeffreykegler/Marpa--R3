@@ -66,8 +66,7 @@ TOP_C_StringLiteral ::= L0_i_C_StringLiteral
 
 TOP_Tex_Source ::= texBody
 texBody ::= texBodyElement*
-texBodyElement ::= BRICK_Tex_Line
-BRICK_Tex_Line ::= L0_Tex_Line
+texBodyElement ::= L0_Tex_Line
 texBodyElement ::= L0_Tex_CodeBlock
 texBodyElement ::= L0_Tex_StrayOpenCodeBlock
 
@@ -78,22 +77,18 @@ nonNewLine ~ [^\n]
 newLine ~ [\n]
 
 TOP_CCode ::= C_element*
-C_element ::= BRICK_C_Comment
-C_element ::= BRICK_C_Token
-C_element ::= BRICK_C_WhiteSpace
+C_element ::= L0_C_Comment
+C_element ::= L0_C_Token
+C_element ::= L0_C_WhiteSpace
 C_element ::= BRICK_C_CharacterConstant
 C_element ::= BRICK_C_StringLiteral
-C_element ::= BRICK_C_DivideOp
+C_element ::= L0_C_DivideOp
 C_element ::= ERROR_C_StrayCommentOpen
 C_element ::= ERROR_C_StraySingleQuote
 C_element ::= ERROR_C_StrayDoubleQuote
 
-BRICK_C_Comment ::= L0_C_Comment
-BRICK_C_Token ::= L0_C_Token
-BRICK_C_WhiteSpace ::= L0_C_WhiteSpace
 BRICK_C_CharacterConstant ::= L0_C_CharacterConstant
 BRICK_C_StringLiteral ::= L0_C_StringLiteral
-BRICK_C_DivideOp ::= L0_C_DivideOp
 
 ERROR_C_StrayCommentOpen ::= L0_C_StrayCommentOpen
 ERROR_C_StraySingleQuote ::= L0_C_StraySingleQuote
@@ -197,7 +192,19 @@ for my $top (qw(TOP_CCode)) {
 
 local $main::DEBUG = 0;
 
-# This is the top level parse routine.
+
+sub brick_node {
+    my ( $recce, $name, $desc, $first, $last ) = @_;
+    my ($blockID) = $recce->block_progress();
+    my ( $line1, $column1, $line2, $column2 );
+    ( $line1, $column1 ) = $recce->line_column( $blockID, $first );
+    ( $line2, $column2 ) = $recce->line_column( $blockID, $last );
+    return [
+        $name, $first, ( $last + 1 ) - $first,
+        join '', 'L', $line1, 'c', $column1, '-', 'L', $line2, 'c',
+        $column2, ' ', $desc
+    ];
+}
 
 sub lexer {
     my ($recce, $inputRef) = @_;
@@ -233,46 +240,14 @@ sub lexer {
                     ( $line2, $column2 ) =
                       $recce->line_column( $blockID, $firstNL );
                     push @values,
-                      [
-                        'BRICK',                     $thisPos,
-                        ( $firstNL + 1 ) - $thisPos, join '',
-                        'L',                         $line1,
-                        'c',                         $column1,
-                        '-',                         'L',
-                        $line2,                      'c',
-                        $column2,                    ' \begin{code}'
-                      ];
-
-                    ( $line1, $column1 ) =
-                      $recce->line_column( $blockID, $firstNL + 1 );
-                    ( $line2, $column2 ) =
-                      $recce->line_column( $blockID, $lastNL );
+                      brick_node( $recce, 'BRICK', '\begin{code}', $thisPos,
+                        $firstNL );
                     push @values,
-                      [
-                        'BRICK',            $firstNL + 1,
-                        $lastNL - $firstNL, join '',
-                        'L',                $line1,
-                        'c',                $column1,
-                        '-',                'L',
-                        $line2,             'c',
-                        $column2,           ' [CODE]'
-                      ];
-
-                    ( $line1, $column1 ) =
-                      $recce->line_column( $blockID, $lastNL + 1 );
-                    ( $line2, $column2 ) =
-                      $recce->line_column( $blockID, $eoMatch );
+                      brick_node( $recce, 'BRICK', '[CODE]', $firstNL+1,
+                        $lastNL );
                     push @values,
-                      [
-                        'BRICK',            $lastNL + 1,
-                        $eoMatch - $lastNL, join '',
-                        'L',                $line1,
-                        'c',                $column1,
-                        '-',                'L',
-                        $line2,             'c',
-                        $column2,           ' \end{code}'
-                      ];
-
+                      brick_node( $recce, 'BRICK', '\end{code}', $lastNL+1,
+                        $eoMatch );
                     # Skip ahead to after next newline.
                     # Sometime check standards to see it this is OK, but
                     # for now it is convenient for testing.
@@ -324,8 +299,11 @@ sub lexer {
                 if ( $expected{L0_Tex_Line} and ${$inputRef} =~ m/\G([^\n]*\n)/gcxms )
                 {
                     my $match = $1;
-                    $recce->lexeme_alternative( 'L0_Tex_Line', $match,
-                        length $match );
+		    my $length = length $match;
+                    my $value =
+                      brick_node( $recce, 'BRICK', 'Tex line: "' . $match . '"',
+                        $thisPos, $thisPos + $length - 1 );
+                    $recce->lexeme_alternative( 'L0_Tex_Line', $value, $length );
                     last TEX_LEXEME;
                 }
             }
@@ -337,30 +315,14 @@ sub lexer {
                 {
 		    my @values = ();
                     my $match   = $1;
-                    my $eoMatch = $thisPos + (length $match) - 1;
-                    my ( $line1, $column1, $line2, $column2 );
-                    ( $line1, $column1 ) =
-                      $recce->line_column( $blockID, $thisPos );
-                    ( $line2, $column2 ) =
-                      $recce->line_column( $blockID, $eoMatch );
+		    my $length = length $match;
+                    my $eoMatch = $thisPos + $length - 1;
                     push @values,
-                      [
-                        'BRICK_C',                     $thisPos,
-                        ( $eoMatch + 1 ) - $thisPos, join '',
-                        'L',                         $line1,
-                        'c',                         $column1,
-                        '-',                         'L',
-                        $line2,                      'c',
-                        $column2,                    ' ',
-			substr($match, 0, 10)
-                      ];
+		      brick_node($recce, 'BRICK',
+			'comment: "' . substr($match, 0) . '"',
+			$thisPos, $eoMatch);
 
-                    # Skip ahead to after next newline.
-                    # Sometime check standards to see it this is OK, but
-                    # for now it is convenient for testing.
-                    my $endPos = index( ${$inputRef}, "\n", $eoMatch ) + 1;
-                    $recce->lexeme_alternative( 'L0_C_Comment', \@values,
-                        $endPos - $thisPos );
+                    $recce->lexeme_alternative( 'L0_C_Comment', \@values, $length);
                     last C_LEXEME;
                 }
 
@@ -409,7 +371,9 @@ sub lexer {
                 if ( $expected{L0_C_DivideOp} and ${$inputRef} =~ m{\G([/])}gcxms )
                 {
                     my $match = $1;
-                    $recce->lexeme_alternative( 'L0_C_DivideOp', $match,
+		    my $value = brick_node($recce, 'BRICK', $match, $thisPos, 
+		       $thisPos + (length $match) - 1);
+                    $recce->lexeme_alternative( 'L0_C_DivideOp', [$value],
                         length $match );
                     last C_LEXEME;
                 }
@@ -442,17 +406,29 @@ sub lexer {
                 if ( $expected{L0_C_Token} and ${$inputRef} =~ m{\G([^\s'"/]+)}gcxms )
                 {
                     my $match = $1;
-                    $recce->lexeme_alternative( 'L0_C_Token', $match,
-                        length $match );
+                    my $length = length $match;
+                    my $value = brick_node( $recce, 'BRICK',
+                        (
+                            join '', 'token="', substr( $match, 0, 10 ),
+                            '"; ', "length=$length"
+                        ),
+                        $thisPos,
+                        $thisPos + $length - 1
+                    );
+                    $recce->lexeme_alternative( 'L0_C_Token', $value, $length );
                     last C_LEXEME;
                 }
 
 		# Whitespace
                 if ( $expected{L0_C_WhiteSpace} and ${$inputRef} =~ m/\G([\s]+)/gcxms )
                 {
-                    my $match = $1;
-                    $recce->lexeme_alternative( 'L0_C_WhiteSpace', $match,
-                        length $match );
+                    my $match  = $1;
+                    my $length = length $match;
+                    my $value =
+                      brick_node( $recce, 'BRICK', "white space, length=$length", $thisPos,
+                        $thisPos + $length - 1 );
+                    $recce->lexeme_alternative( 'L0_C_WhiteSpace', $value,
+                        $length );
                     last C_LEXEME;
                 }
             }
@@ -474,6 +450,7 @@ sub lexer {
     # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 }
 
+# This is the top level parse routine.
 sub parse {
     my ($inputRef) = @_;
 
@@ -567,13 +544,6 @@ sub showBricks {
       ( $line2, $column2 ) = $recce->line_column( $blockID, $start+$length-1 );
       my $desc;
       FIND_DESC: {
-	if ($id eq 'BRICK_Tex_Line') {
-	    # say "start line=$line1, column=$column1";
-	    # say Data::Dumper::Dumper($brick);
-	    $tag =~ s/\n.*//;
-	    $desc = ' texLine ' . $tag;
-	    last FIND_DESC;
-	}
 	if ($id eq 'BRICK') {
 	    # say "start line=$line1, column=$column1";
 	    # say Data::Dumper::Dumper($brick);
