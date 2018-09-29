@@ -345,7 +345,7 @@ sub lexer {
                       $recce->line_column( $blockID, $eoMatch );
                     push @values,
                       [
-                        'BRICK',                     $thisPos,
+                        'BRICK_C',                     $thisPos,
                         ( $eoMatch + 1 ) - $thisPos, join '',
                         'L',                         $line1,
                         'c',                         $column1,
@@ -379,7 +379,7 @@ sub lexer {
                       $recce->line_column( $blockID, $nextNL );
                     push @values,
                       [
-                        'BRICK',                     $thisPos,
+                        'BRICK_C',                     $thisPos,
                         ( $nextNL + 1 ) - $thisPos, join '',
                         'L',                         $line1,
                         'c',                         $column1,
@@ -601,27 +601,6 @@ sub showBricks {
     return join '', @results;
 }
 
-# This handler assumes a recognizer has been created.  Given
-# an input, an offset into that input, it reads using that recognizer.
-# The return values are the parse value and a new offset in the input.
-# Errors are thrown.
-
-sub getValue {
-    my ( $recce, $target, $input, $offset ) = @_;
-    my $input_length = length ${$input};
-    my $resume_pos;
-    my @values = ();
-
-    # The main read loop.  Read starting at $offset.
-    # If interrupted execute the handler logic,
-    # and, possibly, resume.
-
-    my $thisPos = $recce->read( $input, $offset ) ;
-        divergence('Premature end of parse') if $thisPos < $input_length;
-    return [\@values], $thisPos;
-
-}
-
 sub subParse {
     my ( $grammar, $target, $inputRef ) = @_;
     say STDERR qq{Starting combinator for "$target"}
@@ -659,76 +638,6 @@ sub subParse {
     }
 
     return [@values], $thisPos;
-}
-
-# This utility right now is primarily for testing.  It takes an
-# AST and returns one whose nodes more closely match the standard.
-# Right now, this makes it easy for test cases, but perhaps this
-# could also be the start of a compile/interpretation phase.
-
-# Takes one argument and returns a ref to an array of acceptable
-# nodes.  The array may be empty.  All scalars are acceptable
-# leaf nodes.  Acceptable interior nodes have length at least 1
-# and contain a "standard" symbol name, followed by zero or
-# more acceptable nodes.
-sub pruneNodes {
-    my ($v) = @_;
-
-    state $deleteIfEmpty = {
-        # topdecl => 1,
-        # decl => 1,
-    };
-
-    state $nonStandard = {
-        # apats             => 1,
-    };
-
-    return [] if not defined $v;
-    my $reftype = ref $v;
-    return [$v] if not $reftype; # An acceptable leaf node
-    return pruneNodes($$v) if $reftype eq 'REF';
-    divergence("Tree node has reftype $reftype") if $reftype ne 'ARRAY';
-    my @source = grep { defined } @{$v};
-    my $element_count = scalar @source;
-    return [] if $element_count <= 0; # must have at least one element
-    my $name = shift @source;
-    my $nameReftype = ref $name;
-    # divergence("Tree node name has reftype $nameReftype") if $nameReftype;
-    if ($nameReftype) {
-      my @result = ();
-      ELEMENT:for my $element ($name, @source) {
-	if (ref $element eq 'ARRAY') {
-	  push @result, grep { defined }
-		  map { @{$_}; }
-		  map { pruneNodes($_); }
-		  @{$element}
-		;
-	  next ELEMENT;
-	}
-	push @result, $_;
-      }
-      return [@result];
-    }
-    if (defined $deleteIfEmpty->{$name} and $element_count == 1) {
-      return [];
-    }
-    if (defined $nonStandard->{$name}) {
-      # Not an acceptable branch node, but (hopefully)
-      # its children are acceptable
-      return [ grep { defined }
-	      map { @{$_}; }
-	      map { pruneNodes($_); }
-	      @source
-	    ];
-    }
-
-    # An acceptable branch node
-    my @result = ($name);
-    push @result, grep { defined }
-	    map { @{$_}; }
-	    map { pruneNodes($_); }
-	    @source;
-    return [\@result];
 }
 
 1;
