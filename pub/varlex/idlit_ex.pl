@@ -87,8 +87,7 @@ if (1) {
     say STDERR "small C code block";
     # C code block
     my $sourceFile = <<'EOS';
-    token
-/* test
+    token /* test
 \begin{code}
    */
 \end{code}

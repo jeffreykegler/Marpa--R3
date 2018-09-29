@@ -226,8 +226,9 @@ sub lexer {
 
                 # Find a Tex lexeme
                 # L0_Tex_CodeBlock ~ texCodeBegin anything newLine texCodeEnd
+		pos ${$inputRef} = $thisPos;
                 if ( $expected{L0_Tex_CodeBlock}
-                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E .*? \Q$texCodeEnd\E )/gcxms )
+                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E .*? \Q$texCodeEnd\E )/xms )
                 {
 		    my @values = ();
                     my $match   = $1;
@@ -258,8 +259,9 @@ sub lexer {
                 }
 
 		# Check for stray '\begin{code}' lines
+		pos ${$inputRef} = $thisPos;
                 if ( $expected{L0_Tex_StrayOpenCodeBlock}
-                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E )/gcxms )
+                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E )/xms )
                 {
 		    my @values = ();
                     my $match   = $1;
@@ -296,7 +298,8 @@ sub lexer {
                     last TEX_LEXEME;
                 }
 
-                if ( $expected{L0_Tex_Line} and ${$inputRef} =~ m/\G([^\n]*\n)/gcxms )
+		pos ${$inputRef} = $thisPos;
+                if ( $expected{L0_Tex_Line} and ${$inputRef} =~ m/\G([^\n]*\n)/xms )
                 {
                     my $match = $1;
 		    my $length = length $match;
@@ -310,9 +313,11 @@ sub lexer {
           C_LEXEME: {
 
                 # Find a C lexeme
+		pos ${$inputRef} = $thisPos;
                 if ( $expected{L0_C_Comment}
-                    and ${$inputRef} =~ m{\G ( [/][*] .*? [*][/] )}gcxms )
+                    and ${$inputRef} =~ m{\G ( [/][*] .*? [*][/] )}xms )
                 {
+		    say STDERR "C comment found!!! at " . (pos ${$inputRef});
 		    my @values = ();
                     my $match   = $1;
 		    my $length = length $match;
@@ -327,8 +332,9 @@ sub lexer {
                 }
 
 		# Check for unclosed C comments
+		pos ${$inputRef} = $thisPos;
                 if ( $expected{L0_C_StrayCommentOpen}
-                    and ${$inputRef} =~ m{\G ( [/][*] )}gcxms )
+                    and ${$inputRef} =~ m{\G ( [/][*] )}xms )
                 {
 		    my @values = ();
                     my $match   = $1;
@@ -368,7 +374,8 @@ sub lexer {
 		# For now, an absurdly liberal idea of what a token is -- any
 		# non-whitespace sequence without quotes or slashes.  Quotes
 		# and slashes are taken care of above
-                if ( $expected{L0_C_DivideOp} and ${$inputRef} =~ m{\G([/])}gcxms )
+		pos ${$inputRef} = $thisPos;
+                if ( $expected{L0_C_DivideOp} and ${$inputRef} =~ m{\G([/])}xms )
                 {
                     my $match = $1;
 		    my $value = brick_node($recce, 'BRICK', $match, $thisPos, 
@@ -381,7 +388,8 @@ sub lexer {
 		# For now, an absurdly liberal idea of what a token is -- any
 		# non-whitespace sequence without quotes or slashes.  Quotes
 		# and slashes are taken care of above
-                if ( $expected{L0_C_StrayDoubleQuote} and ${$inputRef} =~ m/\G(["])/gcxms )
+		pos ${$inputRef} = $thisPos;
+                if ( $expected{L0_C_StrayDoubleQuote} and ${$inputRef} =~ m/\G(["])/xms )
                 {
                     my $match = $1;
                     $recce->lexeme_alternative( 'L0_C_StrayDoubleQuote', $match,
@@ -392,7 +400,8 @@ sub lexer {
 		# For now, an absurdly liberal idea of what a token is -- any
 		# non-whitespace sequence without quotes or slashes.  Quotes
 		# and slashes are taken care of above
-                if ( $expected{L0_C_StraySingleQuote} and ${$inputRef} =~ m/\G(['])/gcxms )
+		pos ${$inputRef} = $thisPos;
+                if ( $expected{L0_C_StraySingleQuote} and ${$inputRef} =~ m/\G(['])/xms )
                 {
                     my $match = $1;
                     $recce->lexeme_alternative( 'L0_C_StraySingleQuote', $match,
@@ -403,7 +412,8 @@ sub lexer {
 		# For now, an absurdly liberal idea of what a token is -- any
 		# non-whitespace sequence without quotes or slashes.  Quotes
 		# and slashes are taken care of above
-                if ( $expected{L0_C_Token} and ${$inputRef} =~ m{\G([^\s'"/]+)}gcxms )
+		pos ${$inputRef} = $thisPos;
+                if ( $expected{L0_C_Token} and ${$inputRef} =~ m{\G([^\s'"/]+)}xms )
                 {
                     my $match = $1;
                     my $length = length $match;
@@ -420,8 +430,10 @@ sub lexer {
                 }
 
 		# Whitespace
-                if ( $expected{L0_C_WhiteSpace} and ${$inputRef} =~ m/\G([\s]+)/gcxms )
+		pos ${$inputRef} = $thisPos;
+                if ( $expected{L0_C_WhiteSpace} and ${$inputRef} =~ m/\G([\s]+)/xms )
                 {
+		    say STDERR "C Whitespace found!!! at " . (pos ${$inputRef});
                     my $match  = $1;
                     my $length = length $match;
                     my $value =
