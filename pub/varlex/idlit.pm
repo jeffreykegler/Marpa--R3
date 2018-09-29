@@ -305,6 +305,46 @@ sub lexer {
                         $endPos - $thisPos );
                     last TEX_LEXEME;
                 }
+
+		# Check for stray '\begin{code}' lines
+                if ( $expected{L0_texStrayOpenCodeBlock}
+                    and ${$inputRef} =~ m/\G ( \Q$texCodeBegin\E )/xms )
+                {
+		    my @values = ();
+                    my $match   = $1;
+                    my $eoMatch = $thisPos + (length $match) - 1;
+                    my $nextNL = index( ${$inputRef}, "\n", $eoMatch );
+                    my ( $line1, $column1, $line2, $column2 );
+                    ( $line1, $column1 ) =
+                      $recce->line_column( $blockID, $thisPos );
+                    ( $line2, $column2 ) =
+                      $recce->line_column( $blockID, $nextNL );
+                    push @values,
+                      [
+                        'BRICK',                     $thisPos,
+                        ( $nextNL + 1 ) - $thisPos, join '',
+                        'L',                         $line1,
+                        'c',                         $column1,
+                        '-',                         'L',
+                        $line2,                      'c',
+                        $column2,                    ' stray \begin{code}'
+                      ];
+
+                    # Skip ahead to after next newline.
+                    # Sometime check standards to see it this is OK, but
+                    # for now it is convenient for testing.
+                    my $endPos = $nextNL + 1;
+                    $recce->lexeme_alternative( 'L0_texStrayOpenCodeBlock',
+                        \@values, $endPos - $thisPos );
+		    # Once we've seen a stray open, we can never see a valid
+		    # block.  Every stray open causes a scan to the end of input,
+		    # can in theory they can make a parse go quadratic.  Therefore
+		    # we disable tex Code Blocks -- from now on, we will only look
+		    # for strays.
+		    $disabled{L0_texCodeBlock} = 1;
+                    last TEX_LEXEME;
+                }
+
                 if ( $expected{L0_texLine} and ${$inputRef} =~ m/\G([^\n]*\n)/xms )
                 {
                     my $match = $1;
