@@ -25,8 +25,10 @@ use Marpa::R3 4.001_053;
 require "idlit.pm";
 
 # This trace level above that allowed in test suite
-local $main::TRACE_ES = 0;
-local $main::DEBUG = 0;
+local $main::TRACE_ES;
+$main::TRACE_ES = 0;
+local $main::DEBUG;
+$main::DEBUG = 0;
 
 if (0) {
 
@@ -84,8 +86,28 @@ EOS
 
 if (1) {
 
-    say STDERR "small C code block";
     # C code block
+    my $expected = <<'EOS';
+=== Value 1 ===
+@1-1 L1c1-L1c4 white space, length=4
+@1-1 L1c5-L1c9 token="token"; length=5
+@1-1 L1c10-L1c10 white space, length=1
+@1-3 L1c11-L3c5 comment: "/* test
+\begin{code}
+   */"
+@3-3 L3c6-L3c6 white space, length=1
+@4-4 L4c1-L4c10 token="\end{code}"; length=10
+@4-4 L4c11-L4c11 white space, length=1
+
+=== Value 2 ===
+@1-1 L1c1-L1c18 Tex line: "    token /* test
+"
+@2-2 L2c1-L2c13 \begin{code}
+@3-3 L3c1-L3c6 [CODE]
+@4-4 L4c1-L4c10 \end{code}
+
+EOS
+
     my $sourceFile = <<'EOS';
     token /* test
 \begin{code}
@@ -94,7 +116,7 @@ if (1) {
 EOS
     my $result = MarpaX::R3::Idlit::parse( \$sourceFile );
     # say Data::Dumper::Dumper($result);
-    # eq_or_diff $result, "";
-    say $result;
+    eq_or_diff $result, $expected, "small C code block";
 }
 
+exit 0;

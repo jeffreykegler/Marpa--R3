@@ -313,11 +313,13 @@ sub lexer {
           C_LEXEME: {
 
                 # Find a C lexeme
+
+		# Check for C comments
 		pos ${$inputRef} = $thisPos;
                 if ( $expected{L0_C_Comment}
                     and ${$inputRef} =~ m{\G ( [/][*] .*? [*][/] )}xms )
                 {
-		    say STDERR "C comment found!!! at " . (pos ${$inputRef});
+		    # say STDERR "C comment found!!! at " . (pos ${$inputRef});
 		    my @values = ();
                     my $match   = $1;
 		    my $length = length $match;
@@ -433,7 +435,6 @@ sub lexer {
 		pos ${$inputRef} = $thisPos;
                 if ( $expected{L0_C_WhiteSpace} and ${$inputRef} =~ m/\G([\s]+)/xms )
                 {
-		    say STDERR "C Whitespace found!!! at " . (pos ${$inputRef});
                     my $match  = $1;
                     my $length = length $match;
                     my $value =
@@ -447,19 +448,12 @@ sub lexer {
         }
         my $closest_earleme = $recce->closest_earleme();
 
-# say STDERR join ' ', __LINE__, "closest_earleme=$closest_earleme";
-# say STDERR join ' ', __LINE__, substr(${$inputRef}, $closest_earleme, 10);
-# say STDERR join ' ', __LINE__, 'lexeme_complete(', $thisPos, $closest_earleme - $thisPos, ')';
-
         $thisPos =
           $recce->lexeme_complete( undef, $thisPos,
             $closest_earleme - $thisPos );
 
-        # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
-        # say STDERR join ' ', __LINE__, "thisPos=$thisPos";
     }
 
-    # say STDERR join ' ', __LINE__, substr(${$inputRef}, $thisPos, 10);
 }
 
 # This is the top level parse routine.
@@ -507,14 +501,14 @@ sub parse {
     # Return value and new offset
 
     my $valuer = Marpa::R3::Valuer->new( { recognizer => $recce } );
-    say STDERR $recce->progress_show( 0, -1 );
     my $valueRef;
     my @results = ();
+    my $valueIx = 0;
   VALUE: while (1) {
+	$valueIx++;
         $valueRef = $valuer->value();
         last VALUE if not $valueRef;
-        say STDERR Data::Dumper::Dumper($valueRef);
-        push @results, '=== Value ===';
+        push @results, "=== Value $valueIx ===";
         push @results, showBricks( $recce, $valueRef );
     }
 
