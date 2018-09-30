@@ -8,7 +8,7 @@ test: test_suite undoc_tests
 
 test_suite:
 	@echo NYI
-	# prove -I. long.t short.t semis.t note1.t short13.t idlit.t
+	prove -I. -I../../cpan/lib/ -I../../cpan/blib/arch idlit_ex2.t
 
 undoc_tests:
 	@echo NYI
