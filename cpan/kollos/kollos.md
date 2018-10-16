@@ -4071,6 +4071,7 @@ TODO: Is the status string needed/used?
                 elect_earley_set, l0r:error_description())
         end
         local discarded, high_lexeme_priority = slr:l0_earley_set_examine(working_pos)
+        l0r:progress_report_finish()
         -- PASS 2 --
         slr:lexeme_queue_examine(high_lexeme_priority)
         local accept_q = slr.accept_queue
