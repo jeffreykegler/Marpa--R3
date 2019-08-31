@@ -27,7 +27,7 @@ use POSIX qw(setlocale LC_ALL);
 
 POSIX::setlocale(LC_ALL, "C");
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 use lib 'inc';
 use Marpa::R3::Test;
 use Marpa::R3;
@@ -103,6 +103,51 @@ END_OF_SOURCE
         \$source, $input, $expected_value,
         "Inaccessible g1 symbol: c\n", qq{test "inaccessible is fatal by default"}
         ];
+}
+
+if (1) {
+    my $swestrup_grammar = \(<<'END_OF_SOURCE');
+:default ::= action => [ name, value]
+lexeme default = action => [ name, value]
+
+A ::= B+
+B ::= D | I | C
+D ::= 'D' V
+I ::= 'I' Ds E
+E ::= 'E' C
+E ::= 'E'
+Ds ::= D+
+V ~ N n
+n ~ [^n]
+N ~ [^\n]+
+C ~ '#' N n
+
+:discard ~ w
+w ~ [\s]+
+END_OF_SOURCE
+
+my $input = <<'EOI';
+I
+D MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+E # zzzzzzz
+D X
+EOI
+
+    push @tests_data, [
+        $swestrup_grammar, $input,
+        'Failure in value() method',
+        <<'END_OF_MESSAGE',
+Parse of the input is ambiguous
+Length of symbol "B" at B1L1c1-L3c12 is ambiguous
+  Choices start with: I\nD MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+  Choice 1, length=61, ends at B1L3c12
+  Choice 1 ending: I
+  Choice 1: I\nD MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM\nE # zzzzz
+  Choice 2, length=50, ends at B1L3c1
+  Choice 2: I\nD MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+END_OF_MESSAGE
+        'Bug found by swestrup'
+    ];
 }
 
 ###
