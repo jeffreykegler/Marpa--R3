@@ -1423,7 +1423,7 @@ END_OF_LUA
                     local escaped_input
                     if l0_length > 60 then
                         escaped_input =
-                            slr:reversed_g1_escape(g1_start + g1_length, 60)
+                            slr:reverse_g1_escape(g1_start + g1_length, 60)
                         subpieces[#subpieces+1] = string.format("  Choice %d ending: %s\n",
                             choice_number,
                             escaped_input)

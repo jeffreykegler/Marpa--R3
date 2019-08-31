@@ -4740,14 +4740,14 @@ TODO: Assumes that the value is all on one block.
     -- miranda: section+ forward declarations
     local reverse_sweep_range
     -- miranda: section+ most Lua function definitions
-    local function reverse_sweep_range(slr, g1_last, g1_first)
+    function reverse_sweep_range(slr, g1_last, g1_first)
          local function iter()
              if not g1_first then g1_first = g1_last end
              local g1_ix = g1_last+1
              while true do
                  local this_per_es = slr.per_es[g1_ix]
                  if not this_per_es then return end
-                 local last_sweep_ix = 3*math.tointeger((#this_per_es-1)/3)+1
+                 local last_sweep_ix = 3*math.tointeger((#this_per_es-1)//3)+1
                  for sweep_ix = last_sweep_ix, 1, -3 do
                       coroutine.yield(this_per_es[sweep_ix],
                           this_per_es[sweep_ix+1],
@@ -8246,6 +8246,10 @@ to set and discover various Lua values.
         return reverse_factory_escape(codes, max_length)
     end
 
+```
+
+```
+    -- miranda: section+ diagnostics
     function _M.class_slr.reverse_g1_escape(slr, g1_base, max_length)
 
         -- a worst case maximum, since each g1 location will have
@@ -8256,7 +8260,7 @@ to set and discover various Lua values.
         local function factory()
             local function iter()
                 for this_block, this_start, this_len in
-                    reverse_sweep_range(slr, g1_base - 1, g1_last)
+                    reverse_sweep_range(slr, g1_last, g1_base - 1)
                 do
                    for this_pos = this_start + this_len - 1, this_start, -1 do
                        local codepoint = slr:codepoint_from_pos(this_block, this_pos)
