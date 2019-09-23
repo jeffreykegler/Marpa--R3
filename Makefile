@@ -24,6 +24,8 @@ releng:
 	cd cpan && $(MAKE) distcheck
 	@echo === releng: make dist ===
 	cd cpan && $(MAKE) dist
+	@echo === releng: make disttest ===
+	cd cpan && $(MAKE) disttest
 	@echo === releng: git status ===
 	git status
 
