@@ -12,6 +12,10 @@
 
 Revision history for Marpa::R3
 
+4.001_054 (forked libmarpa 8.6.0) Mon Sep 23 14:40:37 EDT 2019
+
+   * Fix Github issue #48
+
 4.001_053 (forked libmarpa 8.6.0) Thu Sep 20 14:09:02 EDT 2018
 
    * Added variable length lexemes.
